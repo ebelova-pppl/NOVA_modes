@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+
+# Training outputs
+models/
+LISTS/
+*txt
+#notes
+
+# Data
+data/
+tmp*
+*.npy
+*.pt
+*.ckpt
+*.joblib
+*.csv
+
+# Figures
+PLOTS/
+*.png
+
+# System
+.DS_Store
+diff
