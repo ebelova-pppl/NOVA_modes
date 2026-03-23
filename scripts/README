@@ -1,10 +1,6 @@
-legacy/read_nova.py 
-
-reads NOVA output file and makes plots, it has comment describing the data structure in NOVA output file.
 ==========================================================================
-
-legacy/nova_mode_classifier.py     # old name
-rf_train_classify.py               # new name for RF script
+rf_train_classify.py                # new name for RF script
+/legacy/nova_mode_classifier.py     # old name
 
 ### Random Forest classifier
 To train mode_classifier use list of files in 'train_master.csv' and run this:
@@ -75,7 +71,8 @@ To see all options run:
     python view_modes_csv.py -h 
 ================================================================================
 
-legacy/rf_sort_shot.py    # old version, replaced by sort_shot.py
+/legacy/rf_sort_shot.py    # old version, does not check close frequency modes,
+                             use sort_shot.py instead
 _______________
 
 This script walks a shot directory like .../nstx_123456/
@@ -101,7 +98,35 @@ python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
 For help run as; python rf_sort_shot.py -h 
 ================================================================================
 
-utils/merge_lists.py
+sort_shot.py   - new version, which will check close frequency clusters,
+                   and write cluster_report suggesting KEEP/DROP
+_______________
+
+This script does the same as rf_sort_shot.py sorting GOOD/BAD modes, plus
+checks GOOD modes for frequency spacing.
+By default, it will write cluster_report.txt and cluster.csv files in the shot
+directory.
+
+Use as (without moving BAD modes out):
+python sort_shot.py --model nova_mode_classifier.joblib \
+  --rel_freq_tol 0.02 shot_dir
+
+Or as (move BAD modes in /OUT/ dir):
+python sort_shot.py --model nova_mode_classifier.joblib \
+  --move_bad --rel_freq_tol 0.02 shot_dir
+
+where 'rel_freq_tol' is minimum allowed relative frequency spacing,
+'shot_dir' is the shot directory
+
+It will not actually move closely spaced modes, but it will list them in
+cluster.csv and will write 'cluster_report.txt' suggesting which modes should be
+kept/dropped.
+
+For help run as; python sort_shot.py -h
+================================================================================
+
+/utils/merge_lists.py
+
 Merges multiple training CSV file lists into a single master list, fixes relative paths
 by prepending shot-specific base directories, removes duplicates, and keeps only good/bad
 labels (newer labels override older ones).
@@ -120,7 +145,30 @@ To check # of good/bad in the csv list use command:
 awk -F, '{print $2}' train_master.csv | sort | uniq -c
 ================================================================================
 
-utils/find_rf_disagreements.py
+#### rf_oof_check.py
+
+reads train_master.csv (path,label)
+loads each mode + extra scalars (omega, gamma_d, ntor)
+builds X using your compute_features_for_mode(mode, extra_info=...)
+runs OOF using StratifiedKFold
+writes:
+full OOF table: path,manual_label,p_good_oof,oof_pred
+a “suspects” file ranked by confidence: only strong disagreements (default good but p<0.2; bad but p>0.8)
+It also prints a confusion matrix based on OOF predictions at threshold 0.5
+
+python rf_oof_check.py train_master.csv \
+  --model_in nova_mode_classifier.joblib \
+  --out_oof oof_table.csv \
+  --out_suspects oof_suspects.csv \
+  --thr_low 0.2 --thr_high 0.8
+
+Help  - run: python rf_oof_check.py -h
+
+!!! Re-run rf_train_classify.py after this
+
+==================================================================================
+
+/utils/find_rf_disagreements.py
 
 use as:
 python find_rf_disagreements.py \
@@ -132,9 +180,15 @@ Compares manualy sorted labels against Random Forest predictions and outputs
 only modes where RF and manual labels disagree, including RF confidence (p_good); 
 used to identify candidates for targeted label re-checking.
 
-=================================================================================
-List modes with large disagreements (from rf_vs_manual_disagreements.csv):
+---------------
+to list modes with large disagreements (from rf_vs_manual_disagreements.csv):
 
 awk -F, 'NR>1 && ($4<0.2 || $4>0.8)' rf_vs_manual_disagreements.csv 
 
   - saved result in "re-check_list.csv"
+
+================================================================================
+legacy/read_nova.py
+
+reads NOVA output file and makes plots, it has comment describing the data structure in NOVA output file.
+
