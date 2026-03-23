@@ -11,7 +11,7 @@ venv/
 models/
 LISTS/
 *txt
-#notes
+notes
 
 # Data
 data/
