@@ -1,0 +1,140 @@
+legacy/read_nova.py 
+
+reads NOVA output file and makes plots, it has comment describing the data structure in NOVA output file.
+==========================================================================
+
+legacy/nova_mode_classifier.py     # old name
+rf_train_classify.py               # new name for RF script
+
+### Random Forest classifier
+To train mode_classifier use list of files in 'train_master.csv' and run this:
+
+python rf_train_classify.py --train_csv train_master.csv \
+       --model_out nova_mode_classifier.joblib
+
+      'nova_mode_classifier.joblib' is a binary file that stores the trained ML model =
+          = Python object, ie a saved scikit-learn model (StandardScaler + RandomForest)
+
+
+To classify the mode use this replacing /path_to_mode with file path:
+
+   python rf_train_classify.py --model_in nova_mode_classifier.joblib --classify /path_to_mode
+
+### Continuum-aware features (optional)
+The classifier can optionally compute continuum-related features using NOVA continuum
+data (`datcon` file). These features are used in addition to structural/roughness features.
+### Expected `datcon` location and naming
+For a mode file located in a directory like:    .../<shot>/N5/egn05w.XXXXE+YY
+
+the code looks for a continuum file in the SAME directory, with the name:
+- `datcon<n>` where `<n>` is the toroidal mode number inferred from the path, e.g. `datcon5`.
+
+### What happens if `datcon` is missing?
+If the continuum file is not found (or cannot be parsed), the code will:
+1) Print a warning **once per directory** indicating continuum features are disabled, and
+2) Fall back to structural-only features for modes in that directory.
+This means the script  will still work, but results may differ from continuum-aware runs.
+
+### Continuum-derived features used
+When available, the following scalars are appended to the feature vector:
+- `delta2_eff`: mode-weighted effective squared distance (delta_omega^2) from the continuum
+- `r_star`: radius of closest continuum approach/crossing
+- `S`: normalized separation between mode and r_star, S=(rad_loc-r_star)/rad_width
+- `W_star`: mode amplitude^2 at r=r_star
+
+==============================================================================
+
+label_modes_fast.py
+
+script to go through all modes in a directory and sort them as good/bad/skip.
+Label 'skip' means that the mode will not be used for training AI models.
+It saves labeled modes in 'mode_labels.csv' and 'mode_labels_clean.csv' files. 
+
+use as 
+  python label_modes_fast.py dir_name
+
+where dir_name is 'nstx_20113/N1' etc.
+
+Click 'g' or 'b' or 's' to save as good/bad/skip.
+Click 'u' to undo and go back to previous mode. Click 'q' to quit.
+It will restart from the first unsorted mode and will append to the existing list.
+
+It is linked to my RF classifier, and outputs RF mode classification (good/bad) with
+the score (probability) P>0.5 for good. 
+
+If 'datcon#' file is located in the same directory, the script now will mark the closest
+continuum crossing, R*, and will add an extra plot of continuum gap + mode frequency.
+
+================================================================================
+
+view_modes_csv.py
+
+script to plot mode structures from name.csv list.
+Makes same plots as label_modes_fast.py + contour plots of mode(r,m)
+To see all options run: 
+    python view_modes_csv.py -h 
+================================================================================
+
+legacy/rf_sort_shot.py    # old version, replaced by sort_shot.py
+_______________
+
+This script walks a shot directory like .../nstx_123456/
+* finds N1 … N10 subdirs (or whatever exists)
+* scans all files matching egn* in each N#
+* runs existing RF joblib classifier on each mode file
+* writes a per-shot CSV list: path,label,p_good
+* optionally moves bad modes into N#/out/ (creating it if needed)
+NOTE, threshold =0.5 means that mode is bad if p_good < 0.5
+
+Run as (to preview):
+python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
+  --model nova_mode_classifier.joblib \
+  --threshold 0.5 \
+  --move_bad --dry_run
+
+Run as (to actually move bad modes in /out/*):
+python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
+  --model nova_mode_classifier.joblib \
+  --threshold 0.5 \
+  --move_bad
+
+For help run as; python rf_sort_shot.py -h 
+================================================================================
+
+utils/merge_lists.py
+Merges multiple training CSV file lists into a single master list, fixes relative paths
+by prepending shot-specific base directories, removes duplicates, and keeps only good/bad
+labels (newer labels override older ones).
+
+To create a common list from separate shots:
+
+  python merge_lists.py train_master.csv\
+    old_train_list.csv\
+    nstx_120113_labels.csv@/global/cfs/cdirs/m314/nova/nstx_120113\
+    nstx_135388_labels.csv@/global/cfs/cdirs/m314/nova/nstx_135388\
+    nstx_141711_labels.csv@/global/cfs/cdirs/m314/nova/nstx_141711
+
+Here 'old_train_list.csv' is from 1 NSTX-U shot
+
+To check # of good/bad in the csv list use command:
+awk -F, '{print $2}' train_master.csv | sort | uniq -c
+================================================================================
+
+utils/find_rf_disagreements.py
+
+use as:
+python find_rf_disagreements.py \
+  train_master.csv \
+  nova_mode_classifier.joblib \
+  rf_vs_manual_disagreements.csv
+
+Compares manualy sorted labels against Random Forest predictions and outputs 
+only modes where RF and manual labels disagree, including RF confidence (p_good); 
+used to identify candidates for targeted label re-checking.
+
+=================================================================================
+List modes with large disagreements (from rf_vs_manual_disagreements.csv):
+
+awk -F, 'NR>1 && ($4<0.2 || $4>0.8)' rf_vs_manual_disagreements.csv 
+
+  - saved result in "re-check_list.csv"
