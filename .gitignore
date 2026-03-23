@@ -20,7 +20,7 @@ tmp*
 *.pt
 *.ckpt
 *.joblib
-*.csv
+#*.csv
 
 # Figures
 PLOTS/
