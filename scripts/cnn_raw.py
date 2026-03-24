@@ -9,40 +9,14 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import confusion_matrix, classification_report
 
+from nova_mode_loader import load_mode_from_nova
 
 # =========================
 # 0) Plug in your loader
 # =========================
-def load_mode_from_nova(path: str) -> np.ndarray:
-    """
-    It returns a 2D numpy array: mode[m_index, r_index]
-
-    Here f1 is 1D array of size 3*nr*nhar + 4,
-    it contains 3 perturbations: xi_psi, delta_p, xi_surf,
-    and 4 scalar parameters: 
-    f1[0]= omega, 
-    f1[-3]= nr (=number of radial points),
-    f1[-2]= gamma_d of continuum decay, 
-    f1[-1]= ntor
-
-    """
-    f1 = np.fromfile(path)
-
-    omega = f1[0]
-    nr = int(f1[-3])
-    gamma_d = f1[-2]
-    ntor = f1[-1]
-    nhar = int((f1.size-4)/(3*nr))   # number of poloidal harmonics
-
-    #print('omega=',omega,' nr=',nr,' gamma_d=',gamma_d,' ntor=',ntor,' nhar=',nhar)
-    #print('=========================================================')
-
-    f11 =  f1[1:-3].reshape(3,nhar,nr)
-    mode = f11[0,:,:].reshape(nhar,nr)
-
-
-    return mode, omega, gamma_d, ntor
-
+"""
+    Now in nova_mode_loader.py
+"""
 # =========================
 # 1) CSV utilities
 # =========================
