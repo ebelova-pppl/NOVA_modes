@@ -1,3 +1,29 @@
+CNN models scripts:
+
+  cnn_hybrid.py
+  cnn_straightened.py
+  cnn_raw.py
+  cnn_raw_classify.py
+
+to train:    # all assume "train_master.csv" is the labeled list
+module load pytorch
+
+> python cnn_hybrid.py        # uses: nova_mode_loader, mode_transform.py, mode_features.py
+
+> python cnn_straightened.py  # uses: nova_mode_loader, mode_transform.py
+
+> python cnn_raw.py           # uses: nova_mode_loader
+
+to classify:
+> python cnn_raw_classify.py /mode_file_path/
+
+To handle the large variation in the number of poloidal harmonics in NOVA outputs,
+the CNN input was transformed to a straightened ridge representation.
+The dominant harmonic m_c(r) was estimated from a weighted mean of amplitude
+and a small window m_c(r) +/- M was extracted. M~ 8-12
+
+Modified to HybridCNN = 2d mode(m,r) + 8 scalars
+
 ==========================================================================
 rf_train_classify.py                # new name for RF script
 /legacy/nova_mode_classifier.py     # old name
