@@ -10,7 +10,7 @@ venv/
 # Training outputs
 models/
 LISTS/
-*txt
+#*txt
 notes
 
 # Data

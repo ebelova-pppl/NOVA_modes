@@ -1,0 +1,6 @@
+# Perlmutter
+module load python
+module load pytorch     # for CNN models, runs on GPU or CPU
+
+#Flux
+module load anaconda3
