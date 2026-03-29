@@ -12,6 +12,7 @@ models/
 LISTS/
 #*txt
 notes
+notes_vsc
 
 # Data
 data/
