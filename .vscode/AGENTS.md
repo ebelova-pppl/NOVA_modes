@@ -5,8 +5,7 @@
 - Current model pipelines are `scripts/rf_train_classify.py`, `scripts/cnn_raw.py`,
   `scripts/cnn_straightened.py`, and `scripts/cnn_hybrid.py`.
 - Do not hardcode NERSC or Flux absolute paths.
-- Preserve feature-schema consistency between training and inference, it is also used
-  in visualization scripts.
+- Preserve feature-schema consistency between training and inference, and in visualization scripts.
 - Be careful with mode-array axis ordering / flattening conventions.
 
 ## Context files to read first for nontrivial tasks
