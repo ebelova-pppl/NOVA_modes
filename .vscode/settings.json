@@ -1,0 +1,8 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+    "python-envs.terminal.autoActivationType": "command",
+    "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+    "python.analysis.typeCheckingMode": "basic"
+}
