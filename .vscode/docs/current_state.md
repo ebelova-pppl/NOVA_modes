@@ -96,48 +96,46 @@ From cont_features.py:
 -	Used for label validation (flag p < 0.2 or p > 0.8)
 ### CNN
 -	Performance sensitive to seed + learning rate
--	Best:
--	straightened CNN ≈ 96%
--	Typical threshold ≈ 0.55
+-	Best: straightened CNN ≈ 96% (threshold ≈ 0.55)
 
 ## Major updates
 1) Straightened CNN representation
-- Replaced raw (m,r) input with ridge-aligned representation:
-    -	compute m_c(r) via weighted mean
-    -	apply median filter + slew limiter
-    -	extract (2M+1, r) window
-- Result:
-    -	removes dependence on nhar
-    -	focuses on physical ridge
-    -	improved CNN accuracy from ~90% → ~94–96%
+    - Replaced raw (m,r) input with ridge-aligned representation:
+        -	compute m_c(r) via weighted mean
+        -	apply median filter + slew limiter
+        -	extract (2M+1, r) window
+    - Result:
+        -	removes dependence on nhar
+        -	focuses on physical ridge
+        -	improved CNN accuracy from ~90% → ~94–96%
  
 2) sort_shot.py (major new component)
-- New post-processing script for shot-level mode selection:
-- Functionality:
-    -	works with RF, CNN, HybridCNN outputs
-    -	groups modes by close frequency
-    -	compares mode structure using:
-    -	signed ridge profile
-    -	cosine similarity
-    -	radial centroid r0
-    -	quantile width dr
-- Similarity criteria: sim_tol = 0.9, r_tol   = 0.1, width_tol = 0.05
-- Outcome:
-    -	sorts modes for the whole shot, generate lists, move out ‘bad’ modes (optional)
-    -	identifies duplicate / near-duplicate modes for ‘good’ modes
-    -	retains highest-scoring representative
-    -	preserves distinct radial branches
-- Outputs:
-    -	cluster_report.txt — detailed clustering info
-    -	cluster.csv — paths for mode clusters (for inspection)
-- Validated on all 4 shots.
+    - New post-processing script for shot-level mode selection:
+    - Functionality:
+        -	works with RF, CNN, HybridCNN outputs
+        -	groups modes by close frequency
+        -	compares mode structure using:
+        -	signed ridge profile
+        -	cosine similarity
+        -	radial centroid r0
+        -	quantile width dr
+    - Similarity criteria: sim_tol = 0.9, r_tol   = 0.1, width_tol = 0.05
+    - Outcome:
+        -	sorts modes for the whole shot, generate lists, move out ‘bad’ modes (optional)
+        -	identifies duplicate / near-duplicate modes for ‘good’ modes
+        -	retains highest-scoring representative
+        -	preserves distinct radial branches
+    - Outputs:
+        -	cluster_report.txt — detailed clustering info
+        -	cluster.csv — paths for mode clusters (for inspection)
+    - Validated on all 4 shots.
 
 ## Known issues / fixes
 •	Feature mismatch in find_rf_disagreements.py → fixed
 •	Missing datcon handling → warn once, disable continuum features
 
 ## Current tasks
-•	Continue label cleaning (OOF + CNN comparison, discuss with NG)
+•	Continue label cleaning (OOF + CNN comparison)
 •	Compare misclassified modes (RF vs CNN vs HybridCNN)
 •	Update cnn_raw_classify.py for all CNN variants
  
@@ -145,6 +143,23 @@ From cont_features.py:
 •	Add EAEs (second gap) → update continuum features
 •	Extend training to broader frequency range
 •	Investigate surrogate / autoencoder for mode structure
-•	Possibly unify classification + sorting pipeline
+
+## Environment / portability
+- Tested on:
+    -	NERSC Perlmutter ✅ (pytorch, GPU)
+    -	PPPL Flux ✅
+
+## Interpretation of labels
+-	Good: smooth, physical AE structure, reasonable continuum interaction
+-	Bad: spiky, numerical, boundary artifacts
+- Ambiguities: often near continuum crossings
+ 
+## Current understanding
+-	RF is robust and reliable baseline
+-	CNN (straightened) captures structure very well
+-	HybridCNN useful but not optimized yet
+-	Signed ridge profile + quantile width provides a physically meaningful similarity metric
+-	sort_shot.py successfully sorts good/bad and removes duplicates without merging distinct radial modes
+
 
 
