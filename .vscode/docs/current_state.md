@@ -32,3 +32,48 @@ Notes:
 -	one NSTX-U shot had constant nhar = 54
 -	n_r may vary across shots (handled via resampling)
 
+## Models (current)
+1.	RF (Random Forest)
+    -	Scalar + structure-derived + continuum features (~20)
+    -	Accuracy: ~92–95%
+    -	OOF ≈ 93%
+    -	Most robust / interpretable baseline
+2.	CNN (raw)
+    -	Padded/truncated (m,r)
+    -	~90%, it is actually better now ~93% with cleaned training dataset
+3.	CNN (straightened)
+    -	Ridge-aligned representation (2M+1, r)
+    -	Best CNN: ~94–96%
+    -	Less sensitive to nhar variation, it was sensitive to LR => added scheduler
+4.	HybridCNN (image + scalars)
+    -	Includes continuum scalars
+    -	Current: ~94%
+    -	Comparable to RF, out of box – not optimized ye
+
+## Continuum-derived scalars
+From cont_features.py:
+-	r_star — closest approach to continuum
+-	delta2_eff — mode-weighted distance to continuum
+-	S — normalized separation between r0 and r_star
+-	W_star — mode energy near resonance
+
+## Current scripts
+### Common
+-	nova_mode_loader.py
+-	mode_features.py
+-	cont_features.py
+-	mode_transform.py
+-	view_modes_csv.py
+-	sort_shot.py
+### RF
+-	rf_train_classify.py (renamed from nova_mode_classifier.py)
+-	rf_oof_check.py
+-	find_rf_disagreements.py
+-	label_modes_fast.py
+### CNN
+-	cnn_raw.py
+-	cnn_straightened.py
+-	cnn_hybrid.py
+-	cnn_raw_classify.py (needs extension to other CNN models)
+-	plot_straightened_mode.py
+
