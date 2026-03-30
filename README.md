@@ -16,13 +16,13 @@ Current canonical pipelines:
 - `scripts/label_modes_fast.py`
 
 Shared scripts / features:
-- `scripts/mode_features.py`
-- `scripts/cont_features.py`
-- `scripts/mode_transform.py`
-- `scripts/nova_mode_loader.py`
+- `src/mode_features.py`
+- `src/cont_features.py`
+- `src/mode_transform.py`
+- `src/nova_mode_loader.py`
 
 Plotting:
-- `scripts/view_modes_csv.py`
+- `viz/view_modes_csv.py`
 - `viz/plot_straightened_mode.py`
 
 
