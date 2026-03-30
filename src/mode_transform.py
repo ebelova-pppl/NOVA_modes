@@ -57,7 +57,7 @@ def straighten_mode_window(
     center_power: float = 2.0,
     median_k: int = 3,
     max_step: int = 2,
-) -> np.ndarray:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     mode: (n_m, n_r) real (signed) ndarray
     Returns: (2M+1, n_r) windowed & straightened signed mode.

@@ -1,6 +1,6 @@
 import joblib
 import numpy as np
-from nova_mode_classifier import load_mode_from_nova
+from nova_mode_loader import load_mode_from_nova
 from mode_features import compute_features_for_mode
 from add_tools import explain_by_zscores, class_medians
 
