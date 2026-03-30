@@ -87,6 +87,7 @@ def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: flo
     ax.clear()
 
     try:
+        mode, _, _, _ = load_mode_from_nova(mode_path)
         low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)
     except Exception as e:
         ax.text(
@@ -111,7 +112,8 @@ def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: flo
     r_star = None
     if try_rstar:
         try:
-            r_star = get_r_star_for_mode(mode_path, n_r=n_r)
+            cont = continuum_scalars(mode, float(omega), low2, high2, r=r)
+            r_star = float(cont["r_star"])
         except Exception:
             r_star = None
 
