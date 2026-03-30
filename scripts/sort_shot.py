@@ -318,8 +318,8 @@ def radial_centroid(r: np.ndarray, a: np.ndarray) -> Tuple[float, float]:
     a2 = np.asarray(a, dtype=np.float64) ** 2
     wsum = float(np.sum(a2)) + 1e-14
     r0 = float(np.sum(r * a2) / wsum)
-    #dr = float(np.sqrt(np.sum(((r - r0) ** 2) * a2) / wsum))  # Not used
-    return r0 #, dr
+    dr_o = float(np.sqrt(np.sum(((r - r0) ** 2) * a2) / wsum))  # Not used anymore
+    return r0, dr_o
 
 def quantile_width(
     a: np.ndarray,
@@ -432,7 +432,7 @@ def build_mode_dict(
     r = np.linspace(0.0, 1.0, nr, dtype=np.float32)
     mc_float, mc_int = compute_mc_int(mode, center_power=center_power, median_k=median_k, max_step=max_step)
     a = ridge_envelope_profile(mode, mc_int, dm_band=dm_band)
-    r0 = radial_centroid(r, a)
+    r0, dr = radial_centroid(r, a)
     w90, r_lo, r_hi = quantile_width(a, r, q_low=0.10, q_high=0.90)
     dr = w90
 
