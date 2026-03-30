@@ -11,6 +11,7 @@ from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 import joblib
 from mode_features import compute_features_for_mode
+from path_utils import resolve_mode_csv_path
 
 
 # ========================
@@ -69,7 +70,8 @@ def load_labeled_modes(csv_path):
         for row in reader:
             if not row or len(row) < 2:
                 continue
-            file_path, label_str = row[0].strip(), row[1].strip().lower()
+            file_path = resolve_mode_csv_path(row[0])
+            label_str = row[1].strip().lower()
             mode, omega, gamma_d, ntor = load_mode_from_nova(file_path)
             extra_info = {
                "omega": omega,
@@ -283,6 +285,5 @@ if __name__ == "__main__":
         print(f"Predicted label: {label}  (P(good) = {prob_good:.3f})")
         print('=======================================================')
         print('')
-
 
 

@@ -43,6 +43,8 @@ Data format summary
     - n_r (radial grid) may vary between shots
 - Additional data:
     - continuum data (datcon#) one per shot / per ntor: low2(r), high2(r) (Alfvén continuum bounds)
+- Training label CSVs in `training_labels/` store mode paths relative to `$NOVA_DATA`
+  when possible, for example `nstx_120113/N5/egn05w.1234E+02,good`
 - Internal conventions:
     - radial coordinate normalized to [0,1]
     - mode amplitudes normalized (max amplitude = 1)

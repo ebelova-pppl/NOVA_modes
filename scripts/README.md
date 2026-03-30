@@ -12,6 +12,8 @@ This document consolidates scripts related to various models and methods used in
 ### Training
 
 All training scripts assume `train_master.csv` is the labeled list.
+For portability, paths in `training_labels/train_master.csv` should be stored
+relative to `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
 ```bash
 module load pytorch
@@ -40,10 +42,11 @@ Modified to **HybridCNN** = 2D mode `(m, r)` + 8 scalars.
 
 ### Training
 
-To train the mode classifier, use the list of files in `train_master.csv` and run:
+To train the mode classifier, use the list of files in
+`training_labels/train_master.csv` and run:
 
 ```bash
-python rf_train_classify.py --train_csv train_master.csv \
+python rf_train_classify.py --train_csv training_labels/train_master.csv \
        --model_out nova_mode_classifier.joblib
 ```
 
@@ -255,7 +258,7 @@ awk -F, '{print $2}' train_master.csv | sort | uniq -c
 
 This script:
 
-- reads `train_master.csv` (`path,label`)
+- reads `training_labels/train_master.csv` (`path,label`)
 - loads each mode + extra scalars (`omega`, `gamma_d`, `ntor`)
 - builds `X` using `compute_features_for_mode(mode, extra_info=...)`
 - runs OOF using `StratifiedKFold`
@@ -271,7 +274,7 @@ It also prints a confusion matrix based on OOF predictions at threshold `0.5`.
 ### Usage
 
 ```bash
-python rf_oof_check.py train_master.csv \
+python rf_oof_check.py training_labels/train_master.csv \
   --model_in nova_mode_classifier.joblib \
   --out_oof oof_table.csv \
   --out_suspects oof_suspects.csv \
@@ -294,7 +297,7 @@ python rf_oof_check.py -h
 
 ```bash
 python find_rf_disagreements.py \
-  train_master.csv \
+  training_labels/train_master.csv \
   nova_mode_classifier.joblib \
   rf_vs_manual_disagreements.csv
 ```

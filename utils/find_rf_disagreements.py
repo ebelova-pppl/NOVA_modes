@@ -4,6 +4,7 @@ import numpy as np
 import joblib
 
 from mode_features import compute_features_for_mode
+from path_utils import resolve_mode_csv_path
 from pathlib import Path
 """
 Compare manual sorting list with RF list
@@ -73,7 +74,7 @@ def main():
             if not row or len(row) < 2:
                 continue
 
-            path = row[0].strip()
+            path = resolve_mode_csv_path(row[0])
             manual_lab = row[1].strip().lower()
             if manual_lab not in ("good", "bad"):
                 continue
@@ -112,4 +113,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

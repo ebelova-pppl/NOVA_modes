@@ -13,6 +13,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 from nova_mode_loader import load_mode_from_nova
 from cont_features import load_datcon_for_mode, continuum_scalars
 from mode_transform import resample_r, straighten_mode_window
+from path_utils import resolve_mode_csv_path
 from paths import NOVA_DATA, NOVA_TRAIN_CSV
 
 
@@ -58,7 +59,7 @@ def read_train_csv(csv_path: str) -> List[Dict[str, Any]]:
         for row in reader:
             if not row or len(row) < 2:
                 continue
-            p = row[0].strip()
+            p = resolve_mode_csv_path(row[0])
             lab = row[1].strip().lower()
             if lab not in ("good", "bad"):
                 raise ValueError(f"Bad label '{lab}' in {csv_path} for path {p}")
@@ -453,4 +454,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

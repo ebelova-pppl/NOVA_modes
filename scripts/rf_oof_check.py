@@ -11,6 +11,7 @@ import joblib
 
 from nova_mode_loader import load_mode_from_nova      # returns (mode, omega, gamma_d, ntor)
 from mode_features import compute_features_for_mode   # includes full extra_info dict
+from path_utils import resolve_mode_csv_path
 
 
 def read_train_csv(csv_path: str):
@@ -21,7 +22,7 @@ def read_train_csv(csv_path: str):
         for row in r:
             if not row or len(row) < 2:
                 continue
-            p = row[0].strip()
+            p = resolve_mode_csv_path(row[0])
             lab = row[1].strip().lower()
             if lab not in ("good", "bad"):
                 continue
@@ -152,4 +153,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

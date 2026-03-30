@@ -8,6 +8,10 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
     -	NSTX-U: 1 shot
     -	NSTX: 3 shots
     -	DIII-D: optional (future)
+-	Main version-controlled training list:
+    -	`training_labels/train_master.csv`
+    -	mode paths stored relative to `$NOVA_DATA` when possible
+    -	example entry: `nstx_120113/N5/egn05w.1234E+02,good`
 
 Each mode includes:
 -	Scalar metadata:
@@ -160,6 +164,5 @@ From cont_features.py:
 -	HybridCNN useful but not optimized yet
 -	Signed ridge profile + quantile width provides a physically meaningful similarity metric
 -	sort_shot.py successfully sorts good/bad and removes duplicates without merging distinct radial modes
-
 
 

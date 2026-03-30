@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 from nova_mode_loader import load_mode_from_nova        # returns (mode, omega, gamma_d, ntor)
 from cont_features import load_datcon_for_mode, continuum_scalars
+from path_utils import resolve_mode_csv_path
 
 
 def read_mode_csv(csv_path: str):
@@ -27,7 +28,7 @@ def read_mode_csv(csv_path: str):
         for row in r:
             if not row:
                 continue
-            p = row[0].strip()
+            p = resolve_mode_csv_path(row[0])
             if not p or p.lower().startswith("path"):
                 continue
 
