@@ -13,7 +13,7 @@ export NOVA_MODELS="/global/cfs/cdirs/m314/nova/models"
 export NOVA_RESULTS="/global/cfs/cdirs/m314/nova/results"
 
 # Active run area in scratch
-export NOVA_RUN_ROOT="$SCRATCH/nova"
+export NOVA_RUN_ROOT="$SCRATCH/nova_s"
 
 # Version-controlled labeled training list
 export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/train_master.csv"
