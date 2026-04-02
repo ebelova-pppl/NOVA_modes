@@ -11,43 +11,15 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import confusion_matrix, classification_report
 
 from nova_mode_loader import load_mode_from_nova
-from cont_features import load_datcon_for_mode, continuum_scalars
 from mode_transform import resample_r, straighten_mode_window
 from path_utils import resolve_mode_csv_path
 from paths import NOVA_TRAIN_CSV
+from cnn_infer_common import (
+    CHECKPOINT_VERSION,
+    build_hybrid_scalar_vector,
+    build_preprocess_metadata,
+)
 
-
-# =========================
-# 0) Loader(Now in nova_mode_loader.py) + continuum related scalars
-# =========================
-
-def get_cont_scalars(mode_path: str, mode: np.ndarray, omega: float):
-    """
-    Returns a dict with continuum scalars, plus has_cont flag.
-    If datcon missing/unreadable, return safe defaults.
-    """
-    n_r = mode.shape[1]
-    r = np.linspace(0.0, 1.0, n_r)
-
-    try:
-        low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)
-        cont = continuum_scalars(mode, omega, low2, high2, r=r)
-        return {
-            "delta2_eff": float(cont["delta2_eff"]),
-            "r_star":     float(cont["r_star"]),
-            "S":          float(cont["S"]),
-            "W_star":     float(cont["W_star"]),
-            "has_cont":   1.0,
-        }
-    except Exception:
-        # Safe defaults. Keep consistent with RF choices.
-        return {
-            "delta2_eff": 1e3,
-            "r_star": 0.0,
-            "S": 1e3,
-            "W_star": 0.0,
-            "has_cont": 0.0,
-        }
 
 # =========================
 # 1) CSV utilities
@@ -100,18 +72,7 @@ def compute_scalar_stats(train_items, R_target=201):
         mode, omega, gamma_d, ntor = load_mode_from_nova(path)
         mode = resample_r(mode, R_target=R_target) # interpolate in case n_r <> 201
 
-        cont = get_cont_scalars(path, mode, omega)
-
-        x_sc = np.array([
-            float(gamma_d),
-            float(cont["delta2_eff"]),
-            float(cont["W_star"]),
-            float(cont["S"]),
-            float(cont["r_star"]),
-            float(omega),
-            float(ntor),
-            float(cont["has_cont"]),
-        ], dtype=np.float32)
+        x_sc = build_hybrid_scalar_vector(path, mode, omega, gamma_d, ntor)
 
         # Optional: guard against NaN/inf, just in case
         if not np.all(np.isfinite(x_sc)):
@@ -193,17 +154,7 @@ class NovaModeDataset(Dataset):
         x_img = self._normalize(x_img)
 
         # --- scalar branch input ---
-        cont = get_cont_scalars(path, mode, omega)
-        x_sc = np.array([
-            float(gamma_d),
-            float(cont["delta2_eff"]),
-            float(cont["W_star"]),
-            float(cont["S"]),
-            float(cont["r_star"]),
-            float(omega),
-            float(ntor),
-            float(cont["has_cont"]),
-        ], dtype=np.float32)
+        x_sc = build_hybrid_scalar_vector(path, mode, omega, gamma_d, ntor)
 
         # normalize scalars using train-set stats
         if self.scalars_stats is not None:
@@ -437,17 +388,23 @@ def main():
     print("\nClassification report:")
     print(classification_report(y_true, y_pred, target_names=["bad", "good"]))
 
+    preprocess_meta = build_preprocess_metadata(
+        R_target=cfg.R_target,
+        M=cfg.M,
+        center_power=cfg.center_power,
+        median_k=cfg.median_k,
+        max_step=cfg.max_step,
+    )
+
     # Save model
     torch.save({
         "model_state_dict": model.state_dict(),
         "normalize": cfg.normalize,
         "threshold": thresh,
-        "M": cfg.M,
-        "center_power": cfg.center_power,
-        "median_k": cfg.median_k,
-        "max_step": cfg.max_step,
-        "R_target": cfg.R_target,
-        "model_type": "cnn" or "hybrid",
+        "model_type": "cnn_hybrid",
+        "checkpoint_version": CHECKPOINT_VERSION,
+        "preprocess": preprocess_meta,
+        **preprocess_meta,
         "scalars_mu": mu, "scalars_sig": sig,   # only for hybrid
     }, cfg.model_out)
     print(f"\nSaved CNN to {cfg.model_out}")

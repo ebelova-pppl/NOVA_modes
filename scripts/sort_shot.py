@@ -9,7 +9,7 @@ mode types even when their frequencies are close.
 
 Current behavior preserved:
 - walk shot/N1..N10 directories
-- classify each egn* file with an RF classifier
+- classify each egn* file with an RF classifier or CNN checkpoint
 - optionally move BAD modes to N#/out/
 - write CSV with all classified modes
 
@@ -41,6 +41,7 @@ from typing import Any, Dict, Iterable, List, Sequence, Tuple
 import joblib
 import numpy as np
 
+from cnn_infer_common import load_cnn_classifier
 from nova_mode_loader import load_mode_from_nova
 from mode_features import compute_features_for_mode
 
@@ -84,6 +85,35 @@ def classify_mode_rf(clf: Any, mode_path: str) -> Tuple[float, np.ndarray, float
         p_good = float(clf.predict(x)[0])
 
     return p_good, mode, float(omega), float(gamma_d), int(round(float(ntor)))
+
+
+def classify_mode_cnn(clf: Any, mode_path: str, threshold: float | None = None) -> Tuple[float, np.ndarray, float, float, int]:
+    result = clf.predict(mode_path, threshold=threshold, return_mode=True)
+    return (
+        float(result["p_good"]),
+        result["mode"],
+        float(result["omega"]),
+        float(result["gamma_d"]),
+        int(result["ntor"]),
+    )
+
+
+def infer_backend(model_path: str, model_kind: str) -> str:
+    if model_kind == "rf":
+        return "rf"
+    if model_kind in {"cnn_straightened", "cnn_hybrid"}:
+        return "cnn"
+
+    suffix = Path(model_path).suffix.lower()
+    if suffix == ".joblib":
+        return "rf"
+    if suffix == ".pt":
+        return "cnn"
+
+    raise SystemExit(
+        f"Cannot infer backend from model path '{model_path}'. "
+        "Use --model_kind rf, cnn_straightened, or cnn_hybrid."
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -661,13 +691,20 @@ def main() -> None:
         description="Classify NOVA modes in a shot directory and post-process close-frequency GOOD modes."
     )
     ap.add_argument("shot_dir", help="Shot directory, e.g. /global/cfs/cdirs/.../nstx_123456")
-    ap.add_argument("--model", required=True, help="RF model joblib, e.g. nova_mode_classifier.joblib")
+    ap.add_argument("--model", required=True, help="RF .joblib model or CNN .pt checkpoint")
+    ap.add_argument(
+        "--model_kind",
+        choices=["auto", "rf", "cnn_straightened", "cnn_hybrid"],
+        default="auto",
+        help="Override backend/checkpoint type detection",
+    )
+    ap.add_argument("--device", default=None, help="Torch device for CNN inference, e.g. cpu, cuda, cuda:0")
 
     # Preserve current rf_sort_shot.py output behavior
     ap.add_argument("--out_csv", default=None,
                     help="CSV of all classified modes. Default: <shot_dir>/rf_sorted.csv")
-    ap.add_argument("--threshold", type=float, default=0.5,
-                    help="Mode is GOOD if p_good >= threshold (default 0.5)")
+    ap.add_argument("--threshold", type=float, default=None,
+                    help="GOOD threshold override. Default: 0.5 for RF, checkpoint threshold for CNN")
     ap.add_argument("--move_bad", action="store_true", help="Move bad modes to N#/out/")
     ap.add_argument("--dry_run", action="store_true", help="Do not move files; just report and write CSV")
     ap.add_argument("--n_min", type=int, default=1)
@@ -714,10 +751,24 @@ def main() -> None:
     cluster_csv = shot_dir / "cluster.csv"
 
 
-    clf = joblib.load(args.model)
+    backend = infer_backend(args.model, args.model_kind)
+    if backend == "rf":
+        clf = joblib.load(args.model)
+        effective_threshold = 0.5 if args.threshold is None else args.threshold
+    else:
+        cnn_kind = args.model_kind if args.model_kind != "rf" else "auto"
+        try:
+            clf = load_cnn_classifier(args.model, device=args.device, model_kind=cnn_kind)
+        except RuntimeError as exc:
+            raise SystemExit(str(exc))
+        effective_threshold = clf.threshold if args.threshold is None else args.threshold
+
     print(f"Loaded model: {args.model}")
+    print(f"Backend: {backend}")
+    if backend == "cnn":
+        print(f"Checkpoint kind: {clf.checkpoint_kind}")
     print(f"Shot dir: {shot_dir}")
-    print(f"Threshold: {args.threshold}  (good if p_good >= thr)")
+    print(f"Threshold: {effective_threshold}  (good if p_good >= thr)")
     print(f"Post-process: rel_freq_tol={args.rel_freq_tol}, dm_band={args.dm_band}, sim>{args.sim_threshold}, r_tol={args.r_tol}, width_tol={args.width_tol}")
     if args.move_bad:
         print("Will move BAD modes to N#/out/  (use --dry_run to preview)")
@@ -744,8 +795,15 @@ def main() -> None:
         for f in files:
             n_total += 1
             try:
-                p_good, mode, omega, gamma_d, ntor = classify_mode_rf(clf, f)
-                label = "good" if p_good >= args.threshold else "bad"
+                if backend == "rf":
+                    p_good, mode, omega, gamma_d, ntor = classify_mode_rf(clf, f)
+                else:
+                    p_good, mode, omega, gamma_d, ntor = classify_mode_cnn(
+                        clf,
+                        f,
+                        threshold=args.threshold,
+                    )
+                label = "good" if p_good >= effective_threshold else "bad"
             except Exception as e:
                 n_err += 1
                 rows_all.append([f, "error", "", str(e)])

@@ -13,6 +13,7 @@ from nova_mode_loader import load_mode_from_nova
 from mode_transform import resample_r, straighten_mode_window
 from path_utils import resolve_mode_csv_path
 from paths import NOVA_TRAIN_CSV
+from cnn_infer_common import CHECKPOINT_VERSION, build_preprocess_metadata
 
 
 # =========================
@@ -67,9 +68,23 @@ def train_test_split_stratified(items: List[Dict[str, Any]], test_frac=0.2, seed
 # =========================
 
 class NovaModeDataset(Dataset):
-    def __init__(self, items, normalize="robust"):
+    def __init__(
+        self,
+        items,
+        normalize="robust",
+        M=8,
+        center_power=2.0,
+        median_k=3,
+        max_step=2,
+        R_target=201,
+    ):
         self.items = items
         self.normalize = normalize
+        self.M = M
+        self.center_power = center_power
+        self.median_k = median_k
+        self.max_step = max_step
+        self.R_target = R_target
 
     def _normalize(self, x):
         if self.normalize == "none":
@@ -87,7 +102,7 @@ class NovaModeDataset(Dataset):
             mu = float(np.mean(x))
             sig = float(np.std(x)) + 1e-8
             return (x - mu) / sig
-        raise ValueError("normalize must be none|standard|robust")
+        raise ValueError("normalize must be none|standard|robust|maxabs")
 
     def __len__(self):
         return len(self.items)
@@ -96,13 +111,13 @@ class NovaModeDataset(Dataset):
         it = self.items[idx]
         mode, omega, gamma_d, ntor = load_mode_from_nova(it["path"])
 
-        mode = resample_r(mode, R_target=201)
+        mode = resample_r(mode, R_target=self.R_target)
         x2, mc, mc_int = straighten_mode_window(
             mode,
-            M=8,
-            center_power=2.0,
-            median_k=3,
-            max_step=2,
+            M=self.M,
+            center_power=self.center_power,
+            median_k=self.median_k,
+            max_step=self.max_step,
         )  # (25, n_r)
 
         x = x2[None, :, :]  # (1,25,n_r)
@@ -204,6 +219,11 @@ class Config:
     lr: float = 1e-2
     normalize: str = "maxabs" # "robust"  # "none" is OK too since max=1
     model_out: str = "nova_cnn.pt"
+    M: int = 8
+    center_power: float = 2.0
+    median_k: int = 3
+    max_step: int = 2
+    R_target: int = 201
 
 
 def main():
@@ -214,8 +234,24 @@ def main():
 
     print(f"Total modes: {len(items)} | Train: {len(train_items)} | Test: {len(test_items)}")
 
-    train_ds = NovaModeDataset(train_items, normalize=cfg.normalize)
-    test_ds  = NovaModeDataset(test_items, normalize=cfg.normalize)
+    train_ds = NovaModeDataset(
+        train_items,
+        normalize=cfg.normalize,
+        M=cfg.M,
+        center_power=cfg.center_power,
+        median_k=cfg.median_k,
+        max_step=cfg.max_step,
+        R_target=cfg.R_target,
+    )
+    test_ds  = NovaModeDataset(
+        test_items,
+        normalize=cfg.normalize,
+        M=cfg.M,
+        center_power=cfg.center_power,
+        median_k=cfg.median_k,
+        max_step=cfg.max_step,
+        R_target=cfg.R_target,
+    )
 
     train_loader = DataLoader(train_ds, batch_size=cfg.batch_size, shuffle=True,
                               num_workers=0)
@@ -283,11 +319,23 @@ def main():
     print("\nClassification report:")
     print(classification_report(y_true, y_pred, target_names=["bad", "good"]))
 
+    preprocess_meta = build_preprocess_metadata(
+        R_target=cfg.R_target,
+        M=cfg.M,
+        center_power=cfg.center_power,
+        median_k=cfg.median_k,
+        max_step=cfg.max_step,
+    )
+
     # Save model
     torch.save({
         "model_state_dict": model.state_dict(),
         "normalize": cfg.normalize,
-        "threshold": 0.55,
+        "threshold": thr,
+        "model_type": "cnn_straightened",
+        "checkpoint_version": CHECKPOINT_VERSION,
+        "preprocess": preprocess_meta,
+        **preprocess_meta,
     }, cfg.model_out)
     print(f"\nSaved CNN to {cfg.model_out}")
 

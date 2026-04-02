@@ -7,6 +7,7 @@ This document consolidates scripts related to various models and methods used in
 - `cnn_hybrid.py`
 - `cnn_straightened.py`
 - `cnn_raw.py`
+- `cnn_classify.py`
 - `cnn_raw_classify.py`
 
 ### Training
@@ -27,7 +28,14 @@ python cnn_raw.py           # uses: nova_mode_loader
 
 ```bash
 python cnn_raw_classify.py /mode_file_path/
+python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file_path/
+python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
+python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/train_master.csv --out preds.csv
 ```
+
+`cnn_classify.py` is the shared inference entry point for straightened and hybrid
+CNN checkpoints. Older checkpoints that do not save preprocessing metadata fall
+back to the legacy defaults and emit a warning so the behavior is explicit.
 
 To handle the large variation in the number of poloidal harmonics in NOVA outputs, the CNN input was transformed to a straightened ridge representation. The dominant harmonic `m_c(r)` was estimated from a weighted mean of amplitude, and a small window `m_c(r) +/- M` was extracted, with `M ~ 8-12`.
 
@@ -193,7 +201,9 @@ python rf_sort_shot.py -h
 
 New version, which checks close-frequency clusters and writes `cluster_report` suggesting `KEEP` / `DROP`.
 
-This script does the same as `rf_sort_shot.py` for sorting `GOOD` / `BAD` modes, and in addition checks `GOOD` modes for frequency spacing.
+This script does the same as `rf_sort_shot.py` for sorting `GOOD` / `BAD`
+modes, and in addition checks `GOOD` modes for frequency spacing. It can use
+either the RF `.joblib` model or a straightened / hybrid CNN `.pt` checkpoint.
 
 By default, it writes `cluster_report.txt` and `cluster.csv` files in the shot directory.
 
@@ -203,6 +213,9 @@ Without moving bad modes out:
 
 ```bash
 python sort_shot.py --model nova_mode_classifier.joblib \
+  --rel_freq_tol 0.02 shot_dir
+
+python sort_shot.py --model models/nova_cnn_straightened.pt \
   --rel_freq_tol 0.02 shot_dir
 ```
 

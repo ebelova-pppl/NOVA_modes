@@ -52,7 +52,7 @@ Notes:
 4.	HybridCNN (image + scalars)
     -	Includes continuum scalars
     -	Current: ~94%
-    -	Comparable to RF, out of box – not optimized ye
+    -	Comparable to RF, out of box – not optimized yet
 
 ## Continuum-derived scalars
 From cont_features.py:
@@ -78,7 +78,8 @@ From cont_features.py:
 -	cnn_raw.py
 -	cnn_straightened.py
 -	cnn_hybrid.py
--	cnn_raw_classify.py (needs extension to other CNN models)
+-	cnn_classify.py (shared inference for straightened / hybrid checkpoints)
+-	cnn_raw_classify.py
 -	plot_straightened_mode.py
 
 ## Notation
@@ -141,7 +142,7 @@ From cont_features.py:
 ## Current tasks
 •	Continue label cleaning (OOF + CNN comparison)
 •	Compare misclassified modes (RF vs CNN vs HybridCNN)
-•	Update cnn_raw_classify.py for all CNN variants
+•	Validate the shared `cnn_classify.py` inference path on more checkpoints / shots
  
 ## Next tasks
 •	Add EAEs (second gap) → update continuum features
@@ -164,5 +165,4 @@ From cont_features.py:
 -	HybridCNN useful but not optimized yet
 -	Signed ridge profile + quantile width provides a physically meaningful similarity metric
 -	sort_shot.py successfully sorts good/bad and removes duplicates without merging distinct radial modes
-
 
