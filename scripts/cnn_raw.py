@@ -11,6 +11,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 from nova_mode_loader import load_mode_from_nova
 from path_utils import resolve_mode_csv_path
+from paths import NOVA_TRAIN_CSV
 
 # =========================
 # 0) Plug in your loader
@@ -197,7 +198,7 @@ def eval_model(model, loader, device):
 # =========================
 @dataclass
 class Config:
-    train_csv: str = "train_master.csv"     # name is wired here
+    train_csv: str = str(NOVA_TRAIN_CSV)
     test_frac: float = 0.2
     seed: int = 42
     batch_size: int = 32

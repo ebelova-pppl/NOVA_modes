@@ -14,7 +14,7 @@ from nova_mode_loader import load_mode_from_nova
 from cont_features import load_datcon_for_mode, continuum_scalars
 from mode_transform import resample_r, straighten_mode_window
 from path_utils import resolve_mode_csv_path
-from paths import NOVA_DATA, NOVA_TRAIN_CSV
+from paths import NOVA_TRAIN_CSV
 
 
 # =========================
@@ -312,7 +312,7 @@ def eval_model(model, loader, device, thr=0.5):
 # =========================
 @dataclass
 class Config:
-    train_csv: str = "NOVA_TRAIN_CSV"   # "train_master.csv"  - name was wired here
+    train_csv: str = str(NOVA_TRAIN_CSV)
     test_frac: float = 0.2
     seed: int = 42
     batch_size: int = 32

@@ -11,7 +11,7 @@ This document consolidates scripts related to various models and methods used in
 
 ### Training
 
-All training scripts assume `train_master.csv` is the labeled list.
+All CNN training scripts now default to the labeled list from `$NOVA_TRAIN_CSV`.
 For portability, paths in `training_labels/train_master.csv` should be stored
 relative to `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
