@@ -281,8 +281,8 @@ def infer_checkpoint_kind(
         return "cnn_straightened"
     if any(key in checkpoint for key in LEGACY_PREPROCESS_DEFAULTS):
         return "cnn_straightened"
-    if checkpoint.get("normalize") == "maxabs":
-        return "cnn_straightened"
+    #if checkpoint.get("normalize") == "maxabs": ChatGPT did not like this heuristic since normalize could be maxabs for raw model type, but in practice all known straightened checkpoints have maxabs and no known hybrid checkpoints have maxabs, so this is actually a pretty strong signal. Leaving it out for now since it's a bit hacky, but it could be added back as a final heuristic if we find more ambiguous checkpoints in the future.
+    #    return "cnn_straightened"
 
     raise UnsupportedCheckpointError(
         "Checkpoint does not look like a straightened or hybrid CNN checkpoint. "
