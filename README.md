@@ -8,10 +8,12 @@ Main context files:
 - `scripts/README.md` — detailed script inventory and usage notes
 
 Current canonical pipelines:
-- `scripts/rf_pipeline.py`
+- `scripts/rf_train_classify.py`
 - `scripts/cnn_raw.py`
 - `scripts/cnn_straightened.py`
 - `scripts/cnn_hybrid.py`
+- `scripts/cnn_classify.py`
+- `scipts/snn_raw_classify.py`
 - `scripts/sort_shot.py`
 - `scripts/label_modes_fast.py`
 
@@ -20,6 +22,7 @@ Shared scripts / features:
 - `src/cont_features.py`
 - `src/mode_transform.py`
 - `src/nova_mode_loader.py`
+- `scripts/cnn_infer_common.py`
 
 Plotting:
 - `viz/view_modes_csv.py`
