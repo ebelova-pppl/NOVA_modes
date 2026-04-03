@@ -14,5 +14,6 @@
 
 ## Working style
 - For nontrivial refactors, plan first and summarize the plan before editing.
+- Ask clarifying questions if something in the prompt request is ambiguous.
 - Keep diffs scoped.
 - Update docs when behavior or file layout changes.
