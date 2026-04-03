@@ -702,7 +702,7 @@ def main() -> None:
 
     # Preserve current rf_sort_shot.py output behavior
     ap.add_argument("--out_csv", default=None,
-                    help="CSV of all classified modes. Default: <shot_dir>/rf_sorted.csv")
+                    help="CSV of all classified modes. Default: <shot_dir>/all_classified_modes.csv")
     ap.add_argument("--threshold", type=float, default=None,
                     help="GOOD threshold override. Default: 0.5 for RF, checkpoint threshold for CNN")
     ap.add_argument("--move_bad", action="store_true", help="Move bad modes to N#/out/")
@@ -744,7 +744,7 @@ def main() -> None:
         raise SystemExit(f"Shot dir not found: {shot_dir}")
 
     shot_name = shot_dir.name
-    out_csv = Path(args.out_csv) if args.out_csv else shot_dir / "rf_sorted.csv"
+    out_csv = Path(args.out_csv) if args.out_csv else shot_dir / "all_classified_modes.csv"
     good_csv = Path(args.good_csv) if args.good_csv else shot_dir / "good_modes.csv"
     selected_csv = Path(args.selected_csv) if args.selected_csv else shot_dir / "selected_modes.csv"
     cluster_report = Path(args.cluster_report) if args.cluster_report else shot_dir / "cluster_report.txt"
@@ -890,7 +890,10 @@ def main() -> None:
         width_tol=args.width_tol,
     )
 
-    write_cluster_csv(cluster_csv, cluster_records) # list of paths
+    write_cluster_csv(              # list of all modes in clusters with KEEP/DROP label
+        cluster_csv,
+        cluster_records
+    )
 
     print("\n=== Summary ===")
     print(f"Total: {n_total} | Good: {n_good} | Bad: {n_bad} | Errors: {n_err}")
