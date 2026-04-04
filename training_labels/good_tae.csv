@@ -145,7 +145,6 @@ nstx_135388/N10/egn10w.6459E+02,good,tae
 nstx_135388/N10/egn10w.6962E+02,good,tae
 nstx_135388/N10/egn10w.7465E+02,good,tae
 nstx_135388/N10/egn10w.7952E+02,good,tae
-nstx_135388/N10/egn10w.9093E+02,good,tae
 nstx_135388/N10/egn10w.9310E+02,good,tae
 nstx_135388/N2/egn02w.1612E+02,good,tae
 nstx_135388/N2/egn02w.1754E+02,good,tae
@@ -161,7 +160,6 @@ nstx_135388/N3/egn03w.3194E+02,good,tae
 nstx_135388/N3/egn03w.3321E+02,good,tae
 nstx_135388/N3/egn03w.4022E+02,good,tae
 nstx_135388/N3/egn03w.4432E+02,good,tae
-nstx_135388/N3/egn03w.7934E+02,good,tae
 nstx_135388/N4/egn04w.1894E+02,good,tae
 nstx_135388/N4/egn04w.1910E+02,good,tae
 nstx_135388/N4/egn04w.2013E+02,good,tae
@@ -174,7 +172,6 @@ nstx_135388/N4/egn04w.3862E+02,good,tae
 nstx_135388/N4/egn04w.4640E+02,good,tae
 nstx_135388/N4/egn04w.5200E+02,good,tae
 nstx_135388/N4/egn04w.6101E+02,good,tae
-nstx_135388/N4/egn04w.6847E+02,good,tae
 nstx_135388/N5/egn05w.1702E+02,good,tae
 nstx_135388/N5/egn05w.1781E+02,good,tae
 nstx_135388/N5/egn05w.1917E+02,good,tae
@@ -186,10 +183,8 @@ nstx_135388/N5/egn05w.3570E+02,good,tae
 nstx_135388/N5/egn05w.4285E+02,good,tae
 nstx_135388/N5/egn05w.5005E+02,good,tae
 nstx_135388/N5/egn05w.5648E+02,good,tae
-nstx_135388/N5/egn05w.5997E+02,good,tae
 nstx_135388/N5/egn05w.6203E+02,good,tae
 nstx_135388/N5/egn05w.8395E+02,good,tae
-nstx_135388/N5/egn05w.9050E+02,good,tae
 nstx_135388/N6/egn06w.1180E+03,good,tae
 nstx_135388/N6/egn06w.2105E+02,good,tae
 nstx_135388/N6/egn06w.2279E+02,good,tae
@@ -208,13 +203,10 @@ nstx_135388/N6/egn06w.4312E+02,good,tae
 nstx_135388/N6/egn06w.4763E+02,good,tae
 nstx_135388/N6/egn06w.5196E+02,good,tae
 nstx_135388/N6/egn06w.5263E+02,good,tae
-nstx_135388/N6/egn06w.5344E+02,good,tae
 nstx_135388/N6/egn06w.5877E+02,good,tae
 nstx_135388/N6/egn06w.5943E+02,good,tae
 nstx_135388/N6/egn06w.6479E+02,good,tae
 nstx_135388/N6/egn06w.7164E+02,good,tae
-nstx_135388/N6/egn06w.7294E+02,good,tae
-nstx_135388/N6/egn06w.7937E+02,good,tae
 nstx_135388/N6/egn06w.8126E+02,good,tae
 nstx_135388/N6/egn06w.9258E+02,good,tae
 nstx_135388/N7/egn07w.1168E+03,good,tae
@@ -244,7 +236,6 @@ nstx_135388/N7/egn07w.6105E+02,good,tae
 nstx_135388/N7/egn07w.7225E+02,good,tae
 nstx_135388/N7/egn07w.8224E+02,good,tae
 nstx_135388/N7/egn07w.9318E+02,good,tae
-nstx_135388/N7/egn07w.9511E+02,good,tae
 nstx_135388/N8/egn08w.1026E+03,good,tae
 nstx_135388/N8/egn08w.1049E+03,good,tae
 nstx_135388/N8/egn08w.1968E+02,good,tae
@@ -274,14 +265,10 @@ nstx_135388/N8/egn08w.5652E+02,good,tae
 nstx_135388/N8/egn08w.5708E+02,good,tae
 nstx_135388/N8/egn08w.6162E+02,good,tae
 nstx_135388/N8/egn08w.6258E+02,good,tae
-nstx_135388/N8/egn08w.6603E+02,good,tae
 nstx_135388/N8/egn08w.6824E+02,good,tae
 nstx_135388/N8/egn08w.7043E+02,good,tae
-nstx_135388/N8/egn08w.7239E+02,good,tae
 nstx_135388/N8/egn08w.7330E+02,good,tae
-nstx_135388/N8/egn08w.7827E+02,good,tae
 nstx_135388/N8/egn08w.8043E+02,good,tae
-nstx_135388/N8/egn08w.8622E+02,good,tae
 nstx_135388/N8/egn08w.9271E+02,good,tae
 nstx_135388/N9/egn09w.1010E+03,good,tae
 nstx_135388/N9/egn09w.1110E+03,good,tae
@@ -317,12 +304,10 @@ nstx_135388/N9/egn09w.5019E+02,good,tae
 nstx_135388/N9/egn09w.5020E+02,good,tae
 nstx_135388/N9/egn09w.5617E+02,good,tae
 nstx_135388/N9/egn09w.5860E+02,good,tae
-nstx_135388/N9/egn09w.6110E+02,good,tae
 nstx_135388/N9/egn09w.6252E+02,good,tae
 nstx_135388/N9/egn09w.6908E+02,good,tae
 nstx_135388/N9/egn09w.7416E+02,good,tae
 nstx_135388/N9/egn09w.7772E+02,good,tae
-nstx_135388/N9/egn09w.7932E+02,good,tae
 nstx_135388/N9/egn09w.8950E+02,good,tae
 nstx_141711/N1/egn01w.7183E+02,good,tae
 nstx_141711/N2/egn02w.4308E+02,good,tae
@@ -346,7 +331,6 @@ nstx_141711/N5/egn05w.5596E+02,good,tae
 nstx_141711/N5/egn05w.6648E+02,good,tae
 nstx_141711/N5/egn05w.8838E+02,good,tae
 nstx_141711/N6/egn06w.1265E+03,good,tae
-nstx_141711/N6/egn06w.1611E+03,good,tae
 nstx_141711/N6/egn06w.3557E+02,good,tae
 nstx_141711/N6/egn06w.4024E+02,good,tae
 nstx_141711/N6/egn06w.4312E+02,good,tae
@@ -362,7 +346,6 @@ nstx_141711/N7/egn07w.1500E+03,good,tae
 nstx_141711/N7/egn07w.1594E+03,good,tae
 nstx_141711/N7/egn07w.1825E+03,good,tae
 nstx_141711/N7/egn07w.1840E+03,good,tae
-nstx_141711/N7/egn07w.2019E+03,good,tae
 nstx_141711/N7/egn07w.2912E+02,good,tae
 nstx_141711/N7/egn07w.3047E+02,good,tae
 nstx_141711/N7/egn07w.3129E+02,good,tae
@@ -397,7 +380,6 @@ nstx_141711/N9/egn09w.1110E+03,good,tae
 nstx_141711/N9/egn09w.1148E+03,good,tae
 nstx_141711/N9/egn09w.1261E+03,good,tae
 nstx_141711/N9/egn09w.1394E+03,good,tae
-nstx_141711/N9/egn09w.1559E+03,good,tae
 nstx_141711/N9/egn09w.1566E+03,good,tae
 nstx_141711/N9/egn09w.2629E+02,good,tae
 nstx_141711/N9/egn09w.2747E+02,good,tae
@@ -429,3 +411,8 @@ nstx_141711/N10/egn10w.6830E+02,good,tae
 nstx_141711/N10/egn10w.7518E+02,good,tae
 nstx_141711/N10/egn10w.8537E+02,good,tae
 nstx_141711/N10/egn10w.9564E+02,good,tae
+nstxu_204202/N10/egn10w.3556E+02,good,tae
+nstxu_204202/N2/egn02w.6557E+01,good,tae
+nstxu_204202/N3/egn03w.5461E+02,good,tae
+nstxu_204202/N8/egn08w.3721E+02,good,tae
+nstxu_204202/N9/egn09w.3737E+02,good,tae
