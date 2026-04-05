@@ -57,6 +57,11 @@ To train the mode classifier, use the list of files in
 python rf_train_classify.py --train_csv training_labels/train_master.csv \
        --model_out nova_mode_classifier.joblib
 ```
+Or, using env variables and running from $SCRATCH:
+```bash
+python $NOVA_REPO/scripts/rf_train_classify.py --train_csv $NOVA_TRAIN_CSV \
+       --model_out nova_mode_classifier.joblib
+```
 
 `nova_mode_classifier.joblib` is a binary file that stores the trained ML model, i.e. a saved scikit-learn model (`StandardScaler + RandomForest`).
 
