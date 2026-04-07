@@ -156,29 +156,19 @@ def print_feature_importance(clf, feature_names):
         print(f"{name:25s}  {imp:.4f}")
 
 
-def evaluate_classifier(clf, X, y, paths):
+def evaluate_classifier(clf, X, y):
     """
     Optional: split out a test set and print metrics.
     """
 
-    X_train, X_test, y_train, y_test, _paths_train, paths_test = train_test_split(
-        X, y, paths, test_size=0.10, random_state=42, stratify=y
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.10, random_state=42, stratify=y
     )
 
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
-    probs = clf.predict_proba(X_test)[:, 1]
 
-    # Check FP/FN cases
-    wrong = np.where(y_pred != y_test)[0]
-    print("\nMisclassified modes:")
-    print("Path,  true_label,  pred_label,  p_good")
-    for i in wrong:
-        true_lab = "good" if y_test[i] == 1 else "bad"
-        pred_lab = "good" if y_pred[i] == 1 else "bad"
-        print(f"{paths_test[i]}, {true_lab}, {pred_lab}, {probs[i]:.3f}")
-
-    print("\nConfusion matrix (test):")
+    print("Confusion matrix (test):")
     print(confusion_matrix(y_test, y_pred))
     print("\nClassification report (test):")
     print(classification_report(y_test, y_pred))
@@ -272,7 +262,7 @@ if __name__ == "__main__":
         print_feature_importance(clf, feature_names)
 
         # Optional extra evaluation
-        clf = evaluate_classifier(clf, X, y, paths)
+        clf = evaluate_classifier(clf, X, y)
 
         save_model(clf, args.model_out)
 
@@ -295,3 +285,5 @@ if __name__ == "__main__":
         print(f"Predicted label: {label}  (P(good) = {prob_good:.3f})")
         print('=======================================================')
         print('')
+
+

@@ -22,6 +22,8 @@ tmp*
 *.ckpt
 *.joblib
 #*.csv
+.tmp
+*_o.py
 
 # Figures
 PLOTS/
