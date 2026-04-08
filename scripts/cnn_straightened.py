@@ -300,12 +300,13 @@ def main():
     # Check FP cases
     wrong = np.where(y_pred != y_true)[0]
     print("\nMisclassified modes:")
+    print("Path,  true_label,  pred_label,  p_good")
     for i in wrong:
         true_lab = "good" if y_true[i] == 1 else "bad"
         pred_lab = "good" if y_pred[i] == 1 else "bad"
-        print(f"{paths[i]}  true={true_lab}  pred={pred_lab}  p_good={probs[i]:.3f}")
+        print(f"{paths[i]}, {true_lab}, {pred_lab}, {probs[i]:.3f}")
 
-    print("Good modes p_good range:",
+    print("\nGood modes p_good range:",
           probs[y_true==1].min(), probs[y_true==1].max())
     print("Bad modes p_good range:",
           probs[y_true==0].min(), probs[y_true==0].max())
