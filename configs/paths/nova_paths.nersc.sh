@@ -7,8 +7,11 @@
 # Canonical git repo
 export NOVA_REPO="$HOME/src_nova"
 
-# Persistent data / models / saved results
-export NOVA_DATA="/global/cfs/cdirs/m314/nova/data"
+# Persistent data / models / saved results for TAE-only work or for mixed TAE+EAE data sets.
+
+export NOVA_DATA_TAE="/global/cfs/cdirs/m314/nova/data"      # TAE-only data (in main branch)
+export NOVA_DATA_MIXED="/global/cfs/cdirs/m314/nova2/data"   # Mixed TAE+EAE data (for training TAE+EAE models, in mixed_branch)
+export NOVA_DATA=$NOVA_DATA_TAE    # Default to TAE-only data, since that's the main branch. Switch to mixed if working on mixed_branch.
 export NOVA_MODELS="/global/cfs/cdirs/m314/nova/models"
 export NOVA_RESULTS="/global/cfs/cdirs/m314/nova/results"
 
