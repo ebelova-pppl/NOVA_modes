@@ -46,8 +46,10 @@ Data format summary
     - n_r (radial grid) may vary between shots
 - Additional data:
     - continuum data (datcon#) one per shot / per ntor: low2(r), high2(r) (Alfvén continuum bounds)
-- Training label CSVs in `training_labels/` store mode paths relative to `$NOVA_DATA`
+- Training label CSVs in `training_labels/train_mastr.csv` store mode paths relative to `$NOVA_DATA`
   when possible, for example `nstx_120113/N5/egn05w.1234E+02,good`
+  #### NOTE: This baseline uses the frozen TAE-only dataset rooted at $NOVA_DATA_TAE.
+  Training lists in this version are interpreted relative to that root.
 - Internal conventions:
     - radial coordinate normalized to [0,1]
     - mode amplitudes normalized (max amplitude = 1)
@@ -88,3 +90,5 @@ Minimal install / enviroment
 Notes
 - This repository focuses on mode classification and preprocessing, not NOVA itself
 - Scripts are designed to work with existing NOVA output directories: nstxu_123456/N1/.../N10/
+- main branch is frozen TAE-only models and $NOVA_DATA_TAE dataset. git tag tae_only_baseline_v1
+- mixed_branch is for dealing with mixed TAE+EAE data set in $NOVA_DATA_MIXED
