@@ -47,3 +47,7 @@ The mixed/marginal bucket:
     4 tae
 
 ## still need to fix datcon# problem at large r.
+- fixed!
+New results:
+tae_like.csv: 423 tae, 666 none, 3 eae
+eae_like.csv: 348 eae, 0 tae, 1795 none

@@ -103,6 +103,10 @@ If the continuum file is not found (or cannot be parsed), the code will:
 
 This means the script will still work, but results may differ from continuum-aware runs.
 
+Legacy `datcon<N>` files sometimes use a tail sentinel value near `1000.000`
+instead of `NaN`. The shared datcon loader now treats values `> 999` as missing
+so those edge points do not contaminate continuum features or TAE/EAE splitting.
+
 #### Continuum-derived features used
 
 When available, the following scalars are appended to the feature vector:

@@ -4,6 +4,7 @@ import re
 import warnings
 
 _WARNED_DATCON_DIRS = set()
+DATCON_INVALID_SENTINEL_MIN = 999.0
 
 def warn_once_per_dir(mode_path: str, msg: str):
     d = os.path.dirname(os.path.abspath(mode_path))
@@ -19,6 +20,15 @@ def get_ntor_from_path(mode_path: str) -> int:
     if not m:
         raise ValueError(f"Cannot infer ntor from path: {mode_path}")
     return int(m.group(1))
+
+
+def _mask_datcon_invalid(values: np.ndarray) -> np.ndarray:
+    """
+    Treat the legacy datcon sentinel (~1000.000) as missing data.
+    """
+    arr = values.astype(float, copy=True)
+    arr[arr > DATCON_INVALID_SENTINEL_MIN] = np.nan
+    return arr
 
 def load_datcon_for_mode(mode_path: str, n_r: int):
     """
@@ -57,8 +67,8 @@ def load_datcon_for_mode(mode_path: str, n_r: int):
             f"expected ({expected}, 2+)"
         )
 
-    low2 = data[:, 0].astype(float)
-    high2 = data[:, 1].astype(float)
+    low2 = _mask_datcon_invalid(data[:, 0])
+    high2 = _mask_datcon_invalid(data[:, 1])
 
     # Build full arrays on the mode's radial grid
     low2_full = np.full(n_r, np.nan, dtype=float)
@@ -155,4 +165,3 @@ def continuum_scalars(mode, omega, low2_full, high2_full, r=None, alpha=1.0):
         "r0": r0,
         "rw": rw,
     }
-
