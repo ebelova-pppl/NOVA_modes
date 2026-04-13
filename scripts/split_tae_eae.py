@@ -48,14 +48,20 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument(
         "--signed_delta_threshold",
         type=float,
-        default=0.0,
-        help="Threshold for signed_delta; above this counts as below_upper2",
+        default=-0.1,
+        help="Threshold for signed_delta; below this can count as above_upper2 in the low-fraction regime",
     )
     ap.add_argument(
         "--fraction_threshold",
         type=float,
         default=0.5,
         help="Threshold for fraction_below_upper2; above this counts as below_upper2",
+    )
+    ap.add_argument(
+        "--eae_fraction_threshold",
+        type=float,
+        default=0.4,
+        help="Threshold for fraction_below_upper2; below this can count as above_upper2",
     )
     return ap.parse_args()
 
@@ -164,10 +170,13 @@ def classify_gap_region(
     *,
     signed_delta_threshold: float,
     fraction_threshold: float,
-) -> str:
-    if signed_delta > signed_delta_threshold and fraction_below_upper2 > fraction_threshold:
-        return "below_upper2"
-    return "above_upper2"
+    eae_fraction_threshold: float,
+) -> tuple[str, str]:
+    if fraction_below_upper2 > fraction_threshold:
+        return "below_upper2", "below"
+    if fraction_below_upper2 < eae_fraction_threshold and signed_delta < signed_delta_threshold:
+        return "above_upper2", "above"
+    return "mixed", "below"
 
 
 def fmt_float(value: float | None) -> str:
@@ -251,6 +260,7 @@ def main() -> None:
     all_rows: list[dict[str, str]] = []
     below_rows: list[dict[str, str]] = []
     above_rows: list[dict[str, str]] = []
+    mixed_rows: list[dict[str, str]] = []
     error_rows: list[dict[str, str]] = []
 
     for input_row in input_rows:
@@ -285,11 +295,12 @@ def main() -> None:
             if not Path(mode_path).is_file():
                 raise FileNotFoundError(f"Missing mode file: {mode_path}")
             scalars = load_upper2_scalars_for_mode(mode_path)
-            gap_region = classify_gap_region(
+            gap_region, output_group = classify_gap_region(
                 scalars["signed_delta"],
                 scalars["fraction_below_upper2"],
                 signed_delta_threshold=args.signed_delta_threshold,
                 fraction_threshold=args.fraction_threshold,
+                eae_fraction_threshold=args.eae_fraction_threshold,
             )
             row = build_output_row(
                 input_row,
@@ -298,8 +309,10 @@ def main() -> None:
                 gap_region=gap_region,
             )
             all_rows.append(row)
-            if gap_region == "below_upper2":
+            if output_group == "below":
                 below_rows.append(row)
+                if gap_region == "mixed":
+                    mixed_rows.append(row)
             else:
                 above_rows.append(row)
         except FileNotFoundError as exc:
@@ -358,7 +371,9 @@ def main() -> None:
     write_rows_csv(out_all_csv, output_header, all_rows)
 
     print(f"Processed rows: {len(input_rows)}")
-    print(f"Below upper2 (TAE-like): {len(below_rows)}")
+    print(f"Below upper2 (strict TAE-like): {len(below_rows) - len(mixed_rows)}")
+    print(f"Mixed -> TAE-like output: {len(mixed_rows)}")
+    print(f"TAE-like output total: {len(below_rows)}")
     print(f"Above upper2 (EAE-like): {len(above_rows)}")
     print(f"Skipped/errors: {len(error_rows)}")
     print(f"Wrote below-upper2 CSV: {out_below_csv}")
@@ -372,6 +387,7 @@ def main() -> None:
         out_below_csv.name,
         out_above_csv.name,
     )
+    print_group_summary("Mixed", mixed_rows, header)
     print_group_summary("Below upper2", below_rows, header)
     print_group_summary("Above upper2", above_rows, header)
     print_group_summary("Errors", error_rows, header)

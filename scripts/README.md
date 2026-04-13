@@ -122,13 +122,19 @@ gap boundary from the local `datcon<N>` file.
 It reuses the standard NOVA mode loader plus the existing continuum-file lookup
 logic. For each mode it computes:
 
-- `signed_delta`: mode-weighted average of `upper2 - omega^2`
-- `fraction_below_upper2`: weighted fraction of mode energy where `upper2 > omega^2`
+- `dist = sqrt(upper2) - omega`
+- `signed_delta`: weighted mean of `dist`, normalized by the weighted RMS of `dist`
+- `fraction_below_upper2`: weighted fraction of mode energy where `dist > 0`
 
 Default rule:
 
-- `signed_delta > 0` and `fraction_below_upper2 > 0.5` → `below_upper2` (TAE-like)
-- otherwise → `above_upper2` (EAE-like)
+- `fraction_below_upper2 > 0.5` → `below_upper2` (TAE-like)
+- `fraction_below_upper2 < 0.4` and `signed_delta < 0` → `above_upper2` (EAE-like)
+- otherwise → `mixed`
+
+By default, `mixed` rows are written into the TAE-like output CSV so marginal
+modes stay on the TAE side, but the full CSV still records `gap_region=mixed`
+for inspection.
 
 ### Usage
 

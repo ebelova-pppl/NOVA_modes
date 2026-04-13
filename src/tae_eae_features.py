@@ -23,27 +23,37 @@ def upper2_scalars(
 
     Returns:
         signed_delta:
-            Mode-weighted average of (upper2 - omega^2). Positive means mostly
-            below the upper TAE boundary.
+            Weighted mean of (sqrt(upper2) - omega), normalized by the weighted
+            RMS of that same distance. Positive means mostly below the upper
+            TAE boundary.
         fraction_below_upper2:
-            Weighted fraction of mode energy at radii where upper2 > omega^2.
+            Weighted fraction of mode energy at radii where sqrt(upper2) > omega.
     """
     w = mode_weight_profile(mode)
-    omega2 = float(omega) ** 2
-    dist = upper2_full - omega2
+    omega = float(omega)
 
-    mask = np.isfinite(dist) & np.isfinite(w)
+    mask = np.isfinite(upper2_full) & (upper2_full >= 0.0) & np.isfinite(w)
     if not np.any(mask):
-        raise ValueError("No finite overlap between upper2 and radial mode weights")
+        raise ValueError("No finite non-negative overlap between upper2 and radial mode weights")
 
     w_valid = w[mask]
-    dist_valid = dist[mask]
+    upper_valid = np.sqrt(upper2_full[mask])
+    dist_valid = upper_valid - omega
 
     wsum = float(np.nansum(w_valid))
     if not np.isfinite(wsum) or wsum <= 0.0:
         raise ValueError("Zero valid mode weight for upper2 split")
 
-    signed_delta = float(np.nansum(dist_valid * w_valid) / wsum)
+    dist_mean = float(np.nansum(dist_valid * w_valid) / wsum)
+    dist_rms = float(np.sqrt(np.nansum((dist_valid ** 2) * w_valid) / wsum))
+    if not np.isfinite(dist_rms):
+        raise ValueError("Non-finite RMS distance for upper2 split")
+
+    if dist_rms <= 0.0:
+        signed_delta = 0.0
+    else:
+        signed_delta = float(dist_mean / dist_rms)
+
     fraction_below_upper2 = float(np.nansum(w_valid[dist_valid > 0.0]) / wsum)
     fraction_below_upper2 = float(np.clip(fraction_below_upper2, 0.0, 1.0))
 
