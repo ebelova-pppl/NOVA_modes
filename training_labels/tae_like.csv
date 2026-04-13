@@ -1,4 +1,4 @@
-path,col2,col3,signed_delta,fraction_below_upper2,gap_region,error
+path,validity,family,signed_delta,fraction_below_upper2,gap_region,error
 nstxu_204202/N2/egn02w.1705E+02,bad,none,17.56654764637821,1,below_upper2,
 nstxu_204202/N7/egn07w.1291E+02,bad,none,12.52465903148577,1,below_upper2,
 nstxu_204202/N5/egn05w.1124E+02,bad,none,18.00954844784319,1,below_upper2,

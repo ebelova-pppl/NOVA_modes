@@ -12,7 +12,7 @@ ie each record includes: path,validity,family for TAE modes
 
 ### all_modes.csv
 New extended, complete and verified training list.
-Each record includes: path,validity,family
+Includes a header row: path,validity,family
 for all modes, TAEs and EAEs.
 validity: good or bad
 family: tae or eae

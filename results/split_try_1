@@ -1,0 +1,26 @@
+04/13/2026
+
+## New split_tae_eae.py 
+Ran it on training_labels/all_modes.csv with the default thresholds: 
+    signed_delta > 0.0 and fraction_below_upper2 > 0.5
+
+### Results:
+- 235 total modes
+- 986 in tae_like.csv
+- 2249 in eae_like.csv
+- 0 errors in all_modes_tae_eae_split.csv (line 1)
+
+Quick sanity check using label columns:
+    tae_like.csv: 417 tae, 569 none, 0 eae
+    eae_like.csv: 350 eae, 7 tae, 1892 none
+
+### List of 7 modes in training_labels/tae_misplaced_in_eae_like.csv :
+path,col2,col3,signed_delta,fraction_below_upper2,gap_region,error
+nstx_135388/N5/egn05w.8395E+02,good,tae,0.03727673413109521,0.2689921591171584,above_upper2,
+nstx_135388/N6/egn06w.1180E+03,good,tae,-0.521374297997192,0.3420936063124462,above_upper2,
+nstx_135388/N8/egn08w.1026E+03,good,tae,-1.175703271869547,0.5896319443017339,above_upper2,
+nstx_135388/N9/egn09w.1110E+03,good,tae,-1.473620026911137,0.4701264468068584,above_upper2,
+nstx_135388/N9/egn09w.1148E+03,good,tae,-0.3414873119180153,0.5448347014833445,above_upper2,
+nstx_141711/N1/egn01w.7183E+02,good,tae,23.87721483122705,0.3652873892034998,above_upper2,
+- mislabeled (fixed): nstx_141711/N8/egn08w.1239E+03,good,tae,-2.60370647142389,0.00333152065681288,above_upper2, 
+

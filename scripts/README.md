@@ -114,7 +114,7 @@ When available, the following scalars are appended to the feature vector:
 
 ---
 
-## `split_tae_eae.py`
+## Sorting TAEs vs EAEs from mixed data: `split_tae_eae.py`
 
 Split a CSV list of modes into TAE-like vs EAE-like groups using the upper TAE
 gap boundary from the local `datcon<N>` file.
@@ -144,9 +144,13 @@ scalars, and also writes a full CSV with errors and skipped rows. Modes with
 missing / unreadable `datcon` files are written with `gap_region=error` and are
 excluded from the two split output lists.
 
+For headerless three-column inputs like `path,validity,family`, the script
+infers those column names so the output CSVs and terminal summary include the
+family sanity check automatically.
+
 ---
 
-## `label_modes_fast.py`
+##  `label_modes_fast.py`
 
 Script to go through all modes in a directory and sort them as `good` / `bad` / `skip`.
 

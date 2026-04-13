@@ -12,6 +12,8 @@ from tae_eae_features import load_upper2_scalars_for_mode
 
 PATH_HEADER_NAMES = {"path", "filepath", "mode_path"}
 SUMMARY_COLUMNS = ("label", "validity", "family")
+KNOWN_VALIDITY_VALUES = {"good", "bad", "skip"}
+KNOWN_FAMILY_VALUES = {"tae", "eae", "none"}
 EXTRA_OUTPUT_COLUMNS = [
     "signed_delta",
     "fraction_below_upper2",
@@ -73,6 +75,43 @@ def _make_unique_header(names: list[str]) -> list[str]:
     return unique
 
 
+def _observed_values(rows: list[list[str]], idx: int) -> set[str]:
+    values = set()
+    for row in rows:
+        if idx < len(row):
+            value = row[idx].strip().lower()
+            if value:
+                values.add(value)
+    return values
+
+
+def _infer_default_header(raw_rows: list[list[str]], max_width: int) -> list[str]:
+    if max_width <= 0:
+        return []
+
+    header = ["path"]
+    if max_width == 1:
+        return header
+
+    second_values = _observed_values(raw_rows, 1)
+    if second_values and second_values <= KNOWN_VALIDITY_VALUES:
+        header.append("validity")
+    else:
+        header.append("col2")
+
+    if max_width >= 3:
+        third_values = _observed_values(raw_rows, 2)
+        if third_values and third_values <= KNOWN_FAMILY_VALUES:
+            header.append("family")
+        else:
+            header.append("col3")
+
+    if max_width > 3:
+        header.extend(f"col{idx}" for idx in range(4, max_width + 1))
+
+    return header
+
+
 def read_input_rows(csv_path: str) -> tuple[list[str], str, list[dict[str, str]]]:
     with open(csv_path, "r", newline="") as fp:
         reader = csv.reader(fp)
@@ -99,7 +138,7 @@ def read_input_rows(csv_path: str) -> tuple[list[str], str, list[dict[str, str]]
         data_rows = raw_rows[1:]
     else:
         max_width = max(len(row) for row in raw_rows)
-        header = ["path"] + [f"col{idx}" for idx in range(2, max_width + 1)]
+        header = _infer_default_header(raw_rows, max_width)
         header_idx = 0
         data_rows = raw_rows
 
@@ -172,6 +211,26 @@ def print_group_summary(group_name: str, rows: list[dict[str, str]], header: lis
         print(f"{group_name} by {column}:")
         for value, count in sorted(counts.items()):
             print(f"  {value}: {count}")
+
+
+def format_named_counts(rows: list[dict[str, str]], column: str, order: list[str]) -> str:
+    counts = Counter((row.get(column, "") or "<blank>") for row in rows)
+    return ", ".join(f"{counts.get(name, 0)} {name}" for name in order)
+
+
+def print_label_column_check(
+    below_rows: list[dict[str, str]],
+    above_rows: list[dict[str, str]],
+    header: list[str],
+    below_name: str,
+    above_name: str,
+) -> None:
+    if "family" not in header:
+        return
+
+    print("Check using label columns:")
+    print(f"  {below_name}: {format_named_counts(below_rows, 'family', ['tae', 'none', 'eae'])}")
+    print(f"  {above_name}: {format_named_counts(above_rows, 'family', ['eae', 'tae', 'none'])}")
 
 
 def main() -> None:
@@ -306,6 +365,13 @@ def main() -> None:
     print(f"Wrote above-upper2 CSV: {out_above_csv}")
     print(f"Wrote full CSV:         {out_all_csv}")
 
+    print_label_column_check(
+        below_rows,
+        above_rows,
+        header,
+        out_below_csv.name,
+        out_above_csv.name,
+    )
     print_group_summary("Below upper2", below_rows, header)
     print_group_summary("Above upper2", above_rows, header)
     print_group_summary("Errors", error_rows, header)
