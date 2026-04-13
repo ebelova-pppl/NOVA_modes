@@ -9,25 +9,20 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, classification_report
 import joblib
 
+from mode_csv import read_mode_csv_entries
 from nova_mode_loader import load_mode_from_nova      # returns (mode, omega, gamma_d, ntor)
 from mode_features import compute_features_for_mode   # includes full extra_info dict
-from path_utils import resolve_mode_csv_path
 
 
 def read_train_csv(csv_path: str):
     paths = []
     y = []
-    with open(csv_path, "r", newline="") as f:
-        r = csv.reader(f)
-        for row in r:
-            if not row or len(row) < 2:
-                continue
-            p = resolve_mode_csv_path(row[0])
-            lab = row[1].strip().lower()
-            if lab not in ("good", "bad"):
-                continue
-            paths.append(p)
-            y.append(1 if lab == "good" else 0)
+    for p, raw_label in read_mode_csv_entries(csv_path):
+        lab = (raw_label or "").strip().lower()
+        if lab not in ("good", "bad"):
+            continue
+        paths.append(p)
+        y.append(1 if lab == "good" else 0)
     return paths, np.asarray(y, dtype=int)
 
 
@@ -113,7 +108,7 @@ def write_suspects(out_csv, paths, y, p_oof, thr_low=0.2, thr_high=0.8):
 
 def main():
     ap = argparse.ArgumentParser(description="OOF (StratifiedKFold) label-audit for NOVA RF classifier.")
-    ap.add_argument("train_csv", help="CSV with rows: path,label (good/bad)")
+    ap.add_argument("train_csv", help="Training CSV with good/bad labels; optional header row supported")
     ap.add_argument("--model_in", default="nova_mode_classifier.joblib",
                     help="Existing trained model (joblib) used as a template for hyperparams/pipeline.")
     ap.add_argument("--splits", type=int, default=5)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -11,9 +10,9 @@ import torch
 import torch.nn as nn
 
 from cont_features import load_datcon_for_mode, continuum_scalars
+from mode_csv import read_mode_paths_csv as read_mode_paths_csv_shared
 from mode_transform import resample_r, straighten_mode_window
 from nova_mode_loader import load_mode_from_nova
-from path_utils import resolve_mode_csv_path
 
 
 LEGACY_PREPROCESS_DEFAULTS = {
@@ -464,16 +463,4 @@ def classify_mode_cnn_full(
 
 
 def read_mode_paths_csv(csv_path: str) -> list[str]:
-    paths: list[str] = []
-    with open(csv_path, "r", newline="") as fp:
-        reader = csv.reader(fp)
-        for row in reader:
-            if not row:
-                continue
-            first = row[0].strip()
-            if not first or first.startswith("#"):
-                continue
-            if first.lower() == "path":
-                continue
-            paths.append(resolve_mode_csv_path(first))
-    return paths
+    return read_mode_paths_csv_shared(csv_path)

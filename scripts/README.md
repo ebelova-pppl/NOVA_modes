@@ -2,6 +2,11 @@ This document consolidates scripts related to various models and methods used in
 
 # Scripts README
 
+CSV input note: the shared mode-list readers accept either plain data rows or
+an optional header row. Recognized path headers are `path`, `filepath`, and
+`mode_path`; recognized label headers are `label`, `class`, `target`,
+`manual_label`, and `rf_label`. Blank lines and `#` comment lines are ignored.
+
 ## CNN model scripts
 
 - `cnn_hybrid.py`
@@ -308,7 +313,7 @@ awk -F, '{print $2}' train_master.csv | sort | uniq -c
 
 This script:
 
-- reads `training_labels/train_master.csv` (`path,label`)
+- reads `training_labels/train_master.csv` (`path,label`, with or without a header row)
 - loads each mode + extra scalars (`omega`, `gamma_d`, `ntor`)
 - builds `X` using `compute_features_for_mode(mode, extra_info=...)`
 - runs OOF using `StratifiedKFold`

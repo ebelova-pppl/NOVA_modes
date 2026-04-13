@@ -1,5 +1,4 @@
 import os
-import csv
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Any
 
@@ -9,9 +8,9 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import confusion_matrix, classification_report
 
+from mode_csv import read_mode_csv_entries
 from nova_mode_loader import load_mode_from_nova
 from mode_transform import resample_r, straighten_mode_window
-from path_utils import resolve_mode_csv_path
 from paths import NOVA_TRAIN_CSV
 from cnn_infer_common import CHECKPOINT_VERSION, build_preprocess_metadata
 
@@ -27,17 +26,12 @@ from cnn_infer_common import CHECKPOINT_VERSION, build_preprocess_metadata
 # =========================
 def read_train_csv(csv_path: str) -> List[Dict[str, Any]]:
     items = []
-    with open(csv_path, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if not row or len(row) < 2:
-                continue
-            p = resolve_mode_csv_path(row[0])
-            lab = row[1].strip().lower()
-            if lab not in ("good", "bad"):
-                raise ValueError(f"Bad label '{lab}' in {csv_path} for path {p}")
-            y = 1 if lab == "good" else 0
-            items.append({"path": p, "label": y})
+    for p, raw_label in read_mode_csv_entries(csv_path):
+        lab = (raw_label or "").strip().lower()
+        if lab not in ("good", "bad"):
+            raise ValueError(f"Bad label '{lab}' in {csv_path} for path {p}")
+        y = 1 if lab == "good" else 0
+        items.append({"path": p, "label": y})
     return items
 
 

@@ -1,6 +1,5 @@
 #!usr/bin/env python3
 import argparse
-import csv
 import os
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -10,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from nova_mode_loader import load_mode_from_nova        # returns (mode, omega, gamma_d, ntor)
 from cont_features import load_datcon_for_mode, continuum_scalars
-from path_utils import resolve_mode_csv_path
+from mode_csv import read_mode_csv_entries
 
 
 def read_mode_csv(csv_path: str):
@@ -18,28 +17,21 @@ def read_mode_csv(csv_path: str):
     Accepts CSV with either:
       - path,label
       - path
+      - an optional header row using path/filepath/mode_path
     Returns:
       paths:  list[str]
       labels: list[Optional[str]]  # "good"/"bad"/None
     """
     paths, labels = [], []
-    with open(csv_path, "r", newline="") as f:
-        r = csv.reader(f)
-        for row in r:
-            if not row:
-                continue
-            p = resolve_mode_csv_path(row[0])
-            if not p or p.lower().startswith("path"):
-                continue
+    for p, raw_label in read_mode_csv_entries(csv_path):
+        lab = None
+        if raw_label is not None:
+            s = raw_label.strip().lower()
+            if s in ("good", "bad", "g", "b"):
+                lab = "good" if s in ("good", "g") else "bad"
 
-            lab = None
-            if len(row) >= 2:
-                s = row[1].strip().lower()
-                if s in ("good", "bad", "g", "b"):
-                    lab = "good" if s in ("good", "g") else "bad"
-
-            paths.append(p)
-            labels.append(lab)
+        paths.append(p)
+        labels.append(lab)
     return paths, labels
 
 
@@ -143,7 +135,7 @@ def plot_m_spectrum(ax, mode: np.ndarray):
 
 def main():
     ap = argparse.ArgumentParser(description="Browse NOVA mode files listed in a CSV (no labeling).")
-    ap.add_argument("csv", help="CSV containing mode paths (optionally path,label)")
+    ap.add_argument("csv", help="CSV containing mode paths, with or without a header row")
     ap.add_argument("--start", type=int, default=0, help="start index")
     ap.add_argument("--topk", type=int, default=44, help="number of strongest m harmonics to plot in line mode")
     ap.add_argument("--abs", action="store_true", help="plot abs(mode) instead of signed/real mode")

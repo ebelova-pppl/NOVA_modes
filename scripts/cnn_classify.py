@@ -22,7 +22,11 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("model_pos", nargs="?", help="Checkpoint path (positional form: mode_file checkpoint.pt)")
     ap.add_argument("--path", dest="path_opt", help="Mode file path to classify")
     ap.add_argument("--model", dest="model_opt", help="Checkpoint path (.pt)")
-    ap.add_argument("--csv", dest="csv_in", help="CSV list of mode paths (first column is used)")
+    ap.add_argument(
+        "--csv",
+        dest="csv_in",
+        help="CSV list of mode paths (optional header row with path/filepath/mode_path)",
+    )
     ap.add_argument("--out", help="Output CSV path for --csv mode")
     ap.add_argument("--device", help="Torch device, e.g. cpu, cuda, cuda:0")
     ap.add_argument("--threshold", type=float, default=None, help="Override checkpoint threshold")
