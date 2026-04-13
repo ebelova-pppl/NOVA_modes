@@ -109,6 +109,38 @@ When available, the following scalars are appended to the feature vector:
 
 ---
 
+## `split_tae_eae.py`
+
+Split a CSV list of modes into TAE-like vs EAE-like groups using the upper TAE
+gap boundary from the local `datcon<N>` file.
+
+It reuses the standard NOVA mode loader plus the existing continuum-file lookup
+logic. For each mode it computes:
+
+- `signed_delta`: mode-weighted average of `upper2 - omega^2`
+- `fraction_below_upper2`: weighted fraction of mode energy where `upper2 > omega^2`
+
+Default rule:
+
+- `signed_delta > 0` and `fraction_below_upper2 > 0.5` → `below_upper2` (TAE-like)
+- otherwise → `above_upper2` (EAE-like)
+
+### Usage
+
+```bash
+python split_tae_eae.py \
+  --input_csv all_modes.csv \
+  --out_below_csv tae_like.csv \
+  --out_above_csv eae_like.csv
+```
+
+The script preserves original CSV columns when present, appends the new split
+scalars, and also writes a full CSV with errors and skipped rows. Modes with
+missing / unreadable `datcon` files are written with `gap_region=error` and are
+excluded from the two split output lists.
+
+---
+
 ## `label_modes_fast.py`
 
 Script to go through all modes in a directory and sort them as `good` / `bad` / `skip`.

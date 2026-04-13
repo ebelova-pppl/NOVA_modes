@@ -66,9 +66,11 @@ From cont_features.py:
 -	nova_mode_loader.py
 -	mode_features.py
 -	cont_features.py
+-	tae_eae_features.py
 -	mode_transform.py
 -	view_modes_csv.py
 -	sort_shot.py
+-	split_tae_eae.py
 ### RF
 -	rf_train_classify.py (renamed from nova_mode_classifier.py)
 -	rf_oof_check.py
@@ -145,7 +147,7 @@ From cont_features.py:
 •	Validate the shared `cnn_classify.py` inference path on more checkpoints / shots
  
 ## Next tasks
-•	Add EAEs (second gap) → update continuum features
+•	Add EAEs (second gap) more deeply into training / continuum features
 •	Extend training to broader frequency range
 •	Investigate surrogate / autoencoder for mode structure
 
@@ -170,3 +172,6 @@ From cont_features.py:
 Codex: Implemented the new shared CNN classifier in scripts/cnn_infer_common.py and scripts/cnn_classify.py. It supports straightened and hybrid checkpoints, auto-detects hybrid from checkpoint contents, falls back to legacy preprocess defaults (M=8, R_target=201, center_power=2.0, median_k=3, max_step=2) when older checkpoints are missing metadata, and exposes reusable loading/prediction helpers for other scripts.
 
 I also updated scripts/cnn_straightened.py and scripts/cnn_hybrid.py so future checkpoints save preprocess, flat preprocess keys, model_type, and checkpoint_version. scripts/sort_shot.py now accepts either RF .joblib models or CNN .pt checkpoints, and I refreshed scripts/README.md plus docs/project_state.md.
+
+### Project state (2026-04-12)
+Codex: Added `src/tae_eae_features.py` plus `scripts/split_tae_eae.py` to split mixed TAE/EAE mode lists using the upper TAE gap boundary (`high2_full`) from `datcon<N>`. The new workflow computes `signed_delta` and `fraction_below_upper2`, writes separate below/above CSVs, preserves original input columns, and records failures in a full output CSV instead of silently forcing bad rows into either class.
