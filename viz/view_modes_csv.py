@@ -11,6 +11,14 @@ from nova_mode_loader import load_mode_from_nova        # returns (mode, omega, 
 from cont_features import load_datcon_for_mode, continuum_scalars
 from mode_csv import read_mode_csv_entries
 
+DATCON_INVALID_SENTINEL_MIN = 999.0
+
+
+def mask_invalid_datcon_tail(values: np.ndarray) -> np.ndarray:
+    arr = np.asarray(values, dtype=float).copy()
+    arr[arr > DATCON_INVALID_SENTINEL_MIN] = np.nan
+    return arr
+
 
 def read_mode_csv(csv_path: str):
     """
@@ -93,6 +101,9 @@ def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: flo
         )
         ax.set_axis_off()
         return
+
+    low2 = mask_invalid_datcon_tail(low2)
+    high2 = mask_invalid_datcon_tail(high2)
 
     low = np.sqrt(np.clip(low2, 0.0, np.inf))
     high = np.sqrt(np.clip(high2, 0.0, np.inf))
@@ -203,6 +214,8 @@ def main():
             ax_cont.clear()
             try:
                 low2, high2, *_ = load_datcon_for_mode(path, n_r=nr)
+                low2 = mask_invalid_datcon_tail(low2)
+                high2 = mask_invalid_datcon_tail(high2)
                 low = np.sqrt(np.clip(low2, 0.0, np.inf))
                 high = np.sqrt(np.clip(high2, 0.0, np.inf))
 

@@ -291,8 +291,10 @@ def main():
         r = np.linspace(0.0, 1.0, n_r)
         try:
             low2, high2, *_ = load_datcon_for_mode(path, n_r=n_r)
-            low2[low2 > 999] = 300
-            high2[high2 > 999] = 300
+            low2 = low2.copy()
+            high2 = high2.copy()
+            low2[low2 > 999] = np.nan
+            high2[high2 > 999] = np.nan
             plot_continuum_panel(axC, r, omega, low2, high2, title="Alfvén continuum")
         except Exception:
             axC.clear()

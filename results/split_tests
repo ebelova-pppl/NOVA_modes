@@ -51,3 +51,15 @@ The mixed/marginal bucket:
 New results:
 tae_like.csv: 423 tae, 666 none, 3 eae
 eae_like.csv: 348 eae, 0 tae, 1795 none
+
+## Fixed small nhar (n_m) cases - Codex removed them from all_modes.csv list.
+These were nstx_135388/N2-N6/ dirs, total 108 modes (+ N4/ ones I removed manually)
+
+Updated split on the cleaned list:
+    3127 rows total
+    1085 in tae_like.csv (line 1)
+    2042 in eae_like.csv (line 1)
+    0 errors
+Current label check:
+    tae_like.csv: 423 tae, 659 none, 3 eae
+    eae_like.csv: 339 eae, 0 tae, 1703 none
