@@ -133,7 +133,7 @@ logic. For each mode it computes:
 Default rule:
 
 - `fraction_below_upper2 > 0.5` → `below_upper2` (TAE-like)
-- `fraction_below_upper2 < 0.4` and `signed_delta < 0` → `above_upper2` (EAE-like)
+- `fraction_below_upper2 < 0.4` and `signed_delta < -0.1` → `above_upper2` (EAE-like)
 - otherwise → `mixed`
 
 By default, `mixed` rows are written into the TAE-like output CSV so marginal
