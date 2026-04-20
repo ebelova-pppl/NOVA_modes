@@ -175,3 +175,37 @@ I also updated scripts/cnn_straightened.py and scripts/cnn_hybrid.py so future c
 
 ### Project state (2026-04-12)
 Codex: Added `src/tae_eae_features.py` plus `scripts/split_tae_eae.py` to split mixed TAE/EAE mode lists using the upper TAE gap boundary (`high2_full`) from `datcon<N>`. The new workflow computes `signed_delta` and `fraction_below_upper2`, writes separate below/above CSVs, preserves original input columns, and records failures in a full output CSV instead of silently forcing bad rows into either class.
+Summary on TAE/EAE issue: A robust practical separation of TAE-like and EAE-like modes was obtained using two upper-gap metrics: fraction_below_upper2 and normalized_signed_delta. Modes with fraction_below_upper2 > 0.5 were classified as TAE-like; modes with fraction_below_upper2 < 0.4 and normalized_signed_delta < -0.1 were classified as EAE-like; intermediate cases were marked as mixed and included in the TAE-like set to avoid losing marginal TAEs. This recovered all labeled TAEs while keeping clear EAEs separate, and restored the RF classifier performance to near the original TAE-only level.
+
+### 2026-04-20
+Fixed seed generation issue for cnn_straightened.py
+Updated results for new tae_like.csv list (1085 modes):
+    cnn_raw:          best accuracy=0.96, c.matrix:[[127,4][4,81]]
+    cnn_straightened: best accuracy=0.95, c.matrix:[[126,5][8,77]]
+    cnn_hybrid:       best accuracy=0.96, c.matrix:[[129,2][6,79]]
+    RF:               accuracy=0.94, c.matrix= [[62,4][3,40]]
+        === Feature Importances === 
+        delta2_eff 0.1140 
+        W_star 0.1068 
+        max_abs_d1_abs 0.1000 
+        S 0.0946 
+        std_amp 0.0916
+
+Updated results for new eae_like.csv list (2042 modes):
+    cnn_raw:          best accuracy=0.91, c.matrix:[[323  17][ 19  48]]
+        Classification report:
+              precision    recall  f1-score   support
+         bad       0.94      0.95      0.95       340
+        good       0.74      0.72      0.73        67
+    RF:               accuracy=0.94, c.matrix:[[162 9] [ 3 31]] 
+        Classification report (test): 
+          precision recall f1-score support 
+        0  0.98       0.95   0.96     171 
+        1  0.78       0.91   0.84.    34
+        === Feature Importances === 
+        rad_loc 0.1644 
+        rad_width 0.0804 
+        mean_abs_d2_mode 0.0787 
+        gamma_d 0.0611 
+        ntor 0.0540
+### TAE/EAE sorting is solved, now ready to merge mixed_branch back to main
