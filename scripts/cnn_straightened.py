@@ -1,6 +1,6 @@
-import os
+import random
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Any
+from typing import List, Dict, Any
 
 import numpy as np
 import torch
@@ -55,6 +55,16 @@ def train_test_split_stratified(items: List[Dict[str, Any]], test_frac=0.2, seed
     train_items = [items[i] for i in train_idx]
     test_items = [items[i] for i in test_idx]
     return train_items, test_items
+
+
+def seed_everything(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 # =========================
@@ -212,6 +222,7 @@ class Config:
     epochs: int = 80
     lr: float = 1e-2
     normalize: str = "maxabs" # "robust"  # "none" is OK too since max=1
+    eval_threshold: float = 0.55
     model_out: str = "nova_cnn.pt"
     M: int = 8
     center_power: float = 2.0
@@ -222,6 +233,8 @@ class Config:
 
 def main():
     cfg = Config()
+
+    seed_everything(cfg.seed)
 
     items = read_train_csv(cfg.train_csv)
     train_items, test_items = train_test_split_stratified(items, cfg.test_frac, cfg.seed)
@@ -263,6 +276,7 @@ def main():
     )
 
     best_acc = -1.0
+    best_epoch = 0
     best_state = None
 
     for ep in range(1, cfg.epochs + 1):
@@ -272,19 +286,20 @@ def main():
 
         if acc > best_acc:
             best_acc = acc
+            best_epoch = ep
             best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
 
         if ep == 1 or ep % 5 == 0:
             lr = opt.param_groups[0]["lr"]
             print(f"Epoch {ep:3d}/{cfg.epochs} | loss={loss:.4f} | test_acc={acc:.4f} | lr={lr:.2e}")
 
-    print(f"Best test acc: {best_acc:.4f}")
+    print(f"Best test acc: {best_acc:.4f} (epoch {best_epoch})")
     if best_state is not None:
         model.load_state_dict(best_state)
 
     # Final metrics
     acc, probs, y_true, paths = eval_model(model, test_loader, device)
-    thr = 0.55
+    thr = cfg.eval_threshold
     y_pred = (probs >= thr).astype(int)
     #for thr in np.linspace(0.4, 0.75, 8):     # sweep thresholds to check nmber of FPs
         #y_pred = (probs >= thr).astype(int)
@@ -325,8 +340,11 @@ def main():
     # Save model
     torch.save({
         "model_state_dict": model.state_dict(),
+        "seed": cfg.seed,
         "normalize": cfg.normalize,
         "threshold": thr,
+        "best_test_acc": best_acc,
+        "best_epoch": best_epoch,
         "model_type": "cnn_straightened",
         "checkpoint_version": CHECKPOINT_VERSION,
         "preprocess": preprocess_meta,

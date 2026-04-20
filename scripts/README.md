@@ -29,6 +29,9 @@ python cnn_straightened.py  # uses: nova_mode_loader, mode_transform.py
 python cnn_raw.py           # uses: nova_mode_loader
 ```
 
+`cnn_straightened.py` and `cnn_hybrid.py` seed Python, NumPy, and PyTorch from
+their `Config.seed` so training runs are reproducible by default.
+
 ### Classification
 
 ```bash
