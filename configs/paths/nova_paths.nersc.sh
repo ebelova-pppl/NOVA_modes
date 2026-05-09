@@ -4,10 +4,12 @@
 # NOVA AE project paths at NERSC
 # -----------------------------
 
-# Canonical git repo
-export NOVA_REPO_TAE="$HOME/src_nova"                            # Main branch with TAE-only work.
-export NOVA_REPO_MIXED="$HOME/src_nova.worktrees/mixed_branch"   # Mixed TAE+EAE work.
-export NOVA_REPO=$NOVA_REPO_MIXED   # Default to mixed branch, since that's the working branch. Switch to main branch if working on TAE-only.
+# Canonical git repo / worktree
+# Resolve the repo root from this config file so the same file works when it is
+# sourced from either main or a worktree.
+_NOVA_CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export NOVA_REPO="$(cd "${_NOVA_CONFIG_DIR}/../.." && pwd)"
+unset _NOVA_CONFIG_DIR
 
 # Persistent data / models / saved results for TAE-only work or for mixed TAE+EAE data sets.
 
@@ -22,8 +24,8 @@ export NOVA_RUN_RF="$SCRATCH/nova_rf"
 export NOVA_RUN_CNN="$SCRATCH/nova_cnn"
 
 # Version-controlled labeled training list
-export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/train_master.csv"                  # TAE-only training list (in main branch)
-export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/train_master_tae.csv"
+export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/train_master.csv"   # Keep the legacy TAE-only training default for now.
+export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/train_tae.csv"
 export NOVA_TRAIN_CSV_MIXED="$NOVA_REPO/training_labels/all_modes.csv"
 
 # Python imports from src/
