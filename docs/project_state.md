@@ -196,6 +196,7 @@ Modes with fraction_below_upper2 > 0.5 were classified as TAE-like; modes with f
         - std_amp 0.0916
 
 Updated results for new eae_like.csv list (2042 modes):
+
     - cnn_raw:          best accuracy=0.91, c.matrix:[[323  17][ 19  48]]
 
         Classification report:
@@ -219,4 +220,5 @@ Updated results for new eae_like.csv list (2042 modes):
        - gamma_d 0.0611 
        - ntor 0.0540
 
-### TAE/EAE sorting is solved and mixed_branch has been merged back to main
+### 05/09/26 
+TAE/EAE sorting is solved and mixed_branch has been merged back to main
