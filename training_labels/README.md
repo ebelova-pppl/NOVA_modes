@@ -61,6 +61,9 @@ It preserves the original input columns and appends:
 - `gap_region`
 - `error`
 
+`signed_delta` is already normalized: it is the weighted mean of
+`sqrt(upper2) - omega` divided by the weighted RMS of that same distance.
+
 This is the main audit table for checking how each mode was classified.
 
 ### `tae_like.csv`

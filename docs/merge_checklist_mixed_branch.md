@@ -1,15 +1,16 @@
-# Merge Checklist: `mixed_branch` -> `main`
+# Historical Merge Checklist: `mixed_branch` -> `main`
 
 Date: 2026-05-09
 
-This note summarizes the branch diff against `main` and records the final
-checks worth doing before merging.
+This note summarizes the branch diff that was merged into `main` and records
+the final checks that were useful before merging.
 
 Diff basis:
 - `git diff main...HEAD`
 
 Current status:
-- branch is clean
+- `mixed_branch` was merged into `main` in commit `e77dec1`
+- worktree is clean
 - training-label docs are updated
 - split workflow is documented
 - mixed-mode data lists have been cleaned and regenerated
@@ -115,9 +116,9 @@ Notes:
 
 ## Merge-Time Checklist
 
-- [ ] Confirm `main` is up to date before merging.
-- [ ] Recheck `git diff main...mixed_branch` for any last-minute surprises.
-- [ ] Merge the branch and resolve any conflicts in:
+- [x] Confirm `main` is up to date before merging.
+- [x] Recheck `git diff main...mixed_branch` for any last-minute surprises.
+- [x] Merge the branch and resolve any conflicts in:
   - `configs/paths/nova_paths.nersc.sh`
   - `scripts/README.md`
   - `docs/project_state.md`

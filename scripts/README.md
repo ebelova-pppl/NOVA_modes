@@ -17,9 +17,13 @@ an optional header row. Recognized path headers are `path`, `filepath`, and
 
 ### Training
 
-All CNN training scripts now default to the labeled list from `$NOVA_TRAIN_CSV`.
-For portability, paths in `training_labels/train_master.csv` should be stored
-relative to `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
+All CNN training scripts default to the labeled list from `$NOVA_TRAIN_CSV`.
+For portability, paths in training CSVs should be stored relative to
+`$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
+
+The current mixed-mode list is `training_labels/all_modes.csv`. For TAE/EAE
+separated good/bad training, use the split outputs such as
+`training_labels/tae_like.csv` or `training_labels/eae_like.csv`.
 
 ```bash
 module load pytorch
@@ -38,7 +42,7 @@ their `Config.seed` so training runs are reproducible by default.
 python cnn_raw_classify.py /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
-python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/train_master.csv --out preds.csv
+python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like.csv --out preds.csv
 ```
 
 `cnn_classify.py` is the shared inference entry point for straightened and hybrid
@@ -58,11 +62,11 @@ Modified to **HybridCNN** = 2D mode `(m, r)` + 8 scalars.
 
 ### Training
 
-To train the mode classifier, use the list of files in
-`training_labels/train_master.csv` and run:
+To train the mode classifier, use the relevant labeled list. For example, to
+train on the TAE-like side of the mixed data:
 
 ```bash
-python rf_train_classify.py --train_csv training_labels/train_master.csv \
+python rf_train_classify.py --train_csv training_labels/tae_like.csv \
        --model_out nova_mode_classifier.joblib
 ```
 Or, using env variables and running from $SCRATCH:
@@ -147,9 +151,9 @@ for inspection.
 
 ```bash
 python split_tae_eae.py \
-  --input_csv all_modes.csv \
-  --out_below_csv tae_like.csv \
-  --out_above_csv eae_like.csv
+  --input_csv training_labels/all_modes.csv \
+  --out_below_csv training_labels/tae_like.csv \
+  --out_above_csv training_labels/eae_like.csv
 ```
 
 The script preserves original CSV columns when present, appends the new split
@@ -330,7 +334,7 @@ awk -F, '{print $2}' train_master.csv | sort | uniq -c
 
 This script:
 
-- reads `training_labels/train_master.csv` (`path,label`, with or without a header row)
+- reads a labeled training CSV such as `training_labels/tae_like.csv` (`path,label`, with or without a header row)
 - loads each mode + extra scalars (`omega`, `gamma_d`, `ntor`)
 - builds `X` using `compute_features_for_mode(mode, extra_info=...)`
 - runs OOF using `StratifiedKFold`
@@ -346,7 +350,7 @@ It also prints a confusion matrix based on OOF predictions at threshold `0.5`.
 ### Usage
 
 ```bash
-python rf_oof_check.py training_labels/train_master.csv \
+python rf_oof_check.py training_labels/tae_like.csv \
   --model_in nova_mode_classifier.joblib \
   --out_oof oof_table.csv \
   --out_suspects oof_suspects.csv \
@@ -369,7 +373,7 @@ python rf_oof_check.py -h
 
 ```bash
 python find_rf_disagreements.py \
-  training_labels/train_master.csv \
+  training_labels/tae_like.csv \
   nova_mode_classifier.joblib \
   rf_vs_manual_disagreements.csv
 ```

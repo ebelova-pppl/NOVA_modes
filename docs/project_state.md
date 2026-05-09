@@ -175,7 +175,7 @@ I also updated scripts/cnn_straightened.py and scripts/cnn_hybrid.py so future c
 
 ### Project state (2026-04-12)
 Codex: Added `src/tae_eae_features.py` plus `scripts/split_tae_eae.py` to split mixed TAE/EAE mode lists using the upper TAE gap boundary (`high2_full`) from `datcon<N>`. The new workflow computes `signed_delta` and `fraction_below_upper2`, writes separate below/above CSVs, preserves original input columns, and records failures in a full output CSV instead of silently forcing bad rows into either class.
-Summary on TAE/EAE issue: A robust practical separation of TAE-like and EAE-like modes was obtained using two upper-gap metrics: fraction_below_upper2 and normalized_signed_delta. Modes with fraction_below_upper2 > 0.5 were classified as TAE-like; modes with fraction_below_upper2 < 0.4 and normalized_signed_delta < -0.1 were classified as EAE-like; intermediate cases were marked as mixed and included in the TAE-like set to avoid losing marginal TAEs. This recovered all labeled TAEs while keeping clear EAEs separate, and restored the RF classifier performance to near the original TAE-only level.
+Summary on TAE/EAE issue: A robust practical separation of TAE-like and EAE-like modes was obtained using two upper-gap metrics: fraction_below_upper2 and signed_delta. The signed_delta value is the weighted mean of sqrt(upper2) - omega normalized by its weighted RMS. Modes with fraction_below_upper2 > 0.5 were classified as TAE-like; modes with fraction_below_upper2 < 0.4 and signed_delta < -0.1 were classified as EAE-like; intermediate cases were marked as mixed and included in the TAE-like set to avoid losing marginal TAEs. This recovered all labeled TAEs while keeping clear EAEs separate, and restored the RF classifier performance to near the original TAE-only level.
 
 ### 2026-04-20
 Fixed seed generation issue for cnn_straightened.py
@@ -208,4 +208,4 @@ Updated results for new eae_like.csv list (2042 modes):
         mean_abs_d2_mode 0.0787 
         gamma_d 0.0611 
         ntor 0.0540
-### TAE/EAE sorting is solved, now ready to merge mixed_branch back to main
+### TAE/EAE sorting is solved and mixed_branch has been merged back to main
