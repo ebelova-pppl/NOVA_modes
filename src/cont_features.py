@@ -4,6 +4,10 @@ import re
 import warnings
 
 _WARNED_DATCON_DIRS = set()
+DATCON_INVALID_SENTINEL_MIN = 999.0
+DATCON_TAIL_SPIKE_FACTOR = 3.0
+DATCON_TAIL_SPIKE_ABS_MIN = 50.0
+DATCON_TAIL_LOOKBACK = 4
 
 def warn_once_per_dir(mode_path: str, msg: str):
     d = os.path.dirname(os.path.abspath(mode_path))
@@ -19,6 +23,58 @@ def get_ntor_from_path(mode_path: str) -> int:
     if not m:
         raise ValueError(f"Cannot infer ntor from path: {mode_path}")
     return int(m.group(1))
+
+
+def _mask_datcon_invalid(values: np.ndarray) -> np.ndarray:
+    """
+    Treat the legacy datcon sentinel (~1000.000) as missing data.
+    """
+    arr = values.astype(float, copy=True)
+    arr[arr > DATCON_INVALID_SENTINEL_MIN] = np.nan
+    return arr
+
+
+def _trim_trailing_datcon_spikes(values: np.ndarray) -> np.ndarray:
+    """
+    Trim extra bogus tail points immediately before the masked datcon sentinel.
+
+    Some legacy datcon files contain one more unphysical trailing value before
+    the explicit 1000.000 sentinel region. We only trim at the tail, and only
+    when the last finite point is both:
+    - several times larger than the recent finite tail values, and
+    - large in absolute terms, to avoid overreacting near zero.
+    """
+    arr = values.astype(float, copy=True)
+
+    while True:
+        finite_idx = np.flatnonzero(np.isfinite(arr))
+        if finite_idx.size < DATCON_TAIL_LOOKBACK + 1:
+            break
+
+        last = int(finite_idx[-1])
+        if last == arr.size - 1:
+            break
+
+        prev_idx = finite_idx[-(DATCON_TAIL_LOOKBACK + 1):-1]
+        prev = arr[prev_idx]
+        prev = prev[np.isfinite(prev)]
+        if prev.size < 3:
+            break
+
+        prev_max = float(np.max(prev))
+        last_val = float(arr[last])
+
+        if (
+            prev_max > 0.0
+            and last_val > DATCON_TAIL_SPIKE_FACTOR * prev_max
+            and last_val > DATCON_TAIL_SPIKE_ABS_MIN
+        ):
+            arr[last] = np.nan
+            continue
+
+        break
+
+    return arr
 
 def load_datcon_for_mode(mode_path: str, n_r: int):
     """
@@ -57,8 +113,8 @@ def load_datcon_for_mode(mode_path: str, n_r: int):
             f"expected ({expected}, 2+)"
         )
 
-    low2 = data[:, 0].astype(float)
-    high2 = data[:, 1].astype(float)
+    low2 = _trim_trailing_datcon_spikes(_mask_datcon_invalid(data[:, 0]))
+    high2 = _trim_trailing_datcon_spikes(_mask_datcon_invalid(data[:, 1]))
 
     # Build full arrays on the mode's radial grid
     low2_full = np.full(n_r, np.nan, dtype=float)
@@ -155,4 +211,3 @@ def continuum_scalars(mode, omega, low2_full, high2_full, r=None, alpha=1.0):
         "r0": r0,
         "rw": rw,
     }
-

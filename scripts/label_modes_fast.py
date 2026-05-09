@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import joblib
+from mode_csv import read_mode_csv_entries
 from mode_features import compute_features_for_mode
 from cont_features import load_datcon_for_mode, continuum_scalars
 
@@ -70,12 +71,10 @@ def read_labels(csv_path: str) -> Dict[str, str]:
     labels = {}
     if not os.path.exists(csv_path):
         return labels
-    with open(csv_path, "r", newline="") as f:
-        r = csv.reader(f)
-        for row in r:
-            if not row or len(row) < 2:
-                continue
-            labels[row[0]] = row[1].strip().lower()
+    for path, label in read_mode_csv_entries(csv_path, resolve_paths=False):
+        if label is None:
+            continue
+        labels[path] = label.strip().lower()
     return labels
 
 
@@ -292,8 +291,10 @@ def main():
         r = np.linspace(0.0, 1.0, n_r)
         try:
             low2, high2, *_ = load_datcon_for_mode(path, n_r=n_r)
-            low2[low2 > 999] = 300
-            high2[high2 > 999] = 300
+            low2 = low2.copy()
+            high2 = high2.copy()
+            low2[low2 > 999] = np.nan
+            high2[high2 > 999] = np.nan
             plot_continuum_panel(axC, r, omega, low2, high2, title="Alfvén continuum")
         except Exception:
             axC.clear()
@@ -357,4 +358,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

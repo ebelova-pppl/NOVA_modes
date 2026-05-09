@@ -1,5 +1,4 @@
 import numpy as np
-import csv
 import os
 import warnings
 from pathlib import Path
@@ -11,7 +10,7 @@ from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 import joblib
 from mode_features import compute_features_for_mode
-from path_utils import resolve_mode_csv_path
+from mode_csv import read_mode_csv_entries
 
 
 # ========================
@@ -54,7 +53,8 @@ def load_mode_from_nova(path):
 
 def load_labeled_modes(csv_path):
     """
-    csv_path: CSV with lines 'filepath,label' where label is 'good' or 'bad'.
+    csv_path: CSV with path,label rows and an optional header row.
+    Label must be 'good' or 'bad'.
     Returns:
         modes: list of 2D numpy arrays
         y:     list of integer labels (0 = bad, 1 = good)
@@ -65,32 +65,27 @@ def load_labeled_modes(csv_path):
     paths = []
     extra_infos = []
 
-    with open(csv_path, "r") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if not row or len(row) < 2:
-                continue
-            file_path = resolve_mode_csv_path(row[0])
-            label_str = row[1].strip().lower()
-            mode, omega, gamma_d, ntor = load_mode_from_nova(file_path)
-            extra_info = {
-               "omega": omega,
-               "gamma_d": gamma_d,
-               "ntor": ntor,
-               "path": file_path,
-            }
+    for file_path, raw_label in read_mode_csv_entries(csv_path):
+        label_str = (raw_label or "").strip().lower()
+        mode, omega, gamma_d, ntor = load_mode_from_nova(file_path)
+        extra_info = {
+           "omega": omega,
+           "gamma_d": gamma_d,
+           "ntor": ntor,
+           "path": file_path,
+        }
 
-            feats = compute_features_for_mode(mode, extra_info)
+        feats = compute_features_for_mode(mode, extra_info)
 
-            # map labels: good -> 1, bad -> 0
-            if label_str not in ("good", "bad"):
-                raise ValueError(f"Unknown label {label_str} in {csv_path}")
-            label = 1 if label_str == "good" else 0
+        # map labels: good -> 1, bad -> 0
+        if label_str not in ("good", "bad"):
+            raise ValueError(f"Unknown label {label_str} in {csv_path}")
+        label = 1 if label_str == "good" else 0
 
-            modes.append(mode)
-            labels.append(label)
-            paths.append(file_path)
-            extra_infos.append(extra_info)
+        modes.append(mode)
+        labels.append(label)
+        paths.append(file_path)
+        extra_infos.append(extra_info)
 
     return modes, np.array(labels), paths, extra_infos
 
@@ -231,7 +226,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Train or apply an ML classifier to sort NOVA TAE modes (good vs bad)."
     )
-    parser.add_argument("--train_csv", type=str, help="CSV file with 'path,label' for training.")
+    parser.add_argument(
+        "--train_csv",
+        type=str,
+        help="Training CSV with path,label rows, with or without a header row.",
+    )
     parser.add_argument("--model_out", type=str, default="nova_mode_classifier.joblib",
                         help="Path to save trained model.")
     parser.add_argument("--classify", type=str, default=None,

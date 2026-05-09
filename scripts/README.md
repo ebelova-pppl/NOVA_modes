@@ -2,6 +2,11 @@ This document consolidates scripts related to various models and methods used in
 
 # Scripts README
 
+CSV input note: the shared mode-list readers accept either plain data rows or
+an optional header row. Recognized path headers are `path`, `filepath`, and
+`mode_path`; recognized label headers are `label`, `class`, `target`,
+`manual_label`, and `rf_label`. Blank lines and `#` comment lines are ignored.
+
 ## CNN model scripts
 
 - `cnn_hybrid.py`
@@ -23,6 +28,9 @@ python cnn_hybrid.py        # uses: nova_mode_loader, mode_transform.py, mode_fe
 python cnn_straightened.py  # uses: nova_mode_loader, mode_transform.py
 python cnn_raw.py           # uses: nova_mode_loader
 ```
+
+`cnn_straightened.py` and `cnn_hybrid.py` seed Python, NumPy, and PyTorch from
+their `Config.seed` so training runs are reproducible by default.
 
 ### Classification
 
@@ -98,6 +106,10 @@ If the continuum file is not found (or cannot be parsed), the code will:
 
 This means the script will still work, but results may differ from continuum-aware runs.
 
+Legacy `datcon<N>` files sometimes use a tail sentinel value near `1000.000`
+instead of `NaN`. The shared datcon loader now treats values `> 999` as missing
+so those edge points do not contaminate continuum features or TAE/EAE splitting.
+
 #### Continuum-derived features used
 
 When available, the following scalars are appended to the feature vector:
@@ -109,7 +121,49 @@ When available, the following scalars are appended to the feature vector:
 
 ---
 
-## `label_modes_fast.py`
+## Sorting TAEs vs EAEs from mixed data: `split_tae_eae.py`
+
+Split a CSV list of modes into TAE-like vs EAE-like groups using the upper TAE
+gap boundary from the local `datcon<N>` file.
+
+It reuses the standard NOVA mode loader plus the existing continuum-file lookup
+logic. For each mode it computes:
+
+- `dist = sqrt(upper2) - omega`
+- `signed_delta`: weighted mean of `dist`, normalized by the weighted RMS of `dist`
+- `fraction_below_upper2`: weighted fraction of mode energy where `dist > 0`
+
+Default rule:
+
+- `fraction_below_upper2 > 0.5` → `below_upper2` (TAE-like)
+- `fraction_below_upper2 < 0.4` and `signed_delta < -0.1` → `above_upper2` (EAE-like)
+- otherwise → `mixed`
+
+By default, `mixed` rows are written into the TAE-like output CSV so marginal
+modes stay on the TAE side, but the full CSV still records `gap_region=mixed`
+for inspection.
+
+### Usage
+
+```bash
+python split_tae_eae.py \
+  --input_csv all_modes.csv \
+  --out_below_csv tae_like.csv \
+  --out_above_csv eae_like.csv
+```
+
+The script preserves original CSV columns when present, appends the new split
+scalars, and also writes a full CSV with errors and skipped rows. Modes with
+missing / unreadable `datcon` files are written with `gap_region=error` and are
+excluded from the two split output lists.
+
+For headerless three-column inputs like `path,validity,family`, the script
+infers those column names so the output CSVs and terminal summary include the
+family sanity check automatically.
+
+---
+
+##  `label_modes_fast.py`
 
 Script to go through all modes in a directory and sort them as `good` / `bad` / `skip`.
 
@@ -276,7 +330,7 @@ awk -F, '{print $2}' train_master.csv | sort | uniq -c
 
 This script:
 
-- reads `training_labels/train_master.csv` (`path,label`)
+- reads `training_labels/train_master.csv` (`path,label`, with or without a header row)
 - loads each mode + extra scalars (`omega`, `gamma_d`, `ntor`)
 - builds `X` using `compute_features_for_mode(mode, extra_info=...)`
 - runs OOF using `StratifiedKFold`
