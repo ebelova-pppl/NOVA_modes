@@ -13,9 +13,9 @@ unset _NOVA_CONFIG_DIR
 
 # Persistent data / models / saved results for TAE-only work or for mixed TAE+EAE data sets.
 
-export NOVA_DATA_TAE="/global/cfs/cdirs/m314/nova/data"      # TAE-only data (in main branch)
-export NOVA_DATA_MIXED="/global/cfs/cdirs/m314/nova2/data"   # Mixed TAE+EAE data (for training TAE+EAE models, in mixed_branch)
-export NOVA_DATA=$NOVA_DATA_MIXED    # Default to mixed data, since that's the working branch. Switch to TAE-only if working on main_branch.
+export NOVA_DATA_TAE="/global/cfs/cdirs/m314/nova/data"      # old TAE-only dataset / legacy train_master.csv (for training TAE-only models, in main_branch)
+export NOVA_DATA_MIXED="/global/cfs/cdirs/m314/nova2/data"   # Mixed TAE+EAE data (for training TAE+EAE models, in main and mixed_branch)
+export NOVA_DATA=$NOVA_DATA_MIXED                            # Default to mixed data, since that's the working branch.
 export NOVA_MODELS="/global/cfs/cdirs/m314/nova2/models"
 export NOVA_RESULTS="/global/cfs/cdirs/m314/nova2/results"
 
@@ -40,7 +40,6 @@ fi
 # -----------------------------
 #export NOVA_RUN_RF="$NOVA_RUN_ROOT/rf"
 #export NOVA_RUN_CNN="$NOVA_RUN_ROOT/cnn"
-#export NOVA_LOGS="$NOVA_RUN_ROOT/logs"
 #export NOVA_TMP="$NOVA_RUN_ROOT/tmp"
 
 # -----------------------------
@@ -52,8 +51,9 @@ nova_env() {
     echo "NOVA_DATA      = $NOVA_DATA"
     echo "NOVA_MODELS    = $NOVA_MODELS"
     echo "NOVA_RESULTS   = $NOVA_RESULTS"
-    echo "NOVA_RUN_ROOT  = $NOVA_RUN_ROOT"
     echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"
+    echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"
+    echo "NOVA_TRAIN_CSV_MIXED = $NOVA_TRAIN_CSV_MIXED"
     echo "PYTHONPATH     = $PYTHONPATH"
 }
 

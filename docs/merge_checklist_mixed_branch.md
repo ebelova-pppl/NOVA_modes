@@ -123,18 +123,24 @@ Notes:
   - `scripts/README.md`
   - `docs/project_state.md`
   - `training_labels/README.md`
-- [ ] After merge, source the NERSC config and verify:
+- [x] After merge, source the NERSC config and verify:
   - `NOVA_REPO`
   - `NOVA_DATA`
   - `PYTHONPATH`
   - `NOVA_TRAIN_CSV`
-- [ ] Sanity-check that `view_modes_csv.py` still plots cleaned datcon tails.
+- [x] Sanity-check that `view_modes_csv.py` still plots cleaned datcon tails.
+- [x] also checked `viz/plot_straightened_mode.py` 
 
 ## Post-Merge Follow-Ups
 
 - [ ] Retrain the good/bad classifiers on the updated TAE-side list
   (`training_labels/tae_like.csv`) if that becomes the new canonical training
   pool.
+  RF - done, identical to previous check of 04/14/2026
+  CNN_raw
+  CNN_straightened
+  CNN_hybrid
+
 - [ ] Decide whether to expose the splitter directly inside
   `scripts/sort_shot.py` or keep it as a separate preprocessing step.
 - [ ] If needed, prune or archive intermediate audit CSVs once the new workflow
