@@ -69,14 +69,14 @@ Model families
 
 Current best models
 - `scripts/rf_train_classify.py` - Most robust and interpretable model (~92–94% accuracy). Performs well across datasets and is used as the baseline classifier
-- All three CNN models give comparable results with best accuracy ~0.95-0.96 (GPU on Permutter), but
+- All three CNN models give comparable results with best accuracy ~0.95-0.96 (GPU on Perlmutter), but
 `scripts/cnn_raw.py` - is the simplest CNN model (~96% accuracy on tae_like.csv training set).
 
 Typical workflow
-- Added split_tae_eae.py step to sort out tae-like vs eae-like modes
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
-- Train classifier (RF or CNN)
+- Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
+- Train classifier (RF or CNN) on tae_like modes (for now)
 - Run sort_shot.py to classify modes for a shot and remove duplicates (for each ntor)
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)
 
