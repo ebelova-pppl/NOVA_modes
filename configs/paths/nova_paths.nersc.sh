@@ -20,13 +20,18 @@ export NOVA_MODELS="/global/cfs/cdirs/m314/nova2/models"
 export NOVA_RESULTS="/global/cfs/cdirs/m314/nova2/results"
 
 # Active run area in scratch
-export NOVA_RUN_RF="$SCRATCH/nova_rf"
-export NOVA_RUN_CNN="$SCRATCH/nova_cnn"
+export NOVA_RUN_RF="$SCRATCH/nova_rf"    # older version of RF
+export NOVA_RUN_CNN="$SCRATCH/nova_cnn"  # older versions of CNN
 
 # Version-controlled labeled training list
-export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/train_master.csv"   # Keep the legacy TAE-only training default for now.
-export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/train_tae.csv"
-export NOVA_TRAIN_CSV_MIXED="$NOVA_REPO/training_labels/all_modes.csv"
+export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like.csv"       # "train_master.csv" was the legacy TAE-only training default.
+export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like.csv"   # New TAE training set (for training TAE-only models)
+export NOVA_TRAIN_CSV_MIXED="$NOVA_REPO/training_labels/all_modes.csv" # Includes TAE+EAE data (for now used fro splitting TAEs vs EAEs, in future for training TAE+EAE models)
+
+# Optional Torch device override for CNN scripts:
+#   export NOVA_TORCH_DEVICE=cpu     # diagnose without GPU memory
+#   export NOVA_TORCH_DEVICE=cuda    # force CUDA when available
+# Leave unset for the scripts' automatic cuda/cpu choice.
 
 # Python imports from src/
 if [ -z "${PYTHONPATH:-}" ]; then
@@ -54,6 +59,8 @@ nova_env() {
     echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"
     echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"
     echo "NOVA_TRAIN_CSV_MIXED = $NOVA_TRAIN_CSV_MIXED"
+    echo "NOVA_TORCH_DEVICE = ${NOVA_TORCH_DEVICE:-<auto>}"
+    echo "CUDA_VISIBLE_DEVICES = ${CUDA_VISIBLE_DEVICES:-<unset>}"
     echo "PYTHONPATH     = $PYTHONPATH"
 }
 
@@ -63,4 +70,20 @@ nova_cdrepo() {
 
 nova_run_sort() {
     python "$NOVA_REPO/scripts/sort_shot.py" "$@"
+}
+
+nova_srun_gpu() {
+    srun --nodes 1 --ntasks 1 --cpus-per-task "${NOVA_CPUS_PER_TASK:-16}" --gpus-per-task 1 "$@"
+}
+
+nova_run_cnn_raw() {
+    nova_srun_gpu python "$NOVA_REPO/scripts/cnn_raw.py" "$@"
+}
+
+nova_run_cnn_straightened() {
+    nova_srun_gpu python "$NOVA_REPO/scripts/cnn_straightened.py" "$@"
+}
+
+nova_run_cnn_hybrid() {
+    nova_srun_gpu python "$NOVA_REPO/scripts/cnn_hybrid.py" "$@"
 }

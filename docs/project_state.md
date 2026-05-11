@@ -256,3 +256,12 @@ strongly unstable GOOD modes, false negatives are more costly than false
 positives. The raw CNN default initial learning rate was therefore changed to
 `0.02`, which kept the same best accuracy as `0.01` on this split but reduced
 GOOD-mode false negatives.
+
+### 2026-05-11
+Codex: Added shared Torch device diagnostics for the CNN trainers. The scripts
+now print CUDA availability, `CUDA_VISIBLE_DEVICES`, GPU name, and free/total
+memory before model allocation. `cnn_raw.py` accepts `--device`, and
+`cnn_raw.py`, `cnn_straightened.py`, and `cnn_hybrid.py` honor
+`NOVA_TORCH_DEVICE` so Perlmutter runs can force `cpu`, `cuda`, or `cuda:0`
+without editing source files. `scripts/README.md` now includes a Perlmutter
+interactive `srun` example and OOM triage notes.

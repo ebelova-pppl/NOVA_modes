@@ -1,3 +1,4 @@
+import os
 import random
 from dataclasses import dataclass
 from typing import List, Dict, Any
@@ -13,6 +14,7 @@ from nova_mode_loader import load_mode_from_nova
 from mode_transform import resample_r, straighten_mode_window
 from paths import NOVA_TRAIN_CSV
 from cnn_infer_common import CHECKPOINT_VERSION, build_preprocess_metadata
+from torch_runtime import print_torch_device_report, select_torch_device
 
 
 # =========================
@@ -229,6 +231,7 @@ class Config:
     median_k: int = 3
     max_step: int = 2
     R_target: int = 201
+    device: str | None = os.environ.get("NOVA_TORCH_DEVICE")
 
 
 def main():
@@ -265,9 +268,8 @@ def main():
     test_loader  = DataLoader(test_ds, batch_size=cfg.batch_size, shuffle=False,
                               num_workers=0)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #device = torch.device("cpu")
-    print("Device:", device)
+    device = select_torch_device(cfg.device)
+    print_torch_device_report(device)
 
     model = SmallCNN(in_ch=1).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)

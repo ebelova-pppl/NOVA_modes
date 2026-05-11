@@ -18,6 +18,7 @@ from cnn_infer_common import CHECKPOINT_VERSION, build_raw_preprocess_metadata
 from mode_csv import read_mode_csv_entries
 from mode_transform import resample_r
 from nova_mode_loader import load_mode_from_nova
+from torch_runtime import print_torch_device_report, select_torch_device
 
 
 def default_train_csv() -> str:
@@ -215,6 +216,7 @@ class Config:
     model_out: str = "nova_cnn.pt"
     M_target: int = 54
     R_target: int = 201
+    device: str | None = None
 
 
 def parse_args() -> Config:
@@ -254,6 +256,11 @@ def parse_args() -> Config:
     )
     ap.add_argument("--M_target", type=int, default=54, help="Poloidal harmonics kept after m-axis pad/crop")
     ap.add_argument("--R_target", type=int, default=201, help="Radial grid size after interpolation")
+    ap.add_argument(
+        "--device",
+        default=os.environ.get("NOVA_TORCH_DEVICE"),
+        help="Torch device, e.g. cpu, cuda, cuda:0 (default: $NOVA_TORCH_DEVICE or auto)",
+    )
     return Config(**vars(ap.parse_args()))
 
 
@@ -286,8 +293,8 @@ def main():
     train_loader = DataLoader(train_ds, batch_size=cfg.batch_size, shuffle=True, num_workers=0)
     test_loader = DataLoader(test_ds, batch_size=cfg.batch_size, shuffle=False, num_workers=0)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Device:", device)
+    device = select_torch_device(cfg.device)
+    print_torch_device_report(device)
 
     model = SmallCNN(in_ch=1).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)

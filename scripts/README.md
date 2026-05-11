@@ -51,6 +51,28 @@ unstable mode is more important than minimizing false positives.
 All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
 configuration so training runs are reproducible by default.
 
+The CNN trainers print the selected Torch device, visible CUDA devices, and
+free/total GPU memory before training. `cnn_raw.py` accepts `--device`, and all
+three CNN trainers honor `NOVA_TORCH_DEVICE`, for example:
+
+```bash
+export NOVA_TORCH_DEVICE=cuda
+python "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 8
+```
+
+Inside a Perlmutter interactive allocation, launch the Python process with
+`srun` so it runs on the allocated GPU node rather than on the login shell:
+
+```bash
+salloc --nodes 1 --qos interactive --time 1:00:00 --constraint gpu --gpus 1 --account m314_g
+srun --nodes 1 --ntasks 1 --cpus-per-task 16 --gpus-per-task 1 python "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 8
+```
+
+If CUDA reports out-of-memory for these small CNNs, first check the printed
+free/total memory and try `--batch_size 8` or `--batch_size 4`. To diagnose
+environment issues without using GPU memory, run raw CNN with `--device cpu` or
+set `NOVA_TORCH_DEVICE=cpu` for the older trainers.
+
 Latest TAE-like retraining check on `training_labels/tae_like.csv` used
 threshold 0.5 for CNN evaluation:
 
