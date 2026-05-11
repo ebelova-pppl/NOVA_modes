@@ -245,7 +245,7 @@ def main():
 
     # Final metrics
     acc, probs, y_true, paths = eval_model(model, test_loader, device)
-    thr = 0.55
+    thr = 0.5
     y_pred = (probs >= thr).astype(int)
     #for thr in np.linspace(0.4, 0.75, 8):     # sweep thresholds to check nmber of FPs
         #y_pred = (probs >= thr).astype(int)

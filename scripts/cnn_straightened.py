@@ -222,7 +222,7 @@ class Config:
     epochs: int = 80
     lr: float = 1e-2
     normalize: str = "maxabs" # "robust"  # "none" is OK too since max=1
-    eval_threshold: float = 0.55
+    eval_threshold: float = 0.5
     model_out: str = "nova_cnn.pt"
     M: int = 8
     center_power: float = 2.0

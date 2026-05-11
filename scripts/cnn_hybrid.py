@@ -337,7 +337,7 @@ def main():
     best_acc = -1.0
     best_state = None
 
-    thresh = 0.55
+    thresh = 0.5
     for ep in range(1, cfg.epochs + 1):
         loss = train_epoch(model, train_loader, opt, device)
         acc, probs, y_true, paths = eval_model(model, test_loader, device, thr=thresh)

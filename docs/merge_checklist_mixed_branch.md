@@ -136,10 +136,10 @@ Notes:
 - [ ] Retrain the good/bad classifiers on the updated TAE-side list
   (`training_labels/tae_like.csv`) if that becomes the new canonical training
   pool.
-  RF - done, identical to previous check of 04/14/2026
-  CNN_raw
-  CNN_straightened
-  CNN_hybrid
+  - RF - done, results are identical to previous check on 04/14/2026
+  - CNN_raw - done, ok, best acc=0.96, CM=[[126   5][  4  81]] using thr=0.5
+  - CNN_straightened - done, ok, best acc=0.95, CM=[[126   5][  6  79]] using thr=0.5
+  - CNN_hybrid - done, ok, best acc=0.96, CM=[[129   2][  6  79]] using thr=0.5
 
 - [ ] Decide whether to expose the splitter directly inside
   `scripts/sort_shot.py` or keep it as a separate preprocessing step.
