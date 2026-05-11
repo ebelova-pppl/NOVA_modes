@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import os
 import random
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -91,11 +92,21 @@ class NovaModeDataset(Dataset):
         normalize: str = "robust",
         M_target: int = 54,
         R_target: int = 201,
+        cache_data: bool = False,
     ):
         self.items = items
         self.normalize = normalize
         self.M_target = M_target
         self.R_target = R_target
+        self.cached_samples = None
+        if cache_data:
+            t0 = time.perf_counter()
+            self.cached_samples = [self._load_sample(i) for i in range(len(self.items))]
+            print(
+                f"Cached {len(self.cached_samples)} raw CNN samples in "
+                f"{time.perf_counter() - t0:.1f}s",
+                flush=True,
+            )
 
     def _normalize(self, x):
         if self.normalize == "none":
@@ -118,7 +129,7 @@ class NovaModeDataset(Dataset):
     def __len__(self):
         return len(self.items)
 
-    def __getitem__(self, idx):
+    def _load_sample(self, idx):
         it = self.items[idx]
         mode, omega, gamma_d, ntor = load_mode_from_nova(it["path"])
 
@@ -129,6 +140,11 @@ class NovaModeDataset(Dataset):
 
         y = torch.tensor(it["label"], dtype=torch.long)
         return torch.from_numpy(x), y, it["path"]
+
+    def __getitem__(self, idx):
+        if self.cached_samples is not None:
+            return self.cached_samples[idx]
+        return self._load_sample(idx)
 
 
 class SmallCNN(nn.Module):
@@ -217,6 +233,7 @@ class Config:
     M_target: int = 54
     R_target: int = 201
     device: str | None = None
+    cache_data: bool = False
 
 
 def parse_args() -> Config:
@@ -261,6 +278,11 @@ def parse_args() -> Config:
         default=os.environ.get("NOVA_TORCH_DEVICE"),
         help="Torch device, e.g. cpu, cuda, cuda:0 (default: $NOVA_TORCH_DEVICE or auto)",
     )
+    ap.add_argument(
+        "--cache_data",
+        action="store_true",
+        help="Preload preprocessed mode tensors into RAM once instead of rereading files every epoch",
+    )
     return Config(**vars(ap.parse_args()))
 
 
@@ -282,12 +304,14 @@ def main():
         normalize=cfg.normalize,
         M_target=cfg.M_target,
         R_target=cfg.R_target,
+        cache_data=cfg.cache_data,
     )
     test_ds = NovaModeDataset(
         test_items,
         normalize=cfg.normalize,
         M_target=cfg.M_target,
         R_target=cfg.R_target,
+        cache_data=cfg.cache_data,
     )
 
     train_loader = DataLoader(train_ds, batch_size=cfg.batch_size, shuffle=True, num_workers=0)
@@ -307,6 +331,7 @@ def main():
     best_state = None
 
     for ep in range(1, cfg.epochs + 1):
+        epoch_t0 = time.perf_counter()
         loss = train_epoch(model, train_loader, opt, device)
         acc, probs, y_true, _ = eval_model(model, test_loader, device, thr=cfg.eval_threshold)
         sched.step(acc)
@@ -318,7 +343,12 @@ def main():
 
         if ep == 1 or ep % 5 == 0:
             lr = opt.param_groups[0]["lr"]
-            print(f"Epoch {ep:3d}/{cfg.epochs} | loss={loss:.4f} | test_acc={acc:.4f} | lr={lr:.2e}")
+            elapsed = time.perf_counter() - epoch_t0
+            print(
+                f"Epoch {ep:3d}/{cfg.epochs} | loss={loss:.4f} | "
+                f"test_acc={acc:.4f} | lr={lr:.2e} | elapsed={elapsed:.1f}s",
+                flush=True,
+            )
 
     print(f"Best test acc: {best_acc:.4f} (epoch {best_epoch})")
     if best_state is not None:

@@ -73,17 +73,26 @@ nova_run_sort() {
 }
 
 nova_srun_gpu() {
-    srun --nodes 1 --ntasks 1 --cpus-per-task "${NOVA_CPUS_PER_TASK:-16}" --gpus-per-task 1 "$@"
+    if [ -z "${SLURM_JOB_ID:-}" ]; then
+        echo "nova_srun_gpu: no active Slurm allocation detected; run salloc first."
+        return 2
+    fi
+    echo "nova_srun_gpu: job=$SLURM_JOB_ID cpus_per_task=${NOVA_CPUS_PER_TASK:-1} command=$*"
+    srun --nodes 1 --ntasks 1 --cpus-per-task "${NOVA_CPUS_PER_TASK:-1}" --gpus-per-task 1 --gpu-bind=none --kill-on-bad-exit=1 "$@"
+}
+
+nova_gpu_smoke() {
+    nova_srun_gpu python -u "$NOVA_REPO/scripts/torch_runtime.py" --smoke "$@"
 }
 
 nova_run_cnn_raw() {
-    nova_srun_gpu python "$NOVA_REPO/scripts/cnn_raw.py" "$@"
+    nova_srun_gpu python -u "$NOVA_REPO/scripts/cnn_raw.py" "$@"
 }
 
 nova_run_cnn_straightened() {
-    nova_srun_gpu python "$NOVA_REPO/scripts/cnn_straightened.py" "$@"
+    nova_srun_gpu python -u "$NOVA_REPO/scripts/cnn_straightened.py" "$@"
 }
 
 nova_run_cnn_hybrid() {
-    nova_srun_gpu python "$NOVA_REPO/scripts/cnn_hybrid.py" "$@"
+    nova_srun_gpu python -u "$NOVA_REPO/scripts/cnn_hybrid.py" "$@"
 }

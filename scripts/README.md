@@ -65,13 +65,27 @@ Inside a Perlmutter interactive allocation, launch the Python process with
 
 ```bash
 salloc --nodes 1 --qos interactive --time 1:00:00 --constraint gpu --gpus 1 --account m314_g
-srun --nodes 1 --ntasks 1 --cpus-per-task 16 --gpus-per-task 1 python "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 8
+srun --nodes 1 --ntasks 1 --cpus-per-task 1 --gpus-per-task 1 python -u "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 8
 ```
 
 If CUDA reports out-of-memory for these small CNNs, first check the printed
 free/total memory and try `--batch_size 8` or `--batch_size 4`. To diagnose
 environment issues without using GPU memory, run raw CNN with `--device cpu` or
 set `NOVA_TORCH_DEVICE=cpu` for the older trainers.
+
+After sourcing `configs/paths/nova_paths.nersc.sh`, `nova_gpu_smoke` runs a
+small Torch CUDA allocation through `srun` and prints timing for device report,
+first tensor allocation, matmul, and CPU copy. `nova_run_cnn_raw --batch_size 8`
+runs the raw CNN through the same Slurm launch path. The helpers default to
+`NOVA_CPUS_PER_TASK=1`; if you set a larger value, request matching CPUs in the
+`salloc` command.
+
+If raw CNN training is slow because the shared filesystem is lagging, use
+`--cache_data` to preprocess the train/test tensors once and keep them in RAM:
+
+```bash
+nova_run_cnn_raw --batch_size 8 --cache_data
+```
 
 Latest TAE-like retraining check on `training_labels/tae_like.csv` used
 threshold 0.5 for CNN evaluation:
