@@ -3,15 +3,20 @@ import os
 import glob
 import csv
 import argparse
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-import joblib
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = REPO_ROOT / "src"
+if SRC_DIR.is_dir() and str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 from mode_csv import read_mode_csv_entries
-from mode_features import compute_features_for_mode
 from cont_features import load_datcon_for_mode, continuum_scalars
 
 
@@ -164,7 +169,31 @@ def plot_continuum_panel(ax, r: np.ndarray, omega: float,
 
     ax.grid(True, alpha=0.3)
 
+def load_rf_classifier(rf_model_path: str):
+    try:
+        import joblib
+    except ImportError as exc:
+        print(f"WARNING: joblib is not available; RF disabled ({exc}).")
+        return None
+
+    model_path = Path(rf_model_path).expanduser()
+    if not model_path.exists():
+        print(f"WARNING: RF model not found: {model_path}; RF disabled.")
+        return None
+
+    try:
+        clf = joblib.load(model_path)
+    except Exception as exc:
+        print(f"WARNING: failed to load RF model {model_path}: {exc}; RF disabled.")
+        return None
+
+    print(f"Loaded RF model: {model_path}")
+    return clf
+
+
 def rf_opinion(clf, mode, omega, gamma_d, ntor, file_path):
+    from mode_features import compute_features_for_mode
+
     X = compute_features_for_mode(
         mode,
         extra_info={"omega": omega, "gamma_d": gamma_d, "ntor": ntor, "path": file_path}
@@ -181,9 +210,12 @@ def rf_opinion(clf, mode, omega, gamma_d, ntor, file_path):
 
 @dataclass
 class Config:
-    base_dir: str = "/global/cfs/cdirs/m314/nova"     # root directory
+    data_dir: Optional[str] = None
+    pattern: str = "egn*"
     out_csv: str = "mode_labels.csv"
     sort: bool = True
+    use_rf: bool = True
+    rf_model: str = "nova_mode_classifier.joblib"
 
     # plotting choices
     use_abs: bool = False          # if True, plot |mode| instead of signed
@@ -191,29 +223,79 @@ class Config:
     r_is_uniform_0_1: bool = True  # r = linspace(0,1,nr)
     show_m_spectrum: bool = True   # add a small 2nd panel
 
-def main():
-    
-    rf_model_path = "nova_mode_classifier.joblib"     # Load RF classifier
-    clf = joblib.load(rf_model_path)
-    print(f"Loaded RF model: {rf_model_path}")
 
+def resolve_mode_dir(mode_dir: str, data_dir: Optional[str]) -> Path:
+    raw_path = Path(mode_dir).expanduser()
+    if raw_path.is_absolute():
+        return raw_path.resolve()
+
+    if data_dir:
+        return (Path(data_dir).expanduser() / raw_path).resolve()
+
+    raise ValueError(
+        f"Relative mode directory '{mode_dir}' requires --data_dir or $NOVA_DATA."
+    )
+
+
+def main():
     parser = argparse.ArgumentParser(
         description="Fast interactive labeling of NOVA modes"
     )
     parser.add_argument(
-        "shot",
-        help="device shot number (subdirectory name, e.g. 'D3D/202020')"
+        "mode_dir",
+        help=(
+            "Directory containing mode files. Absolute paths are used directly; "
+            "relative paths are resolved under --data_dir or $NOVA_DATA "
+            "(e.g. 'nstx_120113/N5')."
+        )
     )
     parser.add_argument(
         "--csv",
         default="mode_labels.csv",
         help="Output CSV for labels (default: mode_labels.csv)"
     )
+    parser.add_argument(
+        "--data_dir",
+        default=os.environ.get("NOVA_DATA"),
+        help="Data directory for relative mode_dir paths (default: $NOVA_DATA)"
+    )
+    parser.add_argument(
+        "--pattern",
+        default="egn*",
+        help="Glob pattern for mode files inside mode_dir (default: egn*)"
+    )
+    parser.add_argument(
+        "--rf-model",
+        default="nova_mode_classifier.joblib",
+        help="Random Forest model path used for optional guidance (default: nova_mode_classifier.joblib)"
+    )
+    parser.add_argument(
+        "--no-rf",
+        action="store_true",
+        help="Disable Random Forest evaluation/display."
+    )
     args = parser.parse_args()
 
-    cfg = Config(out_csv=args.csv)
+    cfg = Config(
+        data_dir=args.data_dir,
+        pattern=args.pattern,
+        out_csv=args.csv,
+        use_rf=not args.no_rf,
+        rf_model=args.rf_model,
+    )
 
-    input_glob = os.path.join(cfg.base_dir, args.shot, "egn*")
+    try:
+        mode_dir = resolve_mode_dir(args.mode_dir, cfg.data_dir)
+    except ValueError as exc:
+        parser.error(str(exc))
+
+    clf = load_rf_classifier(cfg.rf_model) if cfg.use_rf else None
+    if cfg.use_rf and clf is None:
+        print("Continuing without RF guidance.")
+    elif not cfg.use_rf:
+        print("RF guidance disabled by --no-rf.")
+
+    input_glob = str(mode_dir / cfg.pattern)
     files = glob.glob(input_glob)
 
     if cfg.sort:
@@ -222,8 +304,16 @@ def main():
     labels = read_labels(cfg.out_csv)
     files_to_do = [p for p in files if p not in labels]
 
+    print(f"Mode directory: {mode_dir}")
+    print(f"File pattern:    {cfg.pattern}")
+    print(f"Input glob:      {input_glob}")
+    print(f"Output CSV:      {Path(cfg.out_csv).expanduser()}")
     print(f"Found {len(files)} files; already labeled {len(labels)}; remaining {len(files_to_do)}")
     print("Keys: g=good, b=bad, s=skip, u=undo, q=quit")
+
+    if not files:
+        print("No mode files found. Check mode_dir, --data_dir, and --pattern.")
+        return
 
     if not files_to_do:
         print("Nothing to label.")
@@ -264,10 +354,16 @@ def main():
         nhar, nr = mode.shape
         r = np.linspace(0.0, 1.0, nr) if cfg.r_is_uniform_0_1 else np.arange(nr)
 
-        p_rf, rf_lab = rf_opinion(clf, mode, omega, gamma_d, ntor, path)  # RF input
+        rf_text = ""
+        if clf is not None:
+            try:
+                p_rf, rf_lab = rf_opinion(clf, mode, omega, gamma_d, ntor, path)
+                rf_text = f"  RF:{rf_lab} (P={p_rf:.3f})"
+            except Exception as exc:
+                print(f"WARNING: RF evaluation failed for {path}: {exc}")
 
         title = (f"{base}  n={ntor}  omega={omega:.4g}  g_d={gamma_d:.3g}  "
-                 f"RF:{rf_lab} (P={p_rf:.3f})  "
+                 f"{rf_text}  "
                  #f"shape=({nhar},{nr})   "
                  f"[g/b/s, u=undo, q=quit]")
 

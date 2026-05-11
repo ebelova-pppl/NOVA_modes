@@ -241,7 +241,29 @@ It saves labeled modes in `mode_labels.csv` and `mode_labels_clean.csv`.
 python label_modes_fast.py dir_name
 ```
 
-where `dir_name` is something like `nstx_20113/N1`.
+where `dir_name` is something like `nstx_20113/N1`. Relative directories are
+resolved under `--data_dir` or `$NOVA_DATA`; absolute directories are used
+directly.
+
+For another device or a local data copy where the NSTX-U RF model is not
+applicable, disable RF guidance:
+
+```bash
+python label_modes_fast.py shot_or_run/N1 \
+  --data_dir /path/to/nova/data \
+  --csv labels_new_device.csv \
+  --no-rf
+```
+
+To keep RF guidance, provide a compatible RF model:
+
+```bash
+python label_modes_fast.py nstx_120113/N5 \
+  --data_dir "$NOVA_DATA" \
+  --rf-model nova_mode_classifier.joblib
+```
+
+Use `--pattern` if mode files are not named `egn*`.
 
 ### Controls
 
@@ -253,7 +275,10 @@ where `dir_name` is something like `nstx_20113/N1`.
 
 The script will restart from the first unsorted mode and append to the existing list.
 
-It is linked to the RF classifier, and outputs RF mode classification (`good` / `bad`) together with the score, i.e. probability `P > 0.5` for good.
+RF classifier guidance is optional. By default the script tries to load
+`nova_mode_classifier.joblib`; pass `--no-rf` to skip RF evaluation, or
+`--rf-model` to select a different compatible model. If RF is enabled but the
+model cannot be loaded, the script prints a warning and continues without RF.
 
 If a `datcon#` file is located in the same directory, the script will mark the closest continuum crossing, `R*`, and will add an extra plot of the continuum gap + mode frequency.
 
