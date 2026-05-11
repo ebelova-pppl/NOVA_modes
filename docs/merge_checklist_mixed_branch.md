@@ -133,7 +133,7 @@ Notes:
 
 ## Post-Merge Follow-Ups
 
-- [ ] Retrain the good/bad classifiers on the updated TAE-side list
+- [x] Retrain the good/bad classifiers on the updated TAE-side list
   (`training_labels/tae_like.csv`) if that becomes the new canonical training
   pool.
   - RF - done, results are identical to previous check on 04/14/2026

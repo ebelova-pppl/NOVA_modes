@@ -103,7 +103,8 @@ From cont_features.py:
 -	Used for label validation (flag p < 0.2 or p > 0.8)
 ### CNN
 -	Performance sensitive to seed + learning rate
--	Best: straightened CNN ≈ 96% (threshold ≈ 0.55)
+-	Latest TAE-like retraining uses threshold 0.5 for all CNN confusion matrices
+-	All three CNNs are comparable on `training_labels/tae_like.csv`, with best accuracy ~0.95-0.96
 
 ## Major updates
 1) Straightened CNN representation
@@ -222,3 +223,11 @@ Updated results for new eae_like.csv list (2042 modes):
 
 ### 05/09/26 
 TAE/EAE sorting is solved and mixed_branch has been merged back to main
+
+### 2026-05-10
+- Retrained / rechecked the good-bad classifiers on `training_labels/tae_like.csv` using threshold 0.5 for CNN evaluation.
+- RF: done; results are identical to the previous check on 2026-04-14.
+- CNN_raw: best accuracy=0.96, CM=[[126 5][4 81]], threshold=0.5.
+- CNN_straightened: best accuracy=0.95, CM=[[126 5][6 79]], threshold=0.5.
+- CNN_hybrid: best accuracy=0.96, CM=[[129 2][6 79]], threshold=0.5.
+- All checked models are working as expected on the updated TAE-like training pool.

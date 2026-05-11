@@ -36,6 +36,13 @@ python cnn_raw.py           # uses: nova_mode_loader
 `cnn_straightened.py` and `cnn_hybrid.py` seed Python, NumPy, and PyTorch from
 their `Config.seed` so training runs are reproducible by default.
 
+Latest TAE-like retraining check on `training_labels/tae_like.csv` used
+threshold 0.5 for CNN evaluation:
+
+- `cnn_raw.py`: best accuracy=0.96, CM=[[126 5][4 81]]
+- `cnn_straightened.py`: best accuracy=0.95, CM=[[126 5][6 79]]
+- `cnn_hybrid.py`: best accuracy=0.96, CM=[[129 2][6 79]]
+
 ### Classification
 
 ```bash
