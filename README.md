@@ -14,7 +14,6 @@ Current canonical pipelines:
 - `scripts/cnn_straightened.py`
 - `scripts/cnn_hybrid.py`
 - `scripts/cnn_classify.py`
-- `scripts/cnn_raw_classify.py`
 - `scripts/sort_shot.py`
 - `scripts/label_modes_fast.py`
 
@@ -63,7 +62,7 @@ Data format summary
 
 Model families
 - `scripts/rf_train_classify.py` - Random Forest classifier using engineered scalar features (mode structure + continuum-related quantities)
-- `scripts/cnn_raw.py` - CNN using raw (m,r) mode structure (padded/truncated)
+- `scripts/cnn_raw.py` - CNN using raw (m,r) mode structure, with r-resampling and m-axis padding/cropping
 - `scripts/cnn_straightened.py` - CNN using ridge-aligned (straightened) mode representation
 - `scripts/cnn_hybrid.py` - CNN + scalar features (continuum + physics-informed inputs)
 

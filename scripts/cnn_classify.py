@@ -16,7 +16,7 @@ from path_utils import resolve_mode_csv_path
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(
-        description="Classify NOVA modes with a straightened or hybrid CNN checkpoint."
+        description="Classify NOVA modes with a raw, straightened, or hybrid CNN checkpoint."
     )
     ap.add_argument("path_pos", nargs="?", help="Mode file path (positional form: mode_file checkpoint.pt)")
     ap.add_argument("model_pos", nargs="?", help="Checkpoint path (positional form: mode_file checkpoint.pt)")
@@ -26,6 +26,10 @@ def parse_args() -> argparse.Namespace:
         "--csv",
         dest="csv_in",
         help="CSV list of mode paths (optional header row with path/filepath/mode_path)",
+    )
+    ap.add_argument(
+        "--data_dir",
+        help="Data directory used to resolve relative mode paths in --path or --csv (default: $NOVA_DATA)",
     )
     ap.add_argument("--out", help="Output CSV path for --csv mode")
     ap.add_argument("--device", help="Torch device, e.g. cpu, cuda, cuda:0")
@@ -60,7 +64,7 @@ def main() -> None:
         raise SystemExit(str(exc))
 
     if args.csv_in:
-        mode_paths = read_mode_paths_csv(args.csv_in)
+        mode_paths = read_mode_paths_csv(args.csv_in, data_root=args.data_dir)
         out_path = Path(args.out) if args.out else Path(args.csv_in).with_name(
             f"{Path(args.csv_in).stem}_preds.csv"
         )
@@ -94,7 +98,10 @@ def main() -> None:
         print(f"Wrote predictions to {out_path}")
         return
 
-    result = classifier.predict(resolve_mode_csv_path(mode_path), threshold=args.threshold)
+    result = classifier.predict(
+        resolve_mode_csv_path(mode_path, data_root=args.data_dir),
+        threshold=args.threshold,
+    )
 
     print(f"{result['path']}")
     print(f"  checkpoint_kind={result['checkpoint_kind']}")

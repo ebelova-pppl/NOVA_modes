@@ -101,7 +101,7 @@ def classify_mode_cnn(clf: Any, mode_path: str, threshold: float | None = None) 
 def infer_backend(model_path: str, model_kind: str) -> str:
     if model_kind == "rf":
         return "rf"
-    if model_kind in {"cnn_straightened", "cnn_hybrid"}:
+    if model_kind in {"cnn_raw", "cnn_straightened", "cnn_hybrid"}:
         return "cnn"
 
     suffix = Path(model_path).suffix.lower()
@@ -112,7 +112,7 @@ def infer_backend(model_path: str, model_kind: str) -> str:
 
     raise SystemExit(
         f"Cannot infer backend from model path '{model_path}'. "
-        "Use --model_kind rf, cnn_straightened, or cnn_hybrid."
+        "Use --model_kind rf, cnn_raw, cnn_straightened, or cnn_hybrid."
     )
 
 
@@ -694,7 +694,7 @@ def main() -> None:
     ap.add_argument("--model", required=True, help="RF .joblib model or CNN .pt checkpoint")
     ap.add_argument(
         "--model_kind",
-        choices=["auto", "rf", "cnn_straightened", "cnn_hybrid"],
+        choices=["auto", "rf", "cnn_raw", "cnn_straightened", "cnn_hybrid"],
         default="auto",
         help="Override backend/checkpoint type detection",
     )

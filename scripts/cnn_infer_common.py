@@ -23,8 +23,13 @@ LEGACY_PREPROCESS_DEFAULTS = {
     "max_step": 2,
 }
 
+RAW_PREPROCESS_DEFAULTS = {
+    "R_target": 201,
+    "M_target": 54,
+}
+
 CHECKPOINT_VERSION = 2
-SUPPORTED_MODEL_KINDS = {"cnn_straightened", "cnn_hybrid"}
+SUPPORTED_MODEL_KINDS = {"cnn_raw", "cnn_straightened", "cnn_hybrid"}
 _WARNED_LEGACY_CHECKPOINTS: set[str] = set()
 
 
@@ -119,6 +124,17 @@ def build_preprocess_metadata(
     }
 
 
+def build_raw_preprocess_metadata(
+    *,
+    R_target: int,
+    M_target: int,
+) -> dict[str, Any]:
+    return {
+        "R_target": int(R_target),
+        "M_target": int(M_target),
+    }
+
+
 def resolve_preprocess_metadata(
     checkpoint: Mapping[str, Any],
     checkpoint_path: str | None = None,
@@ -160,6 +176,56 @@ def resolve_preprocess_metadata(
             _WARNED_LEGACY_CHECKPOINTS.add(warning_key)
 
     return resolved
+
+
+def resolve_raw_preprocess_metadata(
+    checkpoint: Mapping[str, Any],
+    checkpoint_path: str | None = None,
+) -> dict[str, Any]:
+    preprocess_block = checkpoint.get("preprocess")
+    if not isinstance(preprocess_block, Mapping):
+        preprocess_block = {}
+
+    resolved: dict[str, Any] = {}
+    missing: list[str] = []
+
+    for key, default in RAW_PREPROCESS_DEFAULTS.items():
+        value = preprocess_block.get(key)
+        if value is None:
+            value = checkpoint.get(key)
+        if value is None:
+            value = default
+            missing.append(key)
+        resolved[key] = value
+
+    resolved["R_target"] = int(resolved["R_target"])
+    resolved["M_target"] = int(resolved["M_target"])
+
+    if missing:
+        warning_key = f"{checkpoint_path or '<checkpoint>'}:raw:{','.join(missing)}"
+        if warning_key not in _WARNED_LEGACY_CHECKPOINTS:
+            warnings.warn(
+                (
+                    f"{checkpoint_path or 'checkpoint'} does not contain raw preprocessing "
+                    f"metadata for {', '.join(missing)}; using legacy defaults "
+                    f"{RAW_PREPROCESS_DEFAULTS}"
+                ),
+                category=UserWarning,
+                stacklevel=2,
+            )
+            _WARNED_LEGACY_CHECKPOINTS.add(warning_key)
+
+    return resolved
+
+
+def pad_or_crop_raw(mode: np.ndarray, M_target: int = 54, R_target: int = 201) -> np.ndarray:
+    mode = np.asarray(mode, dtype=np.float32)
+    n_m, n_r = mode.shape
+    out = np.zeros((M_target, R_target), dtype=np.float32)
+    mmin = min(n_m, M_target)
+    rmin = min(n_r, R_target)
+    out[:mmin, :rmin] = mode[:mmin, :rmin]
+    return out
 
 
 class SmallCNN(nn.Module):
@@ -255,7 +321,7 @@ def infer_checkpoint_kind(
         if model_kind not in SUPPORTED_MODEL_KINDS:
             raise UnsupportedCheckpointError(
                 f"Unsupported model kind '{model_kind}'. "
-                f"Expected one of: auto, cnn_straightened, cnn_hybrid."
+                f"Expected one of: auto, cnn_raw, cnn_straightened, cnn_hybrid."
             )
         return model_kind
 
@@ -275,18 +341,24 @@ def infer_checkpoint_kind(
         return "cnn_hybrid"
     if model_type in {"cnn_straightened", "straightened"}:
         return "cnn_straightened"
+    if model_type in {"cnn_raw", "raw"}:
+        return "cnn_raw"
 
     if "preprocess" in checkpoint:
+        preprocess = checkpoint.get("preprocess")
+        if isinstance(preprocess, Mapping) and "M_target" in preprocess:
+            return "cnn_raw"
         return "cnn_straightened"
+    if "M_target" in checkpoint:
+        return "cnn_raw"
     if any(key in checkpoint for key in LEGACY_PREPROCESS_DEFAULTS):
         return "cnn_straightened"
     #if checkpoint.get("normalize") == "maxabs": ChatGPT did not like this heuristic since normalize could be maxabs for raw model type, but in practice all known straightened checkpoints have maxabs and no known hybrid checkpoints have maxabs, so this is actually a pretty strong signal. Leaving it out for now since it's a bit hacky, but it could be added back as a final heuristic if we find more ambiguous checkpoints in the future.
     #    return "cnn_straightened"
 
     raise UnsupportedCheckpointError(
-        "Checkpoint does not look like a straightened or hybrid CNN checkpoint. "
-        "It may be the older raw CNN format; use scripts/cnn_raw_classify.py for raw checkpoints "
-        "or pass --model_kind if you know this checkpoint should be treated as straightened."
+        "Checkpoint does not look like a supported CNN checkpoint. "
+        "If this is an older raw CNN checkpoint, pass --model_kind cnn_raw."
     )
 
 
@@ -317,13 +389,20 @@ class LoadedCNNClassifier:
 
     def _prepare_image_tensor(self, mode: np.ndarray) -> torch.Tensor:
         mode_rs = resample_r(mode, R_target=self.preprocess["R_target"])
-        x_img, _mc, _mc_int = straighten_mode_window(
-            mode_rs,
-            M=self.preprocess["M"],
-            center_power=self.preprocess["center_power"],
-            median_k=self.preprocess["median_k"],
-            max_step=self.preprocess["max_step"],
-        )
+        if self.checkpoint_kind == "cnn_raw":
+            x_img = pad_or_crop_raw(
+                mode_rs,
+                M_target=self.preprocess["M_target"],
+                R_target=self.preprocess["R_target"],
+            )
+        else:
+            x_img, _mc, _mc_int = straighten_mode_window(
+                mode_rs,
+                M=self.preprocess["M"],
+                center_power=self.preprocess["center_power"],
+                median_k=self.preprocess["median_k"],
+                max_step=self.preprocess["max_step"],
+            )
         x_img = x_img[None, :, :]
         x_img = normalize_mode_array(x_img, self.normalize)
         return torch.from_numpy(np.asarray(x_img, dtype=np.float32)).unsqueeze(0).to(self.device)
@@ -386,10 +465,16 @@ def load_cnn_classifier(
     resolved_checkpoint_path = str(Path(checkpoint_path).expanduser())
     checkpoint = _load_checkpoint(resolved_checkpoint_path)
     checkpoint_kind = infer_checkpoint_kind(checkpoint, model_kind=model_kind)
-    preprocess = resolve_preprocess_metadata(
-        checkpoint,
-        checkpoint_path=resolved_checkpoint_path,
-    )
+    if checkpoint_kind == "cnn_raw":
+        preprocess = resolve_raw_preprocess_metadata(
+            checkpoint,
+            checkpoint_path=resolved_checkpoint_path,
+        )
+    else:
+        preprocess = resolve_preprocess_metadata(
+            checkpoint,
+            checkpoint_path=resolved_checkpoint_path,
+        )
 
     torch_device = torch.device(device if device is not None else ("cuda" if torch.cuda.is_available() else "cpu"))
 
@@ -462,5 +547,5 @@ def classify_mode_cnn_full(
     return classifier.predict(mode_path, threshold=threshold, return_mode=return_mode)
 
 
-def read_mode_paths_csv(csv_path: str) -> list[str]:
-    return read_mode_paths_csv_shared(csv_path)
+def read_mode_paths_csv(csv_path: str, *, data_root: str | Path | None = None) -> list[str]:
+    return read_mode_paths_csv_shared(csv_path, data_root=data_root)

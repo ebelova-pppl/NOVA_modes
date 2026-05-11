@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 from collections.abc import Collection
+from pathlib import Path
 
 from path_utils import resolve_mode_csv_path
 
@@ -49,6 +50,7 @@ def read_mode_csv_entries(
     csv_path: str,
     *,
     resolve_paths: bool = True,
+    data_root: str | Path | None = None,
     path_header_names: Collection[str] = PATH_HEADER_NAMES,
     label_header_names: Collection[str] = LABEL_HEADER_NAMES,
 ) -> list[tuple[str, str | None]]:
@@ -92,12 +94,12 @@ def read_mode_csv_entries(
         if not raw_path:
             continue
 
-        path = resolve_mode_csv_path(raw_path) if resolve_paths else raw_path
+        path = resolve_mode_csv_path(raw_path, data_root=data_root) if resolve_paths else raw_path
         label = row[label_idx].strip() if label_idx is not None and label_idx < len(row) else None
         entries.append((path, label))
 
     return entries
 
 
-def read_mode_paths_csv(csv_path: str) -> list[str]:
-    return [path for path, _ in read_mode_csv_entries(csv_path)]
+def read_mode_paths_csv(csv_path: str, *, data_root: str | Path | None = None) -> list[str]:
+    return [path for path, _ in read_mode_csv_entries(csv_path, data_root=data_root)]

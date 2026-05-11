@@ -28,13 +28,28 @@ separated good/bad training, use the split outputs such as
 ```bash
 module load pytorch
 
+python cnn_raw.py \
+  --train_csv training_labels/tae_like.csv \
+  --data_dir /path/to/nova/data \
+  --model_out models/nova_cnn_raw.pt
+
 python cnn_hybrid.py        # uses: nova_mode_loader, mode_transform.py, mode_features.py
 python cnn_straightened.py  # uses: nova_mode_loader, mode_transform.py
-python cnn_raw.py           # uses: nova_mode_loader
 ```
 
-`cnn_straightened.py` and `cnn_hybrid.py` seed Python, NumPy, and PyTorch from
-their `Config.seed` so training runs are reproducible by default.
+`cnn_raw.py` has a command-line interface; run `python cnn_raw.py -h` for all
+training, data-path, and preprocessing options. It resamples the radial grid to
+`--R_target` before padding/cropping the raw harmonic axis to `--M_target`.
+When `--data_dir` is provided, relative mode paths in the training CSV are
+resolved relative to that directory instead of requiring `$NOVA_DATA`. It uses
+an adjustable initial `--lr` and the same fixed `ReduceLROnPlateau` scheduler
+settings as the straightened CNN. The raw CNN default `--lr` is `0.02`, chosen
+from a small sweep because it reduced false negatives for GOOD modes compared
+with `0.01`; this is preferred for NOVA-C follow-up, where keeping a possibly
+unstable mode is more important than minimizing false positives.
+
+All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
+configuration so training runs are reproducible by default.
 
 Latest TAE-like retraining check on `training_labels/tae_like.csv` used
 threshold 0.5 for CNN evaluation:
@@ -46,15 +61,17 @@ threshold 0.5 for CNN evaluation:
 ### Classification
 
 ```bash
-python cnn_raw_classify.py /mode_file_path/
+python cnn_classify.py --model models/nova_cnn_raw.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like.csv --out preds.csv
 ```
 
-`cnn_classify.py` is the shared inference entry point for straightened and hybrid
-CNN checkpoints. Older checkpoints that do not save preprocessing metadata fall
-back to the legacy defaults and emit a warning so the behavior is explicit.
+`cnn_classify.py` is the shared inference entry point for raw, straightened, and
+hybrid CNN checkpoints. Older straightened/hybrid checkpoints that do not save
+preprocessing metadata fall back to the legacy defaults and emit a warning so
+the behavior is explicit. Older raw checkpoints can be loaded with
+`--model_kind cnn_raw` when auto-detection is ambiguous.
 
 To handle the large variation in the number of poloidal harmonics in NOVA outputs, the CNN input was transformed to a straightened ridge representation. The dominant harmonic `m_c(r)` was estimated from a weighted mean of amplitude, and a small window `m_c(r) +/- M` was extracted, with `M ~ 8-12`.
 
@@ -273,7 +290,7 @@ New version, which checks close-frequency clusters and writes `cluster_report` s
 
 This script does the same as `rf_sort_shot.py` for sorting `GOOD` / `BAD`
 modes, and in addition checks `GOOD` modes for frequency spacing. It can use
-either the RF `.joblib` model or a straightened / hybrid CNN `.pt` checkpoint.
+either the RF `.joblib` model or a raw / straightened / hybrid CNN `.pt` checkpoint.
 
 By default, it writes `cluster_report.txt` and `cluster.csv` files in the shot directory.
 

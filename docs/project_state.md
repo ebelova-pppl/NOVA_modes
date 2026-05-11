@@ -231,3 +231,28 @@ TAE/EAE sorting is solved and mixed_branch has been merged back to main
 - CNN_straightened: best accuracy=0.95, CM=[[126 5][6 79]], threshold=0.5.
 - CNN_hybrid: best accuracy=0.96, CM=[[129 2][6 79]], threshold=0.5.
 - All checked models are working as expected on the updated TAE-like training pool.
+
+### 2026-05-10
+Codex: Promoted `cnn_raw.py` to the same operational path as the other CNN
+models. The raw trainer now has `argparse` help, accepts `--train_csv` and
+`--data_dir`, resamples the radial grid to `R_target` before padding/cropping
+the harmonic axis, and writes checkpoint metadata with `model_type=cnn_raw`.
+The shared `cnn_classify.py` / `cnn_infer_common.py` path and `sort_shot.py`
+now support raw CNN checkpoints directly.
+
+Codex: Added `ReduceLROnPlateau` to `cnn_raw.py` with the same fixed scheduler
+settings as `cnn_straightened.py` and changed the default initial learning rate
+to `2e-2`. The initial LR remains adjustable with `--lr`.
+
+User LR sweep for `cnn_raw.py` after adding the scheduler:
+- `lr=0.005`: best accuracy=0.9398, CM=[[128 3][10 75]]
+- `lr=0.01`: best accuracy=0.9491, CM=[[129 2][9 76]]
+- `lr=0.02`: best accuracy=0.9491, CM=[[127 4][7 78]]
+- `lr=0.03`: best accuracy=0.9352, CM=[[127 4][10 75]]
+- `lr=0.05`: unstable / stalled near majority-class accuracy after early epochs
+
+Because the downstream NOVA-C workflow should avoid throwing away potentially
+strongly unstable GOOD modes, false negatives are more costly than false
+positives. The raw CNN default initial learning rate was therefore changed to
+`0.02`, which kept the same best accuracy as `0.01` on this split but reduced
+GOOD-mode false negatives.
