@@ -1,0 +1,45 @@
+nova_s>python $NOVA_REPO/scripts/rf_train_classify.py --train_csv $NOVA_REPO/training_labels/tae_like.csv --model_out rf_classifier.joblib
+Cross-validation accuracies: [0.94009217 0.92165899 0.89400922 0.9078341  0.94009217]
+Mean CV accuracy: 0.9207373271889401
+Trained on 1085 modes total
+
+=== Feature Importances ===
+delta2_eff                 0.1140
+W_star                     0.1068
+max_abs_d1_abs             0.1000
+S                          0.0946
+std_amp                    0.0916
+gamma_d                    0.0715
+max_abs_d2_abs             0.0512
+max_to_mean                0.0404
+std_per_m_mean             0.0395
+mean_amp                   0.0372
+mean_abs_d2_mode           0.0323
+r_star                     0.0260
+rad_width                  0.0236
+frac_spikes                0.0231
+max_to_median              0.0228
+max_per_m_mean             0.0223
+spikes_per_m               0.0218
+rad_loc                    0.0198
+mean_abs_d1_mode           0.0179
+std_per_m_max              0.0158
+ntor                       0.0142
+omega                      0.0135
+
+
+Confusion matrix (test):
+[[62  4]
+ [ 3 40]]
+
+Classification report (test):
+              precision    recall  f1-score   support
+
+           0       0.95      0.94      0.95        66
+           1       0.91      0.93      0.92        43
+
+    accuracy                           0.94       109
+   macro avg       0.93      0.93      0.93       109
+weighted avg       0.94      0.94      0.94       109
+
+Saved classifier to rf_classifier.joblib

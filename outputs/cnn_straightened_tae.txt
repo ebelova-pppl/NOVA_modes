@@ -1,0 +1,60 @@
+05/10/2026
+using thr=0.5 - a new default
+
+ebelova//nova_s>python $NOVA_REPO/scripts/cnn_straightened.py
+Total modes: 1085 | Train: 869 | Test: 216
+Device: cuda
+Epoch   1/80 | loss=0.6239 | test_acc=0.6806 | lr=1.00e-02
+Epoch   5/80 | loss=0.3650 | test_acc=0.8750 | lr=1.00e-02
+Epoch  10/80 | loss=0.3626 | test_acc=0.9074 | lr=1.00e-02
+Epoch  15/80 | loss=0.3177 | test_acc=0.9213 | lr=5.00e-03
+Epoch  20/80 | loss=0.2967 | test_acc=0.9259 | lr=5.00e-03
+Epoch  25/80 | loss=0.2517 | test_acc=0.9074 | lr=5.00e-03
+Epoch  30/80 | loss=0.2248 | test_acc=0.9352 | lr=2.50e-03
+Epoch  35/80 | loss=0.2055 | test_acc=0.9444 | lr=2.50e-03
+Epoch  40/80 | loss=0.2063 | test_acc=0.9491 | lr=1.25e-03
+Epoch  45/80 | loss=0.1932 | test_acc=0.9444 | lr=1.25e-03
+Epoch  50/80 | loss=0.1921 | test_acc=0.9444 | lr=6.25e-04
+Epoch  55/80 | loss=0.1865 | test_acc=0.9491 | lr=3.13e-04
+Epoch  60/80 | loss=0.1905 | test_acc=0.9444 | lr=1.56e-04
+Epoch  65/80 | loss=0.1926 | test_acc=0.9444 | lr=7.81e-05
+Epoch  70/80 | loss=0.1876 | test_acc=0.9444 | lr=3.91e-05
+Epoch  75/80 | loss=0.1847 | test_acc=0.9444 | lr=3.91e-05
+Epoch  80/80 | loss=0.1875 | test_acc=0.9444 | lr=1.95e-05
+Best test acc: 0.9491 (epoch 40)
+
+Misclassified modes:
+Path,  true_label,  pred_label,  p_good
+/global/cfs/cdirs/m314/nova2/data/nstx_120113/N3/egn03w.5807E+01, good, bad, 0.159
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N4/egn04w.8898E+02, bad, good, 0.817
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N7/egn07w.1825E+03, good, bad, 0.113
+/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.9561E+01, bad, good, 0.555
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.6072E+02, bad, good, 0.927
+/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.7010E+01, bad, good, 0.774
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N7/egn07w.1500E+03, good, bad, 0.407
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N9/egn09w.3602E+02, good, bad, 0.091
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N7/egn07w.1348E+03, bad, good, 0.587
+/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.1001E+02, good, bad, 0.096
+/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N8/egn08w.4276E+02, good, bad, 0.098
+
+Good modes p_good range: 0.09062029 0.9964914
+Bad modes p_good range: 1.6205954e-08 0.9272944
+mean p_good | true good: 0.84852123
+mean p_good | true bad : 0.068174325
+
+Confusion matrix (rows=actual [bad,good], cols=pred [bad,good]):
+[[126   5]
+ [  6  79]]
+
+Classification report:
+              precision    recall  f1-score   support
+
+         bad       0.95      0.96      0.96       131
+        good       0.94      0.93      0.93        85
+
+    accuracy                           0.95       216
+   macro avg       0.95      0.95      0.95       216
+weighted avg       0.95      0.95      0.95       216
+
+
+Saved CNN to nova_cnn.pt
