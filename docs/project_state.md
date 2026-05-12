@@ -267,11 +267,12 @@ without editing source files. `scripts/README.md` now includes a Perlmutter
 interactive `srun` example and OOM triage notes.
 
 ### 2026-05-12
-Codex: Added `configs/paths/nova_paths.flux.sh` for PPPL Flux. The config
-resolves `NOVA_REPO` from the sourced file, points the old TAE-only dataset at
-`/u/ebelova/NOVA/data_tae`, points the mixed TAE+EAE dataset at
-`/u/ebelova/src_nova/data_mixed`, defaults `NOVA_DATA` to the mixed dataset,
-and sets `NOVA_TORCH_DEVICE=cpu` for Flux CPU runs. It also adds CPU helper
-functions mirroring the NERSC CNN/sort helpers without requesting GPUs. Flux
-still needs `module load anaconda3` for Python and `module load pytorch` for
-CNN training / inference.
+Codex: Added Flux path configs for both shells:
+`configs/paths/nova_paths.flux.csh` for Flux's default `tcsh`, and
+`configs/paths/nova_paths.flux.sh` for bash. They point the old TAE-only
+dataset at `/u/ebelova/NOVA/data_tae`, point the mixed TAE+EAE dataset at
+`/u/ebelova/src_nova/data_mixed`, default `NOVA_DATA` to the mixed dataset,
+and set `NOVA_TORCH_DEVICE=cpu` for Flux CPU runs. They also add CPU helpers
+mirroring the NERSC CNN/sort helpers without requesting GPUs. Flux still needs
+`module load anaconda3` for Python and `module load pytorch` for CNN training /
+inference.
