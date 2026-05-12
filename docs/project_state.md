@@ -265,3 +265,13 @@ memory before model allocation. `cnn_raw.py` accepts `--device`, and
 `NOVA_TORCH_DEVICE` so Perlmutter runs can force `cpu`, `cuda`, or `cuda:0`
 without editing source files. `scripts/README.md` now includes a Perlmutter
 interactive `srun` example and OOM triage notes.
+
+### 2026-05-12
+Codex: Added `configs/paths/nova_paths.flux.sh` for PPPL Flux. The config
+resolves `NOVA_REPO` from the sourced file, points the old TAE-only dataset at
+`/u/ebelova/NOVA/data_tae`, points the mixed TAE+EAE dataset at
+`/u/ebelova/src_nova/data_mixed`, defaults `NOVA_DATA` to the mixed dataset,
+and sets `NOVA_TORCH_DEVICE=cpu` for Flux CPU runs. It also adds CPU helper
+functions mirroring the NERSC CNN/sort helpers without requesting GPUs. Flux
+still needs `module load anaconda3` for Python and `module load pytorch` for
+CNN training / inference.

@@ -83,8 +83,12 @@ Minimal install / enviroment
 - On NERSC Perlmutter:
     - module load python
     - module load pytorch
+    - source configs/paths/nova_paths.nersc.sh
 - On PPPL Flux:
-     - module load anaconda3
+    - module load anaconda3
+    - module load pytorch
+    - source configs/paths/nova_paths.flux.sh
+    - Flux runs the CNN scripts on CPU by default via `NOVA_TORCH_DEVICE=cpu`
 - Python packages:
     - numpy
     - scipy

@@ -80,6 +80,18 @@ runs the raw CNN through the same Slurm launch path. The helpers default to
 `NOVA_CPUS_PER_TASK=1`; if you set a larger value, request matching CPUs in the
 `salloc` command.
 
+On PPPL Flux, source `configs/paths/nova_paths.flux.sh`. Flux defaults
+`NOVA_TORCH_DEVICE=cpu`, points `NOVA_DATA` at the mixed TAE+EAE data directory,
+and provides CPU helpers:
+
+```bash
+module load anaconda3
+module load pytorch
+source configs/paths/nova_paths.flux.sh
+nova_cpu_smoke
+nova_run_cnn_raw --batch_size 8 --cache_data
+```
+
 If raw CNN training is slow because the shared filesystem is lagging, use
 `--cache_data` to preprocess the train/test tensors once and keep them in RAM:
 
