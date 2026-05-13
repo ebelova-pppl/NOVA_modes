@@ -8,7 +8,7 @@ venv/
 .ipynb_checkpoints/
 
 # Training outputs
-models/
+#models/
 LISTS/
 #*txt
 notes
