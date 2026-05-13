@@ -87,13 +87,25 @@ and provides CPU helpers:
 
 ```tcsh
 module load anaconda3
-module load pytorch
+conda activate <your torch env>
 source configs/paths/nova_paths.flux.csh
 nova_cpu_smoke
 nova_run_cnn_raw --batch_size 8 --cache_data
 ```
 
 Bash users can source `configs/paths/nova_paths.flux.sh` instead.
+
+For older Perlmutter-trained CNN checkpoints that do not contain
+`model_type`/preprocessing metadata, `cnn_classify.py` can infer raw,
+straightened, or hybrid from filenames containing `raw`, `straightened`, or
+`hybrid`. If the filename is generic, pass the kind explicitly:
+
+```bash
+python "$NOVA_REPO/scripts/cnn_classify.py" \
+  --model /path/to/checkpoint.pt \
+  --model_kind cnn_raw \
+  --path /path/to/mode
+```
 
 If raw CNN training is slow because the shared filesystem is lagging, use
 `--cache_data` to preprocess the train/test tensors once and keep them in RAM:

@@ -274,5 +274,13 @@ dataset at `/u/ebelova/NOVA/data_tae`, point the mixed TAE+EAE dataset at
 `/u/ebelova/src_nova/data_mixed`, default `NOVA_DATA` to the mixed dataset,
 and set `NOVA_TORCH_DEVICE=cpu` for Flux CPU runs. They also add CPU helpers
 mirroring the NERSC CNN/sort helpers without requesting GPUs. Flux still needs
-`module load anaconda3` for Python and `module load pytorch` for CNN training /
-inference.
+`module load anaconda3` plus a conda environment with PyTorch installed for CNN
+training / inference.
+
+### 2026-05-13
+Codex: Made `cnn_classify.py` / `cnn_infer_common.py` more tolerant of
+Perlmutter-trained legacy CNN checkpoints. The loader now accepts payloads with
+`state_dict`, plain model `state_dict` payloads, and uses checkpoint filenames
+containing `raw`, `straightened`, or `hybrid` as last-resort model-kind hints.
+Generic legacy filenames can still be loaded by passing `--model_kind`
+explicitly.

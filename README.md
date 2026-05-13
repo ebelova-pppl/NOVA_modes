@@ -86,7 +86,7 @@ Minimal install / enviroment
     - source configs/paths/nova_paths.nersc.sh
 - On PPPL Flux:
     - module load anaconda3
-    - module load pytorch
+    - conda activate the environment with PyTorch installed
     - source configs/paths/nova_paths.flux.csh
     - Bash users can source configs/paths/nova_paths.flux.sh instead
     - Flux runs the CNN scripts on CPU by default via `NOVA_TORCH_DEVICE=cpu`

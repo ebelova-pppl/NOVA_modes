@@ -6,7 +6,7 @@
 
 # Recommended Flux modules before running these scripts:
 #   module load anaconda3
-#   module load pytorch      # needed for CNN training / inference
+#   conda activate <your torch env>      # needed for CNN training / inference
 
 # Canonical git repo / worktree
 # Resolve the repo root from this config file so the same file works when it is

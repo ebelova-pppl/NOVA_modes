@@ -306,16 +306,41 @@ def _load_checkpoint(checkpoint_path: str) -> dict[str, Any]:
     except TypeError:
         checkpoint = torch.load(checkpoint_path, map_location="cpu")
 
-    if not isinstance(checkpoint, dict) or "model_state_dict" not in checkpoint:
+    if not isinstance(checkpoint, dict):
         raise UnsupportedCheckpointError(
             f"{checkpoint_path} is not a supported CNN checkpoint payload."
         )
-    return checkpoint
+
+    if "model_state_dict" in checkpoint:
+        return checkpoint
+
+    state_dict = checkpoint.get("state_dict")
+    if isinstance(state_dict, Mapping):
+        normalized = dict(checkpoint)
+        normalized["model_state_dict"] = state_dict
+        return normalized
+
+    if _looks_like_model_state_dict(checkpoint):
+        return {"model_state_dict": checkpoint}
+
+    raise UnsupportedCheckpointError(
+        f"{checkpoint_path} is not a supported CNN checkpoint payload."
+    )
+
+
+def _looks_like_model_state_dict(payload: Mapping[str, Any]) -> bool:
+    if not payload:
+        return False
+    prefixes = {str(key).split(".")[0] for key in payload}
+    if not (prefixes & {"features", "head", "img_fc", "sc_fc", "module"}):
+        return False
+    return all(torch.is_tensor(value) for value in payload.values())
 
 
 def infer_checkpoint_kind(
     checkpoint: Mapping[str, Any],
     model_kind: str = "auto",
+    checkpoint_path: str | None = None,
 ) -> str:
     if model_kind != "auto":
         if model_kind not in SUPPORTED_MODEL_KINDS:
@@ -353,12 +378,23 @@ def infer_checkpoint_kind(
         return "cnn_raw"
     if any(key in checkpoint for key in LEGACY_PREPROCESS_DEFAULTS):
         return "cnn_straightened"
+
+    if checkpoint_path:
+        name = Path(checkpoint_path).name.lower()
+        if "hybrid" in name:
+            return "cnn_hybrid"
+        if "straight" in name:
+            return "cnn_straightened"
+        if "raw" in name:
+            return "cnn_raw"
+
     #if checkpoint.get("normalize") == "maxabs": ChatGPT did not like this heuristic since normalize could be maxabs for raw model type, but in practice all known straightened checkpoints have maxabs and no known hybrid checkpoints have maxabs, so this is actually a pretty strong signal. Leaving it out for now since it's a bit hacky, but it could be added back as a final heuristic if we find more ambiguous checkpoints in the future.
     #    return "cnn_straightened"
 
     raise UnsupportedCheckpointError(
         "Checkpoint does not look like a supported CNN checkpoint. "
-        "If this is an older raw CNN checkpoint, pass --model_kind cnn_raw."
+        "If this is an older checkpoint, pass --model_kind cnn_raw, "
+        "--model_kind cnn_straightened, or --model_kind cnn_hybrid."
     )
 
 
@@ -464,7 +500,11 @@ def load_cnn_classifier(
 ) -> LoadedCNNClassifier:
     resolved_checkpoint_path = str(Path(checkpoint_path).expanduser())
     checkpoint = _load_checkpoint(resolved_checkpoint_path)
-    checkpoint_kind = infer_checkpoint_kind(checkpoint, model_kind=model_kind)
+    checkpoint_kind = infer_checkpoint_kind(
+        checkpoint,
+        model_kind=model_kind,
+        checkpoint_path=resolved_checkpoint_path,
+    )
     if checkpoint_kind == "cnn_raw":
         preprocess = resolve_raw_preprocess_metadata(
             checkpoint,

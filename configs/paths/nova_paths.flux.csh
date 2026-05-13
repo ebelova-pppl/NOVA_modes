@@ -6,7 +6,7 @@
 
 # Recommended Flux modules before running these scripts:
 #   module load anaconda3
-#   module load pytorch      # needed for CNN training / inference
+#   conda activate /p/hym/conda_envs/torch-hym     # needed for CNN training / inference
 
 # tcsh does not expose a sourced file path like bash's BASH_SOURCE. The default
 # below matches the Flux clone layout; setenv NOVA_REPO before sourcing this
