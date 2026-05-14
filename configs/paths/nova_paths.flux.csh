@@ -10,6 +10,7 @@
 #   setenv CONDA_PKGS_DIR "/p/hym/conda_pkgs"     # optional: shared conda pkgs directory
 #   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
 #   cd /p/hym/ebelova/NOVA/NOVA_modes
+#   use: "source /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh" to set up environment variables for data, models, results, and training lists.
 
 # tcsh does not expose a sourced file path like bash's BASH_SOURCE. The default
 # below matches the Flux clone layout; setenv NOVA_REPO before sourcing this
