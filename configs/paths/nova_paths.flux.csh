@@ -62,11 +62,11 @@ if (! $?MKL_NUM_THREADS) then
 endif
 
 # Python imports from src/
-if (! $?PYTHONPATH) then
+#if (! $?PYTHONPATH) then
     setenv PYTHONPATH "${NOVA_REPO}/src"
-else
-    setenv PYTHONPATH "${NOVA_REPO}/src:${PYTHONPATH}"
-endif
+#else
+#    setenv PYTHONPATH "${NOVA_REPO}/src:${PYTHONPATH}"
+#endif
 
 if ($?CUDA_VISIBLE_DEVICES) then
     setenv NOVA_CUDA_VISIBLE_DEVICES_STATUS "$CUDA_VISIBLE_DEVICES"
