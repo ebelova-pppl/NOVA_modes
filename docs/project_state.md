@@ -270,8 +270,8 @@ interactive `srun` example and OOM triage notes.
 Codex: Added Flux path configs for both shells:
 `configs/paths/nova_paths.flux.csh` for Flux's default `tcsh`, and
 `configs/paths/nova_paths.flux.sh` for bash. They point the old TAE-only
-dataset at `/u/ebelova/NOVA/data_tae`, point the mixed TAE+EAE dataset at
-`/u/ebelova/src_nova/data_mixed`, default `NOVA_DATA` to the mixed dataset,
+dataset at `/u/ebelova/NOVA_old/data_tae`, point the mixed TAE+EAE dataset at
+`/p/hym/ebelova/NOVA/data_mixed`, default `NOVA_DATA` to the mixed dataset,
 and set `NOVA_TORCH_DEVICE=cpu` for Flux CPU runs. They also add CPU helpers
 mirroring the NERSC CNN/sort helpers without requesting GPUs. Flux still needs
 `module load anaconda3` plus a conda environment with PyTorch installed for CNN
@@ -284,3 +284,14 @@ Perlmutter-trained legacy CNN checkpoints. The loader now accepts payloads with
 containing `raw`, `straightened`, or `hybrid` as last-resort model-kind hints.
 Generic legacy filenames can still be loaded by passing `--model_kind`
 explicitly.
+
+### 2026-05-14
+Codex: Updated the Flux path configs after moving the active Flux workflow to
+`/p/hym`. The default tcsh repo path is now
+`/p/hym/ebelova/NOVA/NOVA_modes`, the Flux work root is
+`/p/hym/ebelova/NOVA`, mixed data defaults to
+`/p/hym/ebelova/NOVA/data_mixed`, models default to
+`/p/hym/ebelova/NOVA/models_flux`, and the old TAE-only data remains at
+`/u/ebelova/NOVA_old/data_tae`. The bash Flux config mirrors the same data,
+model, and run-directory defaults while still resolving `NOVA_REPO` from the
+sourced file.

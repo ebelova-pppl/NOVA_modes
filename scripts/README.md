@@ -82,12 +82,15 @@ runs the raw CNN through the same Slurm launch path. The helpers default to
 
 On PPPL Flux with the default `tcsh` shell, source
 `configs/paths/nova_paths.flux.csh`. Flux defaults
-`NOVA_TORCH_DEVICE=cpu`, points `NOVA_DATA` at the mixed TAE+EAE data directory,
-and provides CPU helpers:
+`NOVA_TORCH_DEVICE=cpu`, points `NOVA_DATA` at
+`/p/hym/ebelova/NOVA/data_mixed`, points `NOVA_DATA_TAE` at
+`/u/ebelova/NOVA_old/data_tae`, and provides CPU helpers:
 
 ```tcsh
 module load anaconda3
-conda activate <your torch env>
+setenv CONDA_PKGS_DIR /p/hym/conda_pkgs
+conda activate /p/hym/conda_envs/nova-perlmutter
+cd /p/hym/ebelova/NOVA/NOVA_modes
 source configs/paths/nova_paths.flux.csh
 nova_cpu_smoke
 nova_run_cnn_raw --batch_size 8 --cache_data

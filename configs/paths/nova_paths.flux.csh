@@ -1,38 +1,34 @@
-# ~/src_nova/NOVA_modes/configs/paths/nova_paths.flux.csh
+# /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh
 
 # ----------------------------
 # NOVA AE project paths on Flux
 # ----------------------------
 
 # Recommended Flux modules before running these scripts:
+#   in /p/hym:
 #   module load anaconda3
-#   conda activate /p/hym/conda_envs/torch-hym     # needed for CNN training / inference
+#   setenv CONDA_PKGS_DIR "/p/hym/conda_pkgs"     # optional: shared conda pkgs directory
+#   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
+#   cd /p/hym/ebelova/NOVA/NOVA_modes
 
 # tcsh does not expose a sourced file path like bash's BASH_SOURCE. The default
 # below matches the Flux clone layout; setenv NOVA_REPO before sourcing this
 # file if the repo lives somewhere else.
 if (! $?NOVA_REPO) then
-    setenv NOVA_REPO "${HOME}/src_nova/NOVA_modes"
+    setenv NOVA_REPO "/p/hym/ebelova/NOVA/NOVA_modes"
 endif
 
-# Persistent data / models / saved results. On Flux, HOME is expected to be
-# /u/ebelova, so these defaults expand to the requested /u/ebelova/... layout.
-if ($?NOVA_FLUX_HOME) then
-    set _NOVA_FLUX_HOME = "$NOVA_FLUX_HOME"
-else
-    set _NOVA_FLUX_HOME = "$HOME"
-endif
-
+# Persistent data / models / saved results.
 if ($?NOVA_FLUX_WORK_ROOT) then
     set _NOVA_FLUX_WORK_ROOT = "$NOVA_FLUX_WORK_ROOT"
 else
-    set _NOVA_FLUX_WORK_ROOT = "${_NOVA_FLUX_HOME}/src_nova"
+    set _NOVA_FLUX_WORK_ROOT = "/p/hym/ebelova/NOVA"
 endif
 
-setenv NOVA_DATA_TAE "${_NOVA_FLUX_HOME}/NOVA/data_tae"
-setenv NOVA_DATA_MIXED "${_NOVA_FLUX_WORK_ROOT}/data_mixed"
+setenv NOVA_DATA_TAE "/u/ebelova/NOVA_old/data_tae"          # old TAE-only set, used for initial CNN training
+setenv NOVA_DATA_MIXED "${_NOVA_FLUX_WORK_ROOT}/data_mixed"  # new mixed set TAEs+EAEs
 setenv NOVA_DATA "$NOVA_DATA_MIXED"
-setenv NOVA_MODELS "${_NOVA_FLUX_WORK_ROOT}/models"
+setenv NOVA_MODELS "${_NOVA_FLUX_WORK_ROOT}/models_flux"
 setenv NOVA_RESULTS "${_NOVA_FLUX_WORK_ROOT}/results"
 
 # Active run areas. Override NOVA_RUN_ROOT before sourcing if a different Flux
@@ -43,7 +39,6 @@ endif
 setenv NOVA_RUN_RF "${NOVA_RUN_ROOT}/nova_rf"
 setenv NOVA_RUN_CNN "${NOVA_RUN_ROOT}/nova_cnn"
 
-unset _NOVA_FLUX_HOME
 unset _NOVA_FLUX_WORK_ROOT
 
 # Version-controlled labeled training lists.

@@ -1,12 +1,15 @@
-# ~/src_nova/NOVA_modes/configs/paths/nova_paths.flux.sh
+# /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.sh
 
 # ----------------------------
 # NOVA AE project paths on Flux
 # ----------------------------
 
 # Recommended Flux modules before running these scripts:
+#   in /p/hym:
 #   module load anaconda3
-#   conda activate <your torch env>      # needed for CNN training / inference
+#   export CONDA_PKGS_DIR="/p/hym/conda_pkgs"     # optional: shared conda pkgs directory
+#   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
+#   cd /p/hym/ebelova/NOVA/NOVA_modes
 
 # Canonical git repo / worktree
 # Resolve the repo root from this config file so the same file works when it is
@@ -15,14 +18,12 @@ _NOVA_CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export NOVA_REPO="$(cd "${_NOVA_CONFIG_DIR}/../.." && pwd)"
 unset _NOVA_CONFIG_DIR
 
-# Persistent data / models / saved results. On Flux, HOME is expected to be
-# /u/ebelova, so these defaults expand to the requested /u/ebelova/... layout.
-_NOVA_FLUX_HOME="${NOVA_FLUX_HOME:-$HOME}"
-_NOVA_FLUX_WORK_ROOT="${NOVA_FLUX_WORK_ROOT:-${_NOVA_FLUX_HOME}/src_nova}"
-export NOVA_DATA_TAE="${_NOVA_FLUX_HOME}/NOVA/data_tae"          # old TAE-only dataset / legacy train_master.csv
+# Persistent data / models / saved results.
+_NOVA_FLUX_WORK_ROOT="${NOVA_FLUX_WORK_ROOT:-/p/hym/ebelova/NOVA}"
+export NOVA_DATA_TAE="/u/ebelova/NOVA_old/data_tae"              # old TAE-only dataset / legacy train_master.csv
 export NOVA_DATA_MIXED="${_NOVA_FLUX_WORK_ROOT}/data_mixed"      # mixed TAE+EAE training set
 export NOVA_DATA="$NOVA_DATA_MIXED"                              # default to mixed data, since that is the active workflow
-export NOVA_MODELS="${_NOVA_FLUX_WORK_ROOT}/models"
+export NOVA_MODELS="${_NOVA_FLUX_WORK_ROOT}/models_flux"
 export NOVA_RESULTS="${_NOVA_FLUX_WORK_ROOT}/results"
 
 # Active run areas. Override these before sourcing if a different Flux scratch
@@ -30,7 +31,7 @@ export NOVA_RESULTS="${_NOVA_FLUX_WORK_ROOT}/results"
 export NOVA_RUN_ROOT="${NOVA_RUN_ROOT:-${_NOVA_FLUX_WORK_ROOT}/runs}"
 export NOVA_RUN_RF="$NOVA_RUN_ROOT/nova_rf"
 export NOVA_RUN_CNN="$NOVA_RUN_ROOT/nova_cnn"
-unset _NOVA_FLUX_HOME _NOVA_FLUX_WORK_ROOT
+unset _NOVA_FLUX_WORK_ROOT
 
 # Version-controlled labeled training lists.
 export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like.csv"
