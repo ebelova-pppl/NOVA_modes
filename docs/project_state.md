@@ -275,7 +275,9 @@ dataset at `/u/ebelova/NOVA_old/data_tae`, point the mixed TAE+EAE dataset at
 and set `NOVA_TORCH_DEVICE=cpu` for Flux CPU runs. They also add CPU helpers
 mirroring the NERSC CNN/sort helpers without requesting GPUs. Flux still needs
 `module load anaconda3` plus a conda environment with PyTorch installed for CNN
-training / inference.
+training / inference; after loading Anaconda, `tcsh` users need to source
+`` `conda info --base`/etc/profile.d/conda.csh `` before `conda activate`,
+while bash users source `$(conda info --base)/etc/profile.d/conda.sh`.
 
 ### 2026-05-13
 Codex: Made `cnn_classify.py` / `cnn_infer_common.py` more tolerant of

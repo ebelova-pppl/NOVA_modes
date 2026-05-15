@@ -86,6 +86,8 @@ Minimal install / enviroment
     - source configs/paths/nova_paths.nersc.sh
 - On PPPL Flux:
     - module load anaconda3
+    - `tcsh`: ``source `conda info --base`/etc/profile.d/conda.csh``
+    - `bash`: source "$(conda info --base)/etc/profile.d/conda.sh"
     - conda activate /p/hym/conda_envs/nova-perlmutter
     - cd /p/hym/ebelova/NOVA/NOVA_modes
     - source configs/paths/nova_paths.flux.csh

@@ -88,6 +88,7 @@ On PPPL Flux with the default `tcsh` shell, source
 
 ```tcsh
 module load anaconda3
+source `conda info --base`/etc/profile.d/conda.csh
 setenv CONDA_PKGS_DIR /p/hym/conda_pkgs
 conda activate /p/hym/conda_envs/nova-perlmutter
 cd /p/hym/ebelova/NOVA/NOVA_modes
@@ -96,7 +97,8 @@ nova_cpu_smoke
 nova_run_cnn_raw --batch_size 8 --cache_data
 ```
 
-Bash users can source `configs/paths/nova_paths.flux.sh` instead.
+Bash users should source `$(conda info --base)/etc/profile.d/conda.sh` before
+`conda activate`, then source `configs/paths/nova_paths.flux.sh` instead.
 
 For older Perlmutter-trained CNN checkpoints that do not contain
 `model_type`/preprocessing metadata, `cnn_classify.py` can infer raw,

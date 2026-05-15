@@ -7,6 +7,7 @@
 # Recommended Flux modules before running these scripts:
 #   in /p/hym:
 #   module load anaconda3
+#   source "$(conda info --base)/etc/profile.d/conda.sh"
 #   export CONDA_PKGS_DIR="/p/hym/conda_pkgs"     # optional: shared conda pkgs directory
 #   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
 #   cd /p/hym/ebelova/NOVA/NOVA_modes
