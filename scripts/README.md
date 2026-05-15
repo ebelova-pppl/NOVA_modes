@@ -134,6 +134,10 @@ python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like.csv --out preds.csv
 ```
+or using env and running from $SCRATCH or other dir
+```bash
+python $NOVA_REPO/scripts/cnn_classify.py --model $NOVA_REPO/models/nova_cnn_raw.pt --path $NOVA_DATA/nstx_120113/N5/egn05w.6606E+02
+```
 
 `cnn_classify.py` is the shared inference entry point for raw, straightened, and
 hybrid CNN checkpoints. Older straightened/hybrid checkpoints that do not save
