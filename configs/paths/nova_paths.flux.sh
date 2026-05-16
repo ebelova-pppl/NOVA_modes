@@ -8,7 +8,7 @@
 #   in /p/hym:
 #   module load anaconda3
 #   source "$(conda info --base)/etc/profile.d/conda.sh"
-#   export CONDA_PKGS_DIR="/p/hym/conda_pkgs"     # optional: shared conda pkgs directory
+#   export CONDA_PKGS_DIRS="/p/hym/conda_pkgs"    # optional: shared conda pkgs directory
 #   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
 #   cd /p/hym/ebelova/NOVA/NOVA_modes
 
@@ -54,6 +54,15 @@ if [ -z "${PYTHONPATH:-}" ]; then
 else
     export PYTHONPATH="$NOVA_REPO/src:$PYTHONPATH"
 fi
+
+# Keep caches and user-level Python state out of the small home directory.
+export XDG_CACHE_HOME="/p/hym/cache"
+export XDG_CONFIG_HOME="/p/hym/config"
+export XDG_DATA_HOME="/p/hym/local/share"
+export XDG_STATE_HOME="/p/hym/local/state"
+export PIP_CACHE_DIR="/p/hym/cache/pip"
+export MPLCONFIGDIR="/p/hym/cache/matplotlib"
+export PYTHONUSERBASE="/p/hym/local"
 
 # -----------------------------
 # Helper functions

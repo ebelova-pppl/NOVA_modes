@@ -88,11 +88,14 @@ Minimal install / enviroment
     - module load anaconda3
     - `tcsh`: ``source `conda info --base`/etc/profile.d/conda.csh``
     - `bash`: source "$(conda info --base)/etc/profile.d/conda.sh"
+    - set conda package cache under `/p/hym` with `CONDA_PKGS_DIRS`
     - conda activate /p/hym/conda_envs/nova-perlmutter
     - cd /p/hym/ebelova/NOVA/NOVA_modes
     - source configs/paths/nova_paths.flux.csh
     - Bash users can source configs/paths/nova_paths.flux.sh instead
     - Flux runs the CNN scripts on CPU by default via `NOVA_TORCH_DEVICE=cpu`
+    - Perlmutter-trained CNN checkpoints have been cross-checked on Flux with
+      identical RF / raw / straightened / hybrid inference outputs
 - Python packages:
     - numpy
     - scipy

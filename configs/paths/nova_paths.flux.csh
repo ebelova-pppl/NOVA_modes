@@ -9,7 +9,7 @@
 #   module load anaconda3
 #   in /p/hym/ebelova/NOVA/NOVA_modes:
 #   source `conda info --base`/etc/profile.d/conda.csh
-#   setenv CONDA_PKGS_DIR "/p/hym/conda_pkgs"     # optional: shared conda pkgs directory
+#   setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"    # optional: shared conda pkgs directory
 #   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
 #   cd /p/hym/ebelova/NOVA/NOVA_modes
 #   use: "source /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh" to set up environment variables for data, models, results, and training lists.
@@ -76,6 +76,15 @@ if ($?CUDA_VISIBLE_DEVICES) then
 else
     setenv NOVA_CUDA_VISIBLE_DEVICES_STATUS "<unset>"
 endif
+
+# Keep caches and user-level Python state out of the small home directory.
+setenv XDG_CACHE_HOME /p/hym/cache
+setenv XDG_CONFIG_HOME /p/hym/config
+setenv XDG_DATA_HOME /p/hym/local/share
+setenv XDG_STATE_HOME /p/hym/local/state
+setenv PIP_CACHE_DIR /p/hym/cache/pip
+setenv MPLCONFIGDIR /p/hym/cache/matplotlib
+setenv PYTHONUSERBASE /p/hym/local
 
 # -----------------------------
 # Helper aliases

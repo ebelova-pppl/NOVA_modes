@@ -155,7 +155,12 @@ From cont_features.py:
 ## Environment / portability
 - Tested on:
     -	NERSC Perlmutter ✅ (pytorch, GPU)
-    -	PPPL Flux ✅
+    -	PPPL Flux ✅ (CPU inference in `/p/hym` conda env)
+- Cross-cluster inference validation:
+    - RF model output matched between Flux and Perlmutter
+    - Perlmutter GPU-trained `cnn_raw`, `cnn_straightened`, and `cnn_hybrid`
+      checkpoints produced identical `cnn_classify.py` outputs on Flux and
+      Perlmutter when using matching Torch / NumPy / scikit-learn versions
 
 ## Interpretation of labels
 -	Good: smooth, physical AE structure, reasonable continuum interaction
@@ -297,3 +302,17 @@ Codex: Updated the Flux path configs after moving the active Flux workflow to
 `/u/ebelova/NOVA_old/data_tae`. The bash Flux config mirrors the same data,
 model, and run-directory defaults while still resolving `NOVA_REPO` from the
 sourced file.
+
+### 2026-05-15
+User validation on Flux: the `/p/hym` conda environment now matches the
+Perlmutter runtime versions for Torch `2.8.0`, NumPy `2.1.2`, and
+scikit-learn `1.7.2`. RF inference output matched between Flux and Perlmutter,
+and copied Perlmutter GPU-trained checkpoints for `cnn_raw`,
+`cnn_straightened`, and `cnn_hybrid` all produced identical
+`cnn_classify.py` outputs on Flux CPU and Perlmutter.
+
+Codex: Updated the Flux configs to keep package caches and user-level Python
+state out of `/u/ebelova` by setting `XDG_CACHE_HOME`, `XDG_CONFIG_HOME`,
+`XDG_DATA_HOME`, `XDG_STATE_HOME`, `PIP_CACHE_DIR`, `MPLCONFIGDIR`, and
+`PYTHONUSERBASE` under `/p/hym`. The Flux setup instructions now use conda's
+`CONDA_PKGS_DIRS` environment variable name consistently.
