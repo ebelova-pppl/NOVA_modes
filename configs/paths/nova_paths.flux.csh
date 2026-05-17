@@ -90,7 +90,9 @@ setenv PYTHONUSERBASE /p/hym/local
 # Helper aliases
 # -----------------------------
 
-alias set_nova_env 'module load anaconda3; source `conda info --base`/etc/profile.d/conda.csh; setenv CONDA_PKGS_DIRS /p/hym/conda_pkgs; conda activate /p/hym/conda_envs/nova-perlmutter' 
+alias set_paths 'source /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh'
+
+alias set_nova_env 'module load anaconda3; source `conda info --base`/etc/profile.d/conda.csh; setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"; conda activate /p/hym/conda_envs/nova-perlmutter' 
 
 alias nova_env 'echo "NOVA_REPO      = $NOVA_REPO"; echo "NOVA_DATA      = $NOVA_DATA"; echo "NOVA_DATA_TAE  = $NOVA_DATA_TAE"; echo "NOVA_DATA_MIXED = $NOVA_DATA_MIXED"; echo "NOVA_MODELS    = $NOVA_MODELS"; echo "NOVA_RESULTS   = $NOVA_RESULTS"; echo "NOVA_RUN_ROOT  = $NOVA_RUN_ROOT"; echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"; echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"; echo "NOVA_TRAIN_CSV_MIXED = $NOVA_TRAIN_CSV_MIXED"; echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"; echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"; echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"; echo "MKL_NUM_THREADS = $MKL_NUM_THREADS"; echo "CUDA_VISIBLE_DEVICES = $NOVA_CUDA_VISIBLE_DEVICES_STATUS"; echo "PYTHONPATH     = $PYTHONPATH"'
 
