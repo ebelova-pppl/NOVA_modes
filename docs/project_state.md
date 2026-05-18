@@ -70,6 +70,7 @@ From cont_features.py:
 -	mode_transform.py
 -	view_modes_csv.py
 -	sort_shot.py
+-	sort_shot_mixed.py
 -	split_tae_eae.py
 ### RF
 -	rf_train_classify.py (renamed from nova_mode_classifier.py)
@@ -316,3 +317,13 @@ state out of `/u/ebelova` by setting `XDG_CACHE_HOME`, `XDG_CONFIG_HOME`,
 `XDG_DATA_HOME`, `XDG_STATE_HOME`, `PIP_CACHE_DIR`, `MPLCONFIGDIR`, and
 `PYTHONUSERBASE` under `/p/hym`. The Flux setup instructions now use conda's
 `CONDA_PKGS_DIRS` environment variable name consistently.
+
+### 2026-05-17
+Codex: Added `scripts/sort_shot_mixed.py` for one-pass processing of mixed
+TAE/EAE shots. The new workflow validates files, routes valid modes into
+TAE-like / mixed / EAE-like groups with the existing normalized upper-gap
+scalars, scores TAE-side modes with the shared RF path plus raw CNN inference,
+combines scores with gold/silver/borderline tiers, and reuses the existing
+close-frequency deduplication logic from `sort_shot.py`. It writes final good,
+bad, QC-flagged, EAE-like, rejected, all-mode, per-shot, per-`n`, and
+frequency-cluster audit outputs without moving source files.

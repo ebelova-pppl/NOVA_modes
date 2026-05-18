@@ -434,6 +434,55 @@ python sort_shot.py -h
 
 ---
 
+## `sort_shot_mixed.py`
+
+Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
+
+- validates mode files and required continuum inputs,
+- routes valid modes into `tae_like`, `mixed`, and `eae_like` gap regions,
+- sends TAE-like plus mixed modes through both the RF classifier and raw CNN,
+- combines RF/CNN probabilities with the current gold/silver/borderline policy,
+- reuses the close-frequency duplicate removal from `sort_shot.py`, and
+- writes CSV audit tables, shot summaries, a frequency-cluster report, and
+  optional diagnostic plots.
+
+The main outputs are:
+
+- `good_tae_unchecked.csv`
+- `good_tae_final.csv`
+- `bad_tae_like.csv`
+- `flagged_tae_like.csv`
+- `eae_like.csv`
+- `rejected_modes.csv`
+- `shot_summary.csv`
+
+It also writes `all_modes_scored.csv`, `tae_like_all.csv`,
+`shot_summary_by_n.csv`, `frequency_cluster_report.txt`, and
+`frequency_clusters.csv` for auditability.
+
+`flagged_tae_like.csv` is an overlapping QC list rather than a mutually
+exclusive class: it contains scored TAE-side modes that are borderline or show
+RF/CNN disagreement, so they may also appear in either `good_tae_unchecked.csv`
+or `bad_tae_like.csv`.
+
+### Usage
+
+```bash
+python sort_shot_mixed.py \
+  --shot_dir /path/to/nstx_135388 \
+  --rf_model /path/to/nova_mode_classifier.joblib \
+  --cnn_model /path/to/nova_cnn_raw.pt \
+  --out_dir /path/to/sort_outputs/nstx_135388 \
+  --make_plots
+```
+
+The TAE/EAE split uses the normalized `signed_delta` plus
+`fraction_below_upper2` convention from `src/tae_eae_features.py`. `mixed`
+modes stay on the TAE side for RF/CNN classification so marginal TAEs are not
+lost.
+
+---
+
 ## `utils/merge_lists.py`
 
 Merges multiple training CSV file lists into a single master list, fixes relative paths by prepending shot-specific base directories, removes duplicates, and keeps only `good` / `bad` labels (newer labels override older ones).

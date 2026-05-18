@@ -15,6 +15,7 @@ Current canonical pipelines:
 - `scripts/cnn_hybrid.py`
 - `scripts/cnn_classify.py`
 - `scripts/sort_shot.py`
+- `scripts/sort_shot_mixed.py`
 - `scripts/label_modes_fast.py`
 
 Shared scripts / features:
@@ -76,7 +77,11 @@ Typical workflow
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
 - Train classifier (RF or CNN) on tae_like modes (for now)
-- Run sort_shot.py to classify modes for a shot and remove duplicates (for each ntor)
+- Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
+  routes EAE-like modes away, combines RF + raw-CNN TAE decisions, and removes
+  close-frequency duplicate TAEs.
+- Run `sort_shot.py` when you want the older single-model shot sorter and
+  duplicate-removal workflow.
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)
 
 Minimal install / enviroment
