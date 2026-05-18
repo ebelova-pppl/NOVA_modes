@@ -87,9 +87,9 @@ SHOT_SUMMARY_FIELDS = [
     "n_silver_good",
     "n_final_good",
     "n_final_bad",
-    "n_uncertain",
+    "n_flagged",
     "fraction_good",
-    "fraction_uncertain",
+    "fraction_flagged",
     "rf_cnn_agreement_fraction",
     "mean_p_rf_good",
     "mean_p_cnn_good",
@@ -154,7 +154,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def make_base_row(path: str, shot: str, n: int) -> dict[str, Any]:
-    row = {field: "" for field in ALL_OUTPUT_FIELDS}
+    row: dict[str, Any] = {field: "" for field in ALL_OUTPUT_FIELDS}
     row.update(
         {
             "path": path,
@@ -239,13 +239,13 @@ def inspect_mode_file(path: str, *, expected_n: int) -> tuple[dict[str, Any] | N
     if int(ntor) != int(expected_n):
         return (
             None,
-            "ntor_mismatch",
+            "ntor-N_mismatch",
             f"Directory N{expected_n} disagrees with file metadata ntor={ntor}",
         )
     if nhar < 4 * int(ntor):
         return (
             None,
-            "insufficient_nhar",
+            "too_small_nhar",
             f"nhar={nhar} is smaller than required minimum 4*ntor={4 * int(ntor)}",
         )
     if not np.all(np.isfinite(mode)):
@@ -347,7 +347,7 @@ def fuse_scores(
     }
 
 
-def is_uncertain_row(row: dict[str, Any]) -> bool:
+def is_flagged_row(row: dict[str, Any]) -> bool:
     return bool(
         row.get("tier") == "flagged_borderline_or_disagreement"
         or row.get("model_disagreement") is True
@@ -440,7 +440,7 @@ def build_summary_row(
     p_cnn_values = finite_values(scored_rows, "p_cnn_good")
     n_final_good = sum(row.get("final_label") == "good" for row in scored_rows)
     n_final_bad = sum(row.get("final_label") == "bad" for row in scored_rows)
-    n_uncertain = sum(is_uncertain_row(row) for row in scored_rows)
+    n_flagged = sum(is_flagged_row(row) for row in scored_rows)
     good_before_postprocess = n_final_good
 
     summary = {
@@ -456,9 +456,9 @@ def build_summary_row(
         "n_silver_good": sum(row.get("tier") == "silver_good" for row in scored_rows),
         "n_final_good": n_final_good,
         "n_final_bad": n_final_bad,
-        "n_uncertain": n_uncertain,
+        "n_flagged": n_flagged,
         "fraction_good": safe_fraction(n_final_good, len(scored_rows)),
-        "fraction_uncertain": safe_fraction(n_uncertain, len(scored_rows)),
+        "fraction_flagged": safe_fraction(n_flagged, len(scored_rows)),
         "rf_cnn_agreement_fraction": safe_fraction(
             sum(not bool(row.get("model_disagreement")) for row in scored_rows),
             len(scored_rows),
@@ -518,8 +518,8 @@ def write_outputs(
     bad_rows = [
         row for row in rows_sorted if row.get("status") == "scored" and row.get("final_label") == "bad"
     ]
-    uncertain_rows = [
-        row for row in rows_sorted if row.get("status") == "scored" and is_uncertain_row(row)
+    flagged_rows = [
+        row for row in rows_sorted if row.get("status") == "scored" and is_flagged_row(row)
     ]
     eae_rows = [row for row in rows_sorted if row.get("status") == "eae_like"]
     rejected_rows = [row for row in rows_sorted if row.get("status") == "rejected"]
@@ -534,7 +534,7 @@ def write_outputs(
     write_dict_rows_csv(out_dir / "good_tae_unchecked.csv", ALL_OUTPUT_FIELDS, good_rows)
     write_dict_rows_csv(out_dir / "good_tae_final.csv", ALL_OUTPUT_FIELDS, final_good_rows)
     write_dict_rows_csv(out_dir / "bad_tae_like.csv", ALL_OUTPUT_FIELDS, bad_rows)
-    write_dict_rows_csv(out_dir / "flagged_tae_like.csv", ALL_OUTPUT_FIELDS, uncertain_rows)
+    write_dict_rows_csv(out_dir / "flagged_tae_like.csv", ALL_OUTPUT_FIELDS, flagged_rows)
     write_dict_rows_csv(out_dir / "eae_like.csv", ALL_OUTPUT_FIELDS, eae_rows)
     write_dict_rows_csv(out_dir / "rejected_modes.csv", ALL_OUTPUT_FIELDS, rejected_rows)
     write_dict_rows_csv(out_dir / "shot_summary.csv", SHOT_SUMMARY_FIELDS, [summary_row])
@@ -632,7 +632,7 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
         total = [len(by_n[n]) for n in ns]
         gold = [sum(row.get("tier") == "gold_good" for row in by_n[n]) for n in ns]
         silver = [sum(row.get("tier") == "silver_good" for row in by_n[n]) for n in ns]
-        uncertain = [sum(is_uncertain_row(row) for row in by_n[n]) for n in ns]
+        flagged = [sum(is_flagged_row(row) for row in by_n[n]) for n in ns]
         bad = [sum(row.get("final_label") == "bad" for row in by_n[n]) for n in ns]
         x = np.arange(len(ns))
         width = 0.16
@@ -640,7 +640,7 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
         ax.bar(x - 2 * width, total, width, label="total TAE-like")
         ax.bar(x - width, gold, width, label="gold_good")
         ax.bar(x, silver, width, label="silver_good")
-        ax.bar(x + width, uncertain, width, label="uncertain")
+        ax.bar(x + width, flagged, width, label="flagged")
         ax.bar(x + 2 * width, bad, width, label="bad")
         ax.set_xticks(x)
         ax.set_xticklabels([f"N{n}" for n in ns])
@@ -863,7 +863,7 @@ def main() -> None:
         f"{summary_row['n_sent_to_classifiers']} | "
         f"final_good={summary_row['n_final_good']} "
         f"final_bad={summary_row['n_final_bad']} "
-        f"uncertain={summary_row['n_uncertain']}"
+        f"flagged={summary_row['n_flagged']}"
     )
     print(f"Final selected GOOD modes after clustering: {len(selected_modes)}")
     print(f"Wrote outputs to: {out_dir}")
