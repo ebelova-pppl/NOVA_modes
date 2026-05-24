@@ -364,9 +364,26 @@ def write_dict_rows_csv(
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as fp:
-        writer = csv.DictWriter(fp, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(
+            fp,
+            fieldnames=fieldnames,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
+
+
+def write_vertical_summary_csv(
+    path: Path,
+    fieldnames: Sequence[str],
+    row: dict[str, Any],
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", newline="") as fp:
+        writer = csv.writer(fp, lineterminator="\n")
+        for field in fieldnames:
+            writer.writerow([field, row.get(field, "")])
 
 
 def build_good_mode_dicts(
@@ -539,7 +556,8 @@ def write_outputs(
     write_dict_rows_csv(out_dir / "flagged_tae_like.csv", ALL_OUTPUT_FIELDS, flagged_rows)
     write_dict_rows_csv(out_dir / "eae_like.csv", ALL_OUTPUT_FIELDS, eae_rows)
     write_dict_rows_csv(out_dir / "rejected_modes.csv", ALL_OUTPUT_FIELDS, rejected_rows)
-    write_dict_rows_csv(out_dir / "shot_summary.csv", SHOT_SUMMARY_FIELDS, [summary_row])
+    write_vertical_summary_csv(out_dir / "shot_summary.csv", SHOT_SUMMARY_FIELDS, summary_row)
+    write_dict_rows_csv(out_dir / "shot_summary_wide.csv", SHOT_SUMMARY_FIELDS, [summary_row])
     write_dict_rows_csv(out_dir / "shot_summary_by_n.csv", SUMMARY_BY_N_FIELDS, summary_by_n_rows)
 
     write_cluster_report(
@@ -568,34 +586,41 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
     by_n: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for row in scored_rows:
         by_n[int(row["n"])].append(row)
+    shot_names = sorted({str(row.get("shot", "")) for row in rows if row.get("shot")})
+    plot_subject = shot_names[0] if len(shot_names) == 1 else "mixed shots"
 
     try:
-        fig, axes = plt.subplots(len(by_n), 1, figsize=(7, max(3, 2.2 * len(by_n))), squeeze=False)
-        for ax, n in zip(axes[:, 0], sorted(by_n)):
-            vals = finite_values(by_n[n], "p_rf_good")
-            ax.hist(vals, bins=20, range=(0.0, 1.0))
-            ax.set_title(f"N{n}")
-            ax.set_xlim(0.0, 1.0)
-            ax.set_xlabel("p_rf_good")
-        fig.tight_layout()
-        fig.savefig(out_dir / "hist_p_rf_good_by_n.png", dpi=150)
+        ns = sorted(by_n)
+        fig, axes = plt.subplots(
+            len(ns),
+            2,
+            figsize=(7.5, max(3.0, 1.15 * len(ns))),
+            sharex=True,
+            squeeze=False,
+        )
+        for row_idx, n in enumerate(ns):
+            rf_ax = axes[row_idx, 0]
+            cnn_ax = axes[row_idx, 1]
+            rf_ax.hist(finite_values(by_n[n], "p_rf_good"), bins=16, range=(0.0, 1.0))
+            cnn_ax.hist(finite_values(by_n[n], "p_cnn_good"), bins=16, range=(0.0, 1.0))
+            rf_ax.set_ylabel(f"N{n}", rotation=0, ha="right", va="center", fontsize=8)
+            rf_ax.set_xlim(0.0, 1.0)
+            cnn_ax.set_xlim(0.0, 1.0)
+            for ax in (rf_ax, cnn_ax):
+                ax.tick_params(axis="both", labelsize=7)
+                ax.grid(axis="y", alpha=0.2, linewidth=0.5)
+        axes[0, 0].set_title("RF p_good", fontsize=9)
+        axes[0, 1].set_title("CNN p_good", fontsize=9)
+        axes[-1, 0].set_xlabel("p_good", fontsize=8)
+        axes[-1, 1].set_xlabel("p_good", fontsize=8)
+        fig.suptitle(f"{plot_subject}: RF and CNN GOOD-score histograms by N", fontsize=11)
+        fig.tight_layout(rect=(0, 0, 1, 0.98))
+        fig.savefig(out_dir / "hist_p_good_by_n.png", dpi=150)
         plt.close(fig)
+        for legacy_name in ("hist_p_rf_good_by_n.png", "hist_p_cnn_good_by_n.png"):
+            (out_dir / legacy_name).unlink(missing_ok=True)
     except Exception as exc:
-        print(f"[plots] Failed RF histogram plot: {type(exc).__name__}: {exc}")
-
-    try:
-        fig, axes = plt.subplots(len(by_n), 1, figsize=(7, max(3, 2.2 * len(by_n))), squeeze=False)
-        for ax, n in zip(axes[:, 0], sorted(by_n)):
-            vals = finite_values(by_n[n], "p_cnn_good")
-            ax.hist(vals, bins=20, range=(0.0, 1.0))
-            ax.set_title(f"N{n}")
-            ax.set_xlim(0.0, 1.0)
-            ax.set_xlabel("p_cnn_good")
-        fig.tight_layout()
-        fig.savefig(out_dir / "hist_p_cnn_good_by_n.png", dpi=150)
-        plt.close(fig)
-    except Exception as exc:
-        print(f"[plots] Failed CNN histogram plot: {type(exc).__name__}: {exc}")
+        print(f"[plots] Failed RF/CNN histogram plot: {type(exc).__name__}: {exc}")
 
     try:
         colors = {
@@ -622,6 +647,7 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
         ax.set_ylabel("p_cnn_good")
         ax.set_xlim(0.0, 1.0)
         ax.set_ylim(0.0, 1.0)
+        ax.set_title(f"{plot_subject}: RF vs CNN GOOD scores")
         ax.legend(fontsize=8)
         fig.tight_layout()
         fig.savefig(out_dir / "rf_vs_cnn_pgood.png", dpi=150)
@@ -646,6 +672,7 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
         ax.bar(x + 2 * width, bad, width, label="bad")
         ax.set_xticks(x)
         ax.set_xticklabels([f"N{n}" for n in ns])
+        ax.set_title(f"{plot_subject}: TAE-side classification counts by N")
         ax.legend(fontsize=8)
         fig.tight_layout()
         fig.savefig(out_dir / "counts_by_n.png", dpi=150)
@@ -676,6 +703,7 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
             )
         ax.set_xlabel("signed_delta")
         ax.set_ylabel("fraction_below_upper2")
+        ax.set_title(f"{plot_subject}: TAE/EAE gap split diagnostic")
         ax.legend(fontsize=8)
         fig.tight_layout()
         fig.savefig(out_dir / "gap_split_diagnostic.png", dpi=150)

@@ -338,3 +338,10 @@ Codex: Fixed close-frequency post-processing in `sort_shot.py` so modes cannot
 be merged through chained frequency clusters when their direct pairwise
 frequency spacing exceeds `--rel_freq_tol`. Cluster reports now include
 pairwise `rel_domega` and `freq_close` values for each structural comparison.
+
+Codex: Changed `sort_shot_mixed.py` so `shot_summary.csv` is a vertical
+two-column key/value file for easier reading. The previous one-row summary
+layout is still written as `shot_summary_wide.csv`.
+
+Codex: Combined the per-`n` RF and CNN probability histograms into a compact
+side-by-side diagnostic plot, `hist_p_good_by_n.png`.

@@ -615,7 +615,7 @@ def postprocess_good_modes(
 def write_csv(path: Path, header: Sequence[str], rows: Sequence[Sequence[Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as fp:
-        w = csv.writer(fp)
+        w = csv.writer(fp, lineterminator="\n")
         w.writerow(list(header))
         w.writerows(rows)
 
