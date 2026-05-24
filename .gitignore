@@ -20,7 +20,7 @@ tmp*
 *.npy
 #*.pt
 *.ckpt
-*.joblib
+#*.joblib
 #*.csv
 .tmp
 *_o.py
