@@ -460,6 +460,11 @@ It also writes `all_modes_scored.csv`, `tae_like_all.csv`,
 `shot_summary_by_n.csv`, `frequency_cluster_report.txt`, and
 `frequency_clusters.csv` for auditability.
 
+In `shot_summary.csv` and `shot_summary_by_n.csv`,
+`n_good_before_clustering` is the RF/CNN-fused GOOD count before duplicate
+removal, while `n_final_good` is the post-clustering count written to
+`good_tae_final.csv`.
+
 `flagged_tae_like.csv` is an overlapping QC list rather than a mutually
 exclusive class: it contains scored TAE-side modes that are borderline or show
 RF/CNN disagreement, so they may also appear in either `good_tae_unchecked.csv`

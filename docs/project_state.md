@@ -327,3 +327,9 @@ combines scores with gold/silver/borderline tiers, and reuses the existing
 close-frequency deduplication logic from `sort_shot.py`. It writes final good,
 bad, QC-flagged, EAE-like, rejected, all-mode, per-shot, per-`n`, and
 frequency-cluster audit outputs without moving source files.
+
+### 2026-05-24
+Codex: Clarified `sort_shot_mixed.py` summary counts. The fused GOOD count
+before close-frequency duplicate removal is now `n_good_before_clustering`;
+`n_final_good` now means the post-clustering GOOD count that matches
+`good_tae_final.csv`.

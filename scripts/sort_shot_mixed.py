@@ -85,6 +85,7 @@ SHOT_SUMMARY_FIELDS = [
     "n_sent_to_classifiers",
     "n_gold_good",
     "n_silver_good",
+    "n_good_before_clustering",
     "n_final_good",
     "n_final_bad",
     "n_flagged",
@@ -438,10 +439,10 @@ def build_summary_row(
     scored_rows = [row for row in rows if row.get("status") == "scored"]
     p_rf_values = finite_values(scored_rows, "p_rf_good")
     p_cnn_values = finite_values(scored_rows, "p_cnn_good")
-    n_final_good = sum(row.get("final_label") == "good" for row in scored_rows)
+    n_good_before_clustering = sum(row.get("final_label") == "good" for row in scored_rows)
+    n_final_good = len(selected_modes)
     n_final_bad = sum(row.get("final_label") == "bad" for row in scored_rows)
     n_flagged = sum(is_flagged_row(row) for row in scored_rows)
-    good_before_postprocess = n_final_good
 
     summary = {
         "shot": shot,
@@ -454,6 +455,7 @@ def build_summary_row(
         "n_sent_to_classifiers": len(scored_rows),
         "n_gold_good": sum(row.get("tier") == "gold_good" for row in scored_rows),
         "n_silver_good": sum(row.get("tier") == "silver_good" for row in scored_rows),
+        "n_good_before_clustering": n_good_before_clustering,
         "n_final_good": n_final_good,
         "n_final_bad": n_final_bad,
         "n_flagged": n_flagged,
@@ -467,7 +469,7 @@ def build_summary_row(
         "mean_p_cnn_good": safe_mean(p_cnn_values),
         "median_p_rf_good": safe_median(p_rf_values),
         "median_p_cnn_good": safe_median(p_cnn_values),
-        "mode_clusters_removed": good_before_postprocess - len(selected_modes),
+        "mode_clusters_removed": n_good_before_clustering - n_final_good,
     }
     summary.update(thresholds)
     return summary
@@ -861,11 +863,11 @@ def main() -> None:
     print(
         "Scored TAE-side modes: "
         f"{summary_row['n_sent_to_classifiers']} | "
-        f"final_good={summary_row['n_final_good']} "
+        f"good_before_clustering={summary_row['n_good_before_clustering']} "
         f"final_bad={summary_row['n_final_bad']} "
         f"flagged={summary_row['n_flagged']}"
     )
-    print(f"Final selected GOOD modes after clustering: {len(selected_modes)}")
+    print(f"Final GOOD modes after clustering: {summary_row['n_final_good']}")
     print(f"Wrote outputs to: {out_dir}")
 
 
