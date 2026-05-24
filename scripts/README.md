@@ -446,6 +446,11 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 - writes CSV audit tables, shot summaries, a frequency-cluster report, and
   optional diagnostic plots.
 
+Close-frequency duplicate removal enforces the frequency threshold pairwise
+against the candidate representative before structure metrics can merge two
+modes. This avoids chained clusters where several adjacent modes are close but
+the first and last mode are separated by more than `--rel_freq_tol`.
+
 The main outputs are:
 
 - `good_tae_unchecked.csv`

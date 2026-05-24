@@ -333,3 +333,8 @@ Codex: Clarified `sort_shot_mixed.py` summary counts. The fused GOOD count
 before close-frequency duplicate removal is now `n_good_before_clustering`;
 `n_final_good` now means the post-clustering GOOD count that matches
 `good_tae_final.csv`.
+
+Codex: Fixed close-frequency post-processing in `sort_shot.py` so modes cannot
+be merged through chained frequency clusters when their direct pairwise
+frequency spacing exceeds `--rel_freq_tol`. Cluster reports now include
+pairwise `rel_domega` and `freq_close` values for each structural comparison.

@@ -492,6 +492,10 @@ def relative_freq_close(omega_i: float, omega_j: float, rel_tol: float) -> bool:
     return abs(omega_j - omega_i) / denom < rel_tol
 
 
+def relative_freq_delta(omega_i: float, omega_j: float) -> float:
+    denom = max(abs(float(omega_i)), 1e-12)
+    return abs(float(omega_j) - float(omega_i)) / denom
+
 
 def cluster_modes_by_frequency(modes: Sequence[Dict[str, Any]], rel_tol: float = 0.02) -> List[List[Dict[str, Any]]]:
     if not modes:
@@ -501,8 +505,8 @@ def cluster_modes_by_frequency(modes: Sequence[Dict[str, Any]], rel_tol: float =
     clusters: List[List[Dict[str, Any]]] = [[ms[0]]]
 
     for m in ms[1:]:
-        prev = clusters[-1][-1]
-        if relative_freq_close(prev["omega"], m["omega"], rel_tol):
+        anchor = clusters[-1][0]
+        if relative_freq_close(anchor["omega"], m["omega"], rel_tol):
             clusters[-1].append(m)
         else:
             clusters.append([m])
@@ -512,6 +516,7 @@ def cluster_modes_by_frequency(modes: Sequence[Dict[str, Any]], rel_tol: float =
 
 def resolve_cluster(
     cluster: Sequence[Dict[str, Any]],
+    rel_freq_tol: float,
     sim_threshold: float,
     r_tol: float,
     width_tol: float,
@@ -536,7 +541,17 @@ def resolve_cluster(
         placed = False
         for grp in type_groups:
             rep = grp["rep"]
-            ok, met = same_mode_type(mode, rep, sim_threshold=sim_threshold, r_tol=r_tol, width_tol=width_tol)
+            ok_structure, met = same_mode_type(
+                mode,
+                rep,
+                sim_threshold=sim_threshold,
+                r_tol=r_tol,
+                width_tol=width_tol,
+            )
+            met["rel_domega"] = relative_freq_delta(rep["omega"], mode["omega"])
+            freq_ok = relative_freq_close(rep["omega"], mode["omega"], rel_freq_tol)
+            met["freq_close"] = float(freq_ok)
+            ok = freq_ok and ok_structure
             grp["comparisons"].append((mode["path"], rep["path"], met, ok))
             if ok:
                 grp["members"].append(mode)
@@ -575,6 +590,7 @@ def postprocess_good_modes(
         for ic, cluster in enumerate(clusters, start=1):
             kept, type_groups = resolve_cluster(
                 cluster,
+                rel_freq_tol=rel_freq_tol,
                 sim_threshold=sim_threshold,
                 r_tol=r_tol,
                 width_tol=width_tol,
@@ -667,10 +683,18 @@ def write_cluster_report(
                     cos = met["cosine"]
                     dr0 = met["dr0"]
                     ddr = met["ddr"]
+                    rel_domega = met.get("rel_domega")
+                    freq_close = met.get("freq_close")
 
+                    freq_text = ""
+                    if rel_domega is not None:
+                        freq_text = f"  rel_domega={rel_domega:.4f}"
+                    if freq_close is not None:
+                        freq_text += f"  freq_close={bool(freq_close)}"
                     fp.write(
                         f"  Compare: {Path(p1).name}  vs  {Path(p2).name}  "
-                        f"cos={cos:.3f}  dr0={dr0:.4f}  ddr={ddr:.4f}  same={same}\n"
+                        f"cos={cos:.3f}  dr0={dr0:.4f}  ddr={ddr:.4f}"
+                        f"{freq_text}  same={same}\n"
                     )
 
             fp.write("-" * 75 + "\n\n")
