@@ -352,3 +352,8 @@ metrics, but with this option it trains a fresh final model on the full labeled
 CSV for `best_epoch` epochs before saving. Checkpoints now record split sizes,
 `saved_training_scope`, `final_train_size`, `final_train_epochs`, and whether
 the full-data refit was used.
+
+Codex: Added optional labeled-shot evaluation to `sort_shot_mixed.py` via
+`--label_csv`. When labels are supplied, the script writes RF-only, CNN-only,
+and combined-policy confusion matrices/classification reports plus compact
+summary and per-mode evaluation CSVs.

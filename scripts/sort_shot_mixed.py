@@ -33,9 +33,11 @@ from typing import Any, Iterable, Sequence
 
 import joblib
 import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix
 
 from cnn_infer_common import load_cnn_classifier
 from cont_features import load_datcon_for_mode
+from mode_csv import read_mode_csv_entries
 from nova_mode_loader import load_mode_from_nova
 from sort_shot import (
     build_mode_dict,
@@ -137,6 +139,21 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--n_max", type=int, default=10, help="Largest N directory to scan")
     ap.add_argument("--pattern", default="egn*", help="Mode-file glob within each N# directory")
     ap.add_argument("--rel_freq_tol", type=float, default=0.02, help="Relative frequency tolerance for duplicate clustering")
+    ap.add_argument(
+        "--label_csv",
+        default=None,
+        help=(
+            "Optional labeled CSV for RF/CNN/combined-policy evaluation. "
+            "Labels are matched by shot-relative mode path, so absolute output "
+            "paths can be compared with relative training-label paths."
+        ),
+    )
+    ap.add_argument(
+        "--model_eval_threshold",
+        type=float,
+        default=0.5,
+        help="Probability threshold for RF-only and CNN-only label evaluation when --label_csv is provided",
+    )
     ap.add_argument("--make_plots", action="store_true", help="Write optional QC plots")
     ap.add_argument("--verbose", action="store_true", help="Print per-directory progress")
 
@@ -178,6 +195,24 @@ def row_sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
         float(omega) if isinstance(omega, (int, float, np.floating)) else math.inf,
         str(row.get("path", "")),
     )
+
+
+def shot_relative_key(path: str, shot: str) -> str:
+    normalized = str(path).strip().replace("\\", "/")
+    marker = f"{shot}/"
+    idx = normalized.find(marker)
+    if idx >= 0:
+        return normalized[idx:]
+    return normalized.lstrip("./")
+
+
+def normalize_binary_label(raw_label: str | None) -> str | None:
+    label = (raw_label or "").strip().lower()
+    if label in {"good", "g", "1"}:
+        return "good"
+    if label in {"bad", "b", "0"}:
+        return "bad"
+    return None
 
 
 def mark_rejected(row: dict[str, Any], reason: str, error_message: str) -> dict[str, Any]:
@@ -384,6 +419,205 @@ def write_vertical_summary_csv(
         writer = csv.writer(fp, lineterminator="\n")
         for field in fieldnames:
             writer.writerow([field, row.get(field, "")])
+
+
+def load_label_map(label_csv: str, *, shot: str) -> tuple[dict[str, str], dict[str, int]]:
+    labels: dict[str, str] = {}
+    stats = {
+        "n_label_rows_read": 0,
+        "n_label_rows_for_shot": 0,
+        "n_label_rows_used": 0,
+        "n_label_rows_skipped": 0,
+        "n_duplicate_label_keys": 0,
+    }
+    duplicate_keys: set[str] = set()
+
+    for path, raw_label in read_mode_csv_entries(label_csv, resolve_paths=False):
+        stats["n_label_rows_read"] += 1
+        key = shot_relative_key(path, shot)
+        if not key.startswith(f"{shot}/"):
+            continue
+        stats["n_label_rows_for_shot"] += 1
+
+        label = normalize_binary_label(raw_label)
+        if label is None:
+            stats["n_label_rows_skipped"] += 1
+            continue
+
+        if key in labels:
+            duplicate_keys.add(key)
+        labels[key] = label
+
+    stats["n_label_rows_used"] = len(labels)
+    stats["n_duplicate_label_keys"] = len(duplicate_keys)
+    return labels, stats
+
+
+def _prediction_for_model(row: dict[str, Any], model_name: str, threshold: float) -> str:
+    if model_name == "rf":
+        return "good" if float(row["p_rf_good"]) >= threshold else "bad"
+    if model_name == "cnn_raw":
+        return "good" if float(row["p_cnn_good"]) >= threshold else "bad"
+    if model_name == "combined_policy":
+        return str(row["final_label"])
+    raise ValueError(f"Unknown model_name {model_name}")
+
+
+def _evaluation_metrics(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    *,
+    model_name: str,
+) -> dict[str, Any]:
+    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+    tn, fp, fn, tp = (int(value) for value in cm.ravel())
+    n = int(y_true.size)
+    accuracy = safe_fraction(tp + tn, n)
+    precision_good = safe_fraction(tp, tp + fp)
+    recall_good = safe_fraction(tp, tp + fn)
+    f1_good = (
+        2.0 * precision_good * recall_good / (precision_good + recall_good)
+        if isinstance(precision_good, float)
+        and isinstance(recall_good, float)
+        and precision_good + recall_good > 0.0
+        else ""
+    )
+    return {
+        "model": model_name,
+        "n_matched": n,
+        "tn_bad": tn,
+        "fp_bad_as_good": fp,
+        "fn_good_as_bad": fn,
+        "tp_good": tp,
+        "accuracy": accuracy,
+        "precision_good": precision_good,
+        "recall_good": recall_good,
+        "f1_good": f1_good,
+    }
+
+
+def write_labeled_evaluation_outputs(
+    rows: Sequence[dict[str, Any]],
+    *,
+    label_csv: str,
+    shot: str,
+    out_dir: Path,
+    threshold: float = 0.5,
+) -> None:
+    labels, label_stats = load_label_map(label_csv, shot=shot)
+    scored_rows = [row for row in rows if row.get("status") == "scored"]
+    matched_rows = [
+        row for row in scored_rows if shot_relative_key(str(row.get("path", "")), shot) in labels
+    ]
+    scored_keys = {shot_relative_key(str(row.get("path", "")), shot) for row in scored_rows}
+    unmatched_scored = [row for row in scored_rows if shot_relative_key(str(row.get("path", "")), shot) not in labels]
+    labeled_not_scored = sorted(set(labels) - scored_keys)
+
+    y_true = np.asarray(
+        [1 if labels[shot_relative_key(str(row["path"]), shot)] == "good" else 0 for row in matched_rows],
+        dtype=int,
+    )
+    model_names = ["rf", "cnn_raw", "combined_policy"]
+    metric_rows: list[dict[str, Any]] = []
+    prediction_rows: list[dict[str, Any]] = []
+
+    for model_name in model_names:
+        y_pred = np.asarray(
+            [1 if _prediction_for_model(row, model_name, threshold) == "good" else 0 for row in matched_rows],
+            dtype=int,
+        )
+        metric_rows.append(_evaluation_metrics(y_true, y_pred, model_name=model_name))
+
+    for row in matched_rows:
+        key = shot_relative_key(str(row["path"]), shot)
+        prediction_rows.append(
+            {
+                "path": row["path"],
+                "true_label": labels[key],
+                "rf_label": _prediction_for_model(row, "rf", threshold),
+                "cnn_raw_label": _prediction_for_model(row, "cnn_raw", threshold),
+                "combined_policy_label": _prediction_for_model(row, "combined_policy", threshold),
+                "p_rf_good": row["p_rf_good"],
+                "p_cnn_good": row["p_cnn_good"],
+                "p_avg": row["p_avg"],
+                "tier": row["tier"],
+                "is_flagged": is_flagged_row(row),
+                "selected_final": row["selected_final"],
+            }
+        )
+
+    metric_fields = [
+        "model",
+        "n_matched",
+        "tn_bad",
+        "fp_bad_as_good",
+        "fn_good_as_bad",
+        "tp_good",
+        "accuracy",
+        "precision_good",
+        "recall_good",
+        "f1_good",
+    ]
+    prediction_fields = [
+        "path",
+        "true_label",
+        "rf_label",
+        "cnn_raw_label",
+        "combined_policy_label",
+        "p_rf_good",
+        "p_cnn_good",
+        "p_avg",
+        "tier",
+        "is_flagged",
+        "selected_final",
+    ]
+    write_dict_rows_csv(out_dir / "model_evaluation_summary.csv", metric_fields, metric_rows)
+    write_dict_rows_csv(out_dir / "model_evaluation_rows.csv", prediction_fields, prediction_rows)
+
+    report_path = out_dir / "model_evaluation_report.txt"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(report_path, "w") as fp:
+        fp.write("Model evaluation against labeled TAE-side rows\n")
+        fp.write("=" * 72 + "\n")
+        fp.write(f"shot: {shot}\n")
+        fp.write(f"label_csv: {label_csv}\n")
+        fp.write(f"rf_cnn_eval_threshold: {threshold}\n")
+        fp.write("combined_policy_label: uses the script's gold/silver/fallback fusion policy\n")
+        for key, value in label_stats.items():
+            fp.write(f"{key}: {value}\n")
+        fp.write(f"n_scored_rows: {len(scored_rows)}\n")
+        fp.write(f"n_matched_scored_rows: {len(matched_rows)}\n")
+        fp.write(f"n_unmatched_scored_rows: {len(unmatched_scored)}\n")
+        fp.write(f"n_labeled_rows_not_scored: {len(labeled_not_scored)}\n")
+        if unmatched_scored:
+            fp.write("\nUnmatched scored rows, first 20:\n")
+            for row in unmatched_scored[:20]:
+                fp.write(f"  {shot_relative_key(str(row.get('path', '')), shot)}\n")
+        if labeled_not_scored:
+            fp.write("\nLabeled rows not scored, first 20:\n")
+            for key in labeled_not_scored[:20]:
+                fp.write(f"  {key} ({labels[key]})\n")
+
+        for model_name in model_names:
+            y_pred = np.asarray(
+                [1 if _prediction_for_model(row, model_name, threshold) == "good" else 0 for row in matched_rows],
+                dtype=int,
+            )
+            fp.write("\n" + "-" * 72 + "\n")
+            fp.write(f"{model_name} confusion matrix/report\n")
+            fp.write("Rows=true [bad, good]; columns=pred [bad, good]\n")
+            fp.write(str(confusion_matrix(y_true, y_pred, labels=[0, 1])) + "\n\n")
+            fp.write(
+                classification_report(
+                    y_true,
+                    y_pred,
+                    labels=[0, 1],
+                    target_names=["bad", "good"],
+                    digits=4,
+                    zero_division=0,
+                )
+            )
+            fp.write("\n")
 
 
 def build_good_mode_dicts(
@@ -876,6 +1110,14 @@ def main() -> None:
         summary_by_n_rows=summary_by_n_rows,
         rel_freq_tol=args.rel_freq_tol,
     )
+    if args.label_csv:
+        write_labeled_evaluation_outputs(
+            rows,
+            label_csv=args.label_csv,
+            shot=shot,
+            out_dir=out_dir,
+            threshold=args.model_eval_threshold,
+        )
     if args.make_plots:
         make_plots(rows, out_dir)
 
@@ -896,6 +1138,8 @@ def main() -> None:
         f"flagged={summary_row['n_flagged']}"
     )
     print(f"Final GOOD modes after clustering: {summary_row['n_final_good']}")
+    if args.label_csv:
+        print("Wrote model evaluation: model_evaluation_report.txt")
     print(f"Wrote outputs to: {out_dir}")
 
 

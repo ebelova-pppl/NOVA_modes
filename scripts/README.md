@@ -476,6 +476,13 @@ It also writes `all_modes_scored.csv`, `tae_like_all.csv`,
 `frequency_cluster_report.txt`, and
 `frequency_clusters.csv` for auditability.
 
+When `--label_csv` is provided for a labeled validation shot, it also writes:
+
+- `model_evaluation_report.txt` — RF-only, CNN-only, and combined-policy
+  confusion matrices plus classification reports
+- `model_evaluation_summary.csv` — compact metrics table
+- `model_evaluation_rows.csv` — per-mode true/predicted labels and scores
+
 `shot_summary.csv` is written as a human-readable two-column key/value file.
 `shot_summary_wide.csv` keeps the same one-row table layout as
 `shot_summary_by_n.csv` for scripts and spreadsheet workflows. In all summary
@@ -492,6 +499,13 @@ With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`; older separate histogram files are
 removed when this combined plot is regenerated.
 
+For training-set checks, pass `--label_csv training_labels/tae_like.csv`.
+Sorter output paths are matched to label paths by shot-relative suffix, so
+absolute mode paths in the shot output can be compared with relative paths in
+the training-label CSV. `--model_eval_threshold` controls the RF-only and
+CNN-only evaluation threshold and defaults to `0.5`; the combined-policy
+evaluation uses the actual `final_label` assigned by the fusion policy.
+
 ### Usage
 
 ```bash
@@ -500,6 +514,7 @@ python sort_shot_mixed.py \
   --rf_model /path/to/nova_mode_classifier.joblib \
   --cnn_model /path/to/nova_cnn_raw.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
+  --label_csv training_labels/tae_like.csv \
   --make_plots
 ```
 
