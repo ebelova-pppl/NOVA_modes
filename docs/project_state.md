@@ -357,3 +357,8 @@ Codex: Added optional labeled-shot evaluation to `sort_shot_mixed.py` via
 `--label_csv`. When labels are supplied, the script writes RF-only, CNN-only,
 and combined-policy confusion matrices/classification reports plus compact
 summary and per-mode evaluation CSVs.
+
+Codex: Added `--rf_score_weight` and `--cnn_score_weight` to
+`sort_shot_mixed.py`. These control the weighted `p_avg` used in fallback
+fusion decisions and duplicate-clustering scores; defaults are equal weights
+for backward-compatible behavior.

@@ -108,6 +108,8 @@ SHOT_SUMMARY_FIELDS = [
     "gold_bad_threshold",
     "silver_bad_threshold",
     "fallback_good_threshold",
+    "rf_score_weight",
+    "cnn_score_weight",
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[f for f in SHOT_SUMMARY_FIELDS if f != "shot"]]
@@ -168,6 +170,18 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--gold_bad_threshold", type=float, default=0.2)
     ap.add_argument("--silver_bad_threshold", type=float, default=0.4)
     ap.add_argument("--fallback_good_threshold", type=float, default=0.5)
+    ap.add_argument(
+        "--rf_score_weight",
+        type=float,
+        default=0.5,
+        help="RF weight used in weighted p_avg for fallback decisions and clustering scores",
+    )
+    ap.add_argument(
+        "--cnn_score_weight",
+        type=float,
+        default=0.5,
+        help="CNN weight used in weighted p_avg for fallback decisions and clustering scores",
+    )
     return ap.parse_args()
 
 
@@ -354,8 +368,25 @@ def fuse_scores(
     gold_bad_threshold: float,
     silver_bad_threshold: float,
     fallback_good_threshold: float,
+    rf_score_weight: float,
+    cnn_score_weight: float,
 ) -> dict[str, Any]:
-    p_avg = 0.5 * (float(p_rf_good) + float(p_cnn_good))
+    weight_sum = float(rf_score_weight) + float(cnn_score_weight)
+    if (
+        not np.isfinite(rf_score_weight)
+        or not np.isfinite(cnn_score_weight)
+        or rf_score_weight < 0.0
+        or cnn_score_weight < 0.0
+        or weight_sum <= 0.0
+    ):
+        raise ValueError(
+            "rf_score_weight and cnn_score_weight must be finite non-negative values "
+            "with a positive sum"
+        )
+    p_avg = (
+        float(rf_score_weight) * float(p_rf_good)
+        + float(cnn_score_weight) * float(p_cnn_good)
+    ) / weight_sum
 
     if p_rf_good >= gold_good_threshold and p_cnn_good >= gold_good_threshold:
         final_label = "good"
@@ -1061,6 +1092,8 @@ def main() -> None:
                     gold_bad_threshold=args.gold_bad_threshold,
                     silver_bad_threshold=args.silver_bad_threshold,
                     fallback_good_threshold=args.fallback_good_threshold,
+                    rf_score_weight=args.rf_score_weight,
+                    cnn_score_weight=args.cnn_score_weight,
                 )
             )
             rows.append(row)
@@ -1088,6 +1121,8 @@ def main() -> None:
         "gold_bad_threshold": args.gold_bad_threshold,
         "silver_bad_threshold": args.silver_bad_threshold,
         "fallback_good_threshold": args.fallback_good_threshold,
+        "rf_score_weight": args.rf_score_weight,
+        "cnn_score_weight": args.cnn_score_weight,
     }
     summary_row = build_summary_row(
         rows,

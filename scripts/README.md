@@ -506,6 +506,18 @@ the training-label CSV. `--model_eval_threshold` controls the RF-only and
 CNN-only evaluation threshold and defaults to `0.5`; the combined-policy
 evaluation uses the actual `final_label` assigned by the fusion policy.
 
+The `p_avg` score is a weighted RF/CNN average used for fallback decisions and
+as the duplicate-clustering score:
+
+```text
+p_avg = (rf_score_weight * p_rf_good + cnn_score_weight * p_cnn_good)
+        / (rf_score_weight + cnn_score_weight)
+```
+
+Both weights default to `0.5`, preserving the original equal-weight average.
+For RF-leaning validation runs, use for example
+`--rf_score_weight 0.6 --cnn_score_weight 0.4`.
+
 ### Usage
 
 ```bash
@@ -515,6 +527,8 @@ python sort_shot_mixed.py \
   --cnn_model /path/to/nova_cnn_raw.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
   --label_csv training_labels/tae_like.csv \
+  --rf_score_weight 0.6 \
+  --cnn_score_weight 0.4 \
   --make_plots
 ```
 
