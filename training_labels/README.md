@@ -77,6 +77,21 @@ It includes:
 `mixed` rows are kept on the TAE side on purpose, so marginal modes remain
 available for downstream TAE training and review.
 
+### Leave-one-shot-out TAE training lists
+
+These files are derived from `tae_like.csv` for leave-one-shot-out validation.
+Each file preserves the same columns as `tae_like.csv` and excludes exactly one
+labeled shot, so RF and CNN models can be retrained on the remaining three
+shots:
+
+- `tae_like_loso_train_excluding_nstx_120113.csv`
+- `tae_like_loso_train_excluding_nstx_135388.csv`
+- `tae_like_loso_train_excluding_nstx_141711.csv`
+- `tae_like_loso_train_excluding_nstxu_204202.csv`
+
+Use the held-out shot named in the filename for `sort_shot_mixed.py` validation
+after retraining models on the corresponding three-shot list.
+
 ### `eae_like.csv`
 
 EAE-side output from the splitter.
