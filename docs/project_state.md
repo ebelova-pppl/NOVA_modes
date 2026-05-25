@@ -362,3 +362,22 @@ Codex: Added `--rf_score_weight` and `--cnn_score_weight` to
 `sort_shot_mixed.py`. These control the weighted `p_avg` used in fallback
 fusion decisions and duplicate-clustering scores; defaults are equal weights
 for backward-compatible behavior.
+
+User validation after retraining `cnn_raw.py` with `--refit_full_before_save`:
+the deployment raw-CNN checkpoint was trained on the full labeled TAE-like CSV
+after held-out epoch selection, matching the RF model's full-data deployment
+style. On labeled-shot in-sample sanity checks, the combined RF+CNN policy in
+`sort_shot_mixed.py` produced:
+
+- `nstx_120113`: CM `[[125, 0], [0, 49]]`, accuracy `1.000`.
+- `nstx_135388`: CM `[[182, 2], [2, 194]]`, accuracy `0.9895`.
+- `nstx_141711`: CM `[[152, 1], [2, 101]]`, accuracy `0.9883`.
+- `nstxu_204202`: CM `[[197, 0], [5, 73]]`, accuracy `0.9818`.
+
+The combined policy gives the best overall result on these labeled shots vs RF-only or CNN-only.
+
+These are in-sample pipeline-consistency checks: they confirm that
+`sort_shot_mixed.py`, RF inference, full-refit raw-CNN inference, TAE/EAE
+routing, score fusion, and reporting agree with the current labeled training
+set. They should not be interpreted as generalization estimates; leave-one-shot
+out or other held-out-shot validation is still required for that.
