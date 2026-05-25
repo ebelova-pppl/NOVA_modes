@@ -234,6 +234,7 @@ class Config:
     R_target: int = 201
     device: str | None = None
     cache_data: bool = False
+    refit_full_before_save: bool = False
 
 
 def parse_args() -> Config:
@@ -282,6 +283,16 @@ def parse_args() -> Config:
         "--cache_data",
         action="store_true",
         help="Preload preprocessed mode tensors into RAM once instead of rereading files every epoch",
+    )
+    ap.add_argument(
+        "--refit_full_before_save",
+        action="store_true",
+        help=(
+            "After selecting best_epoch on the held-out split, train a fresh "
+            "model on the full labeled CSV for best_epoch epochs and save that "
+            "full-data model. Held-out metrics are still printed from the "
+            "initial split model."
+        ),
     )
     return Config(**vars(ap.parse_args()))
 
@@ -383,14 +394,63 @@ def main():
         M_target=cfg.M_target,
     )
 
+    model_to_save = model
+    saved_training_scope = "train_split"
+    final_train_epochs = 0
+    final_train_size = len(train_items)
+
+    if cfg.refit_full_before_save:
+        if best_epoch <= 0:
+            raise RuntimeError("Cannot refit on the full set because no best epoch was selected.")
+
+        print(
+            f"\nRefitting final raw CNN on all {len(items)} labeled modes "
+            f"for {best_epoch} epochs before saving.",
+            flush=True,
+        )
+        full_ds = NovaModeDataset(
+            items,
+            normalize=cfg.normalize,
+            M_target=cfg.M_target,
+            R_target=cfg.R_target,
+            cache_data=cfg.cache_data,
+        )
+        seed_everything(cfg.seed)
+        full_loader = DataLoader(full_ds, batch_size=cfg.batch_size, shuffle=True, num_workers=0)
+        final_model = SmallCNN(in_ch=1).to(device)
+        final_opt = torch.optim.Adam(final_model.parameters(), lr=cfg.lr)
+
+        for ep in range(1, best_epoch + 1):
+            epoch_t0 = time.perf_counter()
+            loss = train_epoch(final_model, full_loader, final_opt, device)
+            if ep == 1 or ep == best_epoch or ep % 5 == 0:
+                elapsed = time.perf_counter() - epoch_t0
+                print(
+                    f"Full-fit epoch {ep:3d}/{best_epoch} | loss={loss:.4f} | "
+                    f"elapsed={elapsed:.1f}s",
+                    flush=True,
+                )
+
+        model_to_save = final_model
+        saved_training_scope = "full_csv_refit"
+        final_train_epochs = best_epoch
+        final_train_size = len(items)
+
     torch.save(
         {
-            "model_state_dict": model.state_dict(),
+            "model_state_dict": model_to_save.state_dict(),
             "seed": cfg.seed,
             "normalize": cfg.normalize,
             "threshold": cfg.eval_threshold,
             "best_test_acc": best_acc,
             "best_epoch": best_epoch,
+            "test_frac": cfg.test_frac,
+            "initial_train_size": len(train_items),
+            "test_size": len(test_items),
+            "refit_full_before_save": cfg.refit_full_before_save,
+            "saved_training_scope": saved_training_scope,
+            "final_train_epochs": final_train_epochs,
+            "final_train_size": final_train_size,
             "model_type": "cnn_raw",
             "checkpoint_version": CHECKPOINT_VERSION,
             "preprocess": preprocess_meta,
@@ -398,7 +458,7 @@ def main():
         },
         cfg.model_out,
     )
-    print(f"\nSaved CNN to {cfg.model_out}")
+    print(f"\nSaved CNN to {cfg.model_out} ({saved_training_scope})")
 
 
 if __name__ == "__main__":

@@ -76,7 +76,10 @@ Typical workflow
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
-- Train classifier (RF or CNN) on tae_like modes (for now)
+- Train classifier (RF or CNN) on tae_like modes (for now). For raw-CNN
+  checkpoints intended for production sorting, use
+  `cnn_raw.py --refit_full_before_save` so the saved model is trained on the
+  full labeled CSV after held-out epoch selection.
 - Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
   routes EAE-like modes away, combines RF + raw-CNN TAE decisions, and removes
   close-frequency duplicate TAEs.

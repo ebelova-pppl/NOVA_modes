@@ -31,6 +31,7 @@ module load pytorch
 python cnn_raw.py \
   --train_csv training_labels/tae_like.csv \
   --data_dir /path/to/nova/data \
+  --refit_full_before_save \
   --model_out models/nova_cnn_raw.pt
 
 python cnn_hybrid.py        # uses: nova_mode_loader, mode_transform.py, mode_features.py
@@ -47,6 +48,15 @@ settings as the straightened CNN. The raw CNN default `--lr` is `0.02`, chosen
 from a small sweep because it reduced false negatives for GOOD modes compared
 with `0.01`; this is preferred for NOVA-C follow-up, where keeping a possibly
 unstable mode is more important than minimizing false positives.
+
+By default, `cnn_raw.py` trains on a stratified train split, evaluates on the
+held-out split, and saves the best held-out checkpoint. For production sorting
+or apples-to-apples checks against the RF model, pass
+`--refit_full_before_save`: the script still uses the held-out split to choose
+`best_epoch`, then trains a fresh final raw CNN on the full labeled CSV for
+that many epochs before saving. The checkpoint records
+`saved_training_scope`, `best_test_acc`, split sizes, and whether full refit
+was used.
 
 All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
 configuration so training runs are reproducible by default.

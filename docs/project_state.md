@@ -345,3 +345,10 @@ layout is still written as `shot_summary_wide.csv`.
 
 Codex: Combined the per-`n` RF and CNN probability histograms into a compact
 side-by-side diagnostic plot, `hist_p_good_by_n.png`.
+
+Codex: Added `--refit_full_before_save` to `scripts/cnn_raw.py`. The raw CNN
+still uses the stratified held-out split to choose `best_epoch` and report test
+metrics, but with this option it trains a fresh final model on the full labeled
+CSV for `best_epoch` epochs before saving. Checkpoints now record split sizes,
+`saved_training_scope`, `final_train_size`, `final_train_epochs`, and whether
+the full-data refit was used.
