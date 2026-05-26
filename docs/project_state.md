@@ -412,3 +412,16 @@ because the raw CNN added extra false positives in those held-out cases. Raw
 CNN generalization is sensitive to learning rate, input `M_target`, seed, and
 class balance, so further CNN tuning should use LOSO-average performance rather
 than per-shot tuning.
+
+Codex: Added deployment/testing CLI parity to `cnn_straightened.py` and
+`cnn_hybrid.py`: both now accept `--train_csv`, `--data_dir`, `--model_out`,
+`--device`, `--cache_data`, and `--refit_full_before_save`, along with their
+existing preprocessing and training knobs. The full-refit behavior matches
+`cnn_raw.py`: held-out split metrics still select `best_epoch`, then a fresh
+final model is trained on the full training CSV before saving. For hybrid
+checkpoints, scalar normalization statistics are recomputed from the full CSV
+for the final refit. `sort_shot_mixed.py` now loads CNN checkpoints with
+`--cnn_model_kind auto` by default, so raw, straightened, and hybrid CNNs can
+be compared in the RF+CNN mixed-shot policy. Labeled evaluation outputs now use
+generic `cnn` / `cnn_label` names, with the loaded checkpoint kind recorded
+separately in `model_evaluation_report.txt`.

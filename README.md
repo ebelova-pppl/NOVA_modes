@@ -76,15 +76,16 @@ Typical workflow
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
-- Train classifier (RF or CNN) on tae_like modes (for now). For raw-CNN
+- Train classifier (RF or CNN) on tae_like modes (for now). For CNN
   checkpoints intended for production sorting, use
-  `cnn_raw.py --refit_full_before_save` so the saved model is trained on the
-  full labeled CSV after held-out epoch selection. If a LOSO raw-CNN run
+  `--refit_full_before_save` so the saved model is trained on the full labeled
+  CSV after held-out epoch selection. If a LOSO raw-CNN run
   collapses toward the majority class, try `cnn_raw.py --pos_weight auto` to
   weight missed GOOD modes by `n_bad/n_good` during training.
 - Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
-  routes EAE-like modes away, combines RF + raw-CNN TAE decisions, and removes
-  close-frequency duplicate TAEs.
+  routes EAE-like modes away, combines RF + CNN TAE decisions, and removes
+  close-frequency duplicate TAEs. Raw, straightened, and hybrid CNN checkpoints
+  are supported through the shared CNN inference path.
 - Run `sort_shot.py` when you want the older single-model shot sorter and
   duplicate-removal workflow.
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)

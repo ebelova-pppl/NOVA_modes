@@ -34,13 +34,23 @@ python cnn_raw.py \
   --refit_full_before_save \
   --model_out models/nova_cnn_raw.pt
 
-python cnn_hybrid.py        # uses: nova_mode_loader, mode_transform.py, mode_features.py
-python cnn_straightened.py  # uses: nova_mode_loader, mode_transform.py
+python cnn_straightened.py \
+  --train_csv training_labels/tae_like.csv \
+  --data_dir /path/to/nova/data \
+  --refit_full_before_save \
+  --model_out models/nova_cnn_straightened.pt
+
+python cnn_hybrid.py \
+  --train_csv training_labels/tae_like.csv \
+  --data_dir /path/to/nova/data \
+  --refit_full_before_save \
+  --model_out models/nova_cnn_hybrid.pt
 ```
 
-`cnn_raw.py` has a command-line interface; run `python cnn_raw.py -h` for all
-training, data-path, and preprocessing options. It resamples the radial grid to
-`--R_target` before padding/cropping the raw harmonic axis to `--M_target`.
+`cnn_raw.py`, `cnn_straightened.py`, and `cnn_hybrid.py` have command-line
+interfaces; run each script with `-h` for all training, data-path, and
+preprocessing options. The raw CNN resamples the radial grid to `--R_target`
+before padding/cropping the raw harmonic axis to `--M_target`.
 When `--data_dir` is provided, relative mode paths in the training CSV are
 resolved relative to that directory instead of requiring `$NOVA_DATA`. It uses
 an adjustable initial `--lr` and the same fixed `ReduceLROnPlateau` scheduler
@@ -55,21 +65,21 @@ where positive means `good`. Use `--pos_weight auto` to compute
 `n_bad/n_good` from the current training labels, or pass a positive number to
 force a value. The default is unweighted loss.
 
-By default, `cnn_raw.py` trains on a stratified train split, evaluates on the
-held-out split, and saves the best held-out checkpoint. For production sorting
+By default, the CNN trainers use a stratified train split, evaluate on the
+held-out split, and save the best held-out checkpoint. For production sorting
 or apples-to-apples checks against the RF model, pass
 `--refit_full_before_save`: the script still uses the held-out split to choose
-`best_epoch`, then trains a fresh final raw CNN on the full labeled CSV for
-that many epochs before saving. The checkpoint records
-`saved_training_scope`, `best_test_acc`, split sizes, `pos_weight` metadata,
-and whether full refit was used.
+`best_epoch`, then trains a fresh final CNN on the full labeled CSV for that
+many epochs before saving. The checkpoint records `saved_training_scope`,
+`best_test_acc`, split sizes, and whether full refit was used. Raw-CNN
+checkpoints also record `pos_weight` metadata when that option is supplied.
 
 All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
 configuration so training runs are reproducible by default.
 
 The CNN trainers print the selected Torch device, visible CUDA devices, and
-free/total GPU memory before training. `cnn_raw.py` accepts `--device`, and all
-three CNN trainers honor `NOVA_TORCH_DEVICE`, for example:
+free/total GPU memory before training. All three CNN trainers accept
+`--device` and honor `NOVA_TORCH_DEVICE`, for example:
 
 ```bash
 export NOVA_TORCH_DEVICE=cuda
@@ -456,7 +466,7 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 - validates mode files and required continuum inputs,
 - routes valid modes into `tae_like`, `mixed`, and `eae_like` gap regions,
-- sends TAE-like plus mixed modes through both the RF classifier and raw CNN,
+- sends TAE-like plus mixed modes through both the RF classifier and a CNN checkpoint,
 - combines RF/CNN probabilities with the current gold/silver/borderline policy,
 - reuses the close-frequency duplicate removal from `sort_shot.py`, and
 - writes CSV audit tables, shot summaries, a frequency-cluster report, and
@@ -505,6 +515,11 @@ With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`; older separate histogram files are
 removed when this combined plot is regenerated.
 
+`--cnn_model_kind` defaults to `auto`, so `sort_shot_mixed.py` can use raw,
+straightened, or hybrid CNN checkpoints that contain `model_type` metadata.
+Pass `--cnn_model_kind cnn_raw`, `cnn_straightened`, or `cnn_hybrid` only for
+older or ambiguous checkpoints.
+
 For training-set checks, pass `--label_csv training_labels/tae_like.csv`.
 Sorter output paths are matched to label paths by shot-relative suffix, so
 absolute mode paths in the shot output can be compared with relative paths in
@@ -530,7 +545,7 @@ For RF-leaning validation runs, use for example
 python sort_shot_mixed.py \
   --shot_dir /path/to/nstx_135388 \
   --rf_model /path/to/nova_mode_classifier.joblib \
-  --cnn_model /path/to/nova_cnn_raw.pt \
+  --cnn_model /path/to/nova_cnn_straightened.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
   --label_csv training_labels/tae_like.csv \
   --rf_score_weight 0.6 \

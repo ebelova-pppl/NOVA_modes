@@ -7,7 +7,7 @@ Process one mixed TAE/EAE shot directory without moving files:
 
 1. validate candidate NOVA mode files,
 2. route valid modes into TAE-like / EAE-like / mixed groups,
-3. run both the RF classifier and raw CNN on TAE-like modes,
+3. run both the RF classifier and a CNN checkpoint on TAE-like modes,
 4. combine RF/CNN probabilities with a confidence policy,
 5. remove close-frequency near-duplicates from the GOOD TAE list, and
 6. write shot-level CSV outputs, summaries, and optional QC plots.
@@ -129,12 +129,18 @@ def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         description=(
             "Process one mixed TAE/EAE NOVA shot, route EAE-like modes away, "
-            "score TAE-like modes with RF + raw CNN, and write QC outputs."
+            "score TAE-like modes with RF + CNN, and write QC outputs."
         )
     )
     ap.add_argument("--shot_dir", required=True, help="Shot directory containing N1, N2, ...")
     ap.add_argument("--rf_model", required=True, help="RF classifier .joblib path")
-    ap.add_argument("--cnn_model", required=True, help="Raw-CNN checkpoint .pt path")
+    ap.add_argument("--cnn_model", required=True, help="CNN checkpoint .pt path")
+    ap.add_argument(
+        "--cnn_model_kind",
+        choices=["auto", "cnn_raw", "cnn_straightened", "cnn_hybrid"],
+        default="auto",
+        help="CNN checkpoint kind. Use auto for checkpoints with model_type metadata.",
+    )
     ap.add_argument("--out_dir", required=True, help="Directory for CSV outputs and reports")
     ap.add_argument("--device", default=None, help="Torch device for CNN inference, e.g. cpu or cuda")
     ap.add_argument("--n_min", type=int, default=1, help="Smallest N directory to scan")
@@ -487,7 +493,7 @@ def load_label_map(label_csv: str, *, shot: str) -> tuple[dict[str, str], dict[s
 def _prediction_for_model(row: dict[str, Any], model_name: str, threshold: float) -> str:
     if model_name == "rf":
         return "good" if float(row["p_rf_good"]) >= threshold else "bad"
-    if model_name == "cnn_raw":
+    if model_name in {"cnn", "cnn_raw", "cnn_straightened", "cnn_hybrid"}:
         return "good" if float(row["p_cnn_good"]) >= threshold else "bad"
     if model_name == "combined_policy":
         return str(row["final_label"])
@@ -534,6 +540,7 @@ def write_labeled_evaluation_outputs(
     shot: str,
     out_dir: Path,
     threshold: float = 0.5,
+    cnn_checkpoint_kind: str = "auto",
 ) -> None:
     labels, label_stats = load_label_map(label_csv, shot=shot)
     scored_rows = [row for row in rows if row.get("status") == "scored"]
@@ -548,7 +555,7 @@ def write_labeled_evaluation_outputs(
         [1 if labels[shot_relative_key(str(row["path"]), shot)] == "good" else 0 for row in matched_rows],
         dtype=int,
     )
-    model_names = ["rf", "cnn_raw", "combined_policy"]
+    model_names = ["rf", "cnn", "combined_policy"]
     metric_rows: list[dict[str, Any]] = []
     prediction_rows: list[dict[str, Any]] = []
 
@@ -566,7 +573,7 @@ def write_labeled_evaluation_outputs(
                 "path": row["path"],
                 "true_label": labels[key],
                 "rf_label": _prediction_for_model(row, "rf", threshold),
-                "cnn_raw_label": _prediction_for_model(row, "cnn_raw", threshold),
+                "cnn_label": _prediction_for_model(row, "cnn", threshold),
                 "combined_policy_label": _prediction_for_model(row, "combined_policy", threshold),
                 "p_rf_good": row["p_rf_good"],
                 "p_cnn_good": row["p_cnn_good"],
@@ -593,7 +600,7 @@ def write_labeled_evaluation_outputs(
         "path",
         "true_label",
         "rf_label",
-        "cnn_raw_label",
+        "cnn_label",
         "combined_policy_label",
         "p_rf_good",
         "p_cnn_good",
@@ -612,6 +619,7 @@ def write_labeled_evaluation_outputs(
         fp.write("=" * 72 + "\n")
         fp.write(f"shot: {shot}\n")
         fp.write(f"label_csv: {label_csv}\n")
+        fp.write(f"cnn_checkpoint_kind: {cnn_checkpoint_kind}\n")
         fp.write(f"rf_cnn_eval_threshold: {threshold}\n")
         fp.write("combined_policy_label: uses the script's gold/silver/fallback fusion policy\n")
         for key, value in label_stats.items():
@@ -993,12 +1001,12 @@ def main() -> None:
     )
 
     rf_clf = joblib.load(args.rf_model)
-    cnn_clf = load_cnn_classifier(args.cnn_model, device=args.device, model_kind="cnn_raw")
+    cnn_clf = load_cnn_classifier(args.cnn_model, device=args.device, model_kind=args.cnn_model_kind)
 
     if args.verbose:
         print(f"Shot: {shot_dir}")
         print(f"RF model: {args.rf_model}")
-        print(f"CNN model: {args.cnn_model}")
+        print(f"CNN model: {args.cnn_model} ({cnn_clf.checkpoint_kind})")
         print(f"Output directory: {out_dir}")
         print(f"Found populated N directories: {[n for n, _ndir, _files in populated_n_dirs]}")
 
@@ -1152,6 +1160,7 @@ def main() -> None:
             shot=shot,
             out_dir=out_dir,
             threshold=args.model_eval_threshold,
+            cnn_checkpoint_kind=cnn_clf.checkpoint_kind,
         )
     if args.make_plots:
         make_plots(rows, out_dir)
