@@ -79,7 +79,9 @@ Typical workflow
 - Train classifier (RF or CNN) on tae_like modes (for now). For raw-CNN
   checkpoints intended for production sorting, use
   `cnn_raw.py --refit_full_before_save` so the saved model is trained on the
-  full labeled CSV after held-out epoch selection.
+  full labeled CSV after held-out epoch selection. If a LOSO raw-CNN run
+  collapses toward the majority class, try `cnn_raw.py --pos_weight auto` to
+  weight missed GOOD modes by `n_bad/n_good` during training.
 - Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
   routes EAE-like modes away, combines RF + raw-CNN TAE decisions, and removes
   close-frequency duplicate TAEs.

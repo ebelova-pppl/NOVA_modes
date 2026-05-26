@@ -49,14 +49,20 @@ from a small sweep because it reduced false negatives for GOOD modes compared
 with `0.01`; this is preferred for NOVA-C follow-up, where keeping a possibly
 unstable mode is more important than minimizing false positives.
 
+For imbalanced or collapse-prone LOSO subsets, `cnn_raw.py` also accepts
+`--pos_weight`. This is the PyTorch binary-loss weight for the positive class,
+where positive means `good`. Use `--pos_weight auto` to compute
+`n_bad/n_good` from the current training labels, or pass a positive number to
+force a value. The default is unweighted loss.
+
 By default, `cnn_raw.py` trains on a stratified train split, evaluates on the
 held-out split, and saves the best held-out checkpoint. For production sorting
 or apples-to-apples checks against the RF model, pass
 `--refit_full_before_save`: the script still uses the held-out split to choose
 `best_epoch`, then trains a fresh final raw CNN on the full labeled CSV for
 that many epochs before saving. The checkpoint records
-`saved_training_scope`, `best_test_acc`, split sizes, and whether full refit
-was used.
+`saved_training_scope`, `best_test_acc`, split sizes, `pos_weight` metadata,
+and whether full refit was used.
 
 All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
 configuration so training runs are reproducible by default.

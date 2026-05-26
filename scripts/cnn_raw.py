@@ -176,9 +176,12 @@ class SmallCNN(nn.Module):
         return x
 
 
-def train_epoch(model, loader, opt, device):
+def train_epoch(model, loader, opt, device, pos_weight: float | None = None):
     model.train()
-    loss_fn = nn.BCEWithLogitsLoss()
+    pos_weight_tensor = None
+    if pos_weight is not None:
+        pos_weight_tensor = torch.tensor([pos_weight], dtype=torch.float32, device=device)
+    loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight_tensor)
     total = 0.0
     n = 0
     for x, y, _paths in loader:
@@ -227,6 +230,7 @@ class Config:
     batch_size: int = 32
     epochs: int = 80
     lr: float = 2e-2
+    pos_weight: str | None = None
     normalize: str = "robust"
     eval_threshold: float = 0.5
     model_out: str = "nova_cnn.pt"
@@ -260,6 +264,15 @@ def parse_args() -> Config:
     ap.add_argument("--batch_size", type=int, default=32, help="Training batch size")
     ap.add_argument("--epochs", type=int, default=80, help="Number of training epochs")
     ap.add_argument("--lr", type=float, default=2e-2, help="Initial Adam learning rate")
+    ap.add_argument(
+        "--pos_weight",
+        default=None,
+        help=(
+            "Positive-class weight for BCEWithLogitsLoss, where positive=good. "
+            "Use 'auto' to compute n_bad/n_good from the training labels, a "
+            "positive number to force a value, or omit/none for unweighted loss."
+        ),
+    )
     ap.add_argument(
         "--normalize",
         choices=["none", "standard", "robust", "maxabs"],
@@ -297,6 +310,28 @@ def parse_args() -> Config:
     return Config(**vars(ap.parse_args()))
 
 
+def resolve_pos_weight(spec: str | None, items: list[dict[str, Any]], label: str) -> float | None:
+    if spec is None or str(spec).strip().lower() in ("", "none", "off", "false"):
+        return None
+
+    value = str(spec).strip().lower()
+    if value == "auto":
+        n_good = sum(1 for it in items if it["label"] == 1)
+        n_bad = sum(1 for it in items if it["label"] == 0)
+        if n_good == 0 or n_bad == 0:
+            raise ValueError(f"Cannot compute --pos_weight auto for {label}: need both good and bad labels.")
+        return float(n_bad / n_good)
+
+    try:
+        weight = float(value)
+    except ValueError as exc:
+        raise ValueError("--pos_weight must be a positive number, 'auto', or 'none'") from exc
+
+    if weight <= 0.0:
+        raise ValueError("--pos_weight must be positive")
+    return weight
+
+
 def main():
     cfg = parse_args()
 
@@ -304,11 +339,16 @@ def main():
 
     items = read_train_csv(cfg.train_csv, data_root=cfg.data_dir)
     train_items, test_items = train_test_split_stratified(items, cfg.test_frac, cfg.seed)
+    train_pos_weight = resolve_pos_weight(cfg.pos_weight, train_items, "train split")
 
     print(f"Training CSV: {cfg.train_csv}")
     print(f"Data dir: {cfg.data_dir or '$NOVA_DATA'}")
     print(f"Total modes: {len(items)} | Train: {len(train_items)} | Test: {len(test_items)}")
     print(f"Raw preprocessing: R_target={cfg.R_target}, M_target={cfg.M_target}")
+    if train_pos_weight is None:
+        print("Loss pos_weight: none")
+    else:
+        print(f"Loss pos_weight: {train_pos_weight:.6g} (positive class = good)")
 
     train_ds = NovaModeDataset(
         train_items,
@@ -343,7 +383,7 @@ def main():
 
     for ep in range(1, cfg.epochs + 1):
         epoch_t0 = time.perf_counter()
-        loss = train_epoch(model, train_loader, opt, device)
+        loss = train_epoch(model, train_loader, opt, device, pos_weight=train_pos_weight)
         acc, probs, y_true, _ = eval_model(model, test_loader, device, thr=cfg.eval_threshold)
         sched.step(acc)
 
@@ -398,16 +438,20 @@ def main():
     saved_training_scope = "train_split"
     final_train_epochs = 0
     final_train_size = len(train_items)
+    final_pos_weight = train_pos_weight
 
     if cfg.refit_full_before_save:
         if best_epoch <= 0:
             raise RuntimeError("Cannot refit on the full set because no best epoch was selected.")
 
+        final_pos_weight = resolve_pos_weight(cfg.pos_weight, items, "full CSV refit")
         print(
             f"\nRefitting final raw CNN on all {len(items)} labeled modes "
             f"for {best_epoch} epochs before saving.",
             flush=True,
         )
+        if final_pos_weight is not None:
+            print(f"Full-fit loss pos_weight: {final_pos_weight:.6g} (positive class = good)")
         full_ds = NovaModeDataset(
             items,
             normalize=cfg.normalize,
@@ -422,7 +466,7 @@ def main():
 
         for ep in range(1, best_epoch + 1):
             epoch_t0 = time.perf_counter()
-            loss = train_epoch(final_model, full_loader, final_opt, device)
+            loss = train_epoch(final_model, full_loader, final_opt, device, pos_weight=final_pos_weight)
             if ep == 1 or ep == best_epoch or ep % 5 == 0:
                 elapsed = time.perf_counter() - epoch_t0
                 print(
@@ -441,6 +485,10 @@ def main():
             "model_state_dict": model_to_save.state_dict(),
             "seed": cfg.seed,
             "normalize": cfg.normalize,
+            "pos_weight_arg": cfg.pos_weight,
+            "pos_weight": final_pos_weight,
+            "initial_pos_weight": train_pos_weight,
+            "final_pos_weight": final_pos_weight,
             "threshold": cfg.eval_threshold,
             "best_test_acc": best_acc,
             "best_epoch": best_epoch,

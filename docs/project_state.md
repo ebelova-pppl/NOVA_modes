@@ -381,3 +381,34 @@ These are in-sample pipeline-consistency checks: they confirm that
 routing, score fusion, and reporting agree with the current labeled training
 set. They should not be interpreted as generalization estimates; leave-one-shot
 out or other held-out-shot validation is still required for that.
+
+### 2026-05-25
+Codex: Added optional `--pos_weight` support to `scripts/cnn_raw.py` for LOSO
+and other imbalanced/collapse-prone raw-CNN training runs. The positive class
+is `good`; `--pos_weight auto` computes `n_bad/n_good` from the active training
+labels, while a positive numeric value can be supplied manually. The default
+remains unweighted. With `--refit_full_before_save`, the split-training phase
+uses the split-derived auto value and the final full-CSV refit recomputes the
+auto value from the full training CSV. Checkpoints record the requested
+argument plus the split and final numeric weights.
+
+User leave-one-shot-out checks using the four labeled TAE-like shots:
+
+- Held out `nstx_120113`: RF accuracy `0.9425`, CNN accuracy `0.9253`,
+  combined-policy accuracy `0.9598`, RF/CNN agreement `0.9253`.
+- Held out `nstx_135388`: RF accuracy `0.9079`, CNN accuracy `0.8684`,
+  combined-policy accuracy `0.9158`, RF/CNN agreement `0.8560`.
+- Held out `nstx_141711`: RF accuracy `0.9023`, CNN accuracy `0.7891`,
+  combined-policy accuracy `0.8359`, RF/CNN agreement `0.8443`. A later
+  raw-CNN retry with `lr=0.03` and `M_target=65` improved CNN accuracy to
+  `0.8906` and combined-policy accuracy to `0.8945`.
+- Held out `nstxu_204202`: RF accuracy `0.9455`, CNN accuracy `0.8873`,
+  combined-policy accuracy `0.9055`, RF/CNN agreement `0.9055`.
+
+Initial interpretation: RF is the most stable LOSO baseline. The equal-weight
+RF+raw-CNN combined policy improved over RF for `nstx_120113` and
+`nstx_135388`, but underperformed RF for `nstx_141711` and `nstxu_204202`
+because the raw CNN added extra false positives in those held-out cases. Raw
+CNN generalization is sensitive to learning rate, input `M_target`, seed, and
+class balance, so further CNN tuning should use LOSO-average performance rather
+than per-shot tuning.
