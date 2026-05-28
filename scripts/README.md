@@ -258,8 +258,8 @@ When available, the following scalars are appended to the feature vector:
 
 ## Sorting TAEs vs EAEs from mixed data: `split_tae_eae.py`
 
-Split a CSV list of modes into TAE-like vs EAE-like groups using the upper TAE
-gap boundary from the local `datcon<N>` file.
+Split a shot directory or CSV list of modes into TAE-like vs EAE-like groups
+using the upper TAE gap boundary from the local `datcon<N>` file.
 
 It reuses the standard NOVA mode loader plus the existing continuum-file lookup
 logic. For each mode it computes:
@@ -280,6 +280,30 @@ for inspection.
 
 ### Usage
 
+For a new shot directory, the simplest workflow is:
+
+```bash
+python split_tae_eae.py \
+  --shot_dir /path/to/nstx_135388 \
+  --out_dir split_outputs/nstx_135388
+```
+
+This scans `N1` through `N10` for `egn*` files and writes:
+
+- `all_modes.csv` — generated list of all scanned mode files
+- `tae_like.csv` — strict TAE-like plus mixed modes
+- `eae_like.csv` — EAE-like modes
+- `all_modes_tae_eae_split.csv` — full audit table with split scalars and errors
+
+For shot-directory input, the generated path column uses absolute paths so the
+split outputs can be used directly by downstream scripts.
+
+Use `--n_min`, `--n_max`, or `--pattern` for shots with a different directory
+range or file naming pattern. If `--out_dir` is omitted for `--shot_dir`, the
+script writes to `./<shot>_tae_eae_split`.
+
+For an existing CSV list:
+
 ```bash
 python split_tae_eae.py \
   --input_csv training_labels/all_modes.csv \
@@ -288,7 +312,8 @@ python split_tae_eae.py \
 ```
 
 The script preserves original CSV columns when present, appends the new split
-scalars, and also writes a full CSV with errors and skipped rows. Modes with
+scalars rounded to four decimal places, and also writes a full CSV with errors
+and skipped rows. Modes with
 missing / unreadable `datcon` files are written with `gap_region=error` and are
 excluded from the two split output lists.
 

@@ -29,21 +29,52 @@ def parse_args() -> argparse.Namespace:
             "TAE gap boundary from datcon files."
         )
     )
-    ap.add_argument("--input_csv", required=True, help="CSV list of mode files")
+    source = ap.add_mutually_exclusive_group(required=True)
+    source.add_argument("--input_csv", help="CSV list of mode files")
+    source.add_argument("--shot_dir", help="Shot directory containing N1, N2, ...")
+    ap.add_argument(
+        "--out_dir",
+        help=(
+            "Directory for default output CSVs. With --shot_dir, the default "
+            "is ./<shot>_tae_eae_split."
+        ),
+    )
     ap.add_argument(
         "--out_below_csv",
-        required=True,
+        default=None,
         help="Output CSV for modes classified as below_upper2 (TAE-like)",
     )
     ap.add_argument(
         "--out_above_csv",
-        required=True,
+        default=None,
         help="Output CSV for modes classified as above_upper2 (EAE-like)",
     )
     ap.add_argument(
         "--out_all_csv",
         default=None,
-        help="Full output CSV with all rows and errors (default: <input>_tae_eae_split.csv)",
+        help="Full output CSV with all rows and errors",
+    )
+    ap.add_argument(
+        "--out_mode_list_csv",
+        default=None,
+        help="For --shot_dir, write the generated all-mode input list here",
+    )
+    ap.add_argument(
+        "--n_min",
+        type=int,
+        default=1,
+        help="For --shot_dir, smallest N directory to scan",
+    )
+    ap.add_argument(
+        "--n_max",
+        type=int,
+        default=10,
+        help="For --shot_dir, largest N directory to scan",
+    )
+    ap.add_argument(
+        "--pattern",
+        default="egn*",
+        help="For --shot_dir, mode-file glob within each N# directory",
     )
     ap.add_argument(
         "--signed_delta_threshold",
@@ -164,6 +195,112 @@ def read_input_rows(csv_path: str) -> tuple[list[str], str, list[dict[str, str]]
     return header, path_column, rows
 
 
+def read_shot_rows(
+    shot_dir: str,
+    *,
+    n_min: int,
+    n_max: int,
+    pattern: str,
+) -> tuple[list[str], str, list[dict[str, str]]]:
+    shot_path = Path(shot_dir).expanduser().resolve()
+    if not shot_path.is_dir():
+        raise ValueError(f"Shot directory not found: {shot_path}")
+
+    header = ["path", "shot", "n"]
+    rows: list[dict[str, str]] = []
+    for n in range(n_min, n_max + 1):
+        n_dir = shot_path / f"N{n}"
+        if not n_dir.is_dir():
+            continue
+        for mode_path in sorted(n_dir.glob(pattern)):
+            if not mode_path.is_file():
+                continue
+            rows.append(
+                {
+                    "path": str(mode_path.resolve()),
+                    "shot": shot_path.name,
+                    "n": str(n),
+                }
+            )
+
+    if not rows:
+        raise ValueError(
+            f"No mode files found under {shot_path}/N{n_min}..N{n_max} "
+            f"matching pattern {pattern!r}"
+        )
+
+    return header, "path", rows
+
+
+def resolve_output_paths(
+    args: argparse.Namespace,
+) -> tuple[Path, Path, Path, Path | None]:
+    out_dir = Path(args.out_dir).expanduser() if args.out_dir else None
+
+    if args.shot_dir:
+        if out_dir is None:
+            shot_name = Path(args.shot_dir).expanduser().resolve().name
+            out_dir = Path(f"{shot_name}_tae_eae_split")
+        out_below_csv = (
+            Path(args.out_below_csv).expanduser()
+            if args.out_below_csv
+            else out_dir / "tae_like.csv"
+        )
+        out_above_csv = (
+            Path(args.out_above_csv).expanduser()
+            if args.out_above_csv
+            else out_dir / "eae_like.csv"
+        )
+        out_all_csv = (
+            Path(args.out_all_csv).expanduser()
+            if args.out_all_csv
+            else out_dir / "all_modes_tae_eae_split.csv"
+        )
+        out_mode_list_csv = (
+            Path(args.out_mode_list_csv).expanduser()
+            if args.out_mode_list_csv
+            else out_dir / "all_modes.csv"
+        )
+        return out_below_csv, out_above_csv, out_all_csv, out_mode_list_csv
+
+    input_csv = Path(args.input_csv).expanduser()
+    if args.out_mode_list_csv:
+        raise SystemExit("--out_mode_list_csv is only used with --shot_dir.")
+
+    if out_dir is not None:
+        out_below_csv = (
+            Path(args.out_below_csv).expanduser()
+            if args.out_below_csv
+            else out_dir / "tae_like.csv"
+        )
+        out_above_csv = (
+            Path(args.out_above_csv).expanduser()
+            if args.out_above_csv
+            else out_dir / "eae_like.csv"
+        )
+        out_all_csv = (
+            Path(args.out_all_csv).expanduser()
+            if args.out_all_csv
+            else out_dir / f"{input_csv.stem}_tae_eae_split.csv"
+        )
+        return out_below_csv, out_above_csv, out_all_csv, None
+
+    if not args.out_below_csv or not args.out_above_csv:
+        raise SystemExit(
+            "For --input_csv, provide --out_below_csv and --out_above_csv, "
+            "or pass --out_dir for default output names."
+        )
+
+    out_below_csv = Path(args.out_below_csv).expanduser()
+    out_above_csv = Path(args.out_above_csv).expanduser()
+    out_all_csv = (
+        Path(args.out_all_csv).expanduser()
+        if args.out_all_csv
+        else input_csv.with_name(f"{input_csv.stem}_tae_eae_split.csv")
+    )
+    return out_below_csv, out_above_csv, out_all_csv, None
+
+
 def classify_gap_region(
     signed_delta: float,
     fraction_below_upper2: float,
@@ -182,7 +319,7 @@ def classify_gap_region(
 def fmt_float(value: float | None) -> str:
     if value is None:
         return ""
-    return f"{value:.16g}"
+    return f"{value:.4f}"
 
 
 def build_output_row(
@@ -245,16 +382,24 @@ def print_label_column_check(
 def main() -> None:
     args = parse_args()
 
-    input_csv = Path(args.input_csv)
-    out_below_csv = Path(args.out_below_csv)
-    out_above_csv = Path(args.out_above_csv)
-    out_all_csv = (
-        Path(args.out_all_csv)
-        if args.out_all_csv
-        else input_csv.with_name(f"{input_csv.stem}_tae_eae_split.csv")
-    )
+    out_below_csv, out_above_csv, out_all_csv, out_mode_list_csv = resolve_output_paths(args)
 
-    header, path_column, input_rows = read_input_rows(str(input_csv))
+    if args.input_csv:
+        try:
+            header, path_column, input_rows = read_input_rows(args.input_csv)
+        except (OSError, ValueError) as exc:
+            raise SystemExit(f"Could not read --input_csv {args.input_csv!r}: {exc}") from exc
+    else:
+        try:
+            header, path_column, input_rows = read_shot_rows(
+                args.shot_dir,
+                n_min=args.n_min,
+                n_max=args.n_max,
+                pattern=args.pattern,
+            )
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
+
     output_header = header + [name for name in EXTRA_OUTPUT_COLUMNS if name not in header]
 
     all_rows: list[dict[str, str]] = []
@@ -366,6 +511,8 @@ def main() -> None:
             all_rows.append(row)
             error_rows.append(row)
 
+    if out_mode_list_csv is not None:
+        write_rows_csv(out_mode_list_csv, header, input_rows)
     write_rows_csv(out_below_csv, output_header, below_rows)
     write_rows_csv(out_above_csv, output_header, above_rows)
     write_rows_csv(out_all_csv, output_header, all_rows)
@@ -376,6 +523,8 @@ def main() -> None:
     print(f"TAE-like output total: {len(below_rows)}")
     print(f"Above upper2 (EAE-like): {len(above_rows)}")
     print(f"Skipped/errors: {len(error_rows)}")
+    if out_mode_list_csv is not None:
+        print(f"Wrote generated mode list: {out_mode_list_csv}")
     print(f"Wrote below-upper2 CSV: {out_below_csv}")
     print(f"Wrote above-upper2 CSV: {out_above_csv}")
     print(f"Wrote full CSV:         {out_all_csv}")
