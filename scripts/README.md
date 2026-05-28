@@ -322,7 +322,7 @@ applicable, disable RF guidance:
 ```bash
 python label_modes_fast.py shot_or_run/N1 \
   --data_dir /path/to/nova/data \
-  --csv labels_new_device.csv \
+  --csv_out labels_new_device.csv \
   --no-rf
 ```
 
@@ -332,6 +332,17 @@ To keep RF guidance, provide a compatible RF model:
 python label_modes_fast.py nstx_120113/N5 \
   --data_dir "$NOVA_DATA" \
   --rf-model nova_mode_classifier.joblib
+```
+
+To label only one mode family from a mixed directory, pass a split mode list.
+The script still scans `mode_dir`, but only presents files whose resolved path
+appears in the CSV:
+
+```bash
+python label_modes_fast.py nstx_120113/N5 \
+  --data_dir "$NOVA_DATA" \
+  --mode-list training_labels/tae_like.csv \
+  --csv_out labels_tae_like.csv
 ```
 
 Use `--pattern` if mode files are not named `egn*`.

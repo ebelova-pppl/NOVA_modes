@@ -213,6 +213,7 @@ class Config:
     data_dir: Optional[str] = None
     pattern: str = "egn*"
     out_csv: str = "mode_labels.csv"
+    mode_list: Optional[str] = None
     sort: bool = True
     use_rf: bool = True
     rf_model: str = "nova_mode_classifier.joblib"
@@ -237,6 +238,20 @@ def resolve_mode_dir(mode_dir: str, data_dir: Optional[str]) -> Path:
     )
 
 
+def path_key(path: str, data_dir: Optional[str] = None) -> str:
+    raw_path = Path(path).expanduser()
+    if raw_path.is_absolute() or data_dir is None:
+        return str(raw_path.resolve())
+    return str((Path(data_dir).expanduser() / raw_path).resolve())
+
+
+def read_mode_list_keys(csv_path: str, data_dir: Optional[str]) -> set[str]:
+    return {
+        path_key(path)
+        for path, _label in read_mode_csv_entries(csv_path, data_root=data_dir)
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Fast interactive labeling of NOVA modes"
@@ -250,9 +265,24 @@ def main():
         )
     )
     parser.add_argument(
-        "--csv",
+        "--csv_out",
         default="mode_labels.csv",
+        dest="csv_out",
         help="Output CSV for labels (default: mode_labels.csv)"
+    )
+    parser.add_argument(
+        "--csv",
+        dest="csv_out",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--mode-list",
+        help=(
+            "Optional CSV list of candidate modes to label, such as "
+            "training_labels/tae_like.csv or training_labels/eae_like.csv. "
+            "Only files in mode_dir whose resolved path appears in this list "
+            "are shown."
+        )
     )
     parser.add_argument(
         "--data_dir",
@@ -279,7 +309,8 @@ def main():
     cfg = Config(
         data_dir=args.data_dir,
         pattern=args.pattern,
-        out_csv=args.csv,
+        out_csv=args.csv_out,
+        mode_list=args.mode_list,
         use_rf=not args.no_rf,
         rf_model=args.rf_model,
     )
@@ -301,14 +332,38 @@ def main():
     if cfg.sort:
         files = sorted(files)
 
+    mode_list_keys = None
+    if cfg.mode_list:
+        try:
+            mode_list_keys = read_mode_list_keys(cfg.mode_list, cfg.data_dir)
+        except (OSError, RuntimeError, ValueError) as exc:
+            parser.error(f"Could not read --mode-list {cfg.mode_list!r}: {exc}")
+        files_before_filter = len(files)
+        files = [p for p in files if path_key(p) in mode_list_keys]
+        print(
+            f"Mode list filter: {Path(cfg.mode_list).expanduser()} "
+            f"({len(mode_list_keys)} entries)"
+        )
+        print(
+            f"Matched {len(files)} of {files_before_filter} files in mode_dir "
+            "against the mode list."
+        )
+
     labels = read_labels(cfg.out_csv)
-    files_to_do = [p for p in files if p not in labels]
+    labeled_keys = {path_key(p, cfg.data_dir) for p in labels}
+    files_to_do = [p for p in files if path_key(p) not in labeled_keys]
+    labeled_in_scope = len(files) - len(files_to_do)
 
     print(f"Mode directory: {mode_dir}")
     print(f"File pattern:    {cfg.pattern}")
     print(f"Input glob:      {input_glob}")
+    if cfg.mode_list:
+        print(f"Mode list:       {Path(cfg.mode_list).expanduser()}")
     print(f"Output CSV:      {Path(cfg.out_csv).expanduser()}")
-    print(f"Found {len(files)} files; already labeled {len(labels)}; remaining {len(files_to_do)}")
+    print(
+        f"Found {len(files)} files; already labeled {labeled_in_scope}; "
+        f"remaining {len(files_to_do)}"
+    )
     print("Keys: g=good, b=bad, s=skip, u=undo, q=quit")
 
     if not files:
