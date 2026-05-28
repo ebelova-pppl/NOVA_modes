@@ -245,11 +245,33 @@ def path_key(path: str, data_dir: Optional[str] = None) -> str:
     return str((Path(data_dir).expanduser() / raw_path).resolve())
 
 
+def path_match_keys(path: str, data_dir: Optional[str] = None) -> set[str]:
+    """
+    Build exact and suffix keys for matching mode-list rows to scanned files.
+
+    Split outputs may contain absolute paths from a different filesystem root
+    than the current run, especially across Perlmutter/Flux. The
+    shot/N/file suffix is stable across those roots.
+    """
+    keys = {path_key(path, data_dir)}
+    raw_path = Path(path).expanduser()
+    resolved_path = Path(next(iter(keys)))
+
+    for candidate in (raw_path, resolved_path):
+        parts = candidate.parts
+        if len(parts) >= 3:
+            keys.add(str(Path(*parts[-3:])))
+        if len(parts) >= 2:
+            keys.add(str(Path(*parts[-2:])))
+
+    return keys
+
+
 def read_mode_list_keys(csv_path: str, data_dir: Optional[str]) -> set[str]:
-    return {
-        path_key(path)
-        for path, _label in read_mode_csv_entries(csv_path, data_root=data_dir)
-    }
+    keys: set[str] = set()
+    for path, _label in read_mode_csv_entries(csv_path, data_root=data_dir):
+        keys.update(path_match_keys(path))
+    return keys
 
 
 def main():
@@ -280,8 +302,8 @@ def main():
         help=(
             "Optional CSV list of candidate modes to label, such as "
             "training_labels/tae_like.csv or training_labels/eae_like.csv. "
-            "Only files in mode_dir whose resolved path appears in this list "
-            "are shown."
+            "Only files in mode_dir whose resolved path or shot/N/file suffix "
+            "appears in this list are shown."
         )
     )
     parser.add_argument(
@@ -333,25 +355,28 @@ def main():
         files = sorted(files)
 
     mode_list_keys = None
+    files_before_mode_list_filter = None
     if cfg.mode_list:
         try:
             mode_list_keys = read_mode_list_keys(cfg.mode_list, cfg.data_dir)
         except (OSError, RuntimeError, ValueError) as exc:
             parser.error(f"Could not read --mode-list {cfg.mode_list!r}: {exc}")
-        files_before_filter = len(files)
-        files = [p for p in files if path_key(p) in mode_list_keys]
+        files_before_mode_list_filter = len(files)
+        files = [p for p in files if path_match_keys(p, cfg.data_dir) & mode_list_keys]
         print(
             f"Mode list filter: {Path(cfg.mode_list).expanduser()} "
             f"({len(mode_list_keys)} entries)"
         )
         print(
-            f"Matched {len(files)} of {files_before_filter} files in mode_dir "
+            f"Matched {len(files)} of {files_before_mode_list_filter} files in mode_dir "
             "against the mode list."
         )
 
     labels = read_labels(cfg.out_csv)
-    labeled_keys = {path_key(p, cfg.data_dir) for p in labels}
-    files_to_do = [p for p in files if path_key(p) not in labeled_keys]
+    labeled_keys = set()
+    for p in labels:
+        labeled_keys.update(path_match_keys(p, cfg.data_dir))
+    files_to_do = [p for p in files if not (path_match_keys(p, cfg.data_dir) & labeled_keys)]
     labeled_in_scope = len(files) - len(files_to_do)
 
     print(f"Mode directory: {mode_dir}")
@@ -367,7 +392,13 @@ def main():
     print("Keys: g=good, b=bad, s=skip, u=undo, q=quit")
 
     if not files:
-        print("No mode files found. Check mode_dir, --data_dir, and --pattern.")
+        if cfg.mode_list and files_before_mode_list_filter:
+            print(
+                "No mode files matched --mode-list. Check that the list and "
+                "mode_dir refer to the same shot/N directory."
+            )
+        else:
+            print("No mode files found. Check mode_dir, --data_dir, and --pattern.")
         return
 
     if not files_to_do:

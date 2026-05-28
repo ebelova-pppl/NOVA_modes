@@ -361,7 +361,7 @@ python label_modes_fast.py nstx_120113/N5 \
 
 To label only one mode family from a mixed directory, pass a split mode list.
 The script still scans `mode_dir`, but only presents files whose resolved path
-appears in the CSV:
+or shot/N/file suffix appears in the CSV:
 
 ```bash
 python label_modes_fast.py nstx_120113/N5 \
