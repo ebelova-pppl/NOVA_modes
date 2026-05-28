@@ -2,5 +2,29 @@
 module load python
 module load pytorch     # for CNN models, runs on GPU or CPU
 
+Currently using this versions: # need same setting on Flux to use Perlmutter-trained models on Flux, and to ensure reproducibility of results across platforms.
+Perlmutter:
+numpy   2.1.2
+sklearn 1.7.2
+torch   2.8.0+cu129
+
 #Flux
-module load anaconda3
+
+in /p/hym:
+    module load anaconda3
+    in /p/hym/ebelova/NOVA/NOVA_modes:
+    source `conda info --base`/etc/profile.d/conda.csh
+    setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"    # optional: shared conda pkgs directory
+    conda activate /p/hym/conda_envs/nova-perlmutter     # setting up perlmutter-like environment on flux
+    source /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh" # to set up env variables and python paths
+
+conda env setup the same as Perlmutter:
+/p/hym/conda_envs/nova-perlmutter
+numpy   2.1.2
+sklearn 1.7.2
+torch   2.8.0+cu128 # cuda doesn't matter on flux, it is CPU only
+
+To check, use:
+
+which python
+python -c "import sys, numpy, sklearn, torch; print(sys.executable); print('numpy', numpy.__version__); print('sklearn', sklearn.__version__); print('torch', torch.__version__); print('cuda available:', torch.cuda.is_available())"
