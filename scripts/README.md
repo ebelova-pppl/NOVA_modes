@@ -472,6 +472,11 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 - writes CSV audit tables, shot summaries, a frequency-cluster report, and
   optional diagnostic plots.
 
+Current operational note: this is the main large-shot sorting path for the
+current models. The present RF/CNN checkpoints and RF-leaning fusion policy
+remain the baseline until four additional NSTX-U labeled shots are added and
+the RF/CNN models are retrained and revalidated.
+
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
 modes. This avoids chained clusters where several adjacent modes are close but
@@ -511,6 +516,28 @@ exclusive class: it contains scored TAE-side modes that are borderline or show
 RF/CNN disagreement, so they may also appear in either `good_tae_unchecked.csv`
 or `bad_tae_like.csv`.
 
+The default RF/CNN fusion policy is RF-leaning with a high-confidence CNN
+rescue:
+
+```text
+gold_good:          p_rf_good >= 0.7 and p_cnn_good >= 0.6
+silver_good:        p_rf_good >= 0.5 and p_cnn_good >= 0.5
+flagged_cnn_rescue: p_rf_good >= 0.4 and p_cnn_good >= 0.9
+gold_bad:           p_rf_good <  0.2 and p_cnn_good <  0.2
+silver_bad:         p_rf_good <  0.4 and p_cnn_good <  0.4
+flagged_rf_only_good:
+                     p_rf_good >= 0.5
+fallback:           bad, flagged_borderline_or_disagreement
+```
+
+The CNN-rescue, RF-only-good, and fallback tiers are included in
+`flagged_tae_like.csv`.
+
+The RF-leaning policy was chosen from four-shot LOSO checks because RF was the
+more stable held-out-shot ranker, while the CNN still provided useful
+high-confidence rescues. The policy should be rechecked after the planned
+NSTX-U training-data expansion and model retraining.
+
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`; older separate histogram files are
 removed when this combined plot is regenerated.
@@ -527,17 +554,16 @@ the training-label CSV. `--model_eval_threshold` controls the RF-only and
 CNN-only evaluation threshold and defaults to `0.5`; the combined-policy
 evaluation uses the actual `final_label` assigned by the fusion policy.
 
-The `p_avg` score is a weighted RF/CNN average used for fallback decisions and
-as the duplicate-clustering score:
+The `p_avg` score is a weighted RF/CNN average used as the duplicate-clustering
+score:
 
 ```text
 p_avg = (rf_score_weight * p_rf_good + cnn_score_weight * p_cnn_good)
         / (rf_score_weight + cnn_score_weight)
 ```
 
-Both weights default to `0.5`, preserving the original equal-weight average.
-For RF-leaning validation runs, use for example
-`--rf_score_weight 0.6 --cnn_score_weight 0.4`.
+Both weights default to `0.5`. They affect which candidate is retained during
+close-frequency duplicate removal, not the RF/CNN fusion labels.
 
 ### Usage
 
@@ -548,8 +574,6 @@ python sort_shot_mixed.py \
   --cnn_model /path/to/nova_cnn_straightened.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
   --label_csv training_labels/tae_like.csv \
-  --rf_score_weight 0.6 \
-  --cnn_score_weight 0.4 \
   --make_plots
 ```
 

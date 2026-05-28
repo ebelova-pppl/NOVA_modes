@@ -68,9 +68,15 @@ Model families
 - `scripts/cnn_hybrid.py` - CNN + scalar features (continuum + physics-informed inputs)
 
 Current best models
-- `scripts/rf_train_classify.py` - Most robust and interpretable model (~92–94% accuracy). Performs well across datasets and is used as the baseline classifier
+- `scripts/rf_train_classify.py` - Most robust and interpretable model (~92–94% accuracy). Performs well across datasets and is used as the baseline classifier.
 - All three CNN models give comparable results with best accuracy ~0.95-0.96 on `training_labels/tae_like.csv` using evaluation threshold 0.5 (GPU on Perlmutter).
 - `scripts/cnn_raw.py` is the simplest CNN model and reaches ~0.96 accuracy on the TAE-like training set.
+- Current operational baseline: use the current full-refit RF model plus the
+  current CNN checkpoint through `sort_shot_mixed.py` with the RF-leaning
+  RF/CNN fusion policy. This remains the main production sorting path until
+  the next NSTX-U-expanded training set is labeled and the models are retrained.
+- Planned data expansion: add four more labeled NSTX-U shots, then retrain and
+  revalidate the RF and CNN models with the expanded NSTX-U coverage.
 
 Typical workflow
 - Generate NOVA modes for a shot
@@ -85,7 +91,9 @@ Typical workflow
 - Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
   routes EAE-like modes away, combines RF + CNN TAE decisions, and removes
   close-frequency duplicate TAEs. Raw, straightened, and hybrid CNN checkpoints
-  are supported through the shared CNN inference path.
+  are supported through the shared CNN inference path. The current deployment
+  policy is RF-leaning: RF is the main gate, while high-confidence CNN results
+  can rescue selected borderline modes.
 - Run `sort_shot.py` when you want the older single-model shot sorter and
   duplicate-removal workflow.
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)

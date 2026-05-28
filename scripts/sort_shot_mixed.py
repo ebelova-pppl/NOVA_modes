@@ -103,11 +103,15 @@ SHOT_SUMMARY_FIELDS = [
     "fraction_eae_threshold",
     "signed_delta_eae_threshold",
     "include_mixed_in_tae_like",
-    "gold_good_threshold",
-    "silver_good_threshold",
+    "gold_good_rf_threshold",
+    "gold_good_cnn_threshold",
+    "silver_good_rf_threshold",
+    "silver_good_cnn_threshold",
+    "cnn_rescue_rf_threshold",
+    "cnn_rescue_cnn_threshold",
     "gold_bad_threshold",
     "silver_bad_threshold",
-    "fallback_good_threshold",
+    "rf_only_good_threshold",
     "rf_score_weight",
     "cnn_score_weight",
 ]
@@ -171,22 +175,26 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--signed_delta_eae_threshold", type=float, default=-0.1)
 
     # RF/CNN fusion policy.
-    ap.add_argument("--gold_good_threshold", type=float, default=0.8)
-    ap.add_argument("--silver_good_threshold", type=float, default=0.6)
+    ap.add_argument("--gold_good_rf_threshold", type=float, default=0.7)
+    ap.add_argument("--gold_good_cnn_threshold", type=float, default=0.6)
+    ap.add_argument("--silver_good_rf_threshold", type=float, default=0.5)
+    ap.add_argument("--silver_good_cnn_threshold", type=float, default=0.5)
+    ap.add_argument("--cnn_rescue_rf_threshold", type=float, default=0.4)
+    ap.add_argument("--cnn_rescue_cnn_threshold", type=float, default=0.9)
     ap.add_argument("--gold_bad_threshold", type=float, default=0.2)
     ap.add_argument("--silver_bad_threshold", type=float, default=0.4)
-    ap.add_argument("--fallback_good_threshold", type=float, default=0.5)
+    ap.add_argument("--rf_only_good_threshold", type=float, default=0.5)
     ap.add_argument(
         "--rf_score_weight",
         type=float,
         default=0.5,
-        help="RF weight used in weighted p_avg for fallback decisions and clustering scores",
+        help="RF weight used in weighted p_avg for duplicate-clustering scores",
     )
     ap.add_argument(
         "--cnn_score_weight",
         type=float,
         default=0.5,
-        help="CNN weight used in weighted p_avg for fallback decisions and clustering scores",
+        help="CNN weight used in weighted p_avg for duplicate-clustering scores",
     )
     return ap.parse_args()
 
@@ -369,11 +377,15 @@ def fuse_scores(
     p_rf_good: float,
     p_cnn_good: float,
     *,
-    gold_good_threshold: float,
-    silver_good_threshold: float,
+    gold_good_rf_threshold: float,
+    gold_good_cnn_threshold: float,
+    silver_good_rf_threshold: float,
+    silver_good_cnn_threshold: float,
+    cnn_rescue_rf_threshold: float,
+    cnn_rescue_cnn_threshold: float,
     gold_bad_threshold: float,
     silver_bad_threshold: float,
-    fallback_good_threshold: float,
+    rf_only_good_threshold: float,
     rf_score_weight: float,
     cnn_score_weight: float,
 ) -> dict[str, Any]:
@@ -394,20 +406,26 @@ def fuse_scores(
         + float(cnn_score_weight) * float(p_cnn_good)
     ) / weight_sum
 
-    if p_rf_good >= gold_good_threshold and p_cnn_good >= gold_good_threshold:
+    if p_rf_good >= gold_good_rf_threshold and p_cnn_good >= gold_good_cnn_threshold:
         final_label = "good"
         tier = "gold_good"
-    elif p_rf_good <= gold_bad_threshold and p_cnn_good <= gold_bad_threshold:
+    elif p_rf_good < gold_bad_threshold and p_cnn_good < gold_bad_threshold:
         final_label = "bad"
         tier = "gold_bad"
-    elif p_rf_good >= silver_good_threshold and p_cnn_good >= silver_good_threshold:
+    elif p_rf_good >= silver_good_rf_threshold and p_cnn_good >= silver_good_cnn_threshold:
         final_label = "good"
         tier = "silver_good"
-    elif p_rf_good <= silver_bad_threshold and p_cnn_good <= silver_bad_threshold:
+    elif p_rf_good >= cnn_rescue_rf_threshold and p_cnn_good >= cnn_rescue_cnn_threshold:
+        final_label = "good"
+        tier = "flagged_cnn_rescue"
+    elif p_rf_good < silver_bad_threshold and p_cnn_good < silver_bad_threshold:
         final_label = "bad"
         tier = "silver_bad"
+    elif p_rf_good >= rf_only_good_threshold:
+        final_label = "good"
+        tier = "flagged_rf_only_good"
     else:
-        final_label = "good" if p_avg >= fallback_good_threshold else "bad"
+        final_label = "bad"
         tier = "flagged_borderline_or_disagreement"
 
     return {
@@ -421,8 +439,9 @@ def fuse_scores(
 
 
 def is_flagged_row(row: dict[str, Any]) -> bool:
+    tier = str(row.get("tier", ""))
     return bool(
-        row.get("tier") == "flagged_borderline_or_disagreement"
+        tier.startswith("flagged_")
         or row.get("model_disagreement") is True
         or row.get("near_threshold") is True
         or row.get("large_score_gap") is True
@@ -621,7 +640,7 @@ def write_labeled_evaluation_outputs(
         fp.write(f"label_csv: {label_csv}\n")
         fp.write(f"cnn_checkpoint_kind: {cnn_checkpoint_kind}\n")
         fp.write(f"rf_cnn_eval_threshold: {threshold}\n")
-        fp.write("combined_policy_label: uses the script's gold/silver/fallback fusion policy\n")
+        fp.write("combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy\n")
         for key, value in label_stats.items():
             fp.write(f"{key}: {value}\n")
         fp.write(f"n_scored_rows: {len(scored_rows)}\n")
@@ -901,6 +920,7 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
             "silver_good": "#66a61e",
             "gold_bad": "#d95f02",
             "silver_bad": "#e7298a",
+            "flagged_cnn_rescue": "#1f78b4",
             "flagged_borderline_or_disagreement": "#7570b3",
         }
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -1095,11 +1115,15 @@ def main() -> None:
                 fuse_scores(
                     float(p_rf_good),
                     p_cnn_good,
-                    gold_good_threshold=args.gold_good_threshold,
-                    silver_good_threshold=args.silver_good_threshold,
+                    gold_good_rf_threshold=args.gold_good_rf_threshold,
+                    gold_good_cnn_threshold=args.gold_good_cnn_threshold,
+                    silver_good_rf_threshold=args.silver_good_rf_threshold,
+                    silver_good_cnn_threshold=args.silver_good_cnn_threshold,
+                    cnn_rescue_rf_threshold=args.cnn_rescue_rf_threshold,
+                    cnn_rescue_cnn_threshold=args.cnn_rescue_cnn_threshold,
                     gold_bad_threshold=args.gold_bad_threshold,
                     silver_bad_threshold=args.silver_bad_threshold,
-                    fallback_good_threshold=args.fallback_good_threshold,
+                    rf_only_good_threshold=args.rf_only_good_threshold,
                     rf_score_weight=args.rf_score_weight,
                     cnn_score_weight=args.cnn_score_weight,
                 )
@@ -1124,11 +1148,15 @@ def main() -> None:
         "fraction_eae_threshold": args.fraction_eae_threshold,
         "signed_delta_eae_threshold": args.signed_delta_eae_threshold,
         "include_mixed_in_tae_like": True,
-        "gold_good_threshold": args.gold_good_threshold,
-        "silver_good_threshold": args.silver_good_threshold,
+        "gold_good_rf_threshold": args.gold_good_rf_threshold,
+        "gold_good_cnn_threshold": args.gold_good_cnn_threshold,
+        "silver_good_rf_threshold": args.silver_good_rf_threshold,
+        "silver_good_cnn_threshold": args.silver_good_cnn_threshold,
+        "cnn_rescue_rf_threshold": args.cnn_rescue_rf_threshold,
+        "cnn_rescue_cnn_threshold": args.cnn_rescue_cnn_threshold,
         "gold_bad_threshold": args.gold_bad_threshold,
         "silver_bad_threshold": args.silver_bad_threshold,
-        "fallback_good_threshold": args.fallback_good_threshold,
+        "rf_only_good_threshold": args.rf_only_good_threshold,
         "rf_score_weight": args.rf_score_weight,
         "cnn_score_weight": args.cnn_score_weight,
     }

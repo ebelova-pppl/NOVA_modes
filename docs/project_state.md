@@ -359,9 +359,10 @@ and combined-policy confusion matrices/classification reports plus compact
 summary and per-mode evaluation CSVs.
 
 Codex: Added `--rf_score_weight` and `--cnn_score_weight` to
-`sort_shot_mixed.py`. These control the weighted `p_avg` used in fallback
-fusion decisions and duplicate-clustering scores; defaults are equal weights
-for backward-compatible behavior.
+`sort_shot_mixed.py`. These originally controlled the weighted `p_avg` used in
+fallback fusion decisions and duplicate-clustering scores; after the
+2026-05-27 RF-leaning policy update, these weights control the clustering score
+only.
 
 User validation after retraining `cnn_raw.py` with `--refit_full_before_save`:
 the deployment raw-CNN checkpoint was trained on the full labeled TAE-like CSV
@@ -425,3 +426,44 @@ for the final refit. `sort_shot_mixed.py` now loads CNN checkpoints with
 be compared in the RF+CNN mixed-shot policy. Labeled evaluation outputs now use
 generic `cnn` / `cnn_label` names, with the loaded checkpoint kind recorded
 separately in `model_evaluation_report.txt`.
+
+### 2026-05-27
+Codex: Updated the default `sort_shot_mixed.py` RF/CNN fusion rule after LOSO
+checks showed RF is the more stable ranker and equal RF/CNN fusion can add raw
+CNN false positives. The policy is now RF-leaning with only a high-confidence
+CNN rescue:
+
+- `gold_good`: `p_rf_good >= 0.7` and `p_cnn_good >= 0.6`
+- `silver_good`: `p_rf_good >= 0.5` and `p_cnn_good >= 0.5`
+- `flagged_cnn_rescue`: `p_rf_good >= 0.4` and `p_cnn_good >= 0.9`
+- `gold_bad`: `p_rf_good < 0.2` and `p_cnn_good < 0.2`
+- `silver_bad`: `p_rf_good < 0.4` and `p_cnn_good < 0.4`
+- `flagged_rf_only_good`: `p_rf_good >= 0.5`
+- all remaining cases are `bad` with
+  `tier=flagged_borderline_or_disagreement`
+
+`p_avg` remains in the outputs and is still used as the close-frequency
+duplicate-clustering score, with `--rf_score_weight` and `--cnn_score_weight`
+controlling that score only rather than fallback label decisions.
+
+### 2026-05-28
+User decision: the current full-refit RF/CNN models plus the RF-leaning
+`sort_shot_mixed.py` fusion policy are the operational baseline for now. The
+next model-improvement step is to add four more labeled NSTX-U shots, then
+retrain and revalidate the RF and CNN models on the expanded training set.
+
+Rationale: four-shot LOSO checks show RF is currently the most stable
+held-out-shot baseline, while CNN checkpoints can help when used as a limited
+high-confidence rescue signal. The present model is good enough to serve as
+the main sorting path, but broader NSTX-U training coverage is needed before
+expecting more robust NSTX-U generalization.
+
+Current follow-up items:
+
+- label four additional NSTX-U shots and merge them into the TAE-like training
+  pool;
+- retrain RF, raw CNN, straightened CNN, and hybrid CNN with the expanded
+  labeled set;
+- rerun LOSO or held-out-shot checks, especially on NSTX-U shots;
+- re-evaluate the RF-leaning fusion thresholds in `sort_shot_mixed.py` after
+  retraining.
