@@ -552,7 +552,7 @@ exclusive class: it contains scored TAE-side modes that are borderline or show
 RF/CNN disagreement, so they may also appear in either `good_tae_unchecked.csv`
 or `bad_tae_like.csv`.
 
-The default RF/CNN fusion policy is RF-leaning with a high-confidence CNN
+The current (optimized) default RF/CNN fusion policy is RF-leaning with a high-confidence CNN
 rescue:
 
 ```text
@@ -575,8 +575,7 @@ high-confidence rescues. The policy should be rechecked after the planned
 NSTX-U training-data expansion and model retraining.
 
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
-side-by-side in `hist_p_good_by_n.png`; older separate histogram files are
-removed when this combined plot is regenerated.
+side-by-side in `hist_p_good_by_n.png`.
 
 `--cnn_model_kind` defaults to `auto`, so `sort_shot_mixed.py` can use raw,
 straightened, or hybrid CNN checkpoints that contain `model_type` metadata.
@@ -610,6 +609,25 @@ python sort_shot_mixed.py \
   --cnn_model /path/to/nova_cnn_straightened.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
   --label_csv training_labels/tae_like.csv \
+  --make_plots
+```
+or when running from $NOVA_RUN_ROOT/runs/ directory (for checking on old labeled/training shots):
+```bash
+python $NOVA_REPO/scripts/sort_shot_mixed.py \
+  --shot_dir $NOVA_DATA/nstx_135388 \
+  --rf_model $NOVA_REPO/models/nova_mode_classifier.joblib \
+  --cnn_model $NOVA_REPO/models/nova_cnn_raw.pt \
+  --out_dir $NOVA_RUN_ROOT/sort_out_nstx_135388 \
+  --label_csv $NOVA_REPO/training_labels/tae_like.csv \
+  --make_plots
+```
+For production runs (new shots from /u/ngorelen/work/nova/DiTw/projdisk):
+```bash
+python $NOVA_REPO/scripts/sort_shot_mixed.py \
+  --shot_dir /u/ngorelen/work/nova/DiTw/projdisk/nstxuE202855A01t020 \
+  --rf_model $NOVA_REPO/models/nova_mode_classifier.joblib \
+  --cnn_model $NOVA_REPO/models/nova_cnn_raw.pt \
+  --out_dir path/to/sort_nstxuE202855A01t02 \
   --make_plots
 ```
 
