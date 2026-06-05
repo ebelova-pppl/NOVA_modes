@@ -1,17 +1,22 @@
 # Project: AI NOVA mode classifier
-### Project state (2026-03-29)
+### Project state (current snapshot, updated 2026-06-05)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
--	~1272 labeled modes
-    -	NSTX-U: 1 shot
-    -	NSTX: 3 shots
-    -	DIII-D: optional (future)
--	Main version-controlled training list:
-    -	`training_labels/train_master.csv`
-    -	mode paths stored relative to `$NOVA_DATA` when possible
-    -	example entry: `nstx_120113/N5/egn05w.1234E+02,good`
+- Active version-controlled training list:
+    - `training_labels/tae_like.csv`
+    - 1085 labeled TAE-like modes: 426 `good`, 659 `bad`
+    - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`
+    - mode paths stored relative to `$NOVA_DATA` when possible
+    - example entry: `nstx_120113/N5/egn05w.1234E+02,good`
+- Archived historical lists:
+    - older TAE-only lists: `training_labels/old_4shots_tae_only_labels/`
+    - previous four-shot mixed TAE/EAE lists: `training_labels/old_4shots_mixed_labels/`
+- Staged, not yet merged:
+    - six additional NSTX-U TAE-like label lists in the shared `nova2/metadata` area
+    - cleaned staged list has 1040 rows: 284 `good`, 756 `bad`
+    - labels still need review before merging with `training_labels/tae_like.csv`
 
 Each mode includes:
 -	Scalar metadata:
@@ -144,14 +149,16 @@ From cont_features.py:
 •	Missing datcon handling → warn once, disable continuum features
 
 ## Current tasks
-•	Continue label cleaning (OOF + CNN comparison)
-•	Compare misclassified modes (RF vs CNN vs HybridCNN)
-•	Validate the shared `cnn_classify.py` inference path on more checkpoints / shots
+- Retrain RF on the full active `training_labels/tae_like.csv` list.
+- Use the retrained RF to help review the six staged NSTX-U TAE-like label lists.
+- Keep staged six-shot labels separate until label review is complete.
  
 ## Next tasks
-•	Add EAEs (second gap) more deeply into training / continuum features
-•	Extend training to broader frequency range
-•	Investigate surrogate / autoencoder for mode structure
+- Merge reviewed NSTX-U labels into the active TAE-like training pool.
+- Retrain and revalidate RF, raw CNN, straightened CNN, and hybrid CNN on the expanded set.
+- Add EAEs (second gap) more deeply into training / continuum features.
+- Extend training to broader frequency range.
+- Investigate surrogate / autoencoder for mode structure.
 
 ## Environment / portability
 - Tested on:
@@ -449,8 +456,8 @@ controlling that score only rather than fallback label decisions.
 ### 2026-05-28
 User decision: the current full-refit RF/CNN models plus the RF-leaning
 `sort_shot_mixed.py` fusion policy are the operational baseline for now. The
-next model-improvement step is to add four more labeled NSTX-U shots, then
-retrain and revalidate the RF and CNN models on the expanded training set.
+next model-improvement step is to add more labeled NSTX-U shots, then retrain
+and revalidate the RF and CNN models on the expanded training set.
 
 Rationale: four-shot LOSO checks show RF is currently the most stable
 held-out-shot baseline, while CNN checkpoints can help when used as a limited
@@ -460,10 +467,35 @@ expecting more robust NSTX-U generalization.
 
 Current follow-up items:
 
-- label four additional NSTX-U shots and merge them into the TAE-like training
-  pool;
+- label additional NSTX-U shots and merge the reviewed labels into the
+  TAE-like training pool;
 - retrain RF, raw CNN, straightened CNN, and hybrid CNN with the expanded
   labeled set;
 - rerun LOSO or held-out-shot checks, especially on NSTX-U shots;
 - re-evaluate the RF-leaning fusion thresholds in `sort_shot_mixed.py` after
   retraining.
+
+### 2026-06-05
+User update: six additional NSTX-U shots now have staged TAE-like label lists
+in the shared `nova2/metadata` area, but the labels still need review before
+they are merged into `training_labels/tae_like.csv`.
+
+Codex check:
+- `training_labels/tae_like.csv` remains the active four-shot TAE-like training
+  list: 1085 rows, 426 `good`, 659 `bad`, all resolving under `$NOVA_DATA`.
+- The old root-level four-shot label files have been moved into
+  `training_labels/old_4shots_tae_only_labels/` and
+  `training_labels/old_4shots_mixed_labels/`.
+- The cleaned six-shot staged list has 1040 rows: 284 `good`, 756 `bad`.
+- The not-cleaned six-shot staged list has 1041 rows and one duplicate mode:
+  `nstxuG142301H47/N8/egn08w.1092E+02`.
+- All cleaned staged-label paths resolve to existing files under `$NOVA_DATA`
+  by `shot/N/file` suffix.
+- Per-shot TAE/EAE split outputs exist for all six staged NSTX-U shots. Their
+  TAE-like outputs contain 1050 rows total, so 10 split TAE-like modes are not
+  present in the cleaned staged label list yet.
+
+Current workflow decision: retrain RF on the full active
+`training_labels/tae_like.csv` list and use that model to help inspect the
+six staged NSTX-U labels. Keep the staged labels out of the canonical training
+CSV until the review is done.

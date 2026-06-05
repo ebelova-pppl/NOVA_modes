@@ -1,136 +1,96 @@
 # Training Label Lists
 
-This directory contains the main mode-label CSV files used for training,
-splitting, and auditing classifier datasets.
+This directory contains version-controlled mode-label CSV files used for
+training, splitting, and auditing classifier datasets.
 
-Paths are normally stored relative to `$NOVA_DATA`, for example
-`nstx_123456/N5/egn05w.1234E+02`.
+Paths in active training CSVs should be stored relative to `$NOVA_DATA`, for
+example `nstx_120113/N5/egn05w.1234E+02`.
 
-## Original TAE training lists
+## Active training list
 
-### `train_master.csv`
+### `tae_like.csv`
 
-Original TAE-only training list.
-
-Columns:
-- `path`
-- `validity`
-
-### `train_master_full_paths.csv`
-
-Same list as `train_master.csv`, but with absolute mode-file paths.
-
-### `train_tae.csv`
-
-Extended version of the original TAE training list with family labels.
+Current active TAE-like good/bad training list for RF and CNN retraining.
 
 Columns:
 - `path`
 - `validity`
 - `family`
-
-## Mixed-mode master list
-
-### `all_modes.csv`
-
-Current active mixed TAE/EAE training list.
-
-Columns:
-- `path`
-- `validity`
-- `family`
-
-Notes:
-- includes a header row
-- includes both TAE and EAE labels where known
-- has been cleaned to remove known mistaken small-`n_m` mode files from the
-  `nstx_135388` data directories
-
-## TAE/EAE split outputs
-
-These files are generated from `all_modes.csv` by
-`scripts/split_tae_eae.py`.
-
-### `all_modes_tae_eae_split.csv`
-
-Full splitter output for all processed rows.
-
-It preserves the original input columns and appends:
 - `signed_delta`
 - `fraction_below_upper2`
 - `gap_region`
 - `error`
 
-`signed_delta` is already normalized: it is the weighted mean of
-`sqrt(upper2) - omega` divided by the weighted RMS of that same distance.
+Current checked contents:
+- 1085 labeled modes
+- labels: 426 `good`, 659 `bad`
+- shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`
 
-This is the main audit table for checking how each mode was classified.
+This is the list to use when retraining the current RF baseline before checking
+new labels. Do not merge staged NSTX-U labels into this file until the new
+label review is complete.
 
-### `tae_like.csv`
+## Archived four-shot lists
 
-TAE-side output from the splitter.
+### `old_4shots_tae_only_labels/`
 
-It includes:
-- rows classified as `below_upper2`
-- rows classified as `mixed`
+Older TAE-only training lists from before the mixed TAE/EAE workflow.
 
-`mixed` rows are kept on the TAE side on purpose, so marginal modes remain
-available for downstream TAE training and review.
+Contents:
+- `train_master.csv`
+- `train_master_full_paths.csv`
 
-### Leave-one-shot-out TAE training lists
+These are historical inputs only; they are not the current default training
+pool.
 
-These files are derived from `tae_like.csv` for leave-one-shot-out validation.
-Each file preserves the same columns as `tae_like.csv` and excludes exactly one
-labeled shot, so RF and CNN models can be retrained on the remaining three
-shots:
+### `old_4shots_mixed_labels/`
 
-- `tae_like_loso_train_excluding_nstx_120113.csv`
-- `tae_like_loso_train_excluding_nstx_135388.csv`
-- `tae_like_loso_train_excluding_nstx_141711.csv`
-- `tae_like_loso_train_excluding_nstxu_204202.csv`
+Previous four-shot mixed TAE/EAE lists and derived audit files.
 
-Use the held-out shot named in the filename for `sort_shot_mixed.py` validation
-after retraining models on the corresponding three-shot list.
+Contents include:
+- `all_modes.csv`
+- `all_modes_tae_eae_split.csv`
+- `tae_like_loso_train_excluding_*.csv`
+- `eae_like.csv`
+- `mixed_tae_like.csv`
+- `bad_tae_like.csv`
+- cleanup/audit lists for the `nstx_135388` small-`n_m` file issue
 
-### `eae_like.csv`
+Use this directory for historical audit, regeneration, or LOSO references. The
+root of `training_labels/` intentionally no longer carries these older mixed
+lists as active files.
 
-EAE-side output from the splitter.
+## Staged six-shot NSTX-U labels
 
-It contains rows classified as `above_upper2`.
+Six additional NSTX-U shots have staged TAE-like label lists in the shared
+`nova2/metadata` area:
 
-### `mixed_tae_like.csv`
+- `tae_like_6new_NG.csv`
+- `tae_like_6new_not_cleaned_NG.csv`
+- per-shot `*_tae_eae_split/` directories
 
-Subset of the full split table containing only rows with
-`gap_region = mixed`.
+These files are not version-controlled training inputs yet. They are for label
+review with the current four-shot RF/CNN models.
 
-Useful for manual inspection of marginal modes that were still routed into
-`tae_like.csv`.
+Checked staged-label summary:
+- cleaned staged list: 1040 rows, 284 `good`, 756 `bad`
+- not-cleaned staged list: 1041 rows, with one duplicate mode
+- all cleaned staged paths resolve to files under `$NOVA_DATA` by
+  `shot/N/file` suffix
+- the per-shot TAE/EAE split outputs contain 10 additional TAE-like modes that
+  are not in the cleaned staged label list, so only the TAE-like subset has
+  been labeled so far
 
-### `bad_tae_like.csv`
+The staged CSVs currently contain absolute source paths from the labeling
+environment. Tools such as `label_modes_fast.py` can match them by stable
+`shot/N/file` suffix when given `--mode-list`, but training inputs should be
+converted to relative `$NOVA_DATA` paths before any future merge.
 
-Subset of `tae_like.csv` with `validity = bad`.
+Example review command for one `N` directory:
 
-Useful as the bad side of the TAE good/bad classifier training set.
-
-### `tae_misplaced_in_eae_like.csv`
-
-Audit list of rows labeled `family = tae` that still landed in
-`eae_like.csv`.
-
-This file may contain only the header row if no such cases remain.
-
-## Cleanup and audit lists for mistaken small-`n_m` files
-
-### `all_modes_clean_nstx135388_nhar9.csv`
-
-Cleaned candidate list created while removing mistaken small-`n_m` files from
-the `nstx_135388` dataset directories.
-
-This file was used to update `all_modes.csv` after review.
-
-### `removed_nstx135388_nhar9.csv`
-
-Audit list of rows removed from `all_modes.csv` during that cleanup.
-
-It records the removed path plus extra parsed metadata such as `nhar`, `nr`,
-file size, and the removal reason.
+```bash
+python "$NOVA_REPO/scripts/label_modes_fast.py" \
+  "$NOVA_DATA/nstxuE202855A01t020/N1" \
+  --mode-list /path/to/nova2/metadata/tae_like_6new_NG.csv \
+  --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
+```

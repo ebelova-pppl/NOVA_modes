@@ -49,10 +49,15 @@ Data format summary
     - n_r (radial grid) may vary between shots
 - Additional data:
     - continuum data (datcon#) one per shot / per ntor: low2(r), high2(r) (Alfvén continuum bounds - currently for TAE gap only)
-- Training label CSVs in `training_labels/` store mode paths relative to `$NOVA_DATA`
-  when possible, for example `nstx_120113/N5/egn05w.1234E+02,good`.
-  The current mixed TAE/EAE master list is `training_labels/all_modes.csv`.
-  The older TAE-only training list is `training_labels/train_master.csv`.
+- Training label CSVs in `training_labels/` store mode paths relative to
+  `$NOVA_DATA` when possible, for example
+  `nstx_120113/N5/egn05w.1234E+02,good`. The current active good/bad training
+  list is `training_labels/tae_like.csv`. Older four-shot TAE-only and mixed
+  TAE/EAE lists are archived under `training_labels/old_4shots_tae_only_labels/`
+  and `training_labels/old_4shots_mixed_labels/`.
+  Six additional NSTX-U TAE-like label lists are staged in the shared
+  `nova2/metadata` area for review and have not been merged into the active
+  training list yet.
 - Internal conventions:
     - radial coordinate normalized to [0,1]
     - mode amplitudes normalized (max amplitude = 1)
@@ -75,14 +80,16 @@ Current best models
   current CNN checkpoint through `sort_shot_mixed.py` with the RF-leaning
   RF/CNN fusion policy. This remains the main production sorting path until
   the next NSTX-U-expanded training set is labeled and the models are retrained.
-- Planned data expansion: add four more labeled NSTX-U shots, then retrain and
+- Planned data expansion: review six additional NSTX-U TAE-like label lists,
+  merge the checked labels into the active training pool, then retrain and
   revalidate the RF and CNN models with the expanded NSTX-U coverage.
 
 Typical workflow
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
-- Train classifier (RF or CNN) on tae_like modes (for now). For CNN
+- Train classifier (RF or CNN) on `training_labels/tae_like.csv` modes for the
+  current four-shot baseline. For CNN
   checkpoints intended for production sorting, use
   `--refit_full_before_save` so the saved model is trained on the full labeled
   CSV after held-out epoch selection. If a LOSO raw-CNN run

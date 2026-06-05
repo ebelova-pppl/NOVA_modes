@@ -21,9 +21,13 @@ All CNN training scripts default to the labeled list from `$NOVA_TRAIN_CSV`.
 For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
-The current mixed-mode list is `training_labels/all_modes.csv`. For TAE/EAE
-separated good/bad training, use the split outputs such as
-`training_labels/tae_like.csv` or `training_labels/eae_like.csv`.
+The current active four-shot good/bad training list is
+`training_labels/tae_like.csv`. Older four-shot TAE-only and mixed TAE/EAE
+lists are archived under `training_labels/old_4shots_tae_only_labels/` and
+`training_labels/old_4shots_mixed_labels/`. Six additional NSTX-U TAE-like
+label lists are staged in the shared `nova2/metadata` area for review and
+should not be merged into `training_labels/tae_like.csv` until the labels have
+been checked.
 
 ```bash
 module load pytorch
@@ -208,6 +212,27 @@ python $NOVA_REPO/scripts/rf_train_classify.py --train_csv $NOVA_TRAIN_CSV \
 
 `nova_mode_classifier.joblib` is a binary file that stores the trained ML model, i.e. a saved scikit-learn model (`StandardScaler + RandomForest`).
 
+For the current six-shot NSTX-U label-review pass, retrain RF on the active
+four-shot TAE-like list and keep the staged six-shot labels separate:
+
+```bash
+python "$NOVA_REPO/scripts/rf_train_classify.py" \
+  --train_csv "$NOVA_REPO/training_labels/tae_like.csv" \
+  --model_out "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
+```
+
+The staged six-shot metadata CSVs currently use absolute paths from the
+labeling environment. Before using them as training inputs, convert reviewed
+rows to relative `$NOVA_DATA` paths. For interactive review, `label_modes_fast.py`
+can match a staged mode list by stable `shot/N/file` suffix:
+
+```bash
+python "$NOVA_REPO/scripts/label_modes_fast.py" \
+  "$NOVA_DATA/nstxuE202855A01t020/N1" \
+  --mode-list /path/to/nova2/metadata/tae_like_6new_NG.csv \
+  --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
+```
+
 ### Classification
 
 To classify a mode, replace `/path_to_mode` with the file path:
@@ -306,9 +331,9 @@ For an existing CSV list:
 
 ```bash
 python split_tae_eae.py \
-  --input_csv training_labels/all_modes.csv \
-  --out_below_csv training_labels/tae_like.csv \
-  --out_above_csv training_labels/eae_like.csv
+  --input_csv training_labels/old_4shots_mixed_labels/all_modes.csv \
+  --out_below_csv split_outputs/tae_like.csv \
+  --out_above_csv split_outputs/eae_like.csv
 ```
 
 The script preserves original CSV columns when present, appends the new split
@@ -510,8 +535,9 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 Current operational note: this is the main large-shot sorting path for the
 current models. The present RF/CNN checkpoints and RF-leaning fusion policy
-remain the baseline until four additional NSTX-U labeled shots are added and
-the RF/CNN models are retrained and revalidated.
+remain the baseline until the staged six-shot NSTX-U labels are reviewed,
+merged into the training pool, and the RF/CNN models are retrained and
+revalidated.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
