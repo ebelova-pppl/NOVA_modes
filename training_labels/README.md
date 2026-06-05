@@ -78,8 +78,8 @@ Checked staged-label summary:
 - all cleaned staged paths resolve to files under `$NOVA_DATA` by
   `shot/N/file` suffix
 - the per-shot TAE/EAE split outputs contain 10 additional TAE-like modes that
-  are not in the cleaned staged label list, so only the TAE-like subset has
-  been labeled so far
+  are not in the cleaned staged label list because they were marked `skip`
+  during labeling; these are intentionally excluded from training
 
 The staged CSVs currently contain absolute source paths from the labeling
 environment. Tools such as `label_modes_fast.py` can match them by stable

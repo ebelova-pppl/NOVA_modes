@@ -492,10 +492,18 @@ Codex check:
 - All cleaned staged-label paths resolve to existing files under `$NOVA_DATA`
   by `shot/N/file` suffix.
 - Per-shot TAE/EAE split outputs exist for all six staged NSTX-U shots. Their
-  TAE-like outputs contain 1050 rows total, so 10 split TAE-like modes are not
-  present in the cleaned staged label list yet.
+  TAE-like outputs contain 1050 rows total. The 10 split TAE-like modes that
+  are not present in the cleaned staged label list were marked `skip` during
+  labeling and can be ignored for training.
 
 Current workflow decision: retrain RF on the full active
 `training_labels/tae_like.csv` list and use that model to help inspect the
 six staged NSTX-U labels. Keep the staged labels out of the canonical training
 CSV until the review is done.
+
+Codex retrained `models/nova_mode_classifier.joblib` on the full active
+`training_labels/tae_like.csv` list. The RF script loaded 1085 modes, reported
+5-fold CV accuracies `[0.9401, 0.9217, 0.8940, 0.9078, 0.9401]`
+with mean CV accuracy `0.9207`, then ran its 10% held-out sanity check:
+CM `[[62, 4], [3, 40]]`, accuracy `0.94`. After that check, the script refit
+on the full 1085-mode list and saved the deployment model.
