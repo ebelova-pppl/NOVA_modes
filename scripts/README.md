@@ -421,6 +421,16 @@ If a `datcon#` file is located in the same directory, the script will mark the c
 Script to plot mode structures from a `name.csv` list.
 
 Makes the same plots as `label_modes_fast.py` plus contour plots of `mode(r, m)`.
+Relative paths in the CSV are resolved under `--base_dir`, which defaults to
+`$NOVA_DATA`.
+
+For the staged six-shot NSTX-U label list:
+
+```bash
+python "$NOVA_REPO/viz/view_modes_csv.py" \
+  /path/to/nova2/metadata/tae_like_6new.csv \
+  --base_dir "$NOVA_DATA"
+```
 
 To see all options, run:
 

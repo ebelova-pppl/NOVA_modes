@@ -20,18 +20,20 @@ def mask_invalid_datcon_tail(values: np.ndarray) -> np.ndarray:
     return arr
 
 
-def read_mode_csv(csv_path: str):
+def read_mode_csv(csv_path: str, base_dir: Optional[str] = None):
     """
     Accepts CSV with either:
       - path,label
       - path
       - an optional header row using path/filepath/mode_path
+    Relative paths are resolved under base_dir, or left to the shared reader's
+    default path resolution if base_dir is None.
     Returns:
       paths:  list[str]
       labels: list[Optional[str]]  # "good"/"bad"/None
     """
     paths, labels = [], []
-    for p, raw_label in read_mode_csv_entries(csv_path):
+    for p, raw_label in read_mode_csv_entries(csv_path, data_root=base_dir):
         lab = None
         if raw_label is not None:
             s = raw_label.strip().lower()
@@ -153,9 +155,17 @@ def main():
     ap.add_argument("--contour", action="store_true", help="use (m,r) contour panel instead of harmonic lines")
     ap.add_argument("--no_mspec", action="store_true", help="disable m-spectrum panel")
     ap.add_argument("--no_cont", action="store_true", help="disable continuum panel")
+    ap.add_argument(
+        "--base_dir",
+        default=os.environ.get("NOVA_DATA"),
+        help=(
+            "Base directory for resolving relative mode paths in the CSV "
+            "(default: $NOVA_DATA). Absolute paths are used unchanged."
+        ),
+    )
     args = ap.parse_args()
 
-    paths, labels = read_mode_csv(args.csv)
+    paths, labels = read_mode_csv(args.csv, base_dir=args.base_dir)
     if not paths:
         raise SystemExit(f"No paths found in {args.csv}")
 
