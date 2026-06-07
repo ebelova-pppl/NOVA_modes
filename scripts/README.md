@@ -21,13 +21,12 @@ All CNN training scripts default to the labeled list from `$NOVA_TRAIN_CSV`.
 For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
-The current active four-shot good/bad training list is
-`training_labels/tae_like.csv`. Older four-shot TAE-only and mixed TAE/EAE
-lists are archived under `training_labels/old_4shots_tae_only_labels/` and
-`training_labels/old_4shots_mixed_labels/`. Six additional NSTX-U TAE-like
-label lists are staged in the shared `nova2/metadata` area for review and
-should not be merged into `training_labels/tae_like.csv` until the labels have
-been checked.
+The current active good/bad training list is the expanded
+`training_labels/tae_like.csv`, which combines the original four-shot TAE-like
+set with the reviewed six-shot NSTX-U TAE-like set. Older four-shot TAE-only
+and mixed TAE/EAE lists are archived under
+`training_labels/old_4shots_tae_only_labels/` and
+`training_labels/old_4shots_mixed_labels/`.
 
 ```bash
 module load pytorch
@@ -158,8 +157,9 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 8 --cache_data
 ```
 
-Latest TAE-like retraining check on `training_labels/tae_like.csv` used
-threshold 0.5 for CNN evaluation:
+Latest previous four-shot TAE-like retraining check used threshold 0.5 for CNN
+evaluation. Rerun these checks after retraining on the expanded
+`training_labels/tae_like.csv`:
 
 - `cnn_raw.py`: best accuracy=0.96, CM=[[126 5][4 81]]
 - `cnn_straightened.py`: best accuracy=0.95, CM=[[126 5][6 79]]
@@ -212,8 +212,8 @@ python $NOVA_REPO/scripts/rf_train_classify.py --train_csv $NOVA_TRAIN_CSV \
 
 `nova_mode_classifier.joblib` is a binary file that stores the trained ML model, i.e. a saved scikit-learn model (`StandardScaler + RandomForest`).
 
-For the current six-shot NSTX-U label-review pass, retrain RF on the active
-four-shot TAE-like list and keep the staged six-shot labels separate:
+After merging the reviewed six-shot NSTX-U labels, retrain RF on the expanded
+TAE-like list:
 
 ```bash
 python "$NOVA_REPO/scripts/rf_train_classify.py" \
@@ -221,15 +221,14 @@ python "$NOVA_REPO/scripts/rf_train_classify.py" \
   --model_out "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
 ```
 
-The staged six-shot metadata CSVs currently use absolute paths from the
-labeling environment. Before using them as training inputs, convert reviewed
-rows to relative `$NOVA_DATA` paths. For interactive review, `label_modes_fast.py`
-can match a staged mode list by stable `shot/N/file` suffix:
+The component six-shot list is `training_labels/tae_like_6new.csv`, with
+relative `$NOVA_DATA` paths and the same full schema as `tae_like.csv`.
+For interactive review, `label_modes_fast.py` can use it with `--mode-list`:
 
 ```bash
 python "$NOVA_REPO/scripts/label_modes_fast.py" \
   "$NOVA_DATA/nstxuE202855A01t020/N1" \
-  --mode-list /path/to/nova2/metadata/tae_like_6new_NG.csv \
+  --mode-list "$NOVA_REPO/training_labels/tae_like_6new.csv" \
   --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
 ```
 
@@ -545,9 +544,8 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 Current operational note: this is the main large-shot sorting path for the
 current models. The present RF/CNN checkpoints and RF-leaning fusion policy
-remain the baseline until the staged six-shot NSTX-U labels are reviewed,
-merged into the training pool, and the RF/CNN models are retrained and
-revalidated.
+were chosen from the four-shot baseline and should be rechecked after RF/CNN
+models are retrained and revalidated on the expanded TAE-like list.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two

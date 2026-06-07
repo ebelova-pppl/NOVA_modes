@@ -52,12 +52,11 @@ Data format summary
 - Training label CSVs in `training_labels/` store mode paths relative to
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current active good/bad training
-  list is `training_labels/tae_like.csv`. Older four-shot TAE-only and mixed
-  TAE/EAE lists are archived under `training_labels/old_4shots_tae_only_labels/`
-  and `training_labels/old_4shots_mixed_labels/`.
-  Six additional NSTX-U TAE-like label lists are staged in the shared
-  `nova2/metadata` area for review and have not been merged into the active
-  training list yet.
+  list is the expanded `training_labels/tae_like.csv`, now combining the
+  original four-shot list with the reviewed six-shot NSTX-U list. Older
+  four-shot TAE-only and mixed TAE/EAE lists are archived under
+  `training_labels/old_4shots_tae_only_labels/` and
+  `training_labels/old_4shots_mixed_labels/`.
 - Internal conventions:
     - radial coordinate normalized to [0,1]
     - mode amplitudes normalized (max amplitude = 1)
@@ -74,22 +73,24 @@ Model families
 
 Current best models
 - `scripts/rf_train_classify.py` - Most robust and interpretable model (~92–94% accuracy). Performs well across datasets and is used as the baseline classifier.
-- All three CNN models give comparable results with best accuracy ~0.95-0.96 on `training_labels/tae_like.csv` using evaluation threshold 0.5 (GPU on Perlmutter).
+- On the previous four-shot TAE-like list, all three CNN models gave comparable
+  results with best accuracy ~0.95-0.96 using evaluation threshold 0.5 (GPU on
+  Perlmutter). These metrics should be rerun on the expanded
+  `training_labels/tae_like.csv`.
 - `scripts/cnn_raw.py` is the simplest CNN model and reaches ~0.96 accuracy on the TAE-like training set.
 - Current operational baseline: use the current full-refit RF model plus the
   current CNN checkpoint through `sort_shot_mixed.py` with the RF-leaning
-  RF/CNN fusion policy. This remains the main production sorting path until
-  the next NSTX-U-expanded training set is labeled and the models are retrained.
-- Planned data expansion: review six additional NSTX-U TAE-like label lists,
-  merge the checked labels into the active training pool, then retrain and
-  revalidate the RF and CNN models with the expanded NSTX-U coverage.
+  RF/CNN fusion policy. This remains the main production sorting path until the
+  models are retrained and revalidated on the expanded NSTX-U-covered list.
+- Planned retraining: retrain and revalidate the RF and CNN models on the
+  expanded NSTX-U-covered TAE-like training list.
 
 Typical workflow
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
-- Train classifier (RF or CNN) on `training_labels/tae_like.csv` modes for the
-  current four-shot baseline. For CNN
+- Train classifier (RF or CNN) on the expanded `training_labels/tae_like.csv`.
+  For CNN
   checkpoints intended for production sorting, use
   `--refit_full_before_save` so the saved model is trained on the full labeled
   CSV after held-out epoch selection. If a LOSO raw-CNN run

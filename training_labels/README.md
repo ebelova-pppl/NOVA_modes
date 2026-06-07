@@ -10,7 +10,8 @@ example `nstx_120113/N5/egn05w.1234E+02`.
 
 ### `tae_like.csv`
 
-Current active TAE-like good/bad training list for RF and CNN retraining.
+Current active expanded TAE-like good/bad training list for RF and CNN
+retraining.
 
 Columns:
 - `path`
@@ -22,13 +23,22 @@ Columns:
 - `error`
 
 Current checked contents:
-- 1085 labeled modes
-- labels: 426 `good`, 659 `bad`
-- shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`
+- 2125 labeled modes
+- labels: 678 `good`, 1447 `bad`
+- shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
+  `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
+  `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`
 
-This is the list to use when retraining the current RF baseline before checking
-new labels. Do not merge staged NSTX-U labels into this file until the new
-label review is complete.
+This is the list to use when retraining the expanded RF and CNN models.
+
+### `tae_like_4old.csv`
+
+Backup copy of the original four-shot TAE-like training list before the
+six-shot merge.
+
+### `tae_like_6new.csv`
+
+Reviewed six-shot NSTX-U TAE-like list that was appended to `tae_like.csv`.
 
 ## Archived four-shot lists
 
@@ -60,20 +70,28 @@ Use this directory for historical audit, regeneration, or LOSO references. The
 root of `training_labels/` intentionally no longer carries these older mixed
 lists as active files.
 
-## Staged six-shot NSTX-U labels
+## Six-shot NSTX-U component list
 
-Six additional NSTX-U shots have staged TAE-like label lists in the shared
-`nova2/metadata` area:
+Six additional NSTX-U shots have a cleaned staged TAE-like label list:
+
+- `tae_like_6new.csv`
+
+This list uses the same full schema as `tae_like.csv`. The `family` column is
+set to `tae` for `good` rows and `none` for `bad` rows; `signed_delta`,
+`fraction_below_upper2`, `gap_region`, and `error` were restored from the
+per-shot split outputs in the shared `nova2/metadata` area by matching the
+stable `shot/N/file` suffix.
+
+Related metadata/audit files in the shared `nova2/metadata` area:
 
 - `tae_like_6new_NG.csv`
 - `tae_like_6new_not_cleaned_NG.csv`
 - per-shot `*_tae_eae_split/` directories
 
-These files are not version-controlled training inputs yet. They are for label
-review with the current four-shot RF/CNN models.
+The six-shot list has been merged into `tae_like.csv`.
 
 Checked staged-label summary:
-- cleaned staged list: 1040 rows, 284 `good`, 756 `bad`
+- cleaned staged list: 1040 rows, 252 `good`, 788 `bad`
 - not-cleaned staged list: 1041 rows, with one duplicate mode
 - all cleaned staged paths resolve to files under `$NOVA_DATA` by
   `shot/N/file` suffix
@@ -81,16 +99,15 @@ Checked staged-label summary:
   are not in the cleaned staged label list because they were marked `skip`
   during labeling; these are intentionally excluded from training
 
-The staged CSVs currently contain absolute source paths from the labeling
-environment. Tools such as `label_modes_fast.py` can match them by stable
-`shot/N/file` suffix when given `--mode-list`, but training inputs should be
-converted to relative `$NOVA_DATA` paths before any future merge.
+The shared metadata CSVs currently contain absolute source paths from the
+labeling environment. The staged `training_labels/tae_like_6new.csv` file uses
+relative `$NOVA_DATA` paths and is the file to use for the future merge.
 
 Example review command for one `N` directory:
 
 ```bash
 python "$NOVA_REPO/scripts/label_modes_fast.py" \
   "$NOVA_DATA/nstxuE202855A01t020/N1" \
-  --mode-list /path/to/nova2/metadata/tae_like_6new_NG.csv \
+  --mode-list "$NOVA_REPO/training_labels/tae_like_6new.csv" \
   --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
 ```
