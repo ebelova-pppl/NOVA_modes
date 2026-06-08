@@ -25,7 +25,7 @@ _NOVA_FLUX_WORK_ROOT="${NOVA_FLUX_WORK_ROOT:-/p/hym/${_NOVA_FLUX_USER}/NOVA}"
 export NOVA_DATA_TAE="/u/ebelova/NOVA_old/data_tae"              # old TAE-only dataset / legacy train_master.csv
 export NOVA_DATA_MIXED="${_NOVA_FLUX_WORK_ROOT}/data_mixed"      # mixed TAE+EAE training set
 export NOVA_DATA="$NOVA_DATA_MIXED"                              # default to mixed data, since that is the active workflow
-export NOVA_MODELS="${_NOVA_FLUX_WORK_ROOT}/models_flux"
+export NOVA_MODELS="${_NOVA_REPO}/models"
 export NOVA_RESULTS="${_NOVA_FLUX_WORK_ROOT}/results"
 
 # Active run areas. Override these before sourcing if a different Flux scratch

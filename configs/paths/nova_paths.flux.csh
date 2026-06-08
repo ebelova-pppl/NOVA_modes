@@ -44,7 +44,7 @@ endif
 setenv NOVA_DATA_TAE "/u/ebelova/NOVA_old/data_tae"          # old TAE-only set, used for initial CNN training
 setenv NOVA_DATA_MIXED "${_NOVA_FLUX_WORK_ROOT}/data_mixed"  # new mixed set TAEs+EAEs
 setenv NOVA_DATA "$NOVA_DATA_MIXED"
-setenv NOVA_MODELS "${_NOVA_FLUX_WORK_ROOT}/models_flux"
+setenv NOVA_MODELS "${_NOVA_REPO}/models"
 setenv NOVA_RESULTS "${_NOVA_FLUX_WORK_ROOT}/results"
 
 # Active run areas. Override NOVA_RUN_ROOT before sourcing if a different Flux

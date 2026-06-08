@@ -16,7 +16,7 @@ unset _NOVA_CONFIG_DIR
 export NOVA_DATA_TAE="/global/cfs/cdirs/m314/nova/data"      # old TAE-only dataset / legacy train_master.csv (for training TAE-only models, in main_branch)
 export NOVA_DATA_MIXED="/global/cfs/cdirs/m314/nova2/data"   # Mixed TAE+EAE data (for training TAE+EAE models, in main and mixed_branch)
 export NOVA_DATA=$NOVA_DATA_MIXED                            # Default to mixed data, since that's the working branch.
-export NOVA_MODELS="/global/cfs/cdirs/m314/nova2/models"
+export NOVA_MODELS="$NOVA_REPO/models"
 export NOVA_RESULTS="/global/cfs/cdirs/m314/nova2/results"
 
 # Active run area in scratch
