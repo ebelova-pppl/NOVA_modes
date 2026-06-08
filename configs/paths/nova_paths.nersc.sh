@@ -20,8 +20,7 @@ export NOVA_MODELS="/global/cfs/cdirs/m314/nova2/models"
 export NOVA_RESULTS="/global/cfs/cdirs/m314/nova2/results"
 
 # Active run area in scratch
-export NOVA_RUN_RF="$SCRATCH/nova_rf"    # older version of RF
-export NOVA_RUN_CNN="$SCRATCH/nova_cnn"  # older versions of CNN
+export NOVA_RUN="$SCRATCH/nova_s"    # dir on NERSC scratch for RF and CNN runs
 
 # Version-controlled labeled training list
 export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"       # "train_master.csv" was the legacy TAE-only training default.
@@ -43,9 +42,6 @@ fi
 # -----------------------------
 # Convenience locations
 # -----------------------------
-#export NOVA_RUN_RF="$NOVA_RUN_ROOT/rf"
-#export NOVA_RUN_CNN="$NOVA_RUN_ROOT/cnn"
-#export NOVA_TMP="$NOVA_RUN_ROOT/tmp"
 
 # -----------------------------
 # Helper functions

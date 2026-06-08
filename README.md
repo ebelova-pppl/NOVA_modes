@@ -107,10 +107,12 @@ source `conda info --base`/etc/profile.d/conda.csh
 setenv CONDA_PKGS_DIRS /p/hym/conda_pkgs
 conda activate /p/hym/conda_envs/nova-perlmutter
 
-cd /p/hym/ebelova/NOVA/NOVA_modes
+cd /path/to/your/NOVA_modes
 git pull
 ls -lh models/nova_mode_classifier.joblib models/nova_cnn_raw.pt
+setenv NOVA_RUN_ROOT /p/hym/$USER/NOVA/runs
 source configs/paths/nova_paths.flux.csh
+nova_env
 
 setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
 setenv NOVA_SORT_OUT "$NOVA_RUN_ROOT/sort_outputs"
@@ -125,10 +127,12 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 export CONDA_PKGS_DIRS=/p/hym/conda_pkgs
 conda activate /p/hym/conda_envs/nova-perlmutter
 
-cd /p/hym/ebelova/NOVA/NOVA_modes
+cd /path/to/your/NOVA_modes
 git pull
 ls -lh models/nova_mode_classifier.joblib models/nova_cnn_raw.pt
+export NOVA_RUN_ROOT=/p/hym/$USER/NOVA/runs
 source configs/paths/nova_paths.flux.sh
+nova_env
 
 export NOVA_DITW_ROOT=/p/nstxdigtwin/energetic_particles/nova/DiTw
 export NOVA_SORT_OUT="$NOVA_RUN_ROOT/sort_outputs"

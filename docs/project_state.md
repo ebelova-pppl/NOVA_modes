@@ -601,3 +601,12 @@ models for routine sorting, to pull the current repository models
 (`models/nova_mode_classifier.joblib` and `models/nova_cnn_raw.pt`), and to run
 `scripts/sort_shot_mixed.py` against shots under the DiTw data root with
 per-shot outputs written outside the input data tree.
+
+Fixed the Flux `tcsh` path config so `configs/paths/nova_paths.flux.csh` no
+longer falls back to `/p/hym/ebelova/NOVA/NOVA_modes`. It now preserves an
+explicit `NOVA_REPO` if set, otherwise resolves the current Git checkout with
+`git rev-parse --show-toplevel`. The top-level README Flux recipe now tells
+users to `cd /path/to/your/NOVA_modes`, source the config from that checkout,
+set `NOVA_RUN_ROOT` under `/p/hym/$USER/NOVA/runs`, and run `nova_env` to
+verify the active paths. The Flux path configs now default their shared
+work-root to `/p/hym/$USER/NOVA` instead of Elena's Flux work directory.

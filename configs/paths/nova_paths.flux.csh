@@ -1,31 +1,44 @@
-# /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh
+# configs/paths/nova_paths.flux.csh
 
 # ----------------------------
 # NOVA AE project paths on Flux
 # ----------------------------
+set _NOVA_PATHS_CONFIG_OK = 1
 
 # Recommended Flux modules before running these scripts:
 #   in /p/hym:
 #   module load anaconda3
-#   in /p/hym/ebelova/NOVA/NOVA_modes:
 #   source `conda info --base`/etc/profile.d/conda.csh
 #   setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"    # optional: shared conda pkgs directory
 #   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
-#   cd /p/hym/ebelova/NOVA/NOVA_modes
-#   use: "source /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh" to set up environment variables for data, models, results, and training lists.
+#   cd /path/to/your/NOVA_modes
+#   source configs/paths/nova_paths.flux.csh
 
-# tcsh does not expose a sourced file path like bash's BASH_SOURCE. The default
-# below matches the Flux clone layout; setenv NOVA_REPO before sourcing this
-# file if the repo lives somewhere else.
+# tcsh does not expose a sourced file path like bash's BASH_SOURCE. Source this
+# file from inside the intended Git checkout, or setenv NOVA_REPO first if you
+# need to source it from somewhere else.
 if (! $?NOVA_REPO) then
-    setenv NOVA_REPO "/p/hym/ebelova/NOVA/NOVA_modes"
+    git rev-parse --show-toplevel >& /dev/null
+    if ($status == 0) then
+        set _NOVA_REPO_FROM_GIT = `git rev-parse --show-toplevel`
+        setenv NOVA_REPO "$_NOVA_REPO_FROM_GIT"
+    else
+        echo "ERROR: Could not determine NOVA_REPO for tcsh."
+        echo "       cd into your NOVA_modes Git checkout before sourcing this file,"
+        echo "       or run: setenv NOVA_REPO /path/to/your/NOVA_modes"
+        set _NOVA_PATHS_CONFIG_OK = 0
+        goto nova_paths_flux_done
+    endif
+    unset _NOVA_REPO_FROM_GIT
 endif
 
 # Persistent data / models / saved results.
 if ($?NOVA_FLUX_WORK_ROOT) then
     set _NOVA_FLUX_WORK_ROOT = "$NOVA_FLUX_WORK_ROOT"
+else if ($?USER) then
+    set _NOVA_FLUX_WORK_ROOT = "/p/hym/${USER}/NOVA"
 else
-    set _NOVA_FLUX_WORK_ROOT = "/p/hym/ebelova/NOVA"
+    set _NOVA_FLUX_WORK_ROOT = "/p/hym/NOVA"
 endif
 
 setenv NOVA_DATA_TAE "/u/ebelova/NOVA_old/data_tae"          # old TAE-only set, used for initial CNN training
@@ -39,8 +52,6 @@ setenv NOVA_RESULTS "${_NOVA_FLUX_WORK_ROOT}/results"
 if (! $?NOVA_RUN_ROOT) then
     setenv NOVA_RUN_ROOT "${_NOVA_FLUX_WORK_ROOT}/runs"
 endif
-setenv NOVA_RUN_RF "${NOVA_RUN_ROOT}/nova_rf"
-setenv NOVA_RUN_CNN "${NOVA_RUN_ROOT}/nova_cnn"
 
 unset _NOVA_FLUX_WORK_ROOT
 
@@ -90,7 +101,7 @@ setenv PYTHONUSERBASE /p/hym/local
 # Helper aliases
 # -----------------------------
 
-alias set_paths 'source /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.csh'
+alias set_paths 'source "$NOVA_REPO/configs/paths/nova_paths.flux.csh"'
 
 alias set_nova_env 'module load anaconda3; source `conda info --base`/etc/profile.d/conda.csh; setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"; conda activate /p/hym/conda_envs/nova-perlmutter' 
 
@@ -103,3 +114,6 @@ alias nova_cpu_smoke 'python -u "$NOVA_REPO/scripts/torch_runtime.py" --device c
 alias nova_run_cnn_raw 'python -u "$NOVA_REPO/scripts/cnn_raw.py" --device cpu \!*'
 alias nova_run_cnn_straightened 'python -u "$NOVA_REPO/scripts/cnn_straightened.py" \!*'
 alias nova_run_cnn_hybrid 'python -u "$NOVA_REPO/scripts/cnn_hybrid.py" \!*'
+
+nova_paths_flux_done:
+unset _NOVA_PATHS_CONFIG_OK

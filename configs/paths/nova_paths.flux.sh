@@ -20,7 +20,8 @@ export NOVA_REPO="$(cd "${_NOVA_CONFIG_DIR}/../.." && pwd)"
 unset _NOVA_CONFIG_DIR
 
 # Persistent data / models / saved results.
-_NOVA_FLUX_WORK_ROOT="${NOVA_FLUX_WORK_ROOT:-/p/hym/ebelova/NOVA}"
+_NOVA_FLUX_USER="${USER:-nova}"
+_NOVA_FLUX_WORK_ROOT="${NOVA_FLUX_WORK_ROOT:-/p/hym/${_NOVA_FLUX_USER}/NOVA}"
 export NOVA_DATA_TAE="/u/ebelova/NOVA_old/data_tae"              # old TAE-only dataset / legacy train_master.csv
 export NOVA_DATA_MIXED="${_NOVA_FLUX_WORK_ROOT}/data_mixed"      # mixed TAE+EAE training set
 export NOVA_DATA="$NOVA_DATA_MIXED"                              # default to mixed data, since that is the active workflow
@@ -30,9 +31,8 @@ export NOVA_RESULTS="${_NOVA_FLUX_WORK_ROOT}/results"
 # Active run areas. Override these before sourcing if a different Flux scratch
 # or work directory is preferred.
 export NOVA_RUN_ROOT="${NOVA_RUN_ROOT:-${_NOVA_FLUX_WORK_ROOT}/runs}"
-export NOVA_RUN_RF="$NOVA_RUN_ROOT/nova_rf"
-export NOVA_RUN_CNN="$NOVA_RUN_ROOT/nova_cnn"
 unset _NOVA_FLUX_WORK_ROOT
+unset _NOVA_FLUX_USER
 
 # Version-controlled labeled training lists.
 export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
