@@ -186,7 +186,8 @@ If the goal is only to classify new shots, do not run `rf_train_classify.py`,
 `cnn_raw.py`, `cnn_straightened.py`, or `cnn_hybrid.py`. Those scripts are for
 developing or retraining models, not for routine sorting.
 
-Typical workflow
+## Typical workflow (hand labeling, (re-)training, checks etc)
+
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
