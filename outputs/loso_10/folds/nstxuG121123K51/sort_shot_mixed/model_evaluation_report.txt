@@ -1,0 +1,64 @@
+Model evaluation against labeled TAE-side rows
+========================================================================
+shot: nstxuG121123K51
+label_csv: outputs/loso_10/folds/nstxuG121123K51/test.csv
+cnn_checkpoint_kind: cnn_raw
+rf_cnn_eval_threshold: 0.5
+combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy
+n_label_rows_read: 208
+n_label_rows_for_shot: 208
+n_label_rows_used: 208
+n_label_rows_skipped: 0
+n_duplicate_label_keys: 0
+n_scored_rows: 208
+n_matched_scored_rows: 208
+n_unmatched_scored_rows: 0
+n_labeled_rows_not_scored: 0
+
+------------------------------------------------------------------------
+rf confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[173   6]
+ [  7  22]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9611    0.9665    0.9638       179
+        good     0.7857    0.7586    0.7719        29
+
+    accuracy                         0.9375       208
+   macro avg     0.8734    0.8626    0.8679       208
+weighted avg     0.9367    0.9375    0.9370       208
+
+
+------------------------------------------------------------------------
+cnn confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[157  22]
+ [ 19  10]]
+
+              precision    recall  f1-score   support
+
+         bad     0.8920    0.8771    0.8845       179
+        good     0.3125    0.3448    0.3279        29
+
+    accuracy                         0.8029       208
+   macro avg     0.6023    0.6110    0.6062       208
+weighted avg     0.8112    0.8029    0.8069       208
+
+
+------------------------------------------------------------------------
+combined_policy confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[173   6]
+ [  7  22]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9611    0.9665    0.9638       179
+        good     0.7857    0.7586    0.7719        29
+
+    accuracy                         0.9375       208
+   macro avg     0.8734    0.8626    0.8679       208
+weighted avg     0.9367    0.9375    0.9370       208
+

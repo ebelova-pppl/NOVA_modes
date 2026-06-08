@@ -16,6 +16,7 @@ Current canonical pipelines:
 - `scripts/cnn_classify.py`
 - `scripts/sort_shot.py`
 - `scripts/sort_shot_mixed.py`
+- `scripts/run_loso_10.py`
 - `scripts/label_modes_fast.py`
 
 Shared scripts / features:
@@ -82,8 +83,10 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` still defaults to the older RF-leaning fusion policy
-  chosen from four-shot LOSO checks. Revalidate the fusion thresholds with the
-  expanded RF and raw-CNN models before treating that policy as final.
+  chosen from four-shot LOSO checks. The expanded 10-shot LOSO check in
+  `outputs/loso_10/` shows that this combined policy is still close to RF-only
+  and slightly improves GOOD recall, while raw CNN alone is less stable across
+  held-out shots.
 
 ## Classify new NSTX-U shots on Flux (no training)
 

@@ -4,7 +4,7 @@ This document consolidates scripts related to various models and methods used in
 
 CSV input note: the shared mode-list readers accept either plain data rows or
 an optional header row. Recognized path headers are `path`, `filepath`, and
-`mode_path`; recognized label headers are `label`, `class`, `target`,
+`mode_path`; recognized label headers are `label`, `validity`, `class`, `target`,
 `manual_label`, and `rf_label`. Blank lines and `#` comment lines are ignored.
 
 ## CNN model scripts
@@ -561,8 +561,10 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints are trained on the
 expanded 10-shot TAE-like list. The default RF-leaning fusion policy was chosen
-from four-shot LOSO checks and should be rechecked with the expanded RF/raw-CNN
-models before being treated as final.
+from four-shot LOSO checks. The expanded 10-shot LOSO check in
+`outputs/loso_10/` shows that the current combined policy remains close to
+RF-only and slightly improves GOOD recall, while raw CNN alone is less stable
+across held-out shots.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
@@ -622,9 +624,9 @@ The CNN-rescue, RF-only-good, and fallback tiers are included in
 
 The RF-leaning policy was chosen from four-shot LOSO checks because RF was the
 more stable held-out-shot ranker, while the CNN still provided useful
-high-confidence rescues. After the 10-shot expansion, raw CNN now has stronger
-held-out performance than RF on the cleaned labels, so this policy should be
-revalidated and possibly retuned.
+high-confidence rescues. The expanded 10-shot LOSO check gives the current
+policy and RF-only the same aggregate accuracy (`0.9299`), with the combined
+policy trading three extra false positives for three fewer false negatives.
 
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`.
@@ -687,6 +689,70 @@ The TAE/EAE split uses the normalized `signed_delta` plus
 `fraction_below_upper2` convention from `src/tae_eae_features.py`. `mixed`
 modes stay on the TAE side for RF/CNN classification so marginal TAEs are not
 lost.
+
+---
+
+## `run_loso_10.py`
+
+Driver for expanded 10-shot leave-one-shot-out checks. It:
+
+- creates one `train.csv` and `test.csv` split per held-out shot from
+  `training_labels/tae_like_train.csv`,
+- retrains RF once per fold,
+- retrains raw CNN once per fold,
+- runs `sort_shot_mixed.py` on the held-out shot with `--label_csv`, and
+- aggregates RF-only, CNN-only, and combined-policy metrics.
+
+Small split/evaluation files are written under `outputs/loso_10/` by default.
+Model checkpoints and training logs are written under `$NOVA_RUN/loso_10`, or
+`$SCRATCH/nova_s/loso_10` when `$NOVA_RUN` is not set.
+
+NERSC batch run:
+
+```bash
+cd "$NOVA_REPO"
+sbatch scripts/run_loso_10.sbatch
+```
+
+Equivalent interactive run after a GPU allocation:
+
+```bash
+salloc --nodes 1 --qos interactive --time 4:00:00 --constraint gpu --gpus 1 --account m314_g
+cd "$NOVA_REPO"
+source configs/paths/nova_paths.nersc.sh
+python -u scripts/run_loso_10.py \
+  --steps all \
+  --out_root outputs/loso_10 \
+  --work_root "$SCRATCH/nova_s/loso_10" \
+  --cnn_launch srun \
+  --cnn_device cuda \
+  --sort_device cpu \
+  --cnn_batch_size 8 \
+  --cnn_cache_data
+```
+
+Useful partial/resume commands:
+
+```bash
+# Only create the 10 fold split lists.
+python scripts/run_loso_10.py --steps split --out_root outputs/loso_10
+
+# Resume a failed run without repeating completed RF/CNN/sort folds.
+python scripts/run_loso_10.py --steps all --skip_existing --cnn_launch srun --cnn_device cuda
+
+# Re-aggregate after manually rerunning one fold.
+python scripts/run_loso_10.py --steps aggregate --out_root outputs/loso_10
+```
+
+Main aggregate outputs:
+
+- `outputs/loso_10/loso_split_counts.csv`
+- `outputs/loso_10/loso_model_evaluation_summary.csv`
+- `outputs/loso_10/loso_model_evaluation_totals.csv`
+- `outputs/loso_10/loso_shot_summary.csv`
+
+Per-fold sorter outputs live under
+`outputs/loso_10/folds/<heldout-shot>/sort_shot_mixed/`.
 
 ---
 

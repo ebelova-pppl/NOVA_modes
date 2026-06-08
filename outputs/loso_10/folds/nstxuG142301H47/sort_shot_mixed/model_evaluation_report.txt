@@ -1,0 +1,72 @@
+Model evaluation against labeled TAE-side rows
+========================================================================
+shot: nstxuG142301H47
+label_csv: outputs/loso_10/folds/nstxuG142301H47/test.csv
+cnn_checkpoint_kind: cnn_raw
+rf_cnn_eval_threshold: 0.5
+combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy
+n_label_rows_read: 169
+n_label_rows_for_shot: 169
+n_label_rows_used: 169
+n_label_rows_skipped: 0
+n_duplicate_label_keys: 0
+n_scored_rows: 175
+n_matched_scored_rows: 169
+n_unmatched_scored_rows: 6
+n_labeled_rows_not_scored: 0
+
+Unmatched scored rows, first 20:
+  nstxuG142301H47/N2/egn02w.2025E+02
+  nstxuG142301H47/N5/egn05w.1372E+02
+  nstxuG142301H47/N6/egn06w.2005E+02
+  nstxuG142301H47/N6/egn06w.9086E+01
+  nstxuG142301H47/N7/egn07w.1317E+02
+  nstxuG142301H47/N8/egn08w.1696E+02
+
+------------------------------------------------------------------------
+rf confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[139  19]
+ [  9   2]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9392    0.8797    0.9085       158
+        good     0.0952    0.1818    0.1250        11
+
+    accuracy                         0.8343       169
+   macro avg     0.5172    0.5308    0.5167       169
+weighted avg     0.8843    0.8343    0.8575       169
+
+
+------------------------------------------------------------------------
+cnn confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[155   3]
+ [  5   6]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9688    0.9810    0.9748       158
+        good     0.6667    0.5455    0.6000        11
+
+    accuracy                         0.9527       169
+   macro avg     0.8177    0.7632    0.7874       169
+weighted avg     0.9491    0.9527    0.9504       169
+
+
+------------------------------------------------------------------------
+combined_policy confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[139  19]
+ [  9   2]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9392    0.8797    0.9085       158
+        good     0.0952    0.1818    0.1250        11
+
+    accuracy                         0.8343       169
+   macro avg     0.5172    0.5308    0.5167       169
+weighted avg     0.8843    0.8343    0.8575       169
+

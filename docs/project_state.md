@@ -84,6 +84,7 @@ From cont_features.py:
 -	view_modes_csv.py
 -	sort_shot.py
 -	sort_shot_mixed.py
+-	run_loso_10.py
 -	split_tae_eae.py
 ### RF
 -	rf_train_classify.py (renamed from nova_mode_classifier.py)
@@ -594,6 +595,38 @@ Updated `NOVA_TRAIN_CSV`, `NOVA_TRAIN_CSV_TAE`, the raw-CNN fallback default,
 and README examples to use `training_labels/tae_like_train.csv`. The component
 lists remain `training_labels/tae_like_4old.csv` and
 `training_labels/tae_like_6new.csv`.
+
+Added `scripts/run_loso_10.py` and `scripts/run_loso_10.sbatch` to orchestrate
+the expanded 10-shot LOSO check. The workflow creates per-held-out-shot train
+and test lists from `training_labels/tae_like_train.csv`, retrains RF and
+raw CNN per fold, runs `sort_shot_mixed.py` on each held-out shot, and
+aggregates RF-only, CNN-only, and combined-policy metrics under
+`outputs/loso_10/`. Heavy checkpoints and logs go under `$NOVA_RUN/loso_10`
+or `$SCRATCH/nova_s/loso_10`.
+
+Generated the 10 LOSO split lists in `outputs/loso_10/folds/<shot>/`. A first
+12-hour GPU batch submission (`54165050`) was cancelled while pending because
+the expected RF/CNN/sorter fold runtime is only a few minutes per fold, and the
+long walltime can hurt queue priority. Prefer the 4-hour interactive GPU run
+documented in `scripts/README.md`; the batch wrapper now also requests 4 hours.
+The 10-fold LOSO run completed in about 25 minutes. All RF, raw-CNN, and
+`sort_shot_mixed.py` fold logs ended with `returncode=0`. Aggregate held-out
+metrics from `outputs/loso_10/loso_model_evaluation_totals.csv`:
+
+- RF: CM `[[1426, 50], [99, 550]]`, accuracy `0.9299`, GOOD precision/recall
+  `0.9167 / 0.8475`, GOOD F1 `0.8807`.
+- raw CNN: CM `[[1405, 71], [140, 509]]`, accuracy `0.9007`, GOOD
+  precision/recall `0.8776 / 0.7843`, GOOD F1 `0.8283`.
+- combined policy: CM `[[1423, 53], [96, 553]]`, accuracy `0.9299`, GOOD
+  precision/recall `0.9125 / 0.8521`, GOOD F1 `0.8813`.
+
+Interpretation: the existing RF-leaning combined policy is still very close to
+RF-only on the expanded LOSO check, with a small GOOD-recall gain at the cost
+of three additional false positives. CNN-only performs well on several folds
+but is less stable across held-out shots; the worst raw-CNN held-out folds are
+`nstxuE205052A01t022` (all 74 GOOD labels missed), `nstxuG121123K51`, and
+`nstxuG142301H47`. Inspect per-fold `model_evaluation_report.txt` files before
+changing the `sort_shot_mixed.py` fusion policy.
 
 Added a top-level README subsection for the Flux classification-only workflow
 for new NSTX-U shots. The instructions now explicitly tell users not to train

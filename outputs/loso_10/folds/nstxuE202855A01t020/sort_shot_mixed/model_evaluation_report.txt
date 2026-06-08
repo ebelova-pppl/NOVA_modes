@@ -1,0 +1,64 @@
+Model evaluation against labeled TAE-side rows
+========================================================================
+shot: nstxuE202855A01t020
+label_csv: outputs/loso_10/folds/nstxuE202855A01t020/test.csv
+cnn_checkpoint_kind: cnn_raw
+rf_cnn_eval_threshold: 0.5
+combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy
+n_label_rows_read: 79
+n_label_rows_for_shot: 79
+n_label_rows_used: 79
+n_label_rows_skipped: 0
+n_duplicate_label_keys: 0
+n_scored_rows: 79
+n_matched_scored_rows: 79
+n_unmatched_scored_rows: 0
+n_labeled_rows_not_scored: 0
+
+------------------------------------------------------------------------
+rf confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[31  0]
+ [10 38]]
+
+              precision    recall  f1-score   support
+
+         bad     0.7561    1.0000    0.8611        31
+        good     1.0000    0.7917    0.8837        48
+
+    accuracy                         0.8734        79
+   macro avg     0.8780    0.8958    0.8724        79
+weighted avg     0.9043    0.8734    0.8748        79
+
+
+------------------------------------------------------------------------
+cnn confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[26  5]
+ [ 1 47]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9630    0.8387    0.8966        31
+        good     0.9038    0.9792    0.9400        48
+
+    accuracy                         0.9241        79
+   macro avg     0.9334    0.9089    0.9183        79
+weighted avg     0.9270    0.9241    0.9230        79
+
+
+------------------------------------------------------------------------
+combined_policy confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[31  0]
+ [10 38]]
+
+              precision    recall  f1-score   support
+
+         bad     0.7561    1.0000    0.8611        31
+        good     1.0000    0.7917    0.8837        48
+
+    accuracy                         0.8734        79
+   macro avg     0.8780    0.8958    0.8724        79
+weighted avg     0.9043    0.8734    0.8748        79
+
