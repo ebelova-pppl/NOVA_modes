@@ -157,9 +157,14 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 8 --cache_data
 ```
 
-Latest previous four-shot TAE-like retraining check used threshold 0.5 for CNN
-evaluation. Rerun these checks after retraining on the expanded
+Expanded 10-shot TAE-like raw-CNN retraining check on
 `training_labels/tae_like.csv`:
+
+- `cnn_raw.py`: accuracy=0.95, CM=[[288 7][14 115]], GOOD precision=0.94,
+  GOOD recall=0.89
+
+Previous four-shot TAE-like retraining checks used threshold 0.5 for CNN
+evaluation. Those checkpoints are archived under `models/old_4shots_models/`:
 
 - `cnn_raw.py`: best accuracy=0.96, CM=[[126 5][4 81]]
 - `cnn_straightened.py`: best accuracy=0.95, CM=[[126 5][6 79]]
@@ -218,8 +223,19 @@ TAE-like list:
 ```bash
 python "$NOVA_REPO/scripts/rf_train_classify.py" \
   --train_csv "$NOVA_REPO/training_labels/tae_like.csv" \
-  --model_out "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
+  --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
+
+Expanded RF OOF check after label cleanup:
+
+- CM=[[1404 43][93 585]]
+- accuracy=0.94
+- GOOD precision=0.93
+- GOOD recall=0.86
+
+The active expanded-set RF checkpoint is
+`models/nova_mode_classifier.joblib`. Previous four-shot RF checkpoints are
+archived under `models/old_4shots_models/`.
 
 The component six-shot list is `training_labels/tae_like_6new.csv`, with
 relative `$NOVA_DATA` paths and the same full schema as `tae_like.csv`.
@@ -229,7 +245,7 @@ For interactive review, `label_modes_fast.py` can use it with `--mode-list`:
 python "$NOVA_REPO/scripts/label_modes_fast.py" \
   "$NOVA_DATA/nstxuE202855A01t020/N1" \
   --mode-list "$NOVA_REPO/training_labels/tae_like_6new.csv" \
-  --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
+  --rf-model "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
 ### Classification
@@ -543,9 +559,10 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
   optional diagnostic plots.
 
 Current operational note: this is the main large-shot sorting path for the
-current models. The present RF/CNN checkpoints and RF-leaning fusion policy
-were chosen from the four-shot baseline and should be rechecked after RF/CNN
-models are retrained and revalidated on the expanded TAE-like list.
+active models. The top-level RF and raw-CNN checkpoints are trained on the
+expanded 10-shot TAE-like list. The default RF-leaning fusion policy was chosen
+from four-shot LOSO checks and should be rechecked with the expanded RF/raw-CNN
+models before being treated as final.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
@@ -605,8 +622,9 @@ The CNN-rescue, RF-only-good, and fallback tiers are included in
 
 The RF-leaning policy was chosen from four-shot LOSO checks because RF was the
 more stable held-out-shot ranker, while the CNN still provided useful
-high-confidence rescues. The policy should be rechecked after the planned
-NSTX-U training-data expansion and model retraining.
+high-confidence rescues. After the 10-shot expansion, raw CNN now has stronger
+held-out performance than RF on the cleaned labels, so this policy should be
+revalidated and possibly retuned.
 
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`.

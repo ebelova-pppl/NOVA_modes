@@ -72,18 +72,18 @@ Model families
 - `scripts/cnn_hybrid.py` - CNN + scalar features (continuum + physics-informed inputs)
 
 Current best models
-- `scripts/rf_train_classify.py` - Most robust and interpretable model (~92–94% accuracy). Performs well across datasets and is used as the baseline classifier.
-- On the previous four-shot TAE-like list, all three CNN models gave comparable
-  results with best accuracy ~0.95-0.96 using evaluation threshold 0.5 (GPU on
-  Perlmutter). These metrics should be rerun on the expanded
-  `training_labels/tae_like.csv`.
-- `scripts/cnn_raw.py` is the simplest CNN model and reaches ~0.96 accuracy on the TAE-like training set.
-- Current operational baseline: use the current full-refit RF model plus the
-  current CNN checkpoint through `sort_shot_mixed.py` with the RF-leaning
-  RF/CNN fusion policy. This remains the main production sorting path until the
-  models are retrained and revalidated on the expanded NSTX-U-covered list.
-- Planned retraining: retrain and revalidate the RF and CNN models on the
-  expanded NSTX-U-covered TAE-like training list.
+- Active expanded-set models live at `models/nova_mode_classifier.joblib` and
+  `models/nova_cnn_raw.pt`. They were retrained on the 10-shot
+  `training_labels/tae_like.csv` list.
+- RF expanded-set OOF check: CM `[[1404, 43], [93, 585]]`, accuracy `0.94`,
+  GOOD recall `0.86`, GOOD precision `0.93`.
+- Raw CNN expanded-set held-out check: CM `[[288, 7], [14, 115]]`,
+  accuracy `0.95`, GOOD recall `0.89`, GOOD precision `0.94`.
+- Previous four-shot RF/CNN checkpoints have been archived under
+  `models/old_4shots_models/`.
+- `sort_shot_mixed.py` still defaults to the older RF-leaning fusion policy
+  chosen from four-shot LOSO checks. Revalidate the fusion thresholds with the
+  expanded RF and raw-CNN models before treating that policy as final.
 
 Typical workflow
 - Generate NOVA modes for a shot
@@ -99,9 +99,9 @@ Typical workflow
 - Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
   routes EAE-like modes away, combines RF + CNN TAE decisions, and removes
   close-frequency duplicate TAEs. Raw, straightened, and hybrid CNN checkpoints
-  are supported through the shared CNN inference path. The current deployment
-  policy is RF-leaning: RF is the main gate, while high-confidence CNN results
-  can rescue selected borderline modes.
+  are supported through the shared CNN inference path. The default fusion
+  policy is still RF-leaning from the four-shot baseline and should be
+  revalidated with the expanded RF/raw-CNN checkpoints.
 - Run `sort_shot.py` when you want the older single-model shot sorter and
   duplicate-removal workflow.
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)

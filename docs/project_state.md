@@ -46,20 +46,26 @@ Notes:
 ## Models (current)
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (~20)
-    -	Accuracy: ~92–95%
-    -	OOF ≈ 93%
-    -	Most robust / interpretable baseline
+    -	Active checkpoint: `models/nova_mode_classifier.joblib`
+    -	Expanded 10-shot OOF accuracy: 0.94
+    -	Expanded 10-shot OOF CM: `[[1404, 43], [93, 585]]`
+    -	GOOD precision/recall: 0.93 / 0.86
+    -	Most interpretable baseline
 2.	CNN (raw)
     -	Padded/truncated (m,r)
-    -	~90%, it is actually better now ~93% with cleaned training dataset
+    -	Active checkpoint: `models/nova_cnn_raw.pt`
+    -	Expanded 10-shot held-out accuracy: 0.95
+    -	Expanded 10-shot held-out CM: `[[288, 7], [14, 115]]`
+    -	GOOD precision/recall: 0.94 / 0.89
+    -	Current best checked expanded-set model
 3.	CNN (straightened)
     -	Ridge-aligned representation (2M+1, r)
-    -	Best CNN: ~94–96%
-    -	Less sensitive to nhar variation, it was sensitive to LR => added scheduler
+    -	Previous four-shot checkpoint archived under `models/old_4shots_models/`
+    -	Needs expanded-set retraining / recheck
 4.	HybridCNN (image + scalars)
     -	Includes continuum scalars
-    -	Current: ~94%
-    -	Comparable to RF, out of box – not optimized yet
+    -	Previous four-shot checkpoint archived under `models/old_4shots_models/`
+    -	Needs expanded-set retraining / recheck
 
 ## Continuum-derived scalars
 From cont_features.py:
@@ -104,15 +110,17 @@ From cont_features.py:
 
 ## Evaluation protocol
 ### RF
--	Standard split accuracy ~95%
--	OOF check:
-- CM ≈ [[800, 41],
-      [ 53,378]]  → ~93%
--	Used for label validation (flag p < 0.2 or p > 0.8)
+-	Expanded 10-shot OOF check:
+- CM = `[[1404, 43], [93, 585]]` → accuracy 0.94
+- GOOD precision/recall = 0.93 / 0.86
+-	Used for label validation with OOF suspect lists
 ### CNN
 -	Performance sensitive to seed + learning rate
+-	Expanded 10-shot raw-CNN check:
+- CM = `[[288, 7], [14, 115]]` → accuracy 0.95
+- GOOD precision/recall = 0.94 / 0.89
 -	Previous four-shot TAE-like retraining used threshold 0.5 for all CNN confusion matrices
--	All three CNNs were comparable on the previous four-shot list, with best accuracy ~0.95-0.96; rerun on the expanded `training_labels/tae_like.csv`
+-	All three CNNs were comparable on the previous four-shot list, with best accuracy ~0.95-0.96
 
 ## Major updates
 1) Straightened CNN representation
@@ -151,9 +159,9 @@ From cont_features.py:
 •	Missing datcon handling → warn once, disable continuum features
 
 ## Current tasks
-- Retrain RF on the expanded active `training_labels/tae_like.csv` list.
-- Retrain raw CNN, straightened CNN, and hybrid CNN on the expanded active list.
-- Revalidate the RF/CNN policy on the old four shots and the six new NSTX-U shots.
+- Revalidate the `sort_shot_mixed.py` RF/CNN policy on the old four shots and the six new NSTX-U shots.
+- Decide whether to retune the RF-leaning fusion thresholds now that expanded-set raw CNN is stronger.
+- Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
  
 ## Next tasks
 - Add EAEs (second gap) more deeply into training / continuum features.
@@ -542,3 +550,36 @@ Validation after merge:
 - no duplicate paths.
 - no missing paths under `$NOVA_DATA`.
 - no empty required metadata fields.
+
+### 2026-06-07
+User retrained RF and raw CNN on the cleaned expanded 10-shot TAE-like list.
+The active top-level model files are now:
+
+- `models/nova_mode_classifier.joblib` — expanded-set RF.
+- `models/nova_cnn_raw.pt` — expanded-set raw CNN.
+
+The previous four-shot RF, raw CNN, straightened CNN, hybrid CNN, and LOSO
+checkpoints were moved under `models/old_4shots_models/`.
+
+Expanded RF label-audit result from `scripts/rf_oof_check.py` on
+`training_labels/tae_like.csv`:
+
+- labels loaded: 2125 modes, 678 `good`, 1447 `bad`.
+- feature matrix: `(2125, 22)`.
+- OOF CM: `[[1404, 43], [93, 585]]`.
+- accuracy: 0.94.
+- BAD precision/recall/f1: 0.94 / 0.97 / 0.95.
+- GOOD precision/recall/f1: 0.93 / 0.86 / 0.90.
+
+Expanded raw-CNN held-out result:
+
+- held-out size: 424.
+- CM: `[[288, 7], [14, 115]]`.
+- accuracy: 0.95.
+- BAD precision/recall/f1: 0.95 / 0.98 / 0.96.
+- GOOD precision/recall/f1: 0.94 / 0.89 / 0.92.
+
+Interpretation: raw CNN is now the strongest checked expanded-set classifier,
+especially for GOOD-mode recall. The existing RF-leaning `sort_shot_mixed.py`
+fusion policy was chosen from four-shot LOSO behavior and should be revalidated
+or retuned with the expanded RF/raw-CNN models.
