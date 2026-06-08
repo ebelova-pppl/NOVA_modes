@@ -594,3 +594,10 @@ Updated `NOVA_TRAIN_CSV`, `NOVA_TRAIN_CSV_TAE`, the raw-CNN fallback default,
 and README examples to use `training_labels/tae_like_train.csv`. The component
 lists remain `training_labels/tae_like_4old.csv` and
 `training_labels/tae_like_6new.csv`.
+
+Added a top-level README subsection for the Flux classification-only workflow
+for new NSTX-U shots. The instructions now explicitly tell users not to train
+models for routine sorting, to pull the current repository models
+(`models/nova_mode_classifier.joblib` and `models/nova_cnn_raw.pt`), and to run
+`scripts/sort_shot_mixed.py` against shots under the DiTw data root with
+per-shot outputs written outside the input data tree.

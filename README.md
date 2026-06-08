@@ -85,6 +85,107 @@ Current best models
   chosen from four-shot LOSO checks. Revalidate the fusion thresholds with the
   expanded RF and raw-CNN models before treating that policy as final.
 
+## Classify new NSTX-U shots on Flux (no training)
+
+For a user who only wants to sort new NSTX-U NOVA output, do **not** train new
+models. The production workflow is to pull the current repository, use the
+version-controlled active models, and run `scripts/sort_shot_mixed.py` once per
+shot:
+
+- RF model: `models/nova_mode_classifier.joblib`
+- raw-CNN model: `models/nova_cnn_raw.pt`
+- sorter: `scripts/sort_shot_mixed.py`
+
+Do not use checkpoints from `models/old_4shots_models/` for new production
+sorting.
+
+Default Flux shell is usually `tcsh`:
+
+```tcsh
+module load anaconda3
+source `conda info --base`/etc/profile.d/conda.csh
+setenv CONDA_PKGS_DIRS /p/hym/conda_pkgs
+conda activate /p/hym/conda_envs/nova-perlmutter
+
+cd /p/hym/ebelova/NOVA/NOVA_modes
+git pull
+ls -lh models/nova_mode_classifier.joblib models/nova_cnn_raw.pt
+source configs/paths/nova_paths.flux.csh
+
+setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
+setenv NOVA_SORT_OUT "$NOVA_RUN_ROOT/sort_outputs"
+mkdir -p "$NOVA_SORT_OUT"
+```
+
+Bash users should replace the `tcsh` setup lines with:
+
+```bash
+module load anaconda3
+source "$(conda info --base)/etc/profile.d/conda.sh"
+export CONDA_PKGS_DIRS=/p/hym/conda_pkgs
+conda activate /p/hym/conda_envs/nova-perlmutter
+
+cd /p/hym/ebelova/NOVA/NOVA_modes
+git pull
+ls -lh models/nova_mode_classifier.joblib models/nova_cnn_raw.pt
+source configs/paths/nova_paths.flux.sh
+
+export NOVA_DITW_ROOT=/p/nstxdigtwin/energetic_particles/nova/DiTw
+export NOVA_SORT_OUT="$NOVA_RUN_ROOT/sort_outputs"
+mkdir -p "$NOVA_SORT_OUT"
+```
+
+Then classify one shot by replacing `nstxu_example_shot` with the shot
+directory name under `$NOVA_DITW_ROOT`.
+
+For `tcsh`:
+
+```tcsh
+setenv SHOT_NAME nstxu_example_shot
+python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+  --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+  --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
+  --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
+  --cnn_model_kind cnn_raw \
+  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME" \
+  --device cpu \
+  --make_plots
+```
+
+For bash:
+
+```bash
+export SHOT_NAME=nstxu_example_shot
+python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+  --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+  --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
+  --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
+  --cnn_model_kind cnn_raw \
+  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME" \
+  --device cpu \
+  --make_plots
+```
+
+The input shot directory is expected to contain `N1`, `N2`, ... subdirectories
+with `egn*` mode files and matching `datcon<N>` continuum files. The sorter
+does not move or modify the input modes; it writes CSV outputs and reports into
+`$NOVA_SORT_OUT/$SHOT_NAME`.
+
+Most useful outputs:
+
+- `good_tae_final.csv` — final deduplicated GOOD TAE-like modes.
+- `good_tae_unchecked.csv` — GOOD TAE-like modes before duplicate removal.
+- `bad_tae_like.csv` — TAE-like modes rejected by the RF/CNN policy.
+- `eae_like.csv` — modes routed away as EAE-like, not RF/CNN-scored as TAEs.
+- `flagged_tae_like.csv` — overlapping QC list for borderline or RF/CNN
+  disagreement cases.
+- `shot_summary.csv` and `frequency_cluster_report.txt` — run summary and
+  duplicate-cluster audit.
+
+If the goal is only to classify new shots, do not run `rf_train_classify.py`,
+`cnn_raw.py`, `cnn_straightened.py`, or `cnn_hybrid.py`. Those scripts are for
+developing or retraining models, not for routine sorting.
+
 Typical workflow
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
