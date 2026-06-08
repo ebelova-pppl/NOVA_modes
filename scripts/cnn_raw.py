@@ -27,7 +27,7 @@ def default_train_csv() -> str:
     if env_value:
         return env_value
     repo_root = Path(__file__).resolve().parents[1]
-    return str(repo_root / "training_labels" / "tae_like.csv")
+    return str(repo_root / "training_labels" / "tae_like_train.csv")
 
 
 def read_train_csv(csv_path: str, data_root: str | None = None) -> list[dict[str, Any]]:
@@ -251,7 +251,7 @@ def parse_args() -> Config:
     ap.add_argument(
         "--train_csv",
         default=default_train_csv(),
-        help="Training CSV with mode paths and good/bad labels (default: $NOVA_TRAIN_CSV or training_labels/tae_like.csv)",
+        help="Training CSV with mode paths and good/bad labels (default: $NOVA_TRAIN_CSV or training_labels/tae_like_train.csv)",
     )
     ap.add_argument(
         "--data_dir",

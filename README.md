@@ -52,7 +52,7 @@ Data format summary
 - Training label CSVs in `training_labels/` store mode paths relative to
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current active good/bad training
-  list is the expanded `training_labels/tae_like.csv`, now combining the
+  list is the expanded `training_labels/tae_like_train.csv`, now combining the
   original four-shot list with the reviewed six-shot NSTX-U list. Older
   four-shot TAE-only and mixed TAE/EAE lists are archived under
   `training_labels/old_4shots_tae_only_labels/` and
@@ -74,7 +74,7 @@ Model families
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. They were retrained on the 10-shot
-  `training_labels/tae_like.csv` list.
+  `training_labels/tae_like_train.csv` list.
 - RF expanded-set OOF check: CM `[[1404, 43], [93, 585]]`, accuracy `0.94`,
   GOOD recall `0.86`, GOOD precision `0.93`.
 - Raw CNN expanded-set held-out check: CM `[[288, 7], [14, 115]]`,
@@ -89,7 +89,7 @@ Typical workflow
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
-- Train classifier (RF or CNN) on the expanded `training_labels/tae_like.csv`.
+- Train classifier (RF or CNN) on the expanded `training_labels/tae_like_train.csv`.
   For CNN
   checkpoints intended for production sorting, use
   `--refit_full_before_save` so the saved model is trained on the full labeled

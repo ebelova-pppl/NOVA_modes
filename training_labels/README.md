@@ -8,7 +8,7 @@ example `nstx_120113/N5/egn05w.1234E+02`.
 
 ## Active training list
 
-### `tae_like.csv`
+### `tae_like_train.csv`
 
 Current active expanded TAE-like good/bad training list for RF and CNN
 retraining.
@@ -24,7 +24,7 @@ Columns:
 
 Current checked contents:
 - 2125 labeled modes
-- labels: 678 `good`, 1447 `bad`
+- labels: 649 `good`, 1476 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
   `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`
@@ -38,7 +38,13 @@ six-shot merge.
 
 ### `tae_like_6new.csv`
 
-Reviewed six-shot NSTX-U TAE-like list that was appended to `tae_like.csv`.
+Reviewed six-shot NSTX-U TAE-like list that was appended to
+`tae_like_train.csv`.
+
+The bare filename `tae_like.csv` is intentionally not used for the canonical
+training list anymore, because `split_tae_eae.py` and `sort_shot_mixed.py`
+write TAE-like output/audit files with that name in their own output
+directories.
 
 ## Archived four-shot lists
 
@@ -76,11 +82,11 @@ Six additional NSTX-U shots have a cleaned staged TAE-like label list:
 
 - `tae_like_6new.csv`
 
-This list uses the same full schema as `tae_like.csv`. The `family` column is
-set to `tae` for `good` rows and `none` for `bad` rows; `signed_delta`,
-`fraction_below_upper2`, `gap_region`, and `error` were restored from the
-per-shot split outputs in the shared `nova2/metadata` area by matching the
-stable `shot/N/file` suffix.
+This list uses the same full schema as `tae_like_train.csv`. The `family`
+column is set to `tae` for `good` rows and `none` for `bad` rows;
+`signed_delta`, `fraction_below_upper2`, `gap_region`, and `error` were
+restored from the per-shot split outputs in the shared `nova2/metadata` area by
+matching the stable `shot/N/file` suffix.
 
 Related metadata/audit files in the shared `nova2/metadata` area:
 
@@ -88,7 +94,7 @@ Related metadata/audit files in the shared `nova2/metadata` area:
 - `tae_like_6new_not_cleaned_NG.csv`
 - per-shot `*_tae_eae_split/` directories
 
-The six-shot list has been merged into `tae_like.csv`.
+The six-shot list has been merged into `tae_like_train.csv`.
 
 Checked staged-label summary:
 - cleaned staged list: 1040 rows, 252 `good`, 788 `bad`
@@ -101,7 +107,8 @@ Checked staged-label summary:
 
 The shared metadata CSVs currently contain absolute source paths from the
 labeling environment. The staged `training_labels/tae_like_6new.csv` file uses
-relative `$NOVA_DATA` paths and is the file to use for the future merge.
+relative `$NOVA_DATA` paths and is kept as the reviewed six-shot component
+list.
 
 Example review command for one `N` directory:
 

@@ -1,12 +1,12 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-06-06)
+### Project state (current snapshot, updated 2026-06-08)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
 - Active version-controlled training list:
-    - `training_labels/tae_like.csv`
-    - 2125 labeled TAE-like modes: 678 `good`, 1447 `bad`
+    - `training_labels/tae_like_train.csv`
+    - 2125 labeled TAE-like modes: 649 `good`, 1476 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`, `nstxuG121123K51`, `nstxuG133964S31`,
@@ -246,7 +246,7 @@ Updated results for new eae_like.csv list (2042 modes):
 TAE/EAE sorting is solved and mixed_branch has been merged back to main
 
 ### 2026-05-10
-- Retrained / rechecked the good-bad classifiers on `training_labels/tae_like.csv` using threshold 0.5 for CNN evaluation.
+- Retrained / rechecked the good-bad classifiers on `training_labels/tae_like_train.csv` using threshold 0.5 for CNN evaluation.
 - RF: done; results are identical to the previous check on 2026-04-14.
 - CNN_raw: best accuracy=0.96, CM=[[126 5][4 81]], threshold=0.5.
 - CNN_straightened: best accuracy=0.95, CM=[[126 5][6 79]], threshold=0.5.
@@ -486,10 +486,10 @@ Current follow-up items:
 ### 2026-06-05
 User update: six additional NSTX-U shots now have staged TAE-like label lists
 in the shared `nova2/metadata` area, but the labels still need review before
-they are merged into `training_labels/tae_like.csv`.
+they are merged into `training_labels/tae_like_train.csv`.
 
 Codex check:
-- `training_labels/tae_like.csv` remains the active four-shot TAE-like training
+- `training_labels/tae_like_train.csv` remains the active four-shot TAE-like training
   list: 1085 rows, 426 `good`, 659 `bad`, all resolving under `$NOVA_DATA`.
 - The old root-level four-shot label files have been moved into
   `training_labels/old_4shots_tae_only_labels/` and
@@ -505,12 +505,12 @@ Codex check:
   labeling and can be ignored for training.
 
 Current workflow decision: retrain RF on the full active
-`training_labels/tae_like.csv` list and use that model to help inspect the
+`training_labels/tae_like_train.csv` list and use that model to help inspect the
 six staged NSTX-U labels. Keep the staged labels out of the canonical training
 CSV until the review is done.
 
 Codex retrained `models/nova_mode_classifier.joblib` on the full active
-`training_labels/tae_like.csv` list. The RF script loaded 1085 modes, reported
+`training_labels/tae_like_train.csv` list. The RF script loaded 1085 modes, reported
 5-fold CV accuracies `[0.9401, 0.9217, 0.8940, 0.9078, 0.9401]`
 with mean CV accuracy `0.9207`, then ran its 10% held-out sanity check:
 CM `[[62, 4], [3, 40]]`, accuracy `0.94`. After that check, the script refit
@@ -521,7 +521,7 @@ User finished checking and cleaning the six-shot NSTX-U label list. The cleaned
 list is now `training_labels/tae_like_6new.csv`.
 
 Codex enriched `training_labels/tae_like_6new.csv` to match the full
-`tae_like.csv` schema: `path`, `validity`, `family`, `signed_delta`,
+`tae_like_train.csv` schema: `path`, `validity`, `family`, `signed_delta`,
 `fraction_below_upper2`, `gap_region`, and `error`. Split metadata was restored
 from `/global/cfs/cdirs/m314/nova2/metadata/*_tae_eae_split/tae_like.csv` by
 matching `shot/N/file` suffixes and writing relative `$NOVA_DATA` paths.
@@ -537,11 +537,11 @@ Validation after enrichment:
 
 Codex merged `training_labels/tae_like_4old.csv` and
 `training_labels/tae_like_6new.csv` into the active
-`training_labels/tae_like.csv` list. The merged list preserves the full schema,
+`training_labels/tae_like_train.csv` list. The merged list preserves the full schema,
 keeps old rows first and appends the reviewed six-shot NSTX-U rows, and uses
 relative `$NOVA_DATA` paths throughout.
 
-Validation after merge:
+Validation after merge at that time:
 - 2125 rows plus header.
 - labels: 678 `good`, 1447 `bad`.
 - family values: 675 `tae`, 1447 `none`, 3 `eae`.
@@ -562,7 +562,7 @@ The previous four-shot RF, raw CNN, straightened CNN, hybrid CNN, and LOSO
 checkpoints were moved under `models/old_4shots_models/`.
 
 Expanded RF label-audit result from `scripts/rf_oof_check.py` on
-`training_labels/tae_like.csv`:
+`training_labels/tae_like_train.csv`:
 
 - labels loaded: 2125 modes, 678 `good`, 1447 `bad`.
 - feature matrix: `(2125, 22)`.
@@ -583,3 +583,14 @@ Interpretation: raw CNN is now the strongest checked expanded-set classifier,
 especially for GOOD-mode recall. The existing RF-leaning `sort_shot_mixed.py`
 fusion policy was chosen from four-shot LOSO behavior and should be revalidated
 or retuned with the expanded RF/raw-CNN models.
+
+### 2026-06-08
+Renamed the canonical labeled TAE-like training set from
+`training_labels/tae_like.csv` to `training_labels/tae_like_train.csv`.
+This avoids confusion with generated `tae_like.csv` files written by
+`split_tae_eae.py` and `sort_shot_mixed.py` in output directories.
+
+Updated `NOVA_TRAIN_CSV`, `NOVA_TRAIN_CSV_TAE`, the raw-CNN fallback default,
+and README examples to use `training_labels/tae_like_train.csv`. The component
+lists remain `training_labels/tae_like_4old.csv` and
+`training_labels/tae_like_6new.csv`.

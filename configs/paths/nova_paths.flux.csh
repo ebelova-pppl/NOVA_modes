@@ -45,8 +45,8 @@ setenv NOVA_RUN_CNN "${NOVA_RUN_ROOT}/nova_cnn"
 unset _NOVA_FLUX_WORK_ROOT
 
 # Version-controlled labeled training lists.
-setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like.csv"
-setenv NOVA_TRAIN_CSV_TAE "${NOVA_REPO}/training_labels/tae_like.csv"
+setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like_train.csv"
+setenv NOVA_TRAIN_CSV_TAE "${NOVA_REPO}/training_labels/tae_like_train.csv"
 setenv NOVA_TRAIN_CSV_MIXED "${NOVA_REPO}/training_labels/all_modes.csv"
 
 # Flux is CPU-only for this workflow. Override after sourcing only if needed.

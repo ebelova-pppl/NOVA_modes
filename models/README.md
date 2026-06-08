@@ -3,8 +3,8 @@
 Top-level model files are the active expanded 10-shot TAE-like checkpoints:
 
 - `nova_mode_classifier.joblib` — Random Forest trained on
-  `training_labels/tae_like.csv`.
-- `nova_cnn_raw.pt` — raw CNN trained on `training_labels/tae_like.csv`.
+  `training_labels/tae_like_train.csv`.
+- `nova_cnn_raw.pt` — raw CNN trained on `training_labels/tae_like_train.csv`.
 
 Current expanded-set checks:
 

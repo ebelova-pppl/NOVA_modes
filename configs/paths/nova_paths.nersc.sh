@@ -24,8 +24,8 @@ export NOVA_RUN_RF="$SCRATCH/nova_rf"    # older version of RF
 export NOVA_RUN_CNN="$SCRATCH/nova_cnn"  # older versions of CNN
 
 # Version-controlled labeled training list
-export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like.csv"       # "train_master.csv" was the legacy TAE-only training default.
-export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like.csv"   # New TAE training set (for training TAE-only models)
+export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"       # "train_master.csv" was the legacy TAE-only training default.
+export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"   # New TAE training set (for training TAE-only models)
 export NOVA_TRAIN_CSV_MIXED="$NOVA_REPO/training_labels/all_modes.csv" # Includes TAE+EAE data (for now used fro splitting TAEs vs EAEs, in future for training TAE+EAE models)
 
 # Optional Torch device override for CNN scripts:

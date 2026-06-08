@@ -53,8 +53,8 @@ def load_mode_from_nova(path):
 
 def load_labeled_modes(csv_path):
     """
-    csv_path: CSV with path,label rows and an optional header row.
-    Label must be 'good' or 'bad'.
+    csv_path: CSV with path plus good/bad labels and an optional header row.
+    Label/validity values must be 'good' or 'bad'.
     Returns:
         modes: list of 2D numpy arrays
         y:     list of integer labels (0 = bad, 1 = good)
@@ -229,7 +229,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--train_csv",
         type=str,
-        help="Training CSV with path,label rows, with or without a header row.",
+        help="Training CSV with paths plus good/bad labels, with or without a header row.",
     )
     parser.add_argument("--model_out", type=str, default="nova_mode_classifier.joblib",
                         help="Path to save trained model.")

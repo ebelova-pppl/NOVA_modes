@@ -301,7 +301,7 @@ def main():
         "--mode-list",
         help=(
             "Optional CSV list of candidate modes to label, such as "
-            "training_labels/tae_like.csv or training_labels/eae_like.csv. "
+            "training_labels/tae_like_train.csv or training_labels/eae_like.csv. "
             "Only files in mode_dir whose resolved path or shot/N/file suffix "
             "appears in this list are shown."
         )
