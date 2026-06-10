@@ -649,10 +649,9 @@ longer falls back to `/p/hym/ebelova/NOVA/NOVA_modes`. It now preserves an
 explicit `NOVA_REPO` if set, otherwise resolves the current Git checkout with
 `git rev-parse --show-toplevel`. The top-level README Flux recipe now tells
 users to `cd /path/to/your/NOVA_modes`, source the config from that checkout,
-set `NOVA_RUN_ROOT` under `/p/hym/$USER/NOVA/runs`, and run `nova_env` to
-verify the active paths. This first changed the default shared work-root to
-`/p/hym/$USER/NOVA` instead of Elena's Flux work directory; the later cleanup
-below removes that shared work-root default entirely.
+and run `nova_env` to verify the active paths. This first changed the default
+shared work-root to `/p/hym/$USER/NOVA` instead of Elena's Flux work directory;
+the later cleanup below removes that shared work-root default entirely.
 
 Cleaned the Flux path configs further after user reports of errors around the
 derived `_NOVA_FLUX_WORK_ROOT`. The Flux configs now avoid that work-root
