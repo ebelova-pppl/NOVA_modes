@@ -628,6 +628,15 @@ but is less stable across held-out shots; the worst raw-CNN held-out folds are
 `nstxuG142301H47`. Inspect per-fold `model_evaluation_report.txt` files before
 changing the `sort_shot_mixed.py` fusion policy.
 
+Follow-up inspection of `nstxuE205052A01t022` showed the raw CNN split-training
+phase was not bad: its internal held-out split reached accuracy `0.95` and
+GOOD recall `0.93`. The saved full-refit checkpoint then produced a constant
+`p_cnn_good=0.325527...` for every held-out mode, so that fold is a CNN
+full-refit/checkpoint failure rather than a clean model-generalization result.
+Before making the fusion policy more CNN-heavy, rerun at least the problematic
+folds with `--no-cnn_refit_full_before_save`, `--cnn_pos_weight auto`, or an
+improved full-refit learning-rate schedule.
+
 Added a top-level README subsection for the Flux classification-only workflow
 for new NSTX-U shots. The instructions now explicitly tell users not to train
 models for routine sorting, to pull the current repository models
