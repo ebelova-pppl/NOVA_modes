@@ -650,5 +650,15 @@ explicit `NOVA_REPO` if set, otherwise resolves the current Git checkout with
 `git rev-parse --show-toplevel`. The top-level README Flux recipe now tells
 users to `cd /path/to/your/NOVA_modes`, source the config from that checkout,
 set `NOVA_RUN_ROOT` under `/p/hym/$USER/NOVA/runs`, and run `nova_env` to
-verify the active paths. The Flux path configs now default their shared
-work-root to `/p/hym/$USER/NOVA` instead of Elena's Flux work directory.
+verify the active paths. This first changed the default shared work-root to
+`/p/hym/$USER/NOVA` instead of Elena's Flux work directory; the later cleanup
+below removes that shared work-root default entirely.
+
+Cleaned the Flux path configs further after user reports of errors around the
+derived `_NOVA_FLUX_WORK_ROOT`. The Flux configs now avoid that work-root
+entirely and no longer set convenience-only `NOVA_DATA_TAE`, `NOVA_DATA_MIXED`,
+`NOVA_RESULTS`, `NOVA_TRAIN_CSV_TAE`, or `NOVA_TRAIN_CSV_MIXED` values. They
+keep only the repo/model/training-list paths needed by current examples plus
+CPU/thread/cache/Python-path settings. `src/paths.py` now treats data/model/run
+environment variables as optional so importing `NOVA_TRAIN_CSV` does not force
+unused directories to exist.

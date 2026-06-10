@@ -1,4 +1,4 @@
-# /p/hym/ebelova/NOVA/NOVA_modes/configs/paths/nova_paths.flux.sh
+# configs/paths/nova_paths.flux.sh
 
 # ----------------------------
 # NOVA AE project paths on Flux
@@ -10,7 +10,7 @@
 #   source "$(conda info --base)/etc/profile.d/conda.sh"
 #   export CONDA_PKGS_DIRS="/p/hym/conda_pkgs"    # optional: shared conda pkgs directory
 #   conda activate /p/hym/conda_envs/nova-perlmutter     # needed for CNN training / inference
-#   cd /p/hym/ebelova/NOVA/NOVA_modes
+#   cd /path/to/your/NOVA_modes
 
 # Canonical git repo / worktree
 # Resolve the repo root from this config file so the same file works when it is
@@ -19,25 +19,10 @@ _NOVA_CONFIG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export NOVA_REPO="$(cd "${_NOVA_CONFIG_DIR}/../.." && pwd)"
 unset _NOVA_CONFIG_DIR
 
-# Persistent data / models / saved results.
-_NOVA_FLUX_USER="${USER:-nova}"
-_NOVA_FLUX_WORK_ROOT="${NOVA_FLUX_WORK_ROOT:-/p/hym/${_NOVA_FLUX_USER}/NOVA}"
-export NOVA_DATA_TAE="/u/ebelova/NOVA_old/data_tae"              # old TAE-only dataset / legacy train_master.csv
-export NOVA_DATA_MIXED="${_NOVA_FLUX_WORK_ROOT}/data_mixed"      # mixed TAE+EAE training set
-export NOVA_DATA="$NOVA_DATA_MIXED"                              # default to mixed data, since that is the active workflow
-export NOVA_MODELS="${_NOVA_REPO}/models"
-export NOVA_RESULTS="${_NOVA_FLUX_WORK_ROOT}/results"
+# Version-controlled models and labeled training list.
+export NOVA_MODELS="$NOVA_REPO/models"
 
-# Active run areas. Override these before sourcing if a different Flux scratch
-# or work directory is preferred.
-export NOVA_RUN_ROOT="${NOVA_RUN_ROOT:-${_NOVA_FLUX_WORK_ROOT}/runs}"
-unset _NOVA_FLUX_WORK_ROOT
-unset _NOVA_FLUX_USER
-
-# Version-controlled labeled training lists.
 export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
-export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"
-export NOVA_TRAIN_CSV_MIXED="$NOVA_REPO/training_labels/all_modes.csv"
 
 # Flux is CPU-only for this workflow. Override after sourcing only if needed.
 export NOVA_TORCH_DEVICE=cpu
@@ -70,15 +55,9 @@ export PYTHONUSERBASE="/p/hym/local"
 
 nova_env() {
     echo "NOVA_REPO      = $NOVA_REPO"
-    echo "NOVA_DATA      = $NOVA_DATA"
-    echo "NOVA_DATA_TAE  = $NOVA_DATA_TAE"
-    echo "NOVA_DATA_MIXED = $NOVA_DATA_MIXED"
     echo "NOVA_MODELS    = $NOVA_MODELS"
-    echo "NOVA_RESULTS   = $NOVA_RESULTS"
-    echo "NOVA_RUN_ROOT  = $NOVA_RUN_ROOT"
+    echo "NOVA_RUN_ROOT  = ${NOVA_RUN_ROOT:-<unset>}"
     echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"
-    echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"
-    echo "NOVA_TRAIN_CSV_MIXED = $NOVA_TRAIN_CSV_MIXED"
     echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"
     echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"
     echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"

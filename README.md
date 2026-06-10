@@ -226,9 +226,12 @@ Minimal install / enviroment
     - `bash`: source "$(conda info --base)/etc/profile.d/conda.sh"
     - set conda package cache under `/p/hym` with `CONDA_PKGS_DIRS`
     - conda activate /p/hym/conda_envs/nova-perlmutter
-    - cd /p/hym/ebelova/NOVA/NOVA_modes
+    - cd /path/to/your/NOVA_modes
     - source configs/paths/nova_paths.flux.csh
     - Bash users can source configs/paths/nova_paths.flux.sh instead
+    - Flux configs set repo/model/training-list paths only; use explicit
+      `--shot_dir` / `--out_dir` paths or set workflow-specific data/output
+      variables yourself
     - Flux runs the CNN scripts on CPU by default via `NOVA_TORCH_DEVICE=cpu`
     - Perlmutter-trained CNN checkpoints have been cross-checked on Flux with
       identical RF / raw / straightened / hybrid inference outputs
@@ -241,5 +244,5 @@ Minimal install / enviroment
 Notes
 - This repository focuses on mode classification and preprocessing, not NOVA itself
 - Scripts are designed to work with existing NOVA output directories: nstxu_123456/N1/.../N10/
-- Older version for frozen TAE-only models and $NOVA_DATA_TAE dataset - git tag tae_only_baseline_v1
-- mixed_branch was for dealing with mixed TAE+EAE data set in $NOVA_DATA_MIXED - now merged into main
+- Older version for frozen TAE-only models and the old TAE-only dataset: git tag tae_only_baseline_v1
+- mixed_branch was for the mixed TAE+EAE dataset and is now merged into main

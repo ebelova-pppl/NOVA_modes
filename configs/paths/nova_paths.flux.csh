@@ -32,33 +32,10 @@ if (! $?NOVA_REPO) then
     unset _NOVA_REPO_FROM_GIT
 endif
 
-# Persistent data / models / saved results.
-if ($?NOVA_FLUX_WORK_ROOT) then
-    set _NOVA_FLUX_WORK_ROOT = "$NOVA_FLUX_WORK_ROOT"
-else if ($?USER) then
-    set _NOVA_FLUX_WORK_ROOT = "/p/hym/${USER}/NOVA"
-else
-    set _NOVA_FLUX_WORK_ROOT = "/p/hym/NOVA"
-endif
+# Version-controlled models and labeled training list.
+setenv NOVA_MODELS "${NOVA_REPO}/models"
 
-setenv NOVA_DATA_TAE "/u/ebelova/NOVA_old/data_tae"          # old TAE-only set, used for initial CNN training
-setenv NOVA_DATA_MIXED "${_NOVA_FLUX_WORK_ROOT}/data_mixed"  # new mixed set TAEs+EAEs
-setenv NOVA_DATA "$NOVA_DATA_MIXED"
-setenv NOVA_MODELS "${_NOVA_REPO}/models"
-setenv NOVA_RESULTS "${_NOVA_FLUX_WORK_ROOT}/results"
-
-# Active run areas. Override NOVA_RUN_ROOT before sourcing if a different Flux
-# scratch or work directory is preferred.
-if (! $?NOVA_RUN_ROOT) then
-    setenv NOVA_RUN_ROOT "${_NOVA_FLUX_WORK_ROOT}/runs"
-endif
-
-unset _NOVA_FLUX_WORK_ROOT
-
-# Version-controlled labeled training lists.
 setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like_train.csv"
-setenv NOVA_TRAIN_CSV_TAE "${NOVA_REPO}/training_labels/tae_like_train.csv"
-setenv NOVA_TRAIN_CSV_MIXED "${NOVA_REPO}/training_labels/all_modes.csv"
 
 # Flux is CPU-only for this workflow. Override after sourcing only if needed.
 setenv NOVA_TORCH_DEVICE cpu
@@ -75,17 +52,11 @@ if (! $?MKL_NUM_THREADS) then
     setenv MKL_NUM_THREADS "$NOVA_CPUS_PER_TASK"
 endif
 
-# Python imports from src/
-#if (! $?PYTHONPATH) then
+# Python imports from src/.
+if (! $?PYTHONPATH) then
     setenv PYTHONPATH "${NOVA_REPO}/src"
-#else
-#    setenv PYTHONPATH "${NOVA_REPO}/src:${PYTHONPATH}"
-#endif
-
-if ($?CUDA_VISIBLE_DEVICES) then
-    setenv NOVA_CUDA_VISIBLE_DEVICES_STATUS "$CUDA_VISIBLE_DEVICES"
 else
-    setenv NOVA_CUDA_VISIBLE_DEVICES_STATUS "<unset>"
+    setenv PYTHONPATH "${NOVA_REPO}/src:${PYTHONPATH}"
 endif
 
 # Keep caches and user-level Python state out of the small home directory.
@@ -105,7 +76,7 @@ alias set_paths 'source "$NOVA_REPO/configs/paths/nova_paths.flux.csh"'
 
 alias set_nova_env 'module load anaconda3; source `conda info --base`/etc/profile.d/conda.csh; setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"; conda activate /p/hym/conda_envs/nova-perlmutter' 
 
-alias nova_env 'echo "NOVA_REPO      = $NOVA_REPO"; echo "NOVA_DATA      = $NOVA_DATA"; echo "NOVA_DATA_TAE  = $NOVA_DATA_TAE"; echo "NOVA_DATA_MIXED = $NOVA_DATA_MIXED"; echo "NOVA_MODELS    = $NOVA_MODELS"; echo "NOVA_RESULTS   = $NOVA_RESULTS"; echo "NOVA_RUN_ROOT  = $NOVA_RUN_ROOT"; echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"; echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"; echo "NOVA_TRAIN_CSV_MIXED = $NOVA_TRAIN_CSV_MIXED"; echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"; echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"; echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"; echo "MKL_NUM_THREADS = $MKL_NUM_THREADS"; echo "CUDA_VISIBLE_DEVICES = $NOVA_CUDA_VISIBLE_DEVICES_STATUS"; echo "PYTHONPATH     = $PYTHONPATH"'
+alias nova_env 'echo "NOVA_REPO      = $NOVA_REPO"; echo "NOVA_MODELS    = $NOVA_MODELS"; echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"; echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"; echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"; echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"; echo "MKL_NUM_THREADS = $MKL_NUM_THREADS"; echo "PYTHONPATH     = $PYTHONPATH"'
 
 alias nova_cdrepo 'cd "$NOVA_REPO"'
 alias nova_run_sort 'python "$NOVA_REPO/scripts/sort_shot.py" \!*'
