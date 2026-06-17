@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-06-08)
+### Project state (current snapshot, updated 2026-06-15)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -19,6 +19,9 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 - Component lists for the expanded training pool:
     - original four-shot copy: `training_labels/tae_like_4old.csv`
     - reviewed six-shot NSTX-U copy: `training_labels/tae_like_6new.csv`
+- Review-stage lists not yet merged:
+    - `training_labels/tae_like_3new.csv`: three additional NSTX-U G-case
+      shots for visual review before possible enrichment/merge
 
 Each mode includes:
 -	Scalar metadata:
@@ -661,3 +664,24 @@ keep only the repo/model/training-list paths needed by current examples plus
 CPU/thread/cache/Python-path settings. `src/paths.py` now treats data/model/run
 environment variables as optional so importing `NOVA_TRAIN_CSV` does not force
 unused directories to exist.
+
+### 2026-06-15
+Created `training_labels/tae_like_3new.csv` as a review-stage combined label
+list for three newly labeled NSTX-U G-case shots:
+
+- `nstxuG121123Q62`
+- `nstxuG121123N75`
+- `nstxuG142301Y93`
+
+The source files are beside the shot directories in `$CFS/m314/nova2/data` and
+use Flux/DiTw absolute paths:
+
+- `nstxuG121123Q62_mode_labels_clean.csv`
+- `nstxuG121123N75_mode_labels_clean.csv`
+- `nstxuG142301Y93_mode_labels_clean.csv`
+
+The combined list has 523 rows, 14 `good` and 509 `bad`, stored as
+`path,validity` with paths relative to `$NOVA_DATA`. Validation found no
+absolute paths, no duplicate paths, and no missing files under `$NOVA_DATA`.
+This list is intentionally not merged into `tae_like_train.csv`; it is for
+visual review with `viz/view_modes_csv.py` first.

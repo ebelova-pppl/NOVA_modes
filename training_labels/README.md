@@ -118,3 +118,36 @@ python "$NOVA_REPO/scripts/label_modes_fast.py" \
   --mode-list "$NOVA_REPO/training_labels/tae_like_6new.csv" \
   --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
 ```
+
+## Three-shot NSTX-U review list
+
+Three additional NSTX-U G-case shots have a separate review-stage list:
+
+- `tae_like_3new.csv`
+
+This list is not merged into `tae_like_train.csv`. It is intended for visual
+review with `viz/view_modes_csv.py` before deciding whether to enrich and merge
+the labels.
+
+Current checked contents:
+- 523 labeled modes
+- labels: 14 `good`, 509 `bad`
+- shots: `nstxuG121123Q62`, `nstxuG121123N75`, `nstxuG142301Y93`
+- paths are relative to `$NOVA_DATA`
+- no duplicate paths
+- all paths resolve under `$NOVA_DATA`
+
+The source per-shot label files live beside the shot directories in the shared
+`nova2/data` area and use Flux/DiTw absolute paths:
+
+- `nstxuG121123Q62_mode_labels_clean.csv`
+- `nstxuG121123N75_mode_labels_clean.csv`
+- `nstxuG142301Y93_mode_labels_clean.csv`
+
+Example review command:
+
+```bash
+python "$NOVA_REPO/viz/view_modes_csv.py" \
+  "$NOVA_REPO/training_labels/tae_like_3new.csv" \
+  --base_dir "$NOVA_DATA"
+```
