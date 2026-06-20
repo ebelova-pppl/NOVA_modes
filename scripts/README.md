@@ -83,6 +83,14 @@ cosine-anneals to one hundredth of the initial LR. Gradient norm is clipped to
 controlled ablations. Checkpoints record the recipe, split metrics, and saved
 training scope.
 
+To expose quiet prediction collapse, `cnn_raw.py` reports the predicted GOOD
+fraction, true GOOD fraction, mean/standard deviation of `p_good`, and its
+range every five epochs. Starting at epoch 5, it prints a warning for
+near-all-BAD predictions, near-all-GOOD predictions, or nearly constant
+probabilities. The full-data refit is checked with a deterministic evaluation
+loader, and its final prediction-health values are stored in the checkpoint
+under `final_prediction_health`.
+
 All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
 configuration so training runs are reproducible by default.
 

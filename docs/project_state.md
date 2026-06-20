@@ -838,3 +838,17 @@ warmup, cosine annealing, and gradient clipping at norm `1.0`. Full-refit loss
 ended at `0.0008`. This replaces the earlier expanded-set raw-CNN checkpoint;
 the completed symmetric 10-shot LOSO result above remains the generalization
 check used for fusion-policy decisions.
+
+Added prediction-collapse monitoring to `scripts/cnn_raw.py`. At the normal
+epoch-reporting cadence, both split evaluation and full-data refit now report
+the predicted GOOD fraction, true GOOD fraction, `p_good` mean/standard
+deviation, and probability range. Starting at epoch 5, warnings identify:
+
+- predicted GOOD fraction below `0.02` when GOOD labels are present;
+- predicted GOOD fraction above `0.98` when BAD labels are present;
+- `p_good` standard deviation below `0.001`.
+
+The full refit uses a non-shuffled evaluation loader for these checks. Its
+final diagnostics and collapse status are saved as
+`final_prediction_health` in the checkpoint, preventing another stalled model
+from looking healthy solely because the training loop completed.

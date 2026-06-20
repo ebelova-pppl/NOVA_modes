@@ -22,6 +22,11 @@ from nova_mode_loader import load_mode_from_nova
 from torch_runtime import print_torch_device_report, select_torch_device
 
 
+COLLAPSE_CHECK_START_EPOCH = 5
+COLLAPSE_CLASS_FRACTION = 0.02
+COLLAPSE_PROB_STD = 1e-3
+
+
 def default_train_csv() -> str:
     env_value = os.environ.get("NOVA_TRAIN_CSV")
     if env_value:
@@ -256,6 +261,86 @@ class Config:
     onecycle_final_div_factor: float = 100.0
     onecycle_pct_start: float = 0.1
     grad_clip_norm: float | None = 1.0
+
+
+@dataclass(frozen=True)
+class PredictionHealth:
+    predicted_good_fraction: float
+    true_good_fraction: float
+    prob_mean: float
+    prob_std: float
+    prob_min: float
+    prob_max: float
+    collapse_reasons: tuple[str, ...]
+
+    @property
+    def collapse_detected(self) -> bool:
+        return bool(self.collapse_reasons)
+
+
+def summarize_prediction_health(
+    probs: np.ndarray,
+    y_true: np.ndarray,
+    threshold: float,
+) -> PredictionHealth:
+    probs = np.asarray(probs, dtype=float)
+    y_true = np.asarray(y_true, dtype=int)
+    if probs.size == 0 or y_true.size == 0:
+        raise ValueError("Cannot check prediction health with no samples.")
+    if probs.shape != y_true.shape:
+        raise ValueError(
+            "Prediction-health arrays must have matching shapes, "
+            f"got probs={probs.shape} and labels={y_true.shape}."
+        )
+
+    predicted_good_fraction = float(np.mean(probs >= threshold))
+    true_good_fraction = float(np.mean(y_true == 1))
+    prob_std = float(np.std(probs))
+    reasons = []
+
+    if (
+        true_good_fraction >= COLLAPSE_CLASS_FRACTION
+        and predicted_good_fraction < COLLAPSE_CLASS_FRACTION
+    ):
+        reasons.append("near-all-bad predictions")
+    if (
+        (1.0 - true_good_fraction) >= COLLAPSE_CLASS_FRACTION
+        and predicted_good_fraction > 1.0 - COLLAPSE_CLASS_FRACTION
+    ):
+        reasons.append("near-all-good predictions")
+    if prob_std < COLLAPSE_PROB_STD:
+        reasons.append("near-constant probabilities")
+
+    return PredictionHealth(
+        predicted_good_fraction=predicted_good_fraction,
+        true_good_fraction=true_good_fraction,
+        prob_mean=float(np.mean(probs)),
+        prob_std=prob_std,
+        prob_min=float(np.min(probs)),
+        prob_max=float(np.max(probs)),
+        collapse_reasons=tuple(reasons),
+    )
+
+
+def report_prediction_health(
+    stage: str,
+    epoch: int,
+    health: PredictionHealth,
+) -> None:
+    print(
+        f"{stage} prediction health | predicted_good="
+        f"{health.predicted_good_fraction:.4f} | true_good="
+        f"{health.true_good_fraction:.4f} | p_good mean/std="
+        f"{health.prob_mean:.4f}/{health.prob_std:.4f} | "
+        f"range=[{health.prob_min:.4f}, {health.prob_max:.4f}]",
+        flush=True,
+    )
+    if epoch >= COLLAPSE_CHECK_START_EPOCH and health.collapse_detected:
+        print(
+            f"WARNING: {stage.lower()} prediction collapse at epoch {epoch}: "
+            f"{'; '.join(health.collapse_reasons)}. The model may be stalled.",
+            flush=True,
+        )
 
 
 def parse_optional_positive_float(value: str) -> float | None:
@@ -512,7 +597,8 @@ def main():
             best_epoch = ep
             best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
 
-        if ep == 1 or ep % 5 == 0:
+        report_epoch = ep == 1 or ep == cfg.epochs or ep % 5 == 0
+        if report_epoch:
             lr = opt.param_groups[0]["lr"]
             elapsed = time.perf_counter() - epoch_t0
             print(
@@ -520,6 +606,8 @@ def main():
                 f"test_acc={acc:.4f} | lr={lr:.2e} | elapsed={elapsed:.1f}s",
                 flush=True,
             )
+            health = summarize_prediction_health(probs, y_true, cfg.eval_threshold)
+            report_prediction_health("Split-test", ep, health)
 
     print(f"Best test acc: {best_acc:.4f} (epoch {best_epoch})")
     if best_state is not None:
@@ -542,6 +630,12 @@ def main():
     if np.any(y_true == 0):
         print("Bad modes p_good range:", probs[y_true == 0].min(), probs[y_true == 0].max())
         print("mean p_good | true bad :", probs[y_true == 0].mean())
+
+    final_prediction_health = summarize_prediction_health(
+        probs,
+        y_true,
+        cfg.eval_threshold,
+    )
 
     print("\nConfusion matrix (rows=actual [bad,good], cols=pred [bad,good]):")
     print(confusion_matrix(y_true, y_pred))
@@ -582,6 +676,12 @@ def main():
         )
         seed_everything(cfg.seed)
         full_loader = DataLoader(full_ds, batch_size=cfg.batch_size, shuffle=True, num_workers=0)
+        full_eval_loader = DataLoader(
+            full_ds,
+            batch_size=cfg.batch_size,
+            shuffle=False,
+            num_workers=0,
+        )
         final_model = SmallCNN(in_ch=1).to(device)
         final_opt, final_sched = build_onecycle_training(final_model, full_loader, cfg)
 
@@ -596,14 +696,27 @@ def main():
                 batch_scheduler=final_sched,
                 grad_clip_norm=cfg.grad_clip_norm,
             )
-            if ep == 1 or ep == cfg.epochs or ep % 5 == 0:
-                elapsed = time.perf_counter() - epoch_t0
+            report_epoch = ep == 1 or ep == cfg.epochs or ep % 5 == 0
+            if report_epoch:
                 lr = final_opt.param_groups[0]["lr"]
+                _, full_probs, full_y_true, _ = eval_model(
+                    final_model,
+                    full_eval_loader,
+                    device,
+                    thr=cfg.eval_threshold,
+                )
+                final_prediction_health = summarize_prediction_health(
+                    full_probs,
+                    full_y_true,
+                    cfg.eval_threshold,
+                )
+                elapsed = time.perf_counter() - epoch_t0
                 print(
                     f"Full-fit epoch {ep:3d}/{cfg.epochs} | loss={loss:.4f} | "
                     f"lr={lr:.2e} | elapsed={elapsed:.1f}s",
                     flush=True,
                 )
+                report_prediction_health("Full-fit", ep, final_prediction_health)
 
         model_to_save = final_model
         saved_training_scope = "full_csv_refit"
@@ -635,6 +748,23 @@ def main():
             "onecycle_final_div_factor": cfg.onecycle_final_div_factor,
             "onecycle_pct_start": cfg.onecycle_pct_start,
             "grad_clip_norm": cfg.grad_clip_norm,
+            "collapse_check_start_epoch": COLLAPSE_CHECK_START_EPOCH,
+            "collapse_class_fraction": COLLAPSE_CLASS_FRACTION,
+            "collapse_prob_std": COLLAPSE_PROB_STD,
+            "final_prediction_health": (
+                None
+                if final_prediction_health is None
+                else {
+                    "predicted_good_fraction": final_prediction_health.predicted_good_fraction,
+                    "true_good_fraction": final_prediction_health.true_good_fraction,
+                    "prob_mean": final_prediction_health.prob_mean,
+                    "prob_std": final_prediction_health.prob_std,
+                    "prob_min": final_prediction_health.prob_min,
+                    "prob_max": final_prediction_health.prob_max,
+                    "collapse_detected": final_prediction_health.collapse_detected,
+                    "collapse_reasons": list(final_prediction_health.collapse_reasons),
+                }
+            ),
             "model_type": "cnn_raw",
             "checkpoint_version": CHECKPOINT_VERSION,
             "preprocess": preprocess_meta,
