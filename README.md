@@ -78,8 +78,10 @@ Current best models
   `training_labels/tae_like_train.csv` list.
 - RF expanded-set OOF check: CM `[[1404, 43], [93, 585]]`, accuracy `0.94`,
   GOOD recall `0.86`, GOOD precision `0.93`.
-- Raw CNN expanded-set held-out check: CM `[[288, 7], [14, 115]]`,
-  accuracy `0.95`, GOOD recall `0.89`, GOOD precision `0.94`.
+- Production raw CNN held-out check: CM `[[290, 5], [8, 121]]`,
+  accuracy `0.969`, GOOD recall `0.938`, GOOD precision `0.960`, GOOD F1
+  `0.949`. The saved checkpoint was then refit on all 2,125 labels for 80
+  epochs, ending at loss `0.0008`.
 - Symmetric OneCycleLR + gradient-clipping 10-shot LOSO check:
   CNN CM `[[1402, 74], [67, 582]]`, accuracy `0.934`, GOOD recall `0.897`,
   GOOD precision `0.887`. This is now the strongest aggregate LOSO result,
@@ -87,10 +89,10 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` still defaults to the older RF-leaning fusion policy
-  chosen from four-shot LOSO checks. The expanded 10-shot LOSO check in
-  `outputs/loso_10/` shows that this combined policy is still close to RF-only
-  and slightly improves GOOD recall, while raw CNN alone is less stable across
-  held-out shots.
+  chosen from four-shot LOSO checks. The symmetric-recipe 10-shot LOSO check
+  in `outputs/loso_10_onecycle_both/` makes raw CNN the strongest aggregate
+  model, while the combined policy retains better GOOD recall on the sparse
+  NSTX-U G-case group. Fusion retuning is still pending that tradeoff.
 
 ## Classify new NSTX-U shots on Flux (no training)
 
@@ -212,8 +214,10 @@ developing or retraining models, not for routine sorting.
   routes EAE-like modes away, combines RF + CNN TAE decisions, and removes
   close-frequency duplicate TAEs. Raw, straightened, and hybrid CNN checkpoints
   are supported through the shared CNN inference path. The default fusion
-  policy is still RF-leaning from the four-shot baseline and should be
-  revalidated with the expanded RF/raw-CNN checkpoints.
+  policy is still RF-leaning from the four-shot baseline. It has been
+  revalidated with the expanded models, but threshold retuning remains pending
+  because CNN is strongest overall while fusion better protects the sparse
+  NSTX-U G-case regime.
 - Run `sort_shot.py` when you want the older single-model shot sorter and
   duplicate-removal workflow.
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)

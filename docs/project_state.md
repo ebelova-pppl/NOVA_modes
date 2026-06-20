@@ -57,9 +57,10 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Expanded 10-shot held-out accuracy: 0.95
-    -	Expanded 10-shot held-out CM: `[[288, 7], [14, 115]]`
-    -	GOOD precision/recall: 0.94 / 0.89
+    -	Expanded 10-shot held-out accuracy: 0.969
+    -	Expanded 10-shot held-out CM: `[[290, 5], [8, 121]]`
+    -	GOOD precision/recall/F1: 0.960 / 0.938 / 0.949
+    -	Production refit: all 2,125 labels, 80 epochs, final loss 0.0008
     -	Current best checked expanded-set model
 3.	CNN (straightened)
     -	Ridge-aligned representation (2M+1, r)
@@ -121,8 +122,8 @@ From cont_features.py:
 ### CNN
 -	Performance sensitive to seed + learning rate
 -	Expanded 10-shot raw-CNN check:
-- CM = `[[288, 7], [14, 115]]` → accuracy 0.95
-- GOOD precision/recall = 0.94 / 0.89
+- CM = `[[290, 5], [8, 121]]` -> accuracy 0.969
+- GOOD precision/recall/F1 = 0.960 / 0.938 / 0.949
 -	Previous four-shot TAE-like retraining used threshold 0.5 for all CNN confusion matrices
 -	All three CNNs were comparable on the previous four-shot list, with best accuracy ~0.95-0.96
 
@@ -163,8 +164,10 @@ From cont_features.py:
 •	Missing datcon handling → warn once, disable continuum features
 
 ## Current tasks
-- Revalidate the `sort_shot_mixed.py` RF/CNN policy on the old four shots and the six new NSTX-U shots.
-- Decide whether to retune the RF-leaning fusion thresholds now that expanded-set raw CNN is stronger.
+- Decide whether to retune the RF-leaning fusion thresholds: raw CNN is
+  strongest overall in expanded LOSO, but fusion better protects the sparse
+  NSTX-U G-case regime.
+- Recheck the three new G-case shots after corrected continuum files arrive.
 - Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
  
 ## Next tasks
@@ -821,3 +824,17 @@ current combined policy retains better aggregate G-case GOOD recall (`0.600`)
 than CNN alone, but suppresses some CNN gains on NSTX and E-case shots. Retune
 fusion only after deciding whether to optimize globally for GOOD recall or
 retain extra protection for the sparse G-case regime.
+
+Promoted the symmetric-recipe raw CNN to the active production checkpoint at
+`models/nova_cnn_raw.pt`. The held-out split result was:
+
+- CM `[[290, 5], [8, 121]]`
+- accuracy `0.9693`
+- GOOD precision/recall/F1 `0.9603 / 0.9380 / 0.9490`
+
+The checkpoint metadata confirms a fresh full-data refit on all 2,125 modes
+for 80 epochs using OneCycleLR with peak LR `0.02`, `div_factor=20`, 10%
+warmup, cosine annealing, and gradient clipping at norm `1.0`. Full-refit loss
+ended at `0.0008`. This replaces the earlier expanded-set raw-CNN checkpoint;
+the completed symmetric 10-shot LOSO result above remains the generalization
+check used for fusion-policy decisions.

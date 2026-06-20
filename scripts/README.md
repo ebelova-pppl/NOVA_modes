@@ -168,8 +168,10 @@ nova_run_cnn_raw --batch_size 8 --cache_data
 Expanded 10-shot TAE-like raw-CNN retraining check on
 `training_labels/tae_like_train.csv`:
 
-- `cnn_raw.py`: accuracy=0.95, CM=[[288 7][14 115]], GOOD precision=0.94,
-  GOOD recall=0.89
+- `cnn_raw.py`: accuracy=`0.9693`, CM=`[[290, 5], [8, 121]]`, GOOD
+  precision/recall/F1=`0.9603 / 0.9380 / 0.9490`
+- production refit: all 2,125 labels, 80 OneCycleLR epochs, final loss
+  `0.0008`
 
 Targeted LOSO check for held-out `nstxuE205052A01t022` with OneCycleLR and
 gradient clipping in both split training and full-data refit:
@@ -605,10 +607,10 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints are trained on the
 expanded 10-shot TAE-like list. The default RF-leaning fusion policy was chosen
-from four-shot LOSO checks. The expanded 10-shot LOSO check in
-`outputs/loso_10/` shows that the current combined policy remains close to
-RF-only and slightly improves GOOD recall, while raw CNN alone is less stable
-across held-out shots.
+from four-shot LOSO checks. The symmetric-recipe 10-shot LOSO check in
+`outputs/loso_10_onecycle_both/` makes raw CNN strongest overall. The current
+combined policy still has better GOOD recall on the sparse NSTX-U G-case group,
+so fusion-threshold retuning remains a separate decision.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
