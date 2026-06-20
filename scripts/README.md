@@ -55,12 +55,13 @@ interfaces; run each script with `-h` for all training, data-path, and
 preprocessing options. The raw CNN resamples the radial grid to `--R_target`
 before padding/cropping the raw harmonic axis to `--M_target`.
 When `--data_dir` is provided, relative mode paths in the training CSV are
-resolved relative to that directory instead of requiring `$NOVA_DATA`. It uses
-an adjustable initial `--lr` and the same fixed `ReduceLROnPlateau` scheduler
-settings as the straightened CNN. The raw CNN default `--lr` is `0.02`, chosen
-from a small sweep because it reduced false negatives for GOOD modes compared
-with `0.01`; this is preferred for NOVA-C follow-up, where keeping a possibly
-unstable mode is more important than minimizing false positives.
+resolved relative to that directory instead of requiring `$NOVA_DATA`.
+`cnn_raw.py` uses one shared OneCycleLR plus gradient-clipping recipe for both
+split training and the optional production full-data refit. The raw CNN
+default `--lr=0.02` is the OneCycle peak LR, chosen from a small sweep because
+it reduced false negatives for GOOD modes compared with `0.01`; this is
+preferred for NOVA-C follow-up, where keeping a possibly unstable mode is more
+important than minimizing false positives.
 
 For imbalanced or collapse-prone LOSO subsets, `cnn_raw.py` also accepts
 `--pos_weight`. This is the PyTorch binary-loss weight for the positive class,
@@ -71,11 +72,16 @@ force a value. The default is unweighted loss.
 By default, the CNN trainers use a stratified train split, evaluate on the
 held-out split, and save the best held-out checkpoint. For production sorting
 or apples-to-apples checks against the RF model, pass
-`--refit_full_before_save`: the script still uses the held-out split to choose
-`best_epoch`, then trains a fresh final CNN on the full labeled CSV for that
-many epochs before saving. The checkpoint records `saved_training_scope`,
-`best_test_acc`, split sizes, and whether full refit was used. Raw-CNN
-checkpoints also record `pos_weight` metadata when that option is supplied.
+`--refit_full_before_save`: `cnn_raw.py` first reports metrics from the best
+held-out checkpoint, then trains a fresh production model on the full labeled
+CSV for the configured `--epochs` using the same recipe. The default cycle
+starts at `--lr / 20`, reaches `--lr` during the first 10% of batch steps, and
+cosine-anneals to one hundredth of the initial LR. Gradient norm is clipped to
+`1.0`. Configure these with `--onecycle_div_factor`,
+`--onecycle_final_div_factor`, `--onecycle_pct_start`, and
+`--grad_clip_norm`; use `--grad_clip_norm none` (also `off` or `0`) only for
+controlled ablations. Checkpoints record the recipe, split metrics, and saved
+training scope.
 
 All three CNN training scripts seed Python, NumPy, and PyTorch from their seed
 configuration so training runs are reproducible by default.
@@ -164,6 +170,42 @@ Expanded 10-shot TAE-like raw-CNN retraining check on
 
 - `cnn_raw.py`: accuracy=0.95, CM=[[288 7][14 115]], GOOD precision=0.94,
   GOOD recall=0.89
+
+Targeted LOSO check for held-out `nstxuE205052A01t022` with OneCycleLR and
+gradient clipping in both split training and full-data refit:
+
+- nine-shot training list: `outputs/loso_10/folds/nstxuE205052A01t022/train.csv`
+- internal split best accuracy: `0.9617`, CM `[[245, 6], [8, 107]]`
+- production full-refit CNN CM on the held-out shot:
+  `[[191, 28], [1, 73]]`
+- held-out-shot accuracy: `0.9010`
+- GOOD precision/recall/F1: `0.7228 / 0.9865 / 0.8343`
+- output: `outputs/loso_onecycle_both_nstxuE205052A01t022/`
+
+Earlier controlled ablations on this fold established that clipping prevents
+the full-refit collapse, while OneCycle improves precision compared with
+constant LR. The symmetric recipe strongly favors GOOD recall on this shot
+but produces more false positives than the earlier asymmetric experiment.
+The complete LOSO result is recorded below.
+
+Completed symmetric-recipe 10-shot LOSO result:
+
+- output: `outputs/loso_10_onecycle_both/`
+- CNN CM: `[[1402, 74], [67, 582]]`
+- CNN accuracy: `0.9336`
+- CNN GOOD precision/recall/F1: `0.8872 / 0.8968 / 0.8920`
+- combined-policy CM: `[[1418, 58], [86, 563]]`
+- combined-policy accuracy: `0.9322`
+- combined-policy GOOD precision/recall/F1:
+  `0.9066 / 0.8675 / 0.8866`
+
+Compared with the previous raw-CNN LOSO run, false negatives decreased from
+140 to 67 while false positives increased only from 71 to 74. All 10
+full-data refits completed 80 epochs without collapse. CNN is now the strongest
+aggregate LOSO model by accuracy, GOOD recall, and GOOD F1. The NSTX-U G-case
+folds remain the weak group: aggregate CNN GOOD recall is `0.425` there,
+compared with `0.933` for the original NSTX shots and `0.942` for NSTX-U
+E-case shots.
 
 Previous four-shot TAE-like retraining checks used threshold 0.5 for CNN
 evaluation. Those checkpoints are archived under `models/old_4shots_models/`:

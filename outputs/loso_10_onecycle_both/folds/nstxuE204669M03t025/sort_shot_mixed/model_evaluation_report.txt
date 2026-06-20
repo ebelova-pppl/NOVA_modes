@@ -1,0 +1,64 @@
+Model evaluation against labeled TAE-side rows
+========================================================================
+shot: nstxuE204669M03t025
+label_csv: /global/u2/e/ebelova/src_nova/outputs/loso_10_onecycle_both/folds/nstxuE204669M03t025/test.csv
+cnn_checkpoint_kind: cnn_raw
+rf_cnn_eval_threshold: 0.5
+combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy
+n_label_rows_read: 217
+n_label_rows_for_shot: 217
+n_label_rows_used: 217
+n_label_rows_skipped: 0
+n_duplicate_label_keys: 0
+n_scored_rows: 217
+n_matched_scored_rows: 217
+n_unmatched_scored_rows: 0
+n_labeled_rows_not_scored: 0
+
+------------------------------------------------------------------------
+rf confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[130   2]
+ [ 17  68]]
+
+              precision    recall  f1-score   support
+
+         bad     0.8844    0.9848    0.9319       132
+        good     0.9714    0.8000    0.8774        85
+
+    accuracy                         0.9124       217
+   macro avg     0.9279    0.8924    0.9047       217
+weighted avg     0.9185    0.9124    0.9106       217
+
+
+------------------------------------------------------------------------
+cnn confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[126   6]
+ [ 10  75]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9265    0.9545    0.9403       132
+        good     0.9259    0.8824    0.9036        85
+
+    accuracy                         0.9263       217
+   macro avg     0.9262    0.9184    0.9220       217
+weighted avg     0.9263    0.9263    0.9259       217
+
+
+------------------------------------------------------------------------
+combined_policy confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[129   3]
+ [ 15  70]]
+
+              precision    recall  f1-score   support
+
+         bad     0.8958    0.9773    0.9348       132
+        good     0.9589    0.8235    0.8861        85
+
+    accuracy                         0.9171       217
+   macro avg     0.9274    0.9004    0.9104       217
+weighted avg     0.9205    0.9171    0.9157       217
+

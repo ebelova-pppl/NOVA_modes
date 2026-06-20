@@ -80,6 +80,10 @@ Current best models
   GOOD recall `0.86`, GOOD precision `0.93`.
 - Raw CNN expanded-set held-out check: CM `[[288, 7], [14, 115]]`,
   accuracy `0.95`, GOOD recall `0.89`, GOOD precision `0.94`.
+- Symmetric OneCycleLR + gradient-clipping 10-shot LOSO check:
+  CNN CM `[[1402, 74], [67, 582]]`, accuracy `0.934`, GOOD recall `0.897`,
+  GOOD precision `0.887`. This is now the strongest aggregate LOSO result,
+  although the NSTX-U G-case folds remain the weakest group.
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` still defaults to the older RF-leaning fusion policy
@@ -200,7 +204,8 @@ developing or retraining models, not for routine sorting.
   For CNN
   checkpoints intended for production sorting, use
   `--refit_full_before_save` so the saved model is trained on the full labeled
-  CSV after held-out epoch selection. If a LOSO raw-CNN run
+  CSV after held-out evaluation. Raw-CNN split training and full refit use the
+  same OneCycleLR plus gradient-clipping recipe. If a LOSO raw-CNN run
   collapses toward the majority class, try `cnn_raw.py --pos_weight auto` to
   weight missed GOOD modes by `n_bad/n_good` during training.
 - Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that

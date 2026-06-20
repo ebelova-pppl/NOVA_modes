@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-06-15)
+### Project state (current snapshot, updated 2026-06-19)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -685,3 +685,139 @@ The combined list has 523 rows, 14 `good` and 509 `bad`, stored as
 absolute paths, no duplicate paths, and no missing files under `$NOVA_DATA`.
 This list is intentionally not merged into `tae_like_train.csv`; it is for
 visual review with `viz/view_modes_csv.py` first.
+
+### 2026-06-19
+The three new G-case shots remain blocked from training-list merge while
+corrected `datcon` files are prepared. Their mode structures and continuum
+calculations used different resolutions, which can shift the inferred
+continuum-crossing location away from the corresponding mode-structure spike.
+After updated continuum files arrive, rerun the visual review and recompute
+continuum-derived metadata before merging `tae_like_3new.csv`.
+
+Changed only the fresh full-data refit stage in `scripts/cnn_raw.py` to use
+per-batch `OneCycleLR` and gradient clipping. Split training still uses
+`ReduceLROnPlateau`. Full-refit defaults are:
+
+- peak LR from `--lr` (`0.02`)
+- initial LR `0.001` (`div_factor=20`)
+- 10% warmup
+- cosine annealing to `1e-5` (`final_div_factor=100`)
+- gradient norm clipping at `1.0`
+- Adam momentum cycling disabled
+
+Reran the `nstxuE205052A01t022` LOSO fold using the exact existing nine-shot
+training split of 1832 modes. Split training reproduced best accuracy `0.9481`
+at epoch 50. The OneCycle full-refit loss decreased from `0.6269` to `0.0010`
+instead of stalling near `0.62`.
+
+Held-out sorter evaluation for the new full-refit checkpoint:
+
+- CNN CM: `[[205, 14], [3, 71]]`
+- accuracy: `0.9420`
+- GOOD precision/recall/F1: `0.8353 / 0.9595 / 0.8931`
+- previous constant `p_cnn_good=0.325527...` output is gone
+- output directory: `outputs/loso_onecycle_nstxuE205052A01t022/`
+- checkpoint/log directory:
+  `$SCRATCH/nova_s/loso_onecycle_nstxuE205052A01t022/`
+
+This validates the scheduler change on the previously failed fold only. Rerun
+the complete LOSO set before replacing the aggregate CNN/fusion-policy result.
+
+Added an explicit clipping-disabled state for the raw-CNN full refit:
+`--full_refit_grad_clip_norm none`; `off` and `0` are accepted aliases. The
+default remains gradient norm `1.0`.
+
+Reran the same `nstxuE205052A01t022` fold with identical seed, data, epoch
+selection, and OneCycle schedule, but clipping disabled. The full-refit loss
+decreased to `0.1488` by epoch 10, then jumped back to approximately `0.623`
+after the peak-LR phase and remained stalled. The checkpoint again produced a
+constant score, now `p_cnn_good=0.313810...`, with CNN CM
+`[[219, 0], [74, 0]]`.
+
+Conclusion for this controlled one-fold ablation: OneCycleLR alone did not
+prevent collapse at peak LR `0.02`; gradient clipping at norm `1.0` was the
+factor distinguishing the successful run. No-clipping output:
+`outputs/loso_onecycle_no_clip_nstxuE205052A01t022/`.
+
+Added `--full_refit_scheduler {onecycle,constant}` and ran the remaining
+constant-LR plus clipping ablation with the same fold, seed, and 50 full-refit
+epochs. Constant `0.02` plus clipping did not collapse: final loss was
+`0.0308`, and held-out CNN metrics were:
+
+- CM `[[195, 24], [4, 70]]`
+- accuracy `0.9044`
+- GOOD precision/recall/F1 `0.7447 / 0.9459 / 0.8333`
+
+This shows clipping alone is sufficient to prevent the observed collapse.
+However, OneCycle plus clipping remains better on this fold: CM
+`[[205, 14], [3, 71]]`, accuracy `0.9420`, and GOOD F1 `0.8931`. It reduced
+false positives from 24 to 14 while also missing one fewer GOOD mode. Keep
+OneCycle plus clipping as the current full-refit default; the constant option
+remains available for controlled checks. Constant-plus-clipping output:
+`outputs/loso_constant_clip_nstxuE205052A01t022/`.
+
+Final scheduler cleanup: `cnn_raw.py` now uses one shared OneCycleLR plus
+gradient-clipping recipe for both split training and the production full-data
+refit. This supersedes the earlier split-`ReduceLROnPlateau` / refit-OneCycle
+implementation and removes the constant full-refit option from the current
+CLI. Both phases use:
+
+- 80 epochs by default
+- peak LR `0.02`
+- initial LR `0.001`
+- 10% warmup and cosine annealing to `1e-5`
+- gradient norm clipping at `1.0`
+
+The split phase still retains the best held-out checkpoint for evaluation.
+When `--refit_full_before_save` is set, a fresh production model completes the
+same configured 80-epoch recipe on all labels. The checkpoint records both the
+best split epoch and the full-refit epoch count.
+
+Targeted `nstxuE205052A01t022` LOSO result with the symmetric recipe:
+
+- internal split best accuracy `0.9617` at epoch 43
+- internal split CM `[[245, 6], [8, 107]]`
+- full-refit loss ended at `0.0008`
+- held-out-shot CNN CM `[[191, 28], [1, 73]]`
+- held-out-shot accuracy `0.9010`
+- GOOD precision/recall/F1 `0.7228 / 0.9865 / 0.8343`
+- output: `outputs/loso_onecycle_both_nstxuE205052A01t022/`
+
+This version strongly favors GOOD recall but has more false positives on this
+fold than the earlier asymmetric OneCycle-refit experiment. Run the full LOSO
+set with the symmetric recipe before changing production checkpoints or fusion
+thresholds.
+
+Completed the full 10-shot LOSO run with the symmetric OneCycleLR plus
+gradient-clipping recipe in both split training and full-data refit. All 30
+RF/CNN/sorter logs ended with `returncode=0`; all ten CNN refits completed 80
+epochs, with final losses between `0.0000` and `0.0011`.
+
+Aggregate results from
+`outputs/loso_10_onecycle_both/loso_model_evaluation_totals.csv`:
+
+- CNN: CM `[[1402, 74], [67, 582]]`, accuracy `0.9336`, GOOD
+  precision/recall/F1 `0.8872 / 0.8968 / 0.8920`.
+- combined policy: CM `[[1418, 58], [86, 563]]`, accuracy `0.9322`, GOOD
+  precision/recall/F1 `0.9066 / 0.8675 / 0.8866`.
+- RF: CM `[[1426, 50], [99, 550]]`, accuracy `0.9299`, GOOD
+  precision/recall/F1 `0.9167 / 0.8475 / 0.8807`.
+
+Compared with the earlier CNN LOSO result, the symmetric recipe reduced false
+negatives from 140 to 67 while increasing false positives only from 71 to 74.
+CNN is now best overall by accuracy, GOOD recall, and GOOD F1. Since GOOD
+recall is the higher-priority metric, this supports retraining the production
+raw-CNN checkpoint with the symmetric recipe.
+
+Performance remains heterogeneous by shot group:
+
+- original NSTX: CNN CM `[[468, 15], [22, 305]]`, GOOD recall `0.933`.
+- NSTX-U E cases: CNN CM `[[344, 38], [12, 195]]`, GOOD recall `0.942`.
+- NSTX-U G cases: CNN CM `[[397, 14], [23, 17]]`, GOOD recall `0.425`.
+
+The G cases contain only 40 GOOD labels across the three held-out folds, one of
+which has no GOOD labels. Treat their per-shot recall as high variance. The
+current combined policy retains better aggregate G-case GOOD recall (`0.600`)
+than CNN alone, but suppresses some CNN gains on NSTX and E-case shots. Retune
+fusion only after deciding whether to optimize globally for GOOD recall or
+retain extra protection for the sparse G-case regime.

@@ -1,0 +1,464 @@
+Close-frequency cluster report for selected NOVA modes
+  Used parameters: rel_freq_tol=0.02  sim_tol=0.9  r_tol=0.1  width_tol=0.05
+===========================================================================
+
+n=2  cluster=3  size=2  omega_range=[5.87562, 5.94978]  d_omega/omega=0.0125422
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N2/egn02w.3540E+02
+               omega=5.94978  score=0.965000  r0=0.6061  dr=0.4810
+  Compare: egn02w.3452E+02  vs  egn02w.3540E+02  cos=0.930  dr0=0.0681  ddr=0.1308  rel_domega=0.0125  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N2/egn02w.3452E+02
+               omega=5.87562  score=0.396667  r0=0.6742  dr=0.3502
+---------------------------------------------------------------------------
+
+n=3  cluster=3  size=2  omega_range=[5.65135, 5.76313]  d_omega/omega=0.019586
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N3/egn03w.3321E+02
+               omega=5.76313  score=0.955000  r0=0.2965  dr=0.2291
+  Compare: egn03w.3194E+02  vs  egn03w.3321E+02  cos=0.251  dr0=0.3191  ddr=0.3244  rel_domega=0.0194  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N3/egn03w.3194E+02
+               omega=5.65135  score=0.270034  r0=0.6156  dr=0.5535
+---------------------------------------------------------------------------
+
+n=4  cluster=3  size=2  omega_range=[5.28347, 5.32414]  d_omega/omega=0.00766829
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N4/egn04w.2792E+02
+               omega=5.28347  score=0.958333  r0=0.6072  dr=0.4695
+  Compare: egn04w.2835E+02  vs  egn04w.2792E+02  cos=0.237  dr0=0.3539  ddr=0.1588  rel_domega=0.0077  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N4/egn04w.2835E+02
+               omega=5.32414  score=0.915000  r0=0.2533  dr=0.3107
+---------------------------------------------------------------------------
+
+n=4  cluster=4  size=2  omega_range=[5.69276, 5.7335]  d_omega/omega=0.00713076
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N4/egn04w.3287E+02
+               omega=5.7335  score=0.896667  r0=0.2663  dr=0.1690
+  Compare: egn04w.3241E+02  vs  egn04w.3287E+02  cos=0.227  dr0=0.3486  ddr=0.4808  rel_domega=0.0071  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N4/egn04w.3241E+02
+               omega=5.69276  score=0.761667  r0=0.6149  dr=0.6497
+---------------------------------------------------------------------------
+
+n=5  cluster=2  size=2  omega_range=[5.43146, 5.52937]  d_omega/omega=0.0178648
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.3057E+02
+               omega=5.52937  score=0.998333  r0=0.6592  dr=0.3192
+  Compare: egn05w.2950E+02  vs  egn05w.3057E+02  cos=0.143  dr0=0.3608  ddr=0.1064  rel_domega=0.0177  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2950E+02
+               omega=5.43146  score=0.943333  r0=0.2984  dr=0.2128
+---------------------------------------------------------------------------
+
+n=6  cluster=4  size=2  omega_range=[5.17851, 5.27849]  d_omega/omega=0.0191211
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.2786E+02
+               omega=5.27849  score=0.925000  r0=0.2455  dr=0.1976
+  Compare: egn06w.2682E+02  vs  egn06w.2786E+02  cos=0.337  dr0=0.0016  ddr=0.0176  rel_domega=0.0189  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.2682E+02
+               omega=5.17851  score=0.865000  r0=0.2438  dr=0.2151
+---------------------------------------------------------------------------
+
+n=6  cluster=9  size=2  omega_range=[5.88909, 5.96384]  d_omega/omega=0.0126122
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.3557E+02
+               omega=5.96384  score=0.990000  r0=0.5909  dr=0.3350
+  Compare: egn06w.3468E+02  vs  egn06w.3557E+02  cos=0.621  dr0=0.0918  ddr=0.0411  rel_domega=0.0125  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.3468E+02
+               omega=5.88909  score=0.963333  r0=0.6827  dr=0.2939
+---------------------------------------------------------------------------
+
+n=6  cluster=11  size=2  omega_range=[6.34349, 6.41915]  d_omega/omega=0.0118576
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.4024E+02
+               omega=6.34349  score=0.991667  r0=0.5377  dr=0.3615
+  Compare: egn06w.4121E+02  vs  egn06w.4024E+02  cos=0.146  dr0=0.1930  ddr=0.0442  rel_domega=0.0119  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.4121E+02
+               omega=6.41915  score=0.918333  r0=0.7307  dr=0.3173
+---------------------------------------------------------------------------
+
+n=6  cluster=14  size=2  omega_range=[7.20825, 7.25495]  d_omega/omega=0.00645697
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.5196E+02
+               omega=7.20825  score=0.980000  r0=0.6348  dr=0.3110
+  Compare: egn06w.5263E+02  vs  egn06w.5196E+02  cos=0.810  dr0=0.0904  ddr=0.0722  rel_domega=0.0065  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.5263E+02
+               omega=7.25495  score=0.978747  r0=0.7252  dr=0.2387
+---------------------------------------------------------------------------
+
+n=6  cluster=15  size=3  omega_range=[7.6662, 7.79201]  d_omega/omega=0.0162763
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.5877E+02
+               omega=7.6662  score=0.988333  r0=0.6802  dr=0.3184
+  Compare: egn06w.5943E+02  vs  egn06w.5877E+02  cos=0.908  dr0=0.0570  ddr=0.1029  rel_domega=0.0056  freq_close=True  same=False
+  Compare: egn06w.6072E+02  vs  egn06w.5877E+02  cos=0.511  dr0=0.0921  ddr=0.0365  rel_domega=0.0164  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.5943E+02
+               omega=7.709  score=0.988333  r0=0.7371  dr=0.2156
+  Compare: egn06w.6072E+02  vs  egn06w.5943E+02  cos=0.362  dr0=0.0351  ddr=0.1394  rel_domega=0.0108  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.6072E+02
+               omega=7.79201  score=0.888333  r0=0.7722  dr=0.3549
+---------------------------------------------------------------------------
+
+n=6  cluster=17  size=2  omega_range=[8.36402, 8.46395]  d_omega/omega=0.0118768
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.7164E+02
+               omega=8.46395  score=0.845000  r0=0.7884  dr=0.2336
+  Compare: egn06w.6996E+02  vs  egn06w.7164E+02  cos=0.628  dr0=0.0757  ddr=0.1483  rel_domega=0.0118  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.6996E+02
+               omega=8.36402  score=0.758333  r0=0.7127  dr=0.3819
+---------------------------------------------------------------------------
+
+n=7  cluster=5  size=4  omega_range=[5.37643, 5.47146]  d_omega/omega=0.0175194
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2971E+02
+               omega=5.4504  score=0.996667  r0=0.6637  dr=0.3304
+  Compare: egn07w.2994E+02  vs  egn07w.2971E+02  cos=0.048  dr0=0.3769  ddr=0.1166  rel_domega=0.0039  freq_close=True  same=False
+  Compare: egn07w.2891E+02  vs  egn07w.2971E+02  cos=0.000  dr0=0.3976  ddr=0.0902  rel_domega=0.0136  freq_close=True  same=False
+  Compare: egn07w.2912E+02  vs  egn07w.2971E+02  cos=0.337  dr0=0.1600  ddr=0.1260  rel_domega=0.0099  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2994E+02
+               omega=5.47146  score=0.955000  r0=0.2868  dr=0.2138
+  Compare: egn07w.2891E+02  vs  egn07w.2994E+02  cos=0.460  dr0=0.0207  ddr=0.0264  rel_domega=0.0174  freq_close=True  same=False
+  Compare: egn07w.2912E+02  vs  egn07w.2994E+02  cos=0.147  dr0=0.2169  ddr=0.0094  rel_domega=0.0137  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2891E+02
+               omega=5.37643  score=0.946667  r0=0.2661  dr=0.2402
+  Compare: egn07w.2912E+02  vs  egn07w.2891E+02  cos=0.132  dr0=0.2376  ddr=0.0358  rel_domega=0.0037  freq_close=True  same=False
+  type_group=4
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2912E+02
+               omega=5.39627  score=0.265000  r0=0.5037  dr=0.2044
+---------------------------------------------------------------------------
+
+n=7  cluster=6  size=2  omega_range=[5.59361, 5.64134]  d_omega/omega=0.00849667
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.3182E+02
+               omega=5.64134  score=0.986667  r0=0.6819  dr=0.2770
+  Compare: egn07w.3129E+02  vs  egn07w.3182E+02  cos=0.548  dr0=0.0625  ddr=0.1437  rel_domega=0.0085  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.3129E+02
+               omega=5.59361  score=0.923333  r0=0.6194  dr=0.4207
+---------------------------------------------------------------------------
+
+n=7  cluster=9  size=2  omega_range=[6.15374, 6.22818]  d_omega/omega=0.0120247
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.3879E+02
+               omega=6.22818  score=0.980000  r0=0.4498  dr=0.4652
+  Compare: egn07w.3787E+02  vs  egn07w.3879E+02  cos=0.568  dr0=0.0126  ddr=0.1330  rel_domega=0.0120  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.3787E+02
+               omega=6.15374  score=0.905000  r0=0.4371  dr=0.3322
+---------------------------------------------------------------------------
+
+n=7  cluster=11  size=2  omega_range=[6.56012, 6.68077]  d_omega/omega=0.0182242
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.4304E+02
+               omega=6.56012  score=0.986667  r0=0.6098  dr=0.3019
+  Compare: egn07w.4463E+02  vs  egn07w.4304E+02  cos=0.724  dr0=0.1115  ddr=0.0073  rel_domega=0.0184  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.4463E+02
+               omega=6.68077  score=0.853321  r0=0.7213  dr=0.2946
+---------------------------------------------------------------------------
+
+n=7  cluster=12  size=2  omega_range=[6.97905, 7.03562]  d_omega/omega=0.00807348
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.4871E+02
+               omega=6.97905  score=1.000000  r0=0.6820  dr=0.3004
+  Compare: egn07w.4950E+02  vs  egn07w.4871E+02  cos=0.865  dr0=0.0382  ddr=0.0134  rel_domega=0.0081  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.4950E+02
+               omega=7.03562  score=0.940000  r0=0.7202  dr=0.2870
+---------------------------------------------------------------------------
+
+n=8  cluster=3  size=3  omega_range=[5.20931, 5.30283]  d_omega/omega=0.0177923
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.2812E+02
+               omega=5.30283  score=0.998333  r0=0.6579  dr=0.2966
+  Compare: egn08w.2714E+02  vs  egn08w.2812E+02  cos=0.057  dr0=0.4213  ddr=0.0676  rel_domega=0.0176  freq_close=True  same=False
+  Compare: egn08w.2796E+02  vs  egn08w.2812E+02  cos=0.039  dr0=0.4311  ddr=0.0795  rel_domega=0.0028  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.2714E+02
+               omega=5.20931  score=0.891667  r0=0.2365  dr=0.2290
+  Compare: egn08w.2796E+02  vs  egn08w.2714E+02  cos=0.341  dr0=0.0097  ddr=0.0119  rel_domega=0.0151  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.2796E+02
+               omega=5.28785  score=0.843333  r0=0.2268  dr=0.2171
+---------------------------------------------------------------------------
+
+n=8  cluster=5  size=3  omega_range=[5.53302, 5.57872]  d_omega/omega=0.00822564
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3061E+02
+               omega=5.53302  score=1.000000  r0=0.6643  dr=0.2913
+  Compare: egn08w.3109E+02  vs  egn08w.3061E+02  cos=0.216  dr0=0.2737  ddr=0.0858  rel_domega=0.0077  freq_close=True  same=False
+  Compare: egn08w.3112E+02  vs  egn08w.3061E+02  cos=0.006  dr0=0.4152  ddr=0.1415  rel_domega=0.0083  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3109E+02
+               omega=5.57581  score=0.935000  r0=0.3906  dr=0.2055
+  Compare: egn08w.3112E+02  vs  egn08w.3109E+02  cos=0.390  dr0=0.1415  ddr=0.0556  rel_domega=0.0005  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3112E+02
+               omega=5.57872  score=0.916667  r0=0.2491  dr=0.1499
+---------------------------------------------------------------------------
+
+n=8  cluster=6  size=3  omega_range=[5.66338, 5.75027]  d_omega/omega=0.0152259
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3207E+02
+               omega=5.66338  score=0.998333  r0=0.6785  dr=0.2977
+  Compare: egn08w.3275E+02  vs  egn08w.3207E+02  cos=0.500  dr0=0.0715  ddr=0.1444  rel_domega=0.0105  freq_close=True  same=False
+  Compare: egn08w.3307E+02  vs  egn08w.3207E+02  cos=0.338  dr0=0.2598  ddr=0.0725  rel_domega=0.0153  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3275E+02
+               omega=5.72269  score=0.990000  r0=0.6071  dr=0.4420
+  Compare: egn08w.3307E+02  vs  egn08w.3275E+02  cos=0.292  dr0=0.1883  ddr=0.2168  rel_domega=0.0048  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3307E+02
+               omega=5.75027  score=0.983333  r0=0.4188  dr=0.2252
+---------------------------------------------------------------------------
+
+n=8  cluster=8  size=2  omega_range=[5.92254, 6.03792]  d_omega/omega=0.0192935
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3646E+02
+               omega=6.03792  score=1.000000  r0=0.6983  dr=0.2185
+  Compare: egn08w.3508E+02  vs  egn08w.3646E+02  cos=0.732  dr0=0.0090  ddr=0.0737  rel_domega=0.0191  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3508E+02
+               omega=5.92254  score=0.991667  r0=0.6893  dr=0.2922
+---------------------------------------------------------------------------
+
+n=8  cluster=10  size=2  omega_range=[6.33609, 6.42614]  d_omega/omega=0.0141114
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.4015E+02
+               omega=6.33609  score=0.988333  r0=0.6813  dr=0.4402
+  Compare: egn08w.4130E+02  vs  egn08w.4015E+02  cos=0.244  dr0=0.2712  ddr=0.3010  rel_domega=0.0142  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.4130E+02
+               omega=6.42614  score=0.975000  r0=0.4102  dr=0.1392
+---------------------------------------------------------------------------
+
+n=8  cluster=13  size=2  omega_range=[7.08116, 7.19881]  d_omega/omega=0.0164784
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.5014E+02
+               omega=7.08116  score=1.000000  r0=0.7197  dr=0.2016
+  Compare: egn08w.5182E+02  vs  egn08w.5014E+02  cos=0.793  dr0=0.0077  ddr=0.0761  rel_domega=0.0166  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.5182E+02
+               omega=7.19881  score=0.978333  r0=0.7274  dr=0.2778
+---------------------------------------------------------------------------
+
+n=8  cluster=14  size=2  omega_range=[7.51779, 7.55498]  d_omega/omega=0.00493464
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.5652E+02
+               omega=7.51779  score=1.000000  r0=0.7363  dr=0.2055
+  Compare: egn08w.5708E+02  vs  egn08w.5652E+02  cos=0.827  dr0=0.0029  ddr=0.0597  rel_domega=0.0049  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.5708E+02
+               omega=7.55498  score=0.980000  r0=0.7335  dr=0.2652
+---------------------------------------------------------------------------
+
+n=8  cluster=15  size=2  omega_range=[7.84954, 7.91056]  d_omega/omega=0.00774286
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.6258E+02
+               omega=7.91056  score=1.000000  r0=0.7394  dr=0.1917
+  Compare: egn08w.6162E+02  vs  egn08w.6258E+02  cos=0.800  dr0=0.0079  ddr=0.0225  rel_domega=0.0077  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.6162E+02
+               omega=7.84954  score=0.993333  r0=0.7473  dr=0.2142
+---------------------------------------------------------------------------
+
+n=8  cluster=16  size=2  omega_range=[8.26082, 8.39233]  d_omega/omega=0.0157943
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.6824E+02
+               omega=8.26082  score=0.995000  r0=0.7541  dr=0.1881
+  Compare: egn08w.7043E+02  vs  egn08w.6824E+02  cos=0.744  dr0=0.0076  ddr=0.0281  rel_domega=0.0159  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.7043E+02
+               omega=8.39233  score=0.983333  r0=0.7618  dr=0.2162
+---------------------------------------------------------------------------
+
+n=8  cluster=18  size=2  omega_range=[8.9201, 8.96814]  d_omega/omega=0.00537127
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.8043E+02
+               omega=8.96814  score=0.956667  r0=0.7687  dr=0.2090
+  Compare: egn08w.7957E+02  vs  egn08w.8043E+02  cos=0.637  dr0=0.0330  ddr=0.0146  rel_domega=0.0054  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.7957E+02
+               omega=8.9201  score=0.860000  r0=0.8017  dr=0.1944
+---------------------------------------------------------------------------
+
+n=8  cluster=21  size=2  omega_range=[10.128, 10.2409]  d_omega/omega=0.0110816
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.1049E+03
+               omega=10.2409  score=0.780000  r0=0.7659  dr=0.1805
+  Compare: egn08w.1026E+03  vs  egn08w.1049E+03  cos=0.428  dr0=0.2880  ddr=0.3703  rel_domega=0.0110  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.1026E+03
+               omega=10.128  score=0.741667  r0=0.4779  dr=0.5507
+---------------------------------------------------------------------------
+
+n=9  cluster=6  size=2  omega_range=[5.24106, 5.28745]  d_omega/omega=0.00881175
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.2747E+02
+               omega=5.24106  score=0.995000  r0=0.6770  dr=0.2428
+  Compare: egn09w.2796E+02  vs  egn09w.2747E+02  cos=0.008  dr0=0.4274  ddr=0.0034  rel_domega=0.0089  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.2796E+02
+               omega=5.28745  score=0.925000  r0=0.2496  dr=0.2463
+---------------------------------------------------------------------------
+
+n=9  cluster=7  size=3  omega_range=[5.37308, 5.40958]  d_omega/omega=0.00676991
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.2887E+02
+               omega=5.37308  score=0.990000  r0=0.6576  dr=0.2731
+  Compare: egn09w.2889E+02  vs  egn09w.2887E+02  cos=0.719  dr0=0.0113  ddr=0.0625  rel_domega=0.0003  freq_close=True  same=False
+  Compare: egn09w.2926E+02  vs  egn09w.2887E+02  cos=0.006  dr0=0.3454  ddr=0.1126  rel_domega=0.0068  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.2889E+02
+               omega=5.37467  score=0.941667  r0=0.6689  dr=0.2106
+  Compare: egn09w.2926E+02  vs  egn09w.2889E+02  cos=0.023  dr0=0.3568  ddr=0.0501  rel_domega=0.0065  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.2926E+02
+               omega=5.40958  score=0.938333  r0=0.3122  dr=0.1605
+---------------------------------------------------------------------------
+
+n=9  cluster=8  size=3  omega_range=[5.517, 5.59164]  d_omega/omega=0.0134374
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.3044E+02
+               omega=5.517  score=0.993333  r0=0.6706  dr=0.2847
+  Compare: egn09w.3127E+02  vs  egn09w.3044E+02  cos=0.607  dr0=0.0456  ddr=0.0910  rel_domega=0.0135  freq_close=True  same=False
+  Compare: egn09w.3097E+02  vs  egn09w.3044E+02  cos=0.013  dr0=0.4355  ddr=0.1164  rel_domega=0.0086  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.3127E+02
+               omega=5.59164  score=0.976667  r0=0.6250  dr=0.3757
+  Compare: egn09w.3097E+02  vs  egn09w.3127E+02  cos=0.069  dr0=0.3899  ddr=0.2073  rel_domega=0.0048  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.3097E+02
+               omega=5.56468  score=0.840000  r0=0.2351  dr=0.1684
+---------------------------------------------------------------------------
+
+n=9  cluster=9  size=3  omega_range=[5.75501, 5.83556]  d_omega/omega=0.0138988
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.3405E+02
+               omega=5.83556  score=0.996667  r0=0.6625  dr=0.2005
+  Compare: egn09w.3312E+02  vs  egn09w.3405E+02  cos=0.763  dr0=0.0092  ddr=0.0840  rel_domega=0.0138  freq_close=True  same=False
+  Compare: egn09w.3351E+02  vs  egn09w.3405E+02  cos=0.004  dr0=0.4106  ddr=0.0986  rel_domega=0.0080  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.3312E+02
+               omega=5.75501  score=0.988333  r0=0.6718  dr=0.2845
+  Compare: egn09w.3351E+02  vs  egn09w.3312E+02  cos=0.005  dr0=0.4198  ddr=0.1826  rel_domega=0.0059  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.3351E+02
+               omega=5.78873  score=0.920000  r0=0.2520  dr=0.1019
+---------------------------------------------------------------------------
+
+n=9  cluster=12  size=2  omega_range=[6.34561, 6.37208]  d_omega/omega=0.00416345
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.4060E+02
+               omega=6.37208  score=0.991666  r0=0.6866  dr=0.2377
+  Compare: egn09w.4027E+02  vs  egn09w.4060E+02  cos=0.693  dr0=0.0287  ddr=0.1489  rel_domega=0.0042  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.4027E+02
+               omega=6.34561  score=0.990000  r0=0.6579  dr=0.3866
+---------------------------------------------------------------------------
+
+n=9  cluster=13  size=2  omega_range=[6.4799, 6.5944]  d_omega/omega=0.0175147
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.4199E+02
+               omega=6.4799  score=0.986667  r0=0.4473  dr=0.1225
+  Compare: egn09w.4349E+02  vs  egn09w.4199E+02  cos=0.183  dr0=0.2638  ddr=0.1282  rel_domega=0.0177  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.4349E+02
+               omega=6.5944  score=0.797844  r0=0.7111  dr=0.2507
+---------------------------------------------------------------------------
+
+n=9  cluster=14  size=2  omega_range=[6.70489, 6.81233]  d_omega/omega=0.0158976
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.4496E+02
+               omega=6.70489  score=1.000000  r0=0.6701  dr=0.3019
+  Compare: egn09w.4641E+02  vs  egn09w.4496E+02  cos=0.762  dr0=0.0345  ddr=0.0507  rel_domega=0.0160  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.4641E+02
+               omega=6.81233  score=0.970000  r0=0.7046  dr=0.2512
+---------------------------------------------------------------------------
+
+n=9  cluster=15  size=2  omega_range=[7.08422, 7.08513]  d_omega/omega=0.000127547
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.5019E+02
+               omega=7.08422  score=0.998333  r0=0.7057  dr=0.2165
+  Compare: egn09w.5020E+02  vs  egn09w.5019E+02  cos=0.786  dr0=0.0137  ddr=0.0403  rel_domega=0.0001  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.5020E+02
+               omega=7.08513  score=0.986667  r0=0.7195  dr=0.2569
+---------------------------------------------------------------------------
+
+n=9  cluster=21  size=2  omega_range=[8.81566, 8.92242]  d_omega/omega=0.0120384
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.7772E+02
+               omega=8.81566  score=1.000000  r0=0.7485  dr=0.2207
+  Compare: egn09w.7961E+02  vs  egn09w.7772E+02  cos=0.569  dr0=0.0462  ddr=0.0402  rel_domega=0.0121  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N9/egn09w.7961E+02
+               omega=8.92242  score=0.913323  r0=0.7947  dr=0.1805
+---------------------------------------------------------------------------
+
+n=10  cluster=3  size=2  omega_range=[5.10046, 5.1995]  d_omega/omega=0.0192305
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.2601E+02
+               omega=5.10046  score=0.985000  r0=0.6560  dr=0.2956
+    [DROP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.2703E+02
+               omega=5.1995  score=0.981667  r0=0.6561  dr=0.2681
+  Compare: egn10w.2703E+02  vs  egn10w.2601E+02  cos=0.908  dr0=0.0001  ddr=0.0275  rel_domega=0.0194  freq_close=True  same=True
+---------------------------------------------------------------------------
+
+n=10  cluster=4  size=3  omega_range=[5.21864, 5.32168]  d_omega/omega=0.019553
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.2832E+02
+               omega=5.32168  score=0.898333  r0=0.2508  dr=0.1844
+  Compare: egn10w.2723E+02  vs  egn10w.2832E+02  cos=0.118  dr0=0.1355  ddr=0.1038  rel_domega=0.0194  freq_close=True  same=False
+  Compare: egn10w.2742E+02  vs  egn10w.2832E+02  cos=0.319  dr0=0.0038  ddr=0.0226  rel_domega=0.0160  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.2723E+02
+               omega=5.21864  score=0.816667  r0=0.1154  dr=0.0806
+  Compare: egn10w.2742E+02  vs  egn10w.2723E+02  cos=0.152  dr0=0.1316  ddr=0.1264  rel_domega=0.0034  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.2742E+02
+               omega=5.23634  score=0.313333  r0=0.2470  dr=0.2070
+---------------------------------------------------------------------------
+
+n=10  cluster=6  size=2  omega_range=[5.48498, 5.56936]  d_omega/omega=0.0152675
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.3102E+02
+               omega=5.56936  score=0.990000  r0=0.6546  dr=0.2561
+  Compare: egn10w.3008E+02  vs  egn10w.3102E+02  cos=0.006  dr0=0.4502  ddr=0.0959  rel_domega=0.0152  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.3008E+02
+               omega=5.48498  score=0.820000  r0=0.2044  dr=0.1602
+---------------------------------------------------------------------------
+
+n=10  cluster=7  size=2  omega_range=[5.62901, 5.69628]  d_omega/omega=0.0118792
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.3245E+02
+               omega=5.69628  score=0.990000  r0=0.6840  dr=0.2734
+  Compare: egn10w.3169E+02  vs  egn10w.3245E+02  cos=0.023  dr0=0.4178  ddr=0.1274  rel_domega=0.0118  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.3169E+02
+               omega=5.62901  score=0.923333  r0=0.2662  dr=0.1460
+---------------------------------------------------------------------------
+
+n=10  cluster=8  size=2  omega_range=[5.80977, 5.9091]  d_omega/omega=0.0169526
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.3492E+02
+               omega=5.9091  score=0.983333  r0=0.6813  dr=0.2786
+  Compare: egn10w.3375E+02  vs  egn10w.3492E+02  cos=0.013  dr0=0.4207  ddr=0.1753  rel_domega=0.0168  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstx_135388/N10/egn10w.3375E+02
+               omega=5.80977  score=0.923333  r0=0.2607  dr=0.1033
+---------------------------------------------------------------------------
+

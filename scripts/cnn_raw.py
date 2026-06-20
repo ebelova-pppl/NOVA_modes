@@ -176,7 +176,16 @@ class SmallCNN(nn.Module):
         return x
 
 
-def train_epoch(model, loader, opt, device, pos_weight: float | None = None):
+def train_epoch(
+    model,
+    loader,
+    opt,
+    device,
+    pos_weight: float | None = None,
+    *,
+    batch_scheduler=None,
+    grad_clip_norm: float | None = None,
+):
     model.train()
     pos_weight_tensor = None
     if pos_weight is not None:
@@ -192,7 +201,11 @@ def train_epoch(model, loader, opt, device, pos_weight: float | None = None):
         logits = model(x)
         loss = loss_fn(logits, y)
         loss.backward()
+        if grad_clip_norm is not None:
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip_norm)
         opt.step()
+        if batch_scheduler is not None:
+            batch_scheduler.step()
 
         total += float(loss.item()) * x.size(0)
         n += x.size(0)
@@ -239,6 +252,28 @@ class Config:
     device: str | None = None
     cache_data: bool = False
     refit_full_before_save: bool = False
+    onecycle_div_factor: float = 20.0
+    onecycle_final_div_factor: float = 100.0
+    onecycle_pct_start: float = 0.1
+    grad_clip_norm: float | None = 1.0
+
+
+def parse_optional_positive_float(value: str) -> float | None:
+    normalized = value.strip().lower()
+    if normalized in {"none", "off", "false", "0"}:
+        return None
+
+    try:
+        parsed = float(normalized)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "expected a positive number or one of: none, off, 0"
+        ) from exc
+    if parsed <= 0.0:
+        raise argparse.ArgumentTypeError(
+            "expected a positive number or one of: none, off, 0"
+        )
+    return parsed
 
 
 def parse_args() -> Config:
@@ -262,8 +297,18 @@ def parse_args() -> Config:
     ap.add_argument("--test_frac", type=float, default=0.2, help="Stratified test fraction")
     ap.add_argument("--seed", type=int, default=42, help="Random seed for split and training")
     ap.add_argument("--batch_size", type=int, default=32, help="Training batch size")
-    ap.add_argument("--epochs", type=int, default=80, help="Number of training epochs")
-    ap.add_argument("--lr", type=float, default=2e-2, help="Initial Adam learning rate")
+    ap.add_argument(
+        "--epochs",
+        type=int,
+        default=80,
+        help="Number of epochs for split training and optional full-data refit",
+    )
+    ap.add_argument(
+        "--lr",
+        type=float,
+        default=2e-2,
+        help="Peak OneCycleLR learning rate for split training and full-data refit",
+    )
     ap.add_argument(
         "--pos_weight",
         default=None,
@@ -302,9 +347,39 @@ def parse_args() -> Config:
         action="store_true",
         help=(
             "After selecting best_epoch on the held-out split, train a fresh "
-            "model on the full labeled CSV for best_epoch epochs and save that "
-            "full-data model. Held-out metrics are still printed from the "
-            "initial split model."
+            "model on the full labeled CSV using the same OneCycle/clipping "
+            "recipe for --epochs epochs, then save that full-data model. "
+            "Held-out metrics still come from the best split-training checkpoint."
+        ),
+    )
+    ap.add_argument(
+        "--onecycle_div_factor",
+        type=float,
+        default=20.0,
+        help=(
+            "OneCycleLR initial divisor: initial_lr = --lr / value "
+            "(default: 20, so --lr 0.02 starts at 0.001)"
+        ),
+    )
+    ap.add_argument(
+        "--onecycle_final_div_factor",
+        type=float,
+        default=100.0,
+        help="OneCycleLR final divisor relative to initial_lr (default: 100)",
+    )
+    ap.add_argument(
+        "--onecycle_pct_start",
+        type=float,
+        default=0.1,
+        help="Fraction of training steps spent increasing LR to --lr (default: 0.1)",
+    )
+    ap.add_argument(
+        "--grad_clip_norm",
+        type=parse_optional_positive_float,
+        default=1.0,
+        help=(
+            "Maximum gradient norm during split training and full refit (default: 1.0). "
+            "Use none, off, or 0 to disable clipping."
         ),
     )
     return Config(**vars(ap.parse_args()))
@@ -332,9 +407,49 @@ def resolve_pos_weight(spec: str | None, items: list[dict[str, Any]], label: str
     return weight
 
 
+def build_onecycle_training(
+    model: nn.Module,
+    loader: DataLoader,
+    cfg: Config,
+) -> tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.OneCycleLR]:
+    initial_lr = cfg.lr / cfg.onecycle_div_factor
+    optimizer = torch.optim.Adam(model.parameters(), lr=initial_lr)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(
+        optimizer,
+        max_lr=cfg.lr,
+        epochs=cfg.epochs,
+        steps_per_epoch=len(loader),
+        pct_start=cfg.onecycle_pct_start,
+        anneal_strategy="cos",
+        div_factor=cfg.onecycle_div_factor,
+        final_div_factor=cfg.onecycle_final_div_factor,
+        cycle_momentum=False,
+    )
+    return optimizer, scheduler
+
+
+def describe_training_recipe(cfg: Config) -> str:
+    initial_lr = cfg.lr / cfg.onecycle_div_factor
+    final_lr = initial_lr / cfg.onecycle_final_div_factor
+    grad_clip = "disabled" if cfg.grad_clip_norm is None else f"{cfg.grad_clip_norm:.3g}"
+    return (
+        f"OneCycleLR initial_lr={initial_lr:.3g}, max_lr={cfg.lr:.3g}, "
+        f"pct_start={cfg.onecycle_pct_start:.3g}, final_lr={final_lr:.3g}, "
+        f"grad_clip_norm={grad_clip}"
+    )
+
+
 def main():
     cfg = parse_args()
 
+    if cfg.lr <= 0.0:
+        raise ValueError("--lr must be positive")
+    if cfg.onecycle_div_factor <= 0.0:
+        raise ValueError("--onecycle_div_factor must be positive")
+    if cfg.onecycle_final_div_factor <= 0.0:
+        raise ValueError("--onecycle_final_div_factor must be positive")
+    if not 0.0 < cfg.onecycle_pct_start < 1.0:
+        raise ValueError("--onecycle_pct_start must be between 0 and 1")
     seed_everything(cfg.seed)
 
     items = read_train_csv(cfg.train_csv, data_root=cfg.data_dir)
@@ -345,6 +460,7 @@ def main():
     print(f"Data dir: {cfg.data_dir or '$NOVA_DATA'}")
     print(f"Total modes: {len(items)} | Train: {len(train_items)} | Test: {len(test_items)}")
     print(f"Raw preprocessing: R_target={cfg.R_target}, M_target={cfg.M_target}")
+    print(f"Training recipe: {describe_training_recipe(cfg)}")
     if train_pos_weight is None:
         print("Loss pos_weight: none")
     else:
@@ -372,10 +488,7 @@ def main():
     print_torch_device_report(device)
 
     model = SmallCNN(in_ch=1).to(device)
-    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr)
-    sched = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        opt, mode="max", factor=0.5, patience=5, min_lr=1e-5
-    )
+    opt, sched = build_onecycle_training(model, train_loader, cfg)
 
     best_acc = -1.0
     best_epoch = 0
@@ -383,9 +496,16 @@ def main():
 
     for ep in range(1, cfg.epochs + 1):
         epoch_t0 = time.perf_counter()
-        loss = train_epoch(model, train_loader, opt, device, pos_weight=train_pos_weight)
+        loss = train_epoch(
+            model,
+            train_loader,
+            opt,
+            device,
+            pos_weight=train_pos_weight,
+            batch_scheduler=sched,
+            grad_clip_norm=cfg.grad_clip_norm,
+        )
         acc, probs, y_true, _ = eval_model(model, test_loader, device, thr=cfg.eval_threshold)
-        sched.step(acc)
 
         if acc > best_acc:
             best_acc = acc
@@ -447,9 +567,10 @@ def main():
         final_pos_weight = resolve_pos_weight(cfg.pos_weight, items, "full CSV refit")
         print(
             f"\nRefitting final raw CNN on all {len(items)} labeled modes "
-            f"for {best_epoch} epochs before saving.",
+            f"for {cfg.epochs} epochs before saving.",
             flush=True,
         )
+        print(f"Full-fit recipe: {describe_training_recipe(cfg)}", flush=True)
         if final_pos_weight is not None:
             print(f"Full-fit loss pos_weight: {final_pos_weight:.6g} (positive class = good)")
         full_ds = NovaModeDataset(
@@ -462,22 +583,31 @@ def main():
         seed_everything(cfg.seed)
         full_loader = DataLoader(full_ds, batch_size=cfg.batch_size, shuffle=True, num_workers=0)
         final_model = SmallCNN(in_ch=1).to(device)
-        final_opt = torch.optim.Adam(final_model.parameters(), lr=cfg.lr)
+        final_opt, final_sched = build_onecycle_training(final_model, full_loader, cfg)
 
-        for ep in range(1, best_epoch + 1):
+        for ep in range(1, cfg.epochs + 1):
             epoch_t0 = time.perf_counter()
-            loss = train_epoch(final_model, full_loader, final_opt, device, pos_weight=final_pos_weight)
-            if ep == 1 or ep == best_epoch or ep % 5 == 0:
+            loss = train_epoch(
+                final_model,
+                full_loader,
+                final_opt,
+                device,
+                pos_weight=final_pos_weight,
+                batch_scheduler=final_sched,
+                grad_clip_norm=cfg.grad_clip_norm,
+            )
+            if ep == 1 or ep == cfg.epochs or ep % 5 == 0:
                 elapsed = time.perf_counter() - epoch_t0
+                lr = final_opt.param_groups[0]["lr"]
                 print(
-                    f"Full-fit epoch {ep:3d}/{best_epoch} | loss={loss:.4f} | "
-                    f"elapsed={elapsed:.1f}s",
+                    f"Full-fit epoch {ep:3d}/{cfg.epochs} | loss={loss:.4f} | "
+                    f"lr={lr:.2e} | elapsed={elapsed:.1f}s",
                     flush=True,
                 )
 
         model_to_save = final_model
         saved_training_scope = "full_csv_refit"
-        final_train_epochs = best_epoch
+        final_train_epochs = cfg.epochs
         final_train_size = len(items)
 
     torch.save(
@@ -499,6 +629,12 @@ def main():
             "saved_training_scope": saved_training_scope,
             "final_train_epochs": final_train_epochs,
             "final_train_size": final_train_size,
+            "training_scheduler": "onecycle",
+            "onecycle_max_lr": cfg.lr,
+            "onecycle_div_factor": cfg.onecycle_div_factor,
+            "onecycle_final_div_factor": cfg.onecycle_final_div_factor,
+            "onecycle_pct_start": cfg.onecycle_pct_start,
+            "grad_clip_norm": cfg.grad_clip_norm,
             "model_type": "cnn_raw",
             "checkpoint_version": CHECKPOINT_VERSION,
             "preprocess": preprocess_meta,

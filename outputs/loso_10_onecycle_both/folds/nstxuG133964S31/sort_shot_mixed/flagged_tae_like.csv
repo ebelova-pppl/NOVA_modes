@@ -1,0 +1,2 @@
+path,shot,n,ntor,nr,nhar,omega,gamma_d,status,gap_region,signed_delta,fraction_below_upper2,p_rf_good,p_cnn_good,p_avg,final_label,tier,model_disagreement,near_threshold,large_score_gap,selected_final,rejection_reason,error_message
+/global/cfs/cdirs/m314/nova2/data/nstxuG133964S31/N6/egn06w.9560E+01,nstxuG133964S31,6,6,201,101,3.091920727801179,-0.00028476567078299043,scored,tae_like,0.9992151525399467,1.0,0.06666666666666667,0.9950330257415771,0.5308498462041219,bad,flagged_borderline_or_disagreement,True,False,True,,,
