@@ -926,3 +926,12 @@ the largest peak-normalized radial mode energy.
 Archived the unused one-off `utils/debug_mode.py` as
 `legacy/debug_mode.py`; it relied on a hardcoded path and did not track the
 current RF schema metadata.
+
+### 2026-06-21
+
+Changed `scripts/label_modes_fast.py` to plot all `nhar` poloidal harmonics by
+default instead of silently limiting the mode-structure panel to the strongest
+20. This avoids hiding weaker edge harmonics near continuum crossings. The new
+optional `--max-harmonics N` argument restores an explicit strongest-`N` cap
+for crowded plots. Startup output describes the active policy, and each plot
+title reports the exact `plotted/total` harmonic count.

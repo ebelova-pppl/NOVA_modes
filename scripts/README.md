@@ -499,6 +499,17 @@ where `dir_name` is something like `nstx_20113/N1`. Relative directories are
 resolved under `--data_dir` or `$NOVA_DATA`; absolute directories are used
 directly.
 
+The mode-structure panel plots all poloidal harmonics stored in each mode file
+by default, and its title reports `plotted/total`. To reduce visual crowding,
+use `--max-harmonics N`; this keeps the strongest `N` harmonics ranked by
+`max_r |xi_m|`:
+
+```bash
+python label_modes_fast.py nstx_135388/N5 \
+  --data_dir "$NOVA_DATA" \
+  --max-harmonics 80
+```
+
 For another device or a local data copy where the NSTX-U RF model is not
 applicable, disable RF guidance:
 

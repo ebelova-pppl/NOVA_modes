@@ -269,7 +269,7 @@ class Config:
 
     # plotting choices
     use_abs: bool = False          # if True, plot |mode| instead of signed
-    max_lines: Optional[int] = 30  # None = plot all m; else plot strongest N m-lines only
+    max_lines: Optional[int] = None  # None = plot all m; else strongest N only
     r_is_uniform_0_1: bool = True  # r = linspace(0,1,nr)
     show_m_spectrum: bool = True   # add a small 2nd panel
 
@@ -366,6 +366,15 @@ def main():
         help="Glob pattern for mode files inside mode_dir (default: egn*)"
     )
     parser.add_argument(
+        "--max-harmonics",
+        type=int,
+        default=None,
+        help=(
+            "Plot only the strongest N poloidal harmonics by max|xi_m|. "
+            "By default, plot all harmonics stored in each mode file."
+        ),
+    )
+    parser.add_argument(
         "--rf-model",
         default="nova_mode_classifier.joblib",
         help="Random Forest model path used for optional guidance (default: nova_mode_classifier.joblib)"
@@ -376,6 +385,8 @@ def main():
         help="Disable Random Forest evaluation/display."
     )
     args = parser.parse_args()
+    if args.max_harmonics is not None and args.max_harmonics <= 0:
+        parser.error("--max-harmonics must be a positive integer")
 
     cfg = Config(
         data_dir=args.data_dir,
@@ -384,6 +395,7 @@ def main():
         mode_list=args.mode_list,
         use_rf=not args.no_rf,
         rf_model=args.rf_model,
+        max_lines=args.max_harmonics,
     )
 
     try:
@@ -434,6 +446,10 @@ def main():
     if cfg.mode_list:
         print(f"Mode list:       {Path(cfg.mode_list).expanduser()}")
     print(f"Output CSV:      {Path(cfg.out_csv).expanduser()}")
+    if cfg.max_lines is None:
+        print("Harmonics plot:  all harmonics stored in each mode file")
+    else:
+        print(f"Harmonics plot:  strongest {cfg.max_lines} harmonics per mode")
     print(
         f"Found {len(files)} files; already labeled {labeled_in_scope}; "
         f"remaining {len(files_to_do)}"
@@ -497,13 +513,15 @@ def main():
             except Exception as exc:
                 print(f"WARNING: RF evaluation failed for {path}: {exc}")
 
-        title = (f"{base}  n={ntor}  omega={omega:.4g}  g_d={gamma_d:.3g}  "
-                 f"{rf_text}  "
-                 #f"shape=({nhar},{nr})   "
-                 f"[g/b/s, u=undo, q=quit]")
+        harmonics_plotted = (
+            nhar if cfg.max_lines is None else min(cfg.max_lines, nhar)
+        )
+        title = (
+            f"{base}  n={ntor}  omega={omega:.4g}  g_d={gamma_d:.3g}  "
+            f"{rf_text}  [g/b/s, u=undo, q=quit]\n"
+            f"Poloidal harmonics plotted: {harmonics_plotted}/{nhar}"
+        )
 
-
-        #plot_all_harmonics_1d(ax1, mode, r, use_abs=cfg.use_abs, max_lines=cfg.max_lines)
         r_star, r_star_max = get_continuum_markers_for_mode(
             path, mode, omega
         )
@@ -513,7 +531,7 @@ def main():
             mode,
             r,
             use_abs=True,
-            max_lines=20,
+            max_lines=cfg.max_lines,
             r_star=r_star,
             r_star_max=r_star_max,
         )
