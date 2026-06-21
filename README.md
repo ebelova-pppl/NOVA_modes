@@ -64,7 +64,8 @@ Data format summary
 - derived features include:
     - radial centroid r0
     - quantile width dr (10–90% energy span)
-    - continuum interaction metrics (delta2_eff, S, W_star, r_star)
+    - continuum interaction metrics (delta2_eff, S, W_star, r_star,
+      W_star_max)
 
 Model families
 - `scripts/rf_train_classify.py` - Random Forest classifier using engineered scalar features (mode structure + continuum-related quantities)
@@ -76,8 +77,8 @@ Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. They were retrained on the 10-shot
   `training_labels/tae_like_train.csv` list.
-- RF expanded-set OOF check: CM `[[1404, 43], [93, 585]]`, accuracy `0.94`,
-  GOOD recall `0.86`, GOOD precision `0.93`.
+- RF expanded-set OOF check: CM `[[1447, 29], [64, 585]]`, accuracy `0.956`,
+  GOOD recall `0.901`, GOOD precision `0.953`, GOOD F1 `0.926`.
 - Production raw CNN held-out check: CM `[[290, 5], [8, 121]]`,
   accuracy `0.969`, GOOD recall `0.938`, GOOD precision `0.960`, GOOD F1
   `0.949`. The saved checkpoint was then refit on all 2,125 labels for 80

@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-06-19)
+### Project state (current snapshot, updated 2026-06-21)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -48,11 +48,12 @@ Notes:
 
 ## Models (current)
 1.	RF (Random Forest)
-    -	Scalar + structure-derived + continuum features (~20)
+    -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Expanded 10-shot OOF accuracy: 0.94
-    -	Expanded 10-shot OOF CM: `[[1404, 43], [93, 585]]`
-    -	GOOD precision/recall: 0.93 / 0.86
+    -	Current schema: previous RF features minus `omega`, plus `W_star_max`
+    -	Expanded 10-shot OOF accuracy: 0.956
+    -	Expanded 10-shot OOF CM: `[[1447, 29], [64, 585]]`
+    -	GOOD precision/recall/F1: 0.953 / 0.901 / 0.926
     -	Most interpretable baseline
 2.	CNN (raw)
     -	Padded/truncated (m,r)
@@ -77,6 +78,8 @@ From cont_features.py:
 -	delta2_eff — mode-weighted distance to continuum
 -	S — normalized separation between r0 and r_star
 -	W_star — mode energy near resonance
+-	W_star_max — largest peak-normalized mode energy at an interpolated
+  lower/upper continuum-boundary crossing
 
 ## Current scripts
 ### Common
@@ -116,8 +119,8 @@ From cont_features.py:
 ## Evaluation protocol
 ### RF
 -	Expanded 10-shot OOF check:
-- CM = `[[1404, 43], [93, 585]]` → accuracy 0.94
-- GOOD precision/recall = 0.93 / 0.86
+- CM = `[[1447, 29], [64, 585]]` → accuracy 0.956
+- GOOD precision/recall/F1 = 0.953 / 0.901 / 0.926
 -	Used for label validation with OOF suspect lists
 ### CNN
 -	Performance sensitive to seed + learning rate
@@ -852,3 +855,74 @@ The full refit uses a non-shuffled evaluation loader for these checks. Its
 final diagnostics and collapse status are saved as
 `final_prediction_health` in the checkpoint, preventing another stalled model
 from looking healthy solely because the training loop completed.
+
+### 2026-06-20
+
+Added an RF experiment for continuum-boundary-crossing features.
+
+- `src/cont_features.py` now detects lower/upper boundary crossings without
+  bridging NaN gaps, linearly interpolates crossing radius and peak-normalized
+  radial mode energy, handles exact-zero runs once at their midpoint, and
+  exposes diagnostic crossing records.
+- The experimental schema appends seven deterministic features:
+  `n_cross`, `r_star_max`, `W_star_max`, `W_star_sum`,
+  `r_star_high_shear`, `W_star_high_shear`, and
+  `W_star_high_shear_sum`.
+- `src/mode_features.py` owns the canonical production 22-feature schema and
+  the optional 28-feature all-crossings schema.
+- `scripts/rf_train_classify.py` and `scripts/rf_oof_check.py` accept
+  `--crossing-features` and `--r_shear0`. Experimental model and bundle names
+  are separate, and the trainer refuses to replace
+  `models/nova_mode_classifier.joblib` with a 28-feature model.
+- Experimental checkpoints remain plain sklearn pipelines and store schema
+  version, feature names, crossing-feature state, and `r_shear0` metadata.
+- Added standard-library unit tests for interpolated and multiple crossings,
+  exact-grid and zero-run behavior, NaN gaps, no-crossing defaults, tie
+  handling, malformed shapes, 22/29 feature order, and active-checkpoint
+  compatibility.
+
+Real-data checks on the current 2,125-label list used the same shuffled
+five-fold OOF splits and active RF pipeline template:
+
+- legacy 22 features: CM `[[1448, 28], [71, 578]]`, accuracy `0.9534`,
+  GOOD precision/recall/F1 `0.9538 / 0.8906 / 0.9211`
+- all seven crossing features: CM `[[1442, 34], [72, 577]]`, accuracy `0.9501`,
+  GOOD precision/recall/F1 `0.9444 / 0.8891 / 0.9159`
+
+The full seven-feature bundle therefore does not improve aggregate OOF and
+should not be promoted as-is. It helped some NSTX-U folds, including reducing
+false negatives from 7 to 4 for `nstxu_204202`, but degraded several NSTX and
+G-case folds. In a full experimental fit, `W_star_sum` and `W_star_max` ranked
+third and fourth in RF importance, so the crossing signal itself is useful
+even though the full bundle adds too much redundancy/noise.
+
+A same-fold ablation found that adding only `W_star_max` improved the legacy
+schema. Removing raw `omega` at the same time improved it further:
+
+- previous 22 features: CM `[[1448, 28], [71, 578]]`, accuracy `0.9534`,
+  GOOD precision/recall/F1 `0.9538 / 0.8906 / 0.9211`
+- previous features plus `W_star_max`, minus `omega`:
+  CM `[[1447, 29], [64, 585]]`, accuracy `0.9562`,
+  GOOD precision/recall/F1 `0.9528 / 0.9014 / 0.9264`
+
+Several additional crossing-based continuum features were tested, including
+outer-crossing/high-shear variants. These did not improve OOF performance and
+were strongly correlated with `W_star_max`. Replacing legacy `W_star` with
+`W_star_max` also performed worse; the two features carry complementary
+normalizations and should both be retained.
+
+The best RF configuration retained the legacy features, removed `omega`, and
+added only `W_star_max`. This 22-feature schema is now
+`rf_w_star_max_22_v2`. The active
+`models/nova_mode_classifier.joblib` and
+`nova_mode_classifier_bundle.joblib` were retrained on all 2,125 labels with
+this schema. The broader crossing calculations remain available for
+experiments and plotting but are not production RF inputs.
+
+`viz/view_modes_csv.py` and `scripts/label_modes_fast.py` now display both the
+legacy closest-approach `r_star` and `r_star_max`, the boundary crossing with
+the largest peak-normalized radial mode energy.
+
+Archived the unused one-off `utils/debug_mode.py` as
+`legacy/debug_mode.py`; it relied on a hardcoded path and did not track the
+current RF schema metadata.

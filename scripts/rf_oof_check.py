@@ -11,7 +11,11 @@ import joblib
 
 from mode_csv import read_mode_csv_entries
 from nova_mode_loader import load_mode_from_nova      # returns (mode, omega, gamma_d, ntor)
-from mode_features import compute_features_for_mode   # includes full extra_info dict
+from mode_features import (
+    compute_features_for_mode,
+    get_feature_names,
+    get_feature_schema_version,
+)
 
 
 def read_train_csv(csv_path: str):
@@ -26,9 +30,12 @@ def read_train_csv(csv_path: str):
     return paths, np.asarray(y, dtype=int)
 
 
-def build_X(paths):
+def build_X(
+    paths,
+    include_crossing_features=False,
+    r_shear0=0.2,
+):
     X = []
-    bad = 0
     for p in paths:
         try:
             mode, omega, gamma_d, ntor = load_mode_from_nova(p)
@@ -38,10 +45,14 @@ def build_X(paths):
                 "gamma_d": float(gamma_d),
                 "ntor": int(round(float(ntor))),
             }
-            feats = compute_features_for_mode(mode, extra_info=extra).astype(float)
+            feats = compute_features_for_mode(
+                mode,
+                extra_info=extra,
+                include_crossing_features=include_crossing_features,
+                r_shear0=r_shear0,
+            ).astype(float)
             X.append(feats)
         except Exception as e:
-            bad += 1
             raise RuntimeError(f"Failed building features for {p}: {e}") from e
 
     X = np.asarray(X, dtype=float)
@@ -118,7 +129,23 @@ def main():
     ap.add_argument("--thr_high", type=float, default=0.8, help="suspect if manual=bad and p>thr_high")
     ap.add_argument("--out_oof", default="oof_table.csv")
     ap.add_argument("--out_suspects", default="oof_suspects.csv")
+    ap.add_argument(
+        "--crossing-features",
+        action="store_true",
+        help=(
+            "Use the experimental 28-feature schema with all crossing features. "
+            "The production schema already includes W_star_max."
+        ),
+    )
+    ap.add_argument(
+        "--r_shear0",
+        type=float,
+        default=0.2,
+        help="Radial offset for the experimental shear proxy (default: 0.2).",
+    )
     args = ap.parse_args()
+    if not np.isfinite(args.r_shear0):
+        raise ValueError(f"--r_shear0 must be finite, got {args.r_shear0}")
 
     paths, y = read_train_csv(args.train_csv)
     print(f"Loaded labels: {len(paths)} modes  (good={int(y.sum())}, bad={len(y)-int(y.sum())})")
@@ -127,8 +154,22 @@ def main():
     clf = joblib.load(args.model_in)
     print(f"Loaded model template: {args.model_in}")
 
-    X = build_X(paths)
-    print("Built X:", X.shape)
+    X = build_X(
+        paths,
+        include_crossing_features=args.crossing_features,
+        r_shear0=args.r_shear0,
+    )
+    feature_names = get_feature_names(args.crossing_features)
+    if len(feature_names) != X.shape[1]:
+        raise ValueError(
+            f"Feature-name count {len(feature_names)} does not match "
+            f"feature matrix width {X.shape[1]}"
+        )
+    print(
+        "Built X:",
+        X.shape,
+        f"schema={get_feature_schema_version(args.crossing_features)}",
+    )
 
     p_oof = oof_predict_proba(clf, X, y, n_splits=args.splits, seed=args.seed)
 

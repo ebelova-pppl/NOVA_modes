@@ -17,7 +17,11 @@ if SRC_DIR.is_dir() and str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from mode_csv import read_mode_csv_entries
-from cont_features import load_datcon_for_mode, continuum_scalars
+from cont_features import (
+    continuum_crossing_features,
+    continuum_scalars,
+    load_datcon_for_mode,
+)
 
 
 plt.ion()
@@ -54,9 +58,16 @@ def load_mode_from_nova(path: str):
 # =========================
 # get continuum info
 # =========================
-def get_r_star_for_mode(mode_path: str, mode: np.ndarray, omega: float):
+def get_continuum_markers_for_mode(
+    mode_path: str,
+    mode: np.ndarray,
+    omega: float,
+) -> Tuple[Optional[float], Optional[float]]:
     """
-    Returns r_star in [0,1] or None if continuum unavailable.
+    Return (r_star, r_star_max) or (None, None) if continuum is unavailable.
+
+    r_star is the legacy closest-approach location. r_star_max is the
+    continuum-boundary crossing with the largest peak-normalized mode energy.
     """
     n_r = mode.shape[1]
     r = np.linspace(0.0, 1.0, n_r)
@@ -65,9 +76,17 @@ def get_r_star_for_mode(mode_path: str, mode: np.ndarray, omega: float):
         low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)
         cont = continuum_scalars(mode, omega, low2, high2, r=r)
         r_star = float(cont["r_star"])
-        return r_star
+        crossing = continuum_crossing_features(
+            mode, omega, low2, high2, r=r
+        )
+        r_star_max = (
+            float(crossing["r_star_max"])
+            if crossing["n_cross"] > 0
+            else None
+        )
+        return r_star, r_star_max
     except Exception:
-        return None
+        return None, None
 
 # =========================
 # CSV helpers (resume-friendly)
@@ -94,7 +113,8 @@ def append_label(csv_path: str, path: str, label: str):
 # =========================
 def plot_all_harmonics_1d(ax, mode: np.ndarray, r: np.ndarray, use_abs: bool,
                           max_lines: Optional[int] = None,
-                          r_star: Optional[float] = None):
+                          r_star: Optional[float] = None,
+                          r_star_max: Optional[float] = None):
     """
     Overlays xi_m(r) for all m on one axis.
     If max_lines is set, plots only the strongest harmonics (by max|xi_m|).
@@ -113,6 +133,7 @@ def plot_all_harmonics_1d(ax, mode: np.ndarray, r: np.ndarray, use_abs: bool,
         ax.plot(r, y[mi, :], linewidth=1.0, alpha=0.9)
 
     # Mark nearest continuum location if provided
+    has_continuum_marker = False
     if r_star is not None and np.isfinite(r_star):
         ax.axvline(
             r_star,
@@ -120,20 +141,28 @@ def plot_all_harmonics_1d(ax, mode: np.ndarray, r: np.ndarray, use_abs: bool,
             linestyle="--",
             linewidth=1.5,
             alpha=0.8,
-            zorder=5
+            zorder=5,
+            label=r"$R^\ast$",
         )
-        ax.text(
-            r_star, -0.01,
-            r"$R^\ast$",
-            transform=ax.get_xaxis_transform(),
-            ha="center",
-            va="top",
-            fontsize=10
+        has_continuum_marker = True
+
+    if r_star_max is not None and np.isfinite(r_star_max):
+        ax.axvline(
+            r_star_max,
+            color="tab:purple",
+            linestyle=":",
+            linewidth=1.8,
+            alpha=0.9,
+            zorder=5,
+            label=r"$R^\ast_{\rm max}$",
         )
+        has_continuum_marker = True
 
     ax.set_xlabel("r (normalized index)")
     ax.set_ylabel("|xi_m(r)|" if use_abs else "xi_m(r)")
     ax.grid(True, alpha=0.3)
+    if has_continuum_marker:
+        ax.legend(loc="best", fontsize=8)
 
 
 def plot_m_spectrum(ax, mode: np.ndarray):
@@ -148,7 +177,9 @@ def plot_m_spectrum(ax, mode: np.ndarray):
 
 def plot_continuum_panel(ax, r: np.ndarray, omega: float,
                          low2: np.ndarray, high2: np.ndarray,
-                         title: str = "Continuum"):
+                         title: str = "Continuum",
+                         r_star: Optional[float] = None,
+                         r_star_max: Optional[float] = None):
     """
     Plots sqrt(low2) and sqrt(high2) vs r, plus a horizontal line at omega.
     low2/high2 can contain NaNs on skipped edge points.
@@ -159,15 +190,33 @@ def plot_continuum_panel(ax, r: np.ndarray, omega: float,
     low = np.sqrt(np.maximum(low2, 0.0))
     high = np.sqrt(np.maximum(high2, 0.0))
 
-    ax.plot(r, low, linewidth=1.2)
-    ax.plot(r, high, linewidth=1.2)
-    ax.axhline(omega, linestyle="--", linewidth=1.2)
+    ax.plot(r, low, linewidth=1.2, label="sqrt(low2)")
+    ax.plot(r, high, linewidth=1.2, label="sqrt(high2)")
+    ax.axhline(omega, linestyle="--", linewidth=1.2, label="mode omega")
+
+    if r_star is not None and np.isfinite(r_star):
+        ax.axvline(
+            r_star,
+            color="k",
+            linestyle="--",
+            linewidth=1.0,
+            label="r*",
+        )
+    if r_star_max is not None and np.isfinite(r_star_max):
+        ax.axvline(
+            r_star_max,
+            color="tab:purple",
+            linestyle=":",
+            linewidth=1.4,
+            label="r* max crossing",
+        )
 
     ax.set_title(title, fontsize=10)
     ax.set_xlabel("r")
     ax.set_ylabel(r"$\omega$")
 
     ax.grid(True, alpha=0.3)
+    ax.legend(loc="best", fontsize=8)
 
 def load_rf_classifier(rf_model_path: str):
     try:
@@ -455,7 +504,9 @@ def main():
 
 
         #plot_all_harmonics_1d(ax1, mode, r, use_abs=cfg.use_abs, max_lines=cfg.max_lines)
-        r_star = get_r_star_for_mode(path, mode, omega)  # returns None if no datcon
+        r_star, r_star_max = get_continuum_markers_for_mode(
+            path, mode, omega
+        )
 
         plot_all_harmonics_1d(
             ax1,
@@ -463,7 +514,8 @@ def main():
             r,
             use_abs=True,
             max_lines=20,
-            r_star=r_star
+            r_star=r_star,
+            r_star_max=r_star_max,
         )
 
         ax1.set_title(title)
@@ -477,7 +529,16 @@ def main():
             high2 = high2.copy()
             low2[low2 > 999] = np.nan
             high2[high2 > 999] = np.nan
-            plot_continuum_panel(axC, r, omega, low2, high2, title="Alfvén continuum")
+            plot_continuum_panel(
+                axC,
+                r,
+                omega,
+                low2,
+                high2,
+                title="Alfvén continuum",
+                r_star=r_star,
+                r_star_max=r_star_max,
+            )
         except Exception:
             axC.clear()
             axC.text(0.5, 0.5, "no datcon", ha="center", va="center", transform=axC.transAxes)

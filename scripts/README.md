@@ -282,10 +282,9 @@ python "$NOVA_REPO/scripts/rf_train_classify.py" \
 
 Expanded RF OOF check after label cleanup:
 
-- CM=[[1404 43][93 585]]
-- accuracy=0.94
-- GOOD precision=0.93
-- GOOD recall=0.86
+- CM=`[[1447, 29], [64, 585]]`
+- accuracy=`0.956`
+- GOOD precision/recall/F1=`0.953 / 0.901 / 0.926`
 
 The active expanded-set RF checkpoint is
 `models/nova_mode_classifier.joblib`. Previous four-shot RF checkpoints are
@@ -347,6 +346,71 @@ When available, the following scalars are appended to the feature vector:
 - `r_star`: radius of closest continuum approach / crossing
 - `S`: normalized separation between mode and `r_star`, `S = (rad_loc - r_star) / rad_width`
 - `W_star`: mode amplitude² at `r = r_star`
+- `W_star_max`: largest peak-normalized radial mode energy at any interpolated
+  lower/upper continuum-boundary crossing
+
+The current production RF schema has 22 features. It removes the raw `omega`
+feature used by the previous checkpoint and adds `W_star_max`. Missing or
+invalid continuum data use the existing safe fallback, with
+`W_star_max = 0`.
+
+#### Experimental boundary-crossing RF features
+
+The default RF schema used by `models/nova_mode_classifier.joblib` already
+includes `W_star_max`. For experiments only,
+`rf_train_classify.py --crossing-features` appends the other six crossing
+features, producing a 28-feature schema:
+
+- `n_cross`
+- `r_star_max`, `W_star_sum`
+- `r_star_high_shear`, `W_star_high_shear`, `W_star_high_shear_sum`
+
+The shear-weighted quantities use
+`max(r_cross - r_shear0, 0)^2`, with `--r_shear0 0.2` by default. Experimental
+models remain ordinary sklearn pipeline `.joblib` files, but include feature
+schema metadata. They are not yet supported by `sort_shot.py`,
+`sort_shot_mixed.py`, or the interactive labeling workflow.
+
+Example training command:
+
+```bash
+python "$NOVA_REPO/scripts/rf_train_classify.py" \
+  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --crossing-features \
+  --model_out "$NOVA_REPO/models/nova_mode_classifier_crossing.joblib"
+```
+
+The bundle defaults to
+`models/nova_mode_classifier_crossing_bundle.joblib`. The trainer refuses to
+overwrite the active legacy checkpoint with an experimental model.
+
+Run an apples-to-apples OOF experiment with the same feature option:
+
+```bash
+python "$NOVA_REPO/scripts/rf_oof_check.py" \
+  "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --model_in "$NOVA_REPO/models/nova_mode_classifier.joblib" \
+  --crossing-features \
+  --out_oof rf_crossing_oof.csv \
+  --out_suspects rf_crossing_suspects.csv
+```
+
+Here `--model_in` supplies the RF pipeline/hyperparameters as the OOF template;
+the folds are fitted on the selected 28-feature schema. To classify one mode
+with an experimental checkpoint, pass `--crossing-features` together with
+`--model_in` and `--classify`.
+
+The full crossing schema and simpler outer-radius/high-shear variants did not
+improve OOF performance. They were strongly correlated with `W_star_max`. The
+promoted production configuration is the previous feature set minus `omega`,
+plus `W_star_max`.
+
+Synthetic crossing and schema checks use only standard-library `unittest`:
+
+```bash
+PYTHONPATH="$NOVA_REPO/src" python -m unittest discover \
+  -s "$NOVA_REPO/tests" -v
+```
 
 ---
 
@@ -481,7 +545,10 @@ RF classifier guidance is optional. By default the script tries to load
 `--rf-model` to select a different compatible model. If RF is enabled but the
 model cannot be loaded, the script prints a warning and continues without RF.
 
-If a `datcon#` file is located in the same directory, the script will mark the closest continuum crossing, `R*`, and will add an extra plot of the continuum gap + mode frequency.
+If a `datcon#` file is located in the same directory, the script marks both
+the legacy closest-approach location `R*` and the maximum-amplitude
+continuum-boundary crossing `R*max`. It also shows the continuum gap and mode
+frequency.
 
 ---
 

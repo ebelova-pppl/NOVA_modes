@@ -9,7 +9,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 import joblib
-from mode_features import compute_features_for_mode
+from mode_features import (
+    compute_features_for_mode,
+    get_feature_names,
+    get_feature_schema_version,
+)
 from mode_csv import read_mode_csv_entries
 
 
@@ -75,8 +79,6 @@ def load_labeled_modes(csv_path):
            "path": file_path,
         }
 
-        feats = compute_features_for_mode(mode, extra_info)
-
         # map labels: good -> 1, bad -> 0
         if label_str not in ("good", "bad"):
             raise ValueError(f"Unknown label {label_str} in {csv_path}")
@@ -95,13 +97,23 @@ def load_labeled_modes(csv_path):
 # ========================
 # compute_features_for_mode() was separated out and put into mode_features.py
 
-def build_feature_matrix(modes, extra_infos):
+def build_feature_matrix(
+    modes,
+    extra_infos,
+    include_crossing_features=False,
+    r_shear0=0.2,
+):
     """
     modes: list of 2D arrays
     Returns: X 2D array (n_samples, n_features)
     """
     feats = [
-        compute_features_for_mode(m, extra_info) 
+        compute_features_for_mode(
+            m,
+            extra_info,
+            include_crossing_features=include_crossing_features,
+            r_shear0=r_shear0,
+        )
         for m, extra_info in zip(modes, extra_infos)
     ]
     return np.vstack(feats)
@@ -145,6 +157,11 @@ def print_feature_importance(clf, feature_names):
     # Access the RF inside the pipeline
     rf = clf.named_steps["rf"]
     importances = rf.feature_importances_
+    if len(feature_names) != importances.size:
+        raise ValueError(
+            f"Feature-name count {len(feature_names)} does not match "
+            f"RF importance count {importances.size}"
+        )
     
     print("\n=== Feature Importances ===")
     for name, imp in sorted(zip(feature_names, importances), key=lambda x: -x[1]):
@@ -197,7 +214,74 @@ def load_model(path):
     return clf
 
 
-def classify_mode_file(clf, path):
+def attach_feature_metadata(
+    clf,
+    feature_names,
+    include_crossing_features=False,
+    r_shear0=0.2,
+):
+    """Attach lightweight schema metadata while keeping a plain sklearn pipeline."""
+    clf.nova_feature_names_ = list(feature_names)
+    clf.nova_feature_schema_version_ = get_feature_schema_version(
+        include_crossing_features
+    )
+    clf.nova_include_crossing_features_ = bool(include_crossing_features)
+    clf.nova_r_shear0_ = float(r_shear0)
+    return clf
+
+
+def validate_model_feature_schema(
+    clf,
+    feature_names,
+    include_crossing_features=False,
+    r_shear0=0.2,
+):
+    expected_count = getattr(clf, "n_features_in_", None)
+    if expected_count is not None and expected_count != len(feature_names):
+        if expected_count == 28 and len(feature_names) == 22:
+            action = "Add --crossing-features for this experimental model."
+        elif expected_count == 22 and len(feature_names) == 28:
+            action = "Remove --crossing-features for the production model."
+        else:
+            action = "Select the feature schema used to train this model."
+        raise ValueError(
+            f"RF model expects {expected_count} features, but the selected schema "
+            f"builds {len(feature_names)}. {action}"
+        )
+
+    saved_names = getattr(clf, "nova_feature_names_", None)
+    if saved_names is not None and list(saved_names) != list(feature_names):
+        raise ValueError(
+            "Selected feature names do not match the schema stored in the RF model."
+        )
+
+    saved_crossing = getattr(clf, "nova_include_crossing_features_", None)
+    if saved_crossing is not None and bool(saved_crossing) != bool(
+        include_crossing_features
+    ):
+        raise ValueError(
+            "The RF model crossing-feature setting does not match the CLI. "
+            "Add or remove --crossing-features as appropriate."
+        )
+
+    saved_r_shear0 = getattr(clf, "nova_r_shear0_", None)
+    if (
+        include_crossing_features
+        and saved_r_shear0 is not None
+        and not np.isclose(float(saved_r_shear0), float(r_shear0))
+    ):
+        raise ValueError(
+            f"The RF model was trained with r_shear0={saved_r_shear0}, "
+            f"but classification requested {r_shear0}."
+        )
+
+
+def classify_mode_file(
+    clf,
+    path,
+    include_crossing_features=False,
+    r_shear0=0.2,
+):
     """
     Classify a single new NOVA output file.
     Returns:
@@ -211,7 +295,19 @@ def classify_mode_file(clf, path):
         "ntor": ntor,
         "path": path,
     }
-    X = compute_features_for_mode(mode, extra_info).reshape(1, -1)
+    feature_names = get_feature_names(include_crossing_features)
+    validate_model_feature_schema(
+        clf,
+        feature_names,
+        include_crossing_features=include_crossing_features,
+        r_shear0=r_shear0,
+    )
+    X = compute_features_for_mode(
+        mode,
+        extra_info,
+        include_crossing_features=include_crossing_features,
+        r_shear0=r_shear0,
+    ).reshape(1, -1)
     prob_good = clf.predict_proba(X)[0, 1]
     label = "good" if prob_good >= 0.5 else "bad"
     return prob_good, label
@@ -231,41 +327,92 @@ if __name__ == "__main__":
         type=str,
         help="Training CSV with paths plus good/bad labels, with or without a header row.",
     )
-    parser.add_argument("--model_out", type=str, default="nova_mode_classifier.joblib",
-                        help="Path to save trained model.")
+    parser.add_argument(
+        "--model_out",
+        type=str,
+        default=None,
+        help=(
+            "Path to save the trained model. Defaults to "
+            "nova_mode_classifier.joblib for the production schema or "
+            "nova_mode_classifier_crossing.joblib with --crossing-features."
+        ),
+    )
+    parser.add_argument(
+        "--bundle_out",
+        type=str,
+        default=None,
+        help=(
+            "Path to save training arrays and schema metadata. By default, "
+            "'_bundle.joblib' is appended to the model filename stem."
+        ),
+    )
     parser.add_argument("--classify", type=str, default=None,
                         help="If set, classify this NOVA output file using an existing model.")
     parser.add_argument("--model_in", type=str, default=None,
                         help="Path to existing model to use for --classify.")
+    parser.add_argument(
+        "--crossing-features",
+        action="store_true",
+        help=(
+            "Opt in to the experimental 28-feature RF schema. The production "
+            "schema already includes W_star_max; this adds the other six "
+            "continuum-boundary-crossing features."
+        ),
+    )
+    parser.add_argument(
+        "--r_shear0",
+        type=float,
+        default=0.2,
+        help="Radial offset for the experimental shear proxy (default: 0.2).",
+    )
 
     args = parser.parse_args()
+    if not np.isfinite(args.r_shear0):
+        raise ValueError(f"--r_shear0 must be finite, got {args.r_shear0}")
+
+    model_out = args.model_out
+    bundle_out = args.bundle_out
+    if args.train_csv:
+        if model_out is None:
+            model_out = (
+                "nova_mode_classifier_crossing.joblib"
+                if args.crossing_features
+                else "nova_mode_classifier.joblib"
+            )
+        model_out_path = Path(model_out)
+        active_model_path = (
+            Path(__file__).resolve().parents[1]
+            / "models"
+            / "nova_mode_classifier.joblib"
+        )
+        if (
+            args.crossing_features
+            and model_out_path.expanduser().resolve() == active_model_path.resolve()
+        ):
+            raise ValueError(
+                "Refusing to overwrite the active legacy RF checkpoint with an "
+                "experimental crossing-feature model. Choose a different --model_out."
+            )
+        if bundle_out is None:
+            bundle_out = str(
+                model_out_path.with_name(f"{model_out_path.stem}_bundle.joblib")
+            )
 
     if args.train_csv:
         # TRAINING MODE
         modes, y, paths, extra_infos = load_labeled_modes(args.train_csv)
-        X = build_feature_matrix(modes, extra_infos)
-        feature_names = [
-            "mean_amp",
-            "std_amp",
-            "rad_loc",
-            "rad_width",
-            "max_to_mean",
-            "max_to_median",
-            "mean_abs_d1_mode",
-            "max_abs_d1_abs",
-            "mean_abs_d2_mode",
-            "max_abs_d2_abs",
-            "std_per_m_max",
-            "max_per_m_mean",
-            "std_per_m_mean",
-            #"n_spikes",
-            "spikes_per_m",
-            "frac_spikes",
-        ]
-        #feature_names += ["omega", "gamma_d"]
-        feature_names += ["omega", "gamma_d", "ntor"]
-        #feature_names += ["has_intersection", "delta2_eff", "S", "W_star"]
-        feature_names += ["r_star", "delta2_eff", "S", "W_star"]
+        X = build_feature_matrix(
+            modes,
+            extra_infos,
+            include_crossing_features=args.crossing_features,
+            r_shear0=args.r_shear0,
+        )
+        feature_names = get_feature_names(args.crossing_features)
+        if len(feature_names) != X.shape[1]:
+            raise ValueError(
+                f"Feature-name count {len(feature_names)} does not match "
+                f"feature matrix width {X.shape[1]}"
+            )
 
         clf = train_classifier(X, y)
         print_feature_importance(clf, feature_names)
@@ -273,7 +420,14 @@ if __name__ == "__main__":
         # Optional extra evaluation
         clf = evaluate_classifier(clf, X, y, paths)
 
-        save_model(clf, args.model_out)
+        clf = attach_feature_metadata(
+            clf,
+            feature_names,
+            include_crossing_features=args.crossing_features,
+            r_shear0=args.r_shear0,
+        )
+
+        save_model(clf, model_out)
 
         joblib.dump(
             {
@@ -281,15 +435,26 @@ if __name__ == "__main__":
                 "X_train": X,
                 "y_train": y,
                 "feature_names": feature_names,
+                "feature_schema_version": get_feature_schema_version(
+                    args.crossing_features
+                ),
+                "include_crossing_features": bool(args.crossing_features),
+                "r_shear0": float(args.r_shear0),
             },
-            "nova_mode_classifier_bundle.joblib"
+            bundle_out,
         )
+        print(f"Saved classifier bundle to {bundle_out}")
 
     if args.classify:
         if args.model_in is None:
             raise ValueError("You must specify --model_in to classify a new mode.")
         clf = load_model(args.model_in)
-        prob_good, label = classify_mode_file(clf, args.classify)
+        prob_good, label = classify_mode_file(
+            clf,
+            args.classify,
+            include_crossing_features=args.crossing_features,
+            r_shear0=args.r_shear0,
+        )
         print(f"File: {args.classify}")
         print(f"Predicted label: {label}  (P(good) = {prob_good:.3f})")
         print('=======================================================')

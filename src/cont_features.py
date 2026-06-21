@@ -8,6 +8,15 @@ DATCON_INVALID_SENTINEL_MIN = 999.0
 DATCON_TAIL_SPIKE_FACTOR = 3.0
 DATCON_TAIL_SPIKE_ABS_MIN = 50.0
 DATCON_TAIL_LOOKBACK = 4
+CROSSING_FEATURE_DEFAULTS = {
+    "n_cross": 0,
+    "r_star_max": 0.0,
+    "W_star_max": 0.0,
+    "W_star_sum": 0.0,
+    "r_star_high_shear": 0.0,
+    "W_star_high_shear": 0.0,
+    "W_star_high_shear_sum": 0.0,
+}
 
 def warn_once_per_dir(mode_path: str, msg: str):
     d = os.path.dirname(os.path.abspath(mode_path))
@@ -149,6 +158,205 @@ def band_distance(omega2: float, low2: np.ndarray, high2: np.ndarray):
 
     dist[ok] = d
     return dist
+
+
+def _validate_crossing_inputs(mode, omega, low2_full, high2_full, r):
+    mode = np.asarray(mode)
+    if mode.ndim != 2:
+        raise ValueError(f"mode must be 2D (n_m, n_r), got shape {mode.shape}")
+    if mode.shape[0] < 1:
+        raise ValueError("mode must contain at least one poloidal harmonic")
+    if mode.shape[1] < 1:
+        raise ValueError("mode must contain at least one radial point")
+    if not np.all(np.isfinite(mode)):
+        raise ValueError("mode contains non-finite values")
+
+    n_r = mode.shape[1]
+    low2 = np.asarray(low2_full, dtype=float)
+    high2 = np.asarray(high2_full, dtype=float)
+    if low2.ndim != 1 or high2.ndim != 1:
+        raise ValueError(
+            f"continuum arrays must be 1D, got low2={low2.shape}, high2={high2.shape}"
+        )
+    if low2.shape != (n_r,) or high2.shape != (n_r,):
+        raise ValueError(
+            "continuum arrays must match the mode radial dimension: "
+            f"n_r={n_r}, low2={low2.shape}, high2={high2.shape}"
+        )
+
+    if r is None:
+        radial_grid = np.linspace(0.0, 1.0, n_r)
+    else:
+        radial_grid = np.asarray(r, dtype=float)
+        if radial_grid.ndim != 1 or radial_grid.shape != (n_r,):
+            raise ValueError(
+                f"r must be 1D with length {n_r}, got shape {radial_grid.shape}"
+            )
+    if not np.all(np.isfinite(radial_grid)):
+        raise ValueError("r contains non-finite values")
+    if radial_grid.size > 1 and np.any(np.diff(radial_grid) <= 0.0):
+        raise ValueError("r must be strictly increasing")
+
+    omega_value = float(omega)
+    if not np.isfinite(omega_value):
+        raise ValueError(f"omega must be finite, got {omega}")
+
+    return mode, omega_value, low2, high2, radial_grid
+
+
+def _boundary_crossing_records(
+    boundary_type,
+    boundary2,
+    omega2,
+    valid,
+    r,
+    w_peak,
+    r_shear0,
+):
+    """
+    Return crossings for one boundary without bridging invalid radial gaps.
+
+    Exact-zero runs are represented by one crossing at the run midpoint.
+    """
+    f = omega2 - boundary2
+    records = []
+    n_r = r.size
+    i = 0
+
+    while i < n_r:
+        if not valid[i]:
+            i += 1
+            continue
+
+        block_end = i
+        while block_end + 1 < n_r and valid[block_end + 1]:
+            block_end += 1
+
+        while i <= block_end:
+            if f[i] == 0.0:
+                zero_end = i
+                while zero_end + 1 <= block_end and f[zero_end + 1] == 0.0:
+                    zero_end += 1
+                r_cross = 0.5 * (float(r[i]) + float(r[zero_end]))
+                W_cross = float(np.interp(r_cross, r, w_peak))
+                shear_weighted = W_cross * max(r_cross - r_shear0, 0.0) ** 2
+                records.append(
+                    {
+                        "boundary": boundary_type,
+                        "r_cross": r_cross,
+                        "W_peak": W_cross,
+                        "shear_weighted": float(shear_weighted),
+                    }
+                )
+                i = zero_end + 1
+                continue
+
+            if i < block_end and f[i + 1] != 0.0 and f[i] * f[i + 1] < 0.0:
+                fraction = float(-f[i] / (f[i + 1] - f[i]))
+                r_cross = float(r[i] + fraction * (r[i + 1] - r[i]))
+                W_cross = float(w_peak[i] + fraction * (w_peak[i + 1] - w_peak[i]))
+                shear_weighted = W_cross * max(r_cross - r_shear0, 0.0) ** 2
+                records.append(
+                    {
+                        "boundary": boundary_type,
+                        "r_cross": r_cross,
+                        "W_peak": W_cross,
+                        "shear_weighted": float(shear_weighted),
+                    }
+                )
+
+            i += 1
+
+    return records
+
+
+def continuum_crossing_records(
+    mode,
+    omega,
+    low2_full,
+    high2_full,
+    r=None,
+    r_shear0=0.2,
+):
+    """
+    Return diagnostic records for lower/upper continuum-boundary crossings.
+
+    Each record contains boundary type, interpolated radius, peak-normalized
+    radial mode energy, and the shear-weighted value. Lower and upper boundary
+    crossings are counted separately.
+    """
+    mode, omega, low2, high2, r = _validate_crossing_inputs(
+        mode, omega, low2_full, high2_full, r
+    )
+    r_shear0 = float(r_shear0)
+    if not np.isfinite(r_shear0):
+        raise ValueError(f"r_shear0 must be finite, got {r_shear0}")
+
+    radial_energy = np.sum(np.abs(mode) ** 2, axis=0)
+    peak_energy = float(np.max(radial_energy))
+    w_peak = radial_energy / (peak_energy + 1e-14)
+
+    valid = np.isfinite(low2) & np.isfinite(high2)
+    if not np.any(valid):
+        return []
+
+    omega2 = omega**2
+    records = []
+    records.extend(
+        _boundary_crossing_records(
+            "low", low2, omega2, valid, r, w_peak, r_shear0
+        )
+    )
+    records.extend(
+        _boundary_crossing_records(
+            "high", high2, omega2, valid, r, w_peak, r_shear0
+        )
+    )
+    return records
+
+
+def continuum_crossing_features(
+    mode,
+    omega,
+    low2_full,
+    high2_full,
+    r=None,
+    r_shear0=0.2,
+):
+    """
+    Compute peak-energy and shear-weighted continuum-crossing RF features.
+
+    Ties for either maximum are resolved in favor of the largest crossing
+    radius so feature values remain deterministic.
+    """
+    records = continuum_crossing_records(
+        mode,
+        omega,
+        low2_full,
+        high2_full,
+        r=r,
+        r_shear0=r_shear0,
+    )
+    if not records:
+        return dict(CROSSING_FEATURE_DEFAULTS)
+
+    amp_max = max(records, key=lambda item: (item["W_peak"], item["r_cross"]))
+    shear_max = max(
+        records, key=lambda item: (item["shear_weighted"], item["r_cross"])
+    )
+
+    return {
+        "n_cross": len(records),
+        "r_star_max": float(amp_max["r_cross"]),
+        "W_star_max": float(amp_max["W_peak"]),
+        "W_star_sum": float(sum(item["W_peak"] for item in records)),
+        "r_star_high_shear": float(shear_max["r_cross"]),
+        "W_star_high_shear": float(shear_max["shear_weighted"]),
+        "W_star_high_shear_sum": float(
+            sum(item["shear_weighted"] for item in records)
+        ),
+    }
+
 
 def continuum_scalars(mode, omega, low2_full, high2_full, r=None, alpha=1.0):
     """

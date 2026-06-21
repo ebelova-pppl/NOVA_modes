@@ -1,7 +1,62 @@
 import numpy as np
 import os
 
-from cont_features import load_datcon_for_mode, continuum_scalars, warn_once_per_dir
+from cont_features import (
+    CROSSING_FEATURE_DEFAULTS,
+    continuum_crossing_features,
+    continuum_scalars,
+    load_datcon_for_mode,
+    warn_once_per_dir,
+)
+
+
+RF_FEATURE_NAMES = (
+    "mean_amp",
+    "std_amp",
+    "rad_loc",
+    "rad_width",
+    "max_to_mean",
+    "max_to_median",
+    "mean_abs_d1_mode",
+    "max_abs_d1_abs",
+    "mean_abs_d2_mode",
+    "max_abs_d2_abs",
+    "std_per_m_max",
+    "max_per_m_mean",
+    "std_per_m_mean",
+    "spikes_per_m",
+    "frac_spikes",
+    "gamma_d",
+    "ntor",
+    "r_star",
+    "delta2_eff",
+    "S",
+    "W_star",
+    "W_star_max",
+)
+EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES = (
+    "n_cross",
+    "r_star_max",
+    "W_star_sum",
+    "r_star_high_shear",
+    "W_star_high_shear",
+    "W_star_high_shear_sum",
+)
+RF_SCHEMA_VERSION = "rf_w_star_max_22_v2"
+EXPERIMENTAL_CROSSING_RF_SCHEMA_VERSION = "rf_all_crossings_28_v2"
+
+
+def get_feature_names(include_crossing_features=False):
+    names = RF_FEATURE_NAMES
+    if include_crossing_features:
+        names += EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+    return list(names)
+
+
+def get_feature_schema_version(include_crossing_features=False):
+    if include_crossing_features:
+        return EXPERIMENTAL_CROSSING_RF_SCHEMA_VERSION
+    return RF_SCHEMA_VERSION
 
 def radial_centroid(mode, r):
     """
@@ -21,7 +76,12 @@ def radial_width(mode, r, r_centroid=None):
     den = np.sum(w) + 1e-14
     return np.sqrt(num / den)
 
-def compute_features_for_mode(mode, extra_info=None):
+def compute_features_for_mode(
+    mode,
+    extra_info=None,
+    include_crossing_features=False,
+    r_shear0=0.2,
+):
     """
     mode: 2D numpy array of shape (n_m, n_r).
     We compute a set of simple 'roughness / singularity' features
@@ -108,17 +168,20 @@ def compute_features_for_mode(mode, extra_info=None):
         frac_spikes,
     ], dtype=float)
 
-    # Now optional physics-based features added
+    # Metadata scalars used by the promoted RF schema.
     if extra_info is not None:
-        if "omega" in extra_info:
-            features = np.append(features, float(extra_info["omega"]))
         if "gamma_d" in extra_info:
             features = np.append(features, float(extra_info["gamma_d"]))
         if "ntor" in extra_info:
             features = np.append(features, float(extra_info["ntor"]))
 
-    # Get continuum related scalars (optional) 02/04/26
-    CONT_FALLBACK = [0.0, 1e30, 1e30, 0.0]  # [r_star, delta2_eff, S, W_star]
+    # Continuum scalars. W_star_max is part of the promoted default RF schema.
+    cont_fallback = [0.0, 1e30, 1e30, 0.0]  # [r_star, delta2_eff, S, W_star]
+    promoted_crossing_fallback = [CROSSING_FEATURE_DEFAULTS["W_star_max"]]
+    experimental_crossing_fallback = [
+        CROSSING_FEATURE_DEFAULTS[name]
+        for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+    ]
 
     mode_path = extra_info.get("path") if extra_info else None
     omega = float(extra_info.get("omega")) if extra_info and "omega" in extra_info else None
@@ -128,13 +191,27 @@ def compute_features_for_mode(mode, extra_info=None):
             #low2, high2, i1, i2 = load_datcon_for_mode(mode_path, n_r=n_r)  # load datcon
             low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)  # load datcon
             cont = continuum_scalars(mode, omega, low2, high2, r=r)
-            features = np.append(features, [
-                #cont["has_intersection"],
+            continuum_values = [
                 cont["r_star"],
                 cont["delta2_eff"],
                 cont["S"],
                 cont["W_star"],
-            ])
+            ]
+            crossing = continuum_crossing_features(
+                mode,
+                omega,
+                low2,
+                high2,
+                r=r,
+                r_shear0=r_shear0,
+            )
+            continuum_values.append(crossing["W_star_max"])
+            if include_crossing_features:
+                continuum_values.extend(
+                    crossing[name]
+                    for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+                )
+            features = np.append(features, continuum_values)
         except FileNotFoundError:
             warn_once_per_dir(
                 mode_path,
@@ -146,7 +223,10 @@ def compute_features_for_mode(mode, extra_info=None):
                 f"Expected a datcon file ('datcon<N>') alongside mode files.\n"
                 f"========================================================================"
             )
-            features = np.append(features, CONT_FALLBACK)
+            features = np.append(features, cont_fallback)
+            features = np.append(features, promoted_crossing_fallback)
+            if include_crossing_features:
+                features = np.append(features, experimental_crossing_fallback)
         except Exception as e:
             warn_once_per_dir(
                 mode_path,
@@ -155,10 +235,15 @@ def compute_features_for_mode(mode, extra_info=None):
                 f"Continuum-related features will be DISABLED for modes in this directory.\n"
                 f"Reason: {type(e).__name__}: {e}"
             )
-            features = np.append(features, CONT_FALLBACK)
+            features = np.append(features, cont_fallback)
+            features = np.append(features, promoted_crossing_fallback)
+            if include_crossing_features:
+                features = np.append(features, experimental_crossing_fallback)
     else:
-        features = np.append(features, CONT_FALLBACK)
+        features = np.append(features, cont_fallback)
+        features = np.append(features, promoted_crossing_fallback)
+        if include_crossing_features:
+            features = np.append(features, experimental_crossing_fallback)
 
 
     return features
-

@@ -8,7 +8,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from nova_mode_loader import load_mode_from_nova        # returns (mode, omega, gamma_d, ntor)
-from cont_features import load_datcon_for_mode, continuum_scalars
+from cont_features import (
+    continuum_crossing_features,
+    continuum_scalars,
+    load_datcon_for_mode,
+)
 from mode_csv import read_mode_csv_entries
 
 DATCON_INVALID_SENTINEL_MIN = 999.0
@@ -51,6 +55,25 @@ def topk_harmonics(mode: np.ndarray, k: int) -> np.ndarray:
     order = np.argsort(strength)[::-1]
     k = min(k, mode.shape[0])
     return order[:k]
+
+
+def continuum_marker_radii(
+    mode: np.ndarray,
+    omega: float,
+    low2: np.ndarray,
+    high2: np.ndarray,
+    r: np.ndarray,
+) -> Tuple[Optional[float], Optional[float]]:
+    """Return legacy closest-approach r_star and amplitude-max crossing radius."""
+    cont = continuum_scalars(mode, float(omega), low2, high2, r=r)
+    crossing = continuum_crossing_features(
+        mode, float(omega), low2, high2, r=r
+    )
+    r_star = float(cont["r_star"])
+    r_star_max = (
+        float(crossing["r_star_max"]) if crossing["n_cross"] > 0 else None
+    )
+    return r_star, r_star_max
 
 
 def plot_mode_panel(ax, mode: np.ndarray, r: np.ndarray, kind: str, topk: int, use_abs: bool):
@@ -114,19 +137,28 @@ def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: flo
     ax.plot(r, high, linewidth=1.2, label="sqrt(high2)")
     ax.axhline(omega, linestyle="--", linewidth=1.2, label="mode omega")
 
-    # r_star (optional)
+    # Continuum location markers (optional).
     r_star = None
+    r_star_max = None
     if try_rstar:
         try:
-            cont = continuum_scalars(mode, float(omega), low2, high2, r=r)
-            r_star = float(cont["r_star"])
+            r_star, r_star_max = continuum_marker_radii(
+                mode, omega, low2, high2, r
+            )
         except Exception:
             r_star = None
+            r_star_max = None
 
-    if r_star is None:
-        pass
-    else:
-        ax.axvline(r_star, linestyle="--", linewidth=1.0, label="r*")
+    if r_star is not None and np.isfinite(r_star):
+        ax.axvline(r_star, color="k", linestyle="--", linewidth=1.0, label="r*")
+    if r_star_max is not None and np.isfinite(r_star_max):
+        ax.axvline(
+            r_star_max,
+            color="tab:purple",
+            linestyle=":",
+            linewidth=1.4,
+            label="r* max crossing",
+        )
 
     ax.set_xlabel("r (normalized)")
     ax.set_ylabel("frequency")
@@ -233,16 +265,33 @@ def main():
                 ax_cont.plot(r, high, linewidth=1.2, label="sqrt(high2)")
                 ax_cont.axhline(float(omega), linestyle="--", linewidth=1.2, label="mode omega")
 
-                # r* EXACTLY like label_modes_fast.py
+                # Legacy closest approach plus maximum-amplitude crossing.
                 r_star = None
+                r_star_max = None
                 try:
-                    cont = continuum_scalars(mode, float(omega), low2, high2, r=r)
-                    r_star = float(cont["r_star"])
+                    r_star, r_star_max = continuum_marker_radii(
+                        mode, omega, low2, high2, r
+                    )
                 except Exception:
                     r_star = None
+                    r_star_max = None
 
                 if r_star is not None and np.isfinite(r_star):
-                    ax_cont.axvline(r_star, linestyle="--", linewidth=1.0, label="r*")
+                    ax_cont.axvline(
+                        r_star,
+                        color="k",
+                        linestyle="--",
+                        linewidth=1.0,
+                        label="r*",
+                    )
+                if r_star_max is not None and np.isfinite(r_star_max):
+                    ax_cont.axvline(
+                        r_star_max,
+                        color="tab:purple",
+                        linestyle=":",
+                        linewidth=1.4,
+                        label="r* max crossing",
+                    )
 
                 ax_cont.set_xlabel("r (normalized)")
                 ax_cont.set_ylabel("frequency")
