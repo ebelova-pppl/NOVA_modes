@@ -375,6 +375,14 @@ def main():
         ),
     )
     parser.add_argument(
+        "--abs",
+        action="store_true",
+        help=(
+            "Plot |xi_m(r)| instead of signed xi_m(r). The default is signed, "
+            "matching viz/view_modes_csv.py."
+        ),
+    )
+    parser.add_argument(
         "--rf-model",
         default="nova_mode_classifier.joblib",
         help="Random Forest model path used for optional guidance (default: nova_mode_classifier.joblib)"
@@ -395,6 +403,7 @@ def main():
         mode_list=args.mode_list,
         use_rf=not args.no_rf,
         rf_model=args.rf_model,
+        use_abs=args.abs,
         max_lines=args.max_harmonics,
     )
 
@@ -450,6 +459,10 @@ def main():
         print("Harmonics plot:  all harmonics stored in each mode file")
     else:
         print(f"Harmonics plot:  strongest {cfg.max_lines} harmonics per mode")
+    if cfg.use_abs:
+        print("Amplitude plot:  absolute |xi_m(r)|")
+    else:
+        print("Amplitude plot:  signed xi_m(r)")
     print(
         f"Found {len(files)} files; already labeled {labeled_in_scope}; "
         f"remaining {len(files_to_do)}"
@@ -519,7 +532,8 @@ def main():
         title = (
             f"{base}  n={ntor}  omega={omega:.4g}  g_d={gamma_d:.3g}  "
             f"{rf_text}  [g/b/s, u=undo, q=quit]\n"
-            f"Poloidal harmonics plotted: {harmonics_plotted}/{nhar}"
+            f"Poloidal harmonics plotted: {harmonics_plotted}/{nhar}; "
+            f"amplitude: {'|xi_m(r)|' if cfg.use_abs else 'signed xi_m(r)'}"
         )
 
         r_star, r_star_max = get_continuum_markers_for_mode(
@@ -530,7 +544,7 @@ def main():
             ax1,
             mode,
             r,
-            use_abs=True,
+            use_abs=cfg.use_abs,
             max_lines=cfg.max_lines,
             r_star=r_star,
             r_star_max=r_star_max,

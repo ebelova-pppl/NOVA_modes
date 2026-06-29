@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-06-21)
+### Project state (current snapshot, updated 2026-06-29)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -935,3 +935,128 @@ default instead of silently limiting the mode-structure panel to the strongest
 optional `--max-harmonics N` argument restores an explicit strongest-`N` cap
 for crowded plots. Startup output describes the active policy, and each plot
 title reports the exact `plotted/total` harmonic count.
+
+### 2026-06-22
+
+Investigated replacement continuum files for `nstxuG121123N75/N3`. The active
+`datcon3` is byte-identical to
+`nstxuG121123N75_new/N3/datcon3`, and checked recomputed `egn03w.*` mode files
+are also byte-identical between the active and `_new` directories. The modes
+have `nr=201`, while `datcon3` covers indices 3 through 199, so this is not an
+obvious copied-file or point-count mismatch.
+
+For the active files, `egn03w.1171E+02` has legacy `r_star=0.560` and an
+interpolated lower-boundary crossing at `0.5553`, so that mode is aligned near
+`0.55`. The reported `r_star` near `0.42` referred instead to
+`egn03w.1445E+02`, whose displayed continuum marker is consistent with the
+current file and confirms the mismatch described below.
+
+The mismatch remains real for following labeled modes:
+
+- `egn03w.1445E+02`: `r_star=0.445`, strongest curvature near `0.560`
+- `egn03w.1473E+02`: `r_star=0.440`, strongest curvature near `0.555`
+- `egn03w.1951E+02`: `r_star=0.350`, strongest curvature near `0.450`
+- `egn03w.1982E+02`: `r_star=0.335`, strongest curvature near `0.445`
+- `egn03w.2008E+02`: `r_star=0.315`, strongest curvature near `0.440`
+- `egn03w.2027E+02`: `r_star=0.300`, strongest curvature near `0.435`
+
+The replacement directory also contains `datcon_gf.txt` with a nonuniform
+`sqrt(Flux_toroid)` coordinate that current tools do not read. Mapping both
+crossing and mode indices through that coordinate changes their displayed
+radial values but does not remove the index-level separation. Keep this shot
+out of `tae_like_train.csv` until the NOVA continuum/mode-grid provenance is
+confirmed.
+
+Direct comparison of `N3/old_datcon3` and `N3/new_datcon3` shows that the
+replacement changes continuum frequency levels but does not radially shift
+the profiles. Pointwise profile correlations are `0.99998` for the lower
+branch and `0.99829` for the upper branch, with best correlation at zero index
+shift. In plotted frequency units, the new lower branch is higher by `0.0155`
+on average and the new upper branch by `0.0704`.
+
+For the lower-boundary crossings relevant to the first labeled `N3` modes, the
+new file moves crossings outward only modestly:
+
+- `egn03w.1171E+02`: `0.5505 -> 0.5553`
+- `egn03w.1445E+02`: `0.4389 -> 0.4414`
+- `egn03w.1473E+02`: `0.4342 -> 0.4367`
+- `egn03w.1951E+02`: `0.3354 -> 0.3466`
+- `egn03w.1982E+02`: `0.3156 -> 0.3306`
+- `egn03w.2008E+02`: `0.2958 -> 0.3127`
+- `egn03w.2027E+02`: `0.2804 -> 0.2970`
+
+Thus the replacement moves several crossings slightly toward the visible
+structure features, but the `0.0025-0.017` changes are much smaller than the
+remaining roughly `0.10-0.12` separations.
+
+The same alignment concern was checked for the recomputed
+`nstx_135388_new` modes. All old and replacement `datcon<N>` files cover
+indices 3 through 199 on the same 201-point radial grid. The supplied
+`datcon_gf_old.txt` and replacement `datcon_gf.txt` radial coordinates are
+identical for every `N1` through `N10`.
+
+The two replacement-shot workflows differ materially:
+
+- `nstxuG121123N75_new`: all 772 mode files across `N1-N10` have the same
+  filenames, counts, decoded shapes, frequencies, damping values, and bytes as
+  the corresponding files in `nstxuG121123N75`. Their newer timestamps are
+  from copying; the TAE modes were not recalculated. Only the continuum files
+  changed relative to the preserved `old_datcon<N>` files.
+- `nstx_135388_new`: most matching mode files differ from
+  `nstx_135388`, mode counts also differ, and many poloidal-harmonic counts
+  changed. Examples include `N6` 101 to 106 harmonics and `N7` 101 to 123.
+  These modes were genuinely recalculated, although a minority of matching
+  files remain byte-identical.
+
+For labeled `N6` and `N7` modes, replacing the continuum has essentially no
+effect on the relevant crossings:
+
+- no legacy `r_star` values changed on the displayed 0.005 grid;
+- paired interpolated crossings changed by at most `0.00008` for `N6`;
+- paired interpolated crossings changed by at most `0.00003` for `N7`.
+
+The replacement mainly removes unphysical old tail spikes near the outer
+boundary. Through the interior, the old and new `N6/N7` TAE-gap profiles
+overlap visually.
+
+The recomputed mode structures did change harmonic resolution while retaining
+`nr=201`: matched labeled `N6` modes commonly changed from 101 to 106
+harmonics, and matched `N7` modes from 101 to 123. Visual inspection found
+multiple modes where both `r_star` and `r_star_max` lie far inside the sharp
+outer structure, including:
+
+- `N6/egn06w.3147E+02`: marker near `0.030`, sharp structure near `0.8-0.9`
+- `N6/egn06w.3468E+02`: marker near `0.059`, sharp structure near `0.8-0.9`
+- `N6/egn06w.5263E+02`: marker near `0.189`, sharp structure near `0.8-0.95`
+- `N7/egn07w.3518E+02`: marker near `0.045`, sharp structure near `0.8-0.93`
+- `N7/egn07w.4950E+02`: marker near `0.167`, sharp structure near `0.8-0.94`
+- `N7/egn07w.5504E+02`: marker near `0.232`, sharp structure near `0.8-0.95`
+
+An automated screening check found few such low-energy, displaced crossings
+for matched labeled recomputed modes in `N1-N4`, but many from `N5` through
+`N10`. This metric is only a review flag: a continuum crossing with negligible
+mode energy need not produce a visible singularity. Still, the `N6/N7`
+examples confirm that the replacement continuum did not resolve the apparent
+mode/continuum alignment issue. Recheck `nstx_135388` labels, especially
+`N5-N10`, before the next training-list cleanup or model retraining.
+
+Likely root cause identified for `nstxuG121123N75`: modes for some toroidal
+mode numbers were calculated with the wrong q profile. This is consistent
+with the file audit above: the `_new` directory copied the original modes
+unchanged while replacing their continuum files, so the mode structures and
+continuum could represent different equilibrium inputs despite matching
+radial dimensions. The affected case is now being recalculated. Do not review
+or merge its staged labels until the replacement modes and matching continuum
+files are available.
+
+The cause of the `nstx_135388` alignment flags remains unresolved and should
+be treated separately. Its `_new` modes were genuinely recalculated, so the
+wrong-q explanation for `nstxuG121123N75` should not be assumed to apply
+without additional provenance checks.
+
+### 2026-06-29
+
+Changed `scripts/label_modes_fast.py` to plot signed `xi_m(r)` harmonic
+profiles by default, matching `viz/view_modes_csv.py`. The older absolute
+amplitude view remains available with `--abs`; startup output and plot titles
+now state the active amplitude convention.
