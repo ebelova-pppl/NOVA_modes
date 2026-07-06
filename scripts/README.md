@@ -22,9 +22,11 @@ For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
 The current active good/bad training list is the expanded
-`training_labels/tae_like_train.csv`, which combines the original four-shot TAE-like
-set with the reviewed six-shot NSTX-U TAE-like set. Older four-shot TAE-only
-and mixed TAE/EAE lists are archived under
+`training_labels/tae_like_train.csv`, which combines the original four-shot
+TAE-like set, the reviewed six-shot NSTX-U TAE-like set, refreshed
+`nstx_135388` labels, and the new `nstxuG121123J38` labels. It currently has
+2263 rows across 11 shots. Older four-shot TAE-only and mixed TAE/EAE lists
+are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
 
@@ -173,12 +175,12 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 8 --cache_data
 ```
 
-Expanded 10-shot TAE-like raw-CNN retraining check on
+Previous expanded 10-shot TAE-like raw-CNN retraining check on
 `training_labels/tae_like_train.csv`:
 
 - `cnn_raw.py`: accuracy=`0.9693`, CM=`[[290, 5], [8, 121]]`, GOOD
   precision/recall/F1=`0.9603 / 0.9380 / 0.9490`
-- production refit: all 2,125 labels, 80 OneCycleLR epochs, final loss
+- previous production refit: all 2,125 labels, 80 OneCycleLR epochs, final loss
   `0.0008`
 
 Targeted LOSO check for held-out `nstxuE205052A01t022` with OneCycleLR and

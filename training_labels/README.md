@@ -23,13 +23,16 @@ Columns:
 - `error`
 
 Current checked contents:
-- 2125 labeled modes
-- labels: 649 `good`, 1476 `bad`
+- 2263 labeled modes
+- labels: 592 `good`, 1671 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
-  `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`
+  `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
+  `nstxuG121123J38`
 
 This is the list to use when retraining the expanded RF and CNN models.
+The active RF/CNN checkpoints were trained before the 2026-07-06 merge, on
+the previous 2125-row / 10-shot version of this list; retraining is pending.
 
 ### `tae_like_4old.csv`
 
@@ -152,7 +155,7 @@ python "$NOVA_REPO/viz/view_modes_csv.py" \
   --base_dir "$NOVA_DATA"
 ```
 
-## Refreshed / new co-worker labeled training candidates
+## Refreshed / new co-worker labeled component lists
 
 Two additional TAE-like review-stage lists were generated from the per-shot
 `*_tae_eae_split/tae_like.csv` files in `$CFS/m314/nova2/data` and the
@@ -161,9 +164,9 @@ corresponding `*_mode_labels_clean.csv` hand labels:
 - `tae_like_nstx_135388.csv`
 - `tae_like_nstxuG121123J38.csv`
 
-These lists are accepted for training but are not merged into
-`tae_like_train.csv` yet. They use relative `$NOVA_DATA` paths and the same
-full schema as the active training list:
+These lists were accepted for training and merged into `tae_like_train.csv` on
+2026-07-06. They use relative `$NOVA_DATA` paths and the same full schema as
+the active training list:
 `path,validity,family,signed_delta,fraction_below_upper2,gap_region,error`.
 The source split CSVs still contain Flux/DiTw absolute paths; the staged
 review files in this directory do not.
@@ -172,11 +175,14 @@ Current checked contents after final manual review:
 - `tae_like_nstx_135388.csv`: 344 TAE-like rows, 122 `good`, 222 `bad`
 - `tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 6 `good`, 168 `bad`
 
-`nstx_135388` already appears in the active 10-shot training list, so these
-refreshed labels should replace the older `nstx_135388` rows when merged.
-`nstxuG121123J38` is a new candidate shot to append. The continuum-crossing
-mismatch issue is considered resolved for modes recalculated with the correct
-q profile.
+Merge details:
+- old `nstx_135388` rows removed from `tae_like_train.csv`: 380 rows, 185
+  `good`, 195 `bad`
+- refreshed `nstx_135388` rows added: 344 rows, 122 `good`, 222 `bad`
+- new `nstxuG121123J38` rows added: 174 rows, 6 `good`, 168 `bad`
+
+The continuum-crossing mismatch issue is considered resolved for modes
+recalculated with the correct q profile.
 
 Example review commands:
 

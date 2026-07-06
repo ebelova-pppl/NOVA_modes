@@ -54,8 +54,9 @@ Data format summary
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current active good/bad training
   list is the expanded `training_labels/tae_like_train.csv`, now combining the
-  original four-shot list with the reviewed six-shot NSTX-U list. Older
-  four-shot TAE-only and mixed TAE/EAE lists are archived under
+  original four-shot list, the reviewed six-shot NSTX-U list, the refreshed
+  `nstx_135388` labels, and the new `nstxuG121123J38` labels. Older four-shot
+  TAE-only and mixed TAE/EAE lists are archived under
   `training_labels/old_4shots_tae_only_labels/` and
   `training_labels/old_4shots_mixed_labels/`.
 - Internal conventions:
@@ -75,11 +76,12 @@ Model families
 
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
-  `models/nova_cnn_raw.pt`. They were retrained on the 10-shot
-  `training_labels/tae_like_train.csv` list.
-- RF expanded-set OOF check: CM `[[1447, 29], [64, 585]]`, accuracy `0.956`,
+  `models/nova_cnn_raw.pt`. They were trained before the 2026-07-06
+  `tae_like_train.csv` merge, on the previous 2125-row / 10-shot list.
+  Retraining on the current 2263-row / 11-shot list is pending.
+- Previous RF expanded-set OOF check: CM `[[1447, 29], [64, 585]]`, accuracy `0.956`,
   GOOD recall `0.901`, GOOD precision `0.953`, GOOD F1 `0.926`.
-- Production raw CNN held-out check: CM `[[290, 5], [8, 121]]`,
+- Previous production raw CNN held-out check: CM `[[290, 5], [8, 121]]`,
   accuracy `0.969`, GOOD recall `0.938`, GOOD precision `0.960`, GOOD F1
   `0.949`. The saved checkpoint was then refit on all 2,125 labels for 80
   epochs, ending at loss `0.0008`.
