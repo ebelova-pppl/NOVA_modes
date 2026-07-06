@@ -35,3 +35,4 @@ diff
 chats/
 results/split_tests
 prompts/
+outputs/review*

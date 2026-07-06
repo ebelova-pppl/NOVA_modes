@@ -167,9 +167,9 @@ These lists are not merged into `tae_like_train.csv`. They use relative
 The source split CSVs still contain Flux/DiTw absolute paths; the staged
 review files in this directory do not.
 
-Current checked contents:
-- `tae_like_nstx_135388.csv`: 344 TAE-like rows, 99 `good`, 245 `bad`
-- `tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 0 `good`, 174 `bad`
+Current checked contents after manual review:
+- `tae_like_nstx_135388.csv`: 344 TAE-like rows, 124 `good`, 220 `bad`
+- `tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 5 `good`, 169 `bad`
 
 `nstx_135388` already appears in the active 10-shot training list, so these
 refreshed labels should replace the older `nstx_135388` rows if they are

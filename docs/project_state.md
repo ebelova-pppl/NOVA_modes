@@ -1086,13 +1086,43 @@ the per-shot split `tae_like.csv` rows to the corresponding
 `*_mode_labels_clean.csv` files and converting Flux absolute paths to relative
 `shot/N/file` paths:
 
-- `training_labels/tae_like_nstx_135388.csv`: `344` rows, `99` good, `245`
-  bad.
-- `training_labels/tae_like_nstxuG121123J38.csv`: `174` rows, `0` good,
-  `174` bad.
+- `training_labels/tae_like_nstx_135388.csv`: `344` rows, `124` good,
+  `220` bad after manual review.
+- `training_labels/tae_like_nstxuG121123J38.csv`: `174` rows, `5` good,
+  `169` bad after manual review.
 
 These files use the same full schema as `tae_like_train.csv`, with `family`
 set to `tae` for `good` rows and `none` for `bad` rows. Before merging, review
 the co-worker labels with the current RF/CNN models and decide how to replace
 the older `nstx_135388` entries already present in the active 10-shot training
 list.
+
+Ran inference-only RF/CNN checks on the two manually reviewed lists using the
+active production checkpoints:
+
+- RF: `models/nova_mode_classifier.joblib`, schema `rf_w_star_max_22_v2`
+- CNN: `models/nova_cnn_raw.pt`, kind `cnn_raw`
+- output directory: `outputs/review_2new_labels_20260706/`
+
+Metrics against the current manual labels:
+
+- `nstx_135388`, RF: CM `[[196, 24], [4, 120]]`, accuracy `0.9186`,
+  GOOD precision/recall/F1 `0.8333 / 0.9677 / 0.8955`.
+- `nstx_135388`, CNN: CM `[[193, 27], [3, 121]]`, accuracy `0.9128`,
+  GOOD precision/recall/F1 `0.8176 / 0.9758 / 0.8897`.
+- `nstxuG121123J38`, RF: CM `[[154, 15], [0, 5]]`, accuracy `0.9138`,
+  GOOD precision/recall/F1 `0.2500 / 1.0000 / 0.4000`.
+- `nstxuG121123J38`, CNN: CM `[[142, 27], [0, 5]]`, accuracy `0.8448`,
+  GOOD precision/recall/F1 `0.1562 / 1.0000 / 0.2703`.
+
+Combined over both review lists, RF found `43` model-vs-label disagreements
+and CNN found `57`; RF and CNN disagreed with each other on `28` modes. The
+most directly useful review lists are:
+
+- `rf_good_label_pred_bad_candidates.csv`: `4` rows, all from `nstx_135388`
+- `cnn_good_label_pred_bad_candidates.csv`: `3` rows, all from `nstx_135388`
+- `rf_bad_label_pred_good_candidates.csv`: `39` rows
+- `cnn_bad_label_pred_good_candidates.csv`: `54` rows
+- `any_disagreements.csv`: `64` rows
+
+No read, RF-feature, or CNN-inference errors occurred.
