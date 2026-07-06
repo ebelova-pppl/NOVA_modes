@@ -152,7 +152,7 @@ python "$NOVA_REPO/viz/view_modes_csv.py" \
   --base_dir "$NOVA_DATA"
 ```
 
-## Refreshed / new co-worker labeled review lists
+## Refreshed / new co-worker labeled training candidates
 
 Two additional TAE-like review-stage lists were generated from the per-shot
 `*_tae_eae_split/tae_like.csv` files in `$CFS/m314/nova2/data` and the
@@ -161,19 +161,22 @@ corresponding `*_mode_labels_clean.csv` hand labels:
 - `tae_like_nstx_135388.csv`
 - `tae_like_nstxuG121123J38.csv`
 
-These lists are not merged into `tae_like_train.csv`. They use relative
-`$NOVA_DATA` paths and the same full schema as the active training list:
+These lists are accepted for training but are not merged into
+`tae_like_train.csv` yet. They use relative `$NOVA_DATA` paths and the same
+full schema as the active training list:
 `path,validity,family,signed_delta,fraction_below_upper2,gap_region,error`.
 The source split CSVs still contain Flux/DiTw absolute paths; the staged
 review files in this directory do not.
 
-Current checked contents after manual review:
-- `tae_like_nstx_135388.csv`: 344 TAE-like rows, 124 `good`, 220 `bad`
-- `tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 5 `good`, 169 `bad`
+Current checked contents after final manual review:
+- `tae_like_nstx_135388.csv`: 344 TAE-like rows, 122 `good`, 222 `bad`
+- `tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 6 `good`, 168 `bad`
 
 `nstx_135388` already appears in the active 10-shot training list, so these
-refreshed labels should replace the older `nstx_135388` rows if they are
-accepted after review. `nstxuG121123J38` is a new candidate shot.
+refreshed labels should replace the older `nstx_135388` rows when merged.
+`nstxuG121123J38` is a new candidate shot to append. The continuum-crossing
+mismatch issue is considered resolved for modes recalculated with the correct
+q profile.
 
 Example review commands:
 
