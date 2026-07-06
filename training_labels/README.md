@@ -23,16 +23,18 @@ Columns:
 - `error`
 
 Current checked contents:
-- 2263 labeled modes
-- labels: 592 `good`, 1671 `bad`
+- 2610 labeled modes
+- labels: 606 `good`, 2004 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
   `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
-  `nstxuG121123J38`
+  `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`
 
 This is the list to use when retraining the expanded RF and CNN models.
-The active RF/CNN checkpoints were trained before the 2026-07-06 merge, on
-the previous 2125-row / 10-shot version of this list; retraining is pending.
+The active RF checkpoint has been retrained on this 2610-row / 13-shot list.
+The active raw-CNN checkpoint was trained before the 2026-07-06 merges, on the
+previous 2125-row / 10-shot version; CNN retraining is pending a GPU
+allocation.
 
 ### `tae_like_4old.csv`
 
@@ -128,14 +130,23 @@ Three additional NSTX-U G-case shots have a separate review-stage list:
 
 - `tae_like_3new.csv`
 
-This list is not merged into `tae_like_train.csv`. It is intended for visual
-review with `viz/view_modes_csv.py` before deciding whether to enrich and merge
-the labels.
+This original combined list is not merged into `tae_like_train.csv` as-is. It
+is intentionally still blocked because it includes `nstxuG121123N75`, whose
+modes still need recalculation with the corrected q profile. The already
+reviewed `nstxuG121123Q62` and `nstxuG142301Y93` rows were split into
+`tae_like_2new.csv` and merged into the active training list. After the N75
+recalculation, review the affected labels again before creating a replacement
+N75 component.
 
 Current checked contents:
 - 523 labeled modes
 - labels: 14 `good`, 509 `bad`
 - shots: `nstxuG121123Q62`, `nstxuG121123N75`, `nstxuG142301Y93`
+- per-shot counts:
+  - `nstxuG121123Q62`: 241 rows, 13 `good`, 228 `bad`
+  - `nstxuG121123N75`: 176 rows, 0 `good`, 176 `bad`; blocked pending
+    recalculation
+  - `nstxuG142301Y93`: 106 rows, 1 `good`, 105 `bad`
 - paths are relative to `$NOVA_DATA`
 - no duplicate paths
 - all paths resolve under `$NOVA_DATA`
@@ -154,6 +165,21 @@ python "$NOVA_REPO/viz/view_modes_csv.py" \
   "$NOVA_REPO/training_labels/tae_like_3new.csv" \
   --base_dir "$NOVA_DATA"
 ```
+
+### `tae_like_2new.csv`
+
+Reviewed two-shot component split from `tae_like_3new.csv`, excluding blocked
+`nstxuG121123N75`. This list uses the full active training schema and has been
+merged into `tae_like_train.csv`.
+
+Current checked contents:
+- 347 labeled modes
+- labels: 14 `good`, 333 `bad`
+- `nstxuG121123Q62`: 241 rows, 13 `good`, 228 `bad`
+- `nstxuG142301Y93`: 106 rows, 1 `good`, 105 `bad`
+- paths are relative to `$NOVA_DATA`
+- no duplicate paths
+- all paths resolve under `$NOVA_DATA`
 
 ## Refreshed / new co-worker labeled component lists
 

@@ -24,9 +24,9 @@ For portability, paths in training CSVs should be stored relative to
 The current active good/bad training list is the expanded
 `training_labels/tae_like_train.csv`, which combines the original four-shot
 TAE-like set, the reviewed six-shot NSTX-U TAE-like set, refreshed
-`nstx_135388` labels, and the new `nstxuG121123J38` labels. It currently has
-2263 rows across 11 shots. Older four-shot TAE-only and mixed TAE/EAE lists
-are archived under
+`nstx_135388` labels, the new `nstxuG121123J38` labels, and the reviewed
+`nstxuG121123Q62` / `nstxuG142301Y93` labels. It currently has 2610 rows
+across 13 shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
 
@@ -282,11 +282,12 @@ python "$NOVA_REPO/scripts/rf_train_classify.py" \
   --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
-Expanded RF OOF check after label cleanup:
+Current 13-shot RF OOF check after merging `tae_like_2new.csv`:
 
-- CM=`[[1447, 29], [64, 585]]`
-- accuracy=`0.956`
-- GOOD precision/recall/F1=`0.953 / 0.901 / 0.926`
+- CM=`[[1967, 37], [91, 515]]`
+- accuracy=`0.951`
+- GOOD precision/recall/F1=`0.933 / 0.850 / 0.889`
+- output: `outputs/rf_oof_13shots/`
 
 The active expanded-set RF checkpoint is
 `models/nova_mode_classifier.joblib`. Previous four-shot RF checkpoints are
