@@ -73,14 +73,13 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: trained before the 2026-07-06 merges, on the previous
-      2125-row / 10-shot active list; retraining on the current 2610-row /
-      13-shot list is pending
-    -	Previous expanded 10-shot held-out accuracy: 0.969
-    -	Previous expanded 10-shot held-out CM: `[[290, 5], [8, 121]]`
-    -	Previous GOOD precision/recall/F1: 0.960 / 0.938 / 0.949
-    -	Previous production refit: all 2,125 labels, 80 epochs, final loss 0.0008
-    -	Current best checked pre-merge expanded-set model
+    -	Checkpoint status: retrained on the current 2610-row / 13-shot active
+      list
+    -	Current 13-shot held-out accuracy: 0.954
+    -	Current 13-shot held-out CM: `[[394, 6], [18, 103]]`
+    -	Current GOOD precision/recall/F1: 0.945 / 0.851 / 0.896
+    -	Similar held-out performance to the current RF check; LOSO still needed
+      to judge shot-to-shot generalization and fusion policy
 3.	CNN (straightened)
     -	Ridge-aligned representation (2M+1, r)
     -	Previous four-shot checkpoint archived under `models/old_4shots_models/`
@@ -185,15 +184,10 @@ From cont_features.py:
 •	Missing datcon handling → warn once, disable continuum features
 
 ## Current tasks
-- Retrain raw CNN on the current 2610-row / 13-shot
-  `training_labels/tae_like_train.csv` list after the refreshed
-  `nstx_135388`, `nstxuG121123J38`, `nstxuG121123Q62`, and
-  `nstxuG142301Y93` merge.
 - Keep `training_labels/additions/tae_like_3new.csv` out of training until
   `nstxuG121123N75` is recalculated and its labels are reviewed again.
-- Decide whether to retune the RF-leaning fusion thresholds: raw CNN is
-  strongest overall in expanded LOSO, but fusion better protects the sparse
-  NSTX-U G-case regime.
+- Run updated 13-shot LOSO checks before deciding whether to retune the
+  RF-leaning fusion thresholds.
 - Recheck the three new G-case shots after corrected continuum files arrive.
 - Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
  
@@ -1215,5 +1209,14 @@ the root of `training_labels/` contains only the active
 `tae_like_train.csv`, this README, and archive directories. The active training
 CSV and its row contents were not changed by this reorganization.
 
-Raw CNN retraining is still pending because the current shell has no CUDA
-device or Slurm GPU allocation.
+User retrained the raw CNN on the current 13-shot active list and updated
+`models/nova_cnn_raw.pt`.
+
+Current raw-CNN held-out split check:
+
+- test CM `[[394, 6], [18, 103]]`
+- test accuracy `0.954`
+- GOOD precision/recall/F1 `0.945 / 0.851 / 0.896`
+
+This is broadly similar to the current RF split/OOF checks. Updated LOSO
+checks are still needed before changing the RF/CNN fusion policy.

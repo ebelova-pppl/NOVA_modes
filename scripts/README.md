@@ -175,8 +175,13 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 8 --cache_data
 ```
 
-Previous expanded 10-shot TAE-like raw-CNN retraining check on
+Current 13-shot TAE-like raw-CNN retraining check on
 `training_labels/tae_like_train.csv`:
+
+- `cnn_raw.py`: accuracy=`0.954`, CM=`[[394, 6], [18, 103]]`, GOOD
+  precision/recall/F1=`0.945 / 0.851 / 0.896`
+
+Previous expanded 10-shot TAE-like raw-CNN retraining check:
 
 - `cnn_raw.py`: accuracy=`0.9693`, CM=`[[290, 5], [8, 121]]`, GOOD
   precision/recall/F1=`0.9603 / 0.9380 / 0.9490`
@@ -703,11 +708,11 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints are trained on the
-expanded 10-shot TAE-like list. The default RF-leaning fusion policy was chosen
+current 13-shot TAE-like list. The default RF-leaning fusion policy was chosen
 from four-shot LOSO checks. The symmetric-recipe 10-shot LOSO check in
 `outputs/loso_10_onecycle_both/` makes raw CNN strongest overall. The current
 combined policy still has better GOOD recall on the sparse NSTX-U G-case group,
-so fusion-threshold retuning remains a separate decision.
+so an updated 13-shot LOSO check should guide any fusion-threshold retuning.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
@@ -767,9 +772,10 @@ The CNN-rescue, RF-only-good, and fallback tiers are included in
 
 The RF-leaning policy was chosen from four-shot LOSO checks because RF was the
 more stable held-out-shot ranker, while the CNN still provided useful
-high-confidence rescues. The expanded 10-shot LOSO check gives the current
+high-confidence rescues. The expanded 10-shot LOSO check gave the current
 policy and RF-only the same aggregate accuracy (`0.9299`), with the combined
 policy trading three extra false positives for three fewer false negatives.
+Repeat the LOSO check on the 13-shot active set before changing this policy.
 
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`.

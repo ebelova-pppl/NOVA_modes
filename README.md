@@ -77,16 +77,17 @@ Model families
 
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
-  `models/nova_cnn_raw.pt`. The RF checkpoint has been retrained on the
-  current 2610-row / 13-shot `tae_like_train.csv` list. The raw-CNN checkpoint
-  is still from the previous 2125-row / 10-shot list; CNN retraining is
-  pending a GPU allocation.
+  `models/nova_cnn_raw.pt`. Both RF and raw-CNN checkpoints have been
+  retrained on the current 2610-row / 13-shot `tae_like_train.csv` list.
 - Current RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
-- Previous production raw CNN held-out check: CM `[[290, 5], [8, 121]]`,
-  accuracy `0.969`, GOOD recall `0.938`, GOOD precision `0.960`, GOOD F1
-  `0.949`. The saved checkpoint was then refit on all 2,125 labels for 80
-  epochs, ending at loss `0.0008`.
+- Current raw-CNN 13-shot held-out split check: CM `[[394, 6], [18, 103]]`,
+  accuracy `0.954`, GOOD recall `0.851`, GOOD precision `0.945`, GOOD F1
+  `0.896`.
+- Previous production raw-CNN 10-shot held-out check: CM
+  `[[290, 5], [8, 121]]`, accuracy `0.969`, GOOD recall `0.938`, GOOD
+  precision `0.960`, GOOD F1 `0.949`. That saved checkpoint was then refit on
+  all 2,125 labels for 80 epochs, ending at loss `0.0008`.
 - Symmetric OneCycleLR + gradient-clipping 10-shot LOSO check:
   CNN CM `[[1402, 74], [67, 582]]`, accuracy `0.934`, GOOD recall `0.897`,
   GOOD precision `0.887`. This is now the strongest aggregate LOSO result,

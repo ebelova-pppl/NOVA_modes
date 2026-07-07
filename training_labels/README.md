@@ -31,10 +31,8 @@ Current checked contents:
   `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`
 
 This is the list to use when retraining the expanded RF and CNN models.
-The active RF checkpoint has been retrained on this 2610-row / 13-shot list.
-The active raw-CNN checkpoint was trained before the 2026-07-06 merges, on the
-previous 2125-row / 10-shot version; CNN retraining is pending a GPU
-allocation.
+The active RF and raw-CNN checkpoints have both been retrained on this
+2610-row / 13-shot list.
 
 ## Addition / component lists
 
