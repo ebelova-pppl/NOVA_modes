@@ -18,20 +18,23 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
     - older TAE-only lists: `training_labels/old_4shots_tae_only_labels/`
     - previous four-shot mixed TAE/EAE lists: `training_labels/old_4shots_mixed_labels/`
 - Component lists for the expanded training pool:
-    - original four-shot copy: `training_labels/tae_like_4old.csv`
-    - reviewed six-shot NSTX-U copy: `training_labels/tae_like_6new.csv`
+    - original four-shot copy: `training_labels/additions/tae_like_4old.csv`
+    - reviewed six-shot NSTX-U copy: `training_labels/additions/tae_like_6new.csv`
+    - previous 10-shot active-list snapshot:
+      `training_labels/additions/tae_like_copy.csv`
     - refreshed `nstx_135388` replacement copy:
-      `training_labels/tae_like_nstx_135388.csv`
+      `training_labels/additions/tae_like_nstx_135388.csv`
     - new `nstxuG121123J38` copy:
-      `training_labels/tae_like_nstxuG121123J38.csv`
+      `training_labels/additions/tae_like_nstxuG121123J38.csv`
     - reviewed two-shot G-case copy:
-      `training_labels/tae_like_2new.csv`
+      `training_labels/additions/tae_like_2new.csv`
 - Staged lists not yet merged:
-    - `training_labels/tae_like_3new.csv`: three additional NSTX-U G-case
+    - `training_labels/additions/tae_like_3new.csv`: three additional NSTX-U G-case
       shots kept as the original combined reference. Do not merge this file
       as-is: `nstxuG121123Q62` and `nstxuG142301Y93` were split into
-      `tae_like_2new.csv` and merged, while `nstxuG121123N75` remains blocked
-      pending recalculation with the corrected q profile.
+      `training_labels/additions/tae_like_2new.csv` and merged, while
+      `nstxuG121123N75` remains blocked pending recalculation with the
+      corrected q profile.
 
 Each mode includes:
 -	Scalar metadata:
@@ -61,7 +64,7 @@ Notes:
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
     -	Checkpoint status: retrained on the current 2610-row / 13-shot active
-      list after the `tae_like_2new.csv` merge
+      list after the `training_labels/additions/tae_like_2new.csv` merge
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
     -	Current 13-shot OOF accuracy: 0.951
     -	Current 13-shot OOF CM: `[[1967, 37], [91, 515]]`
@@ -186,7 +189,7 @@ From cont_features.py:
   `training_labels/tae_like_train.csv` list after the refreshed
   `nstx_135388`, `nstxuG121123J38`, `nstxuG121123Q62`, and
   `nstxuG142301Y93` merge.
-- Keep `training_labels/tae_like_3new.csv` out of training until
+- Keep `training_labels/additions/tae_like_3new.csv` out of training until
   `nstxuG121123N75` is recalculated and its labels are reviewed again.
 - Decide whether to retune the RF-leaning fusion thresholds: raw CNN is
   strongest overall in expanded LOSO, but fusion better protects the sparse
@@ -549,9 +552,9 @@ on the full 1085-mode list and saved the deployment model.
 
 ### 2026-06-06
 User finished checking and cleaning the six-shot NSTX-U label list. The cleaned
-list is now `training_labels/tae_like_6new.csv`.
+list is now `training_labels/additions/tae_like_6new.csv`.
 
-Codex enriched `training_labels/tae_like_6new.csv` to match the full
+Codex enriched `training_labels/additions/tae_like_6new.csv` to match the full
 `tae_like_train.csv` schema: `path`, `validity`, `family`, `signed_delta`,
 `fraction_below_upper2`, `gap_region`, and `error`. Split metadata was restored
 from `/global/cfs/cdirs/m314/nova2/metadata/*_tae_eae_split/tae_like.csv` by
@@ -566,8 +569,8 @@ Validation after enrichment:
 - no missing paths under `$NOVA_DATA`.
 - no empty required metadata fields.
 
-Codex merged `training_labels/tae_like_4old.csv` and
-`training_labels/tae_like_6new.csv` into the active
+Codex merged `training_labels/additions/tae_like_4old.csv` and
+`training_labels/additions/tae_like_6new.csv` into the active
 `training_labels/tae_like_train.csv` list. The merged list preserves the full schema,
 keeps old rows first and appends the reviewed six-shot NSTX-U rows, and uses
 relative `$NOVA_DATA` paths throughout.
@@ -623,8 +626,9 @@ This avoids confusion with generated `tae_like.csv` files written by
 
 Updated `NOVA_TRAIN_CSV`, `NOVA_TRAIN_CSV_TAE`, the raw-CNN fallback default,
 and README examples to use `training_labels/tae_like_train.csv`. The component
-lists remain `training_labels/tae_like_4old.csv` and
-`training_labels/tae_like_6new.csv`.
+lists are now kept under `training_labels/additions/`, including
+`training_labels/additions/tae_like_4old.csv` and
+`training_labels/additions/tae_like_6new.csv`.
 
 Added `scripts/run_loso_10.py` and `scripts/run_loso_10.sbatch` to orchestrate
 the expanded 10-shot LOSO check. The workflow creates per-held-out-shot train
@@ -693,8 +697,8 @@ environment variables as optional so importing `NOVA_TRAIN_CSV` does not force
 unused directories to exist.
 
 ### 2026-06-15
-Created `training_labels/tae_like_3new.csv` as a review-stage combined label
-list for three newly labeled NSTX-U G-case shots:
+Created `training_labels/additions/tae_like_3new.csv` as a review-stage
+combined label list for three newly labeled NSTX-U G-case shots:
 
 - `nstxuG121123Q62`
 - `nstxuG121123N75`
@@ -719,7 +723,7 @@ corrected `datcon` files are prepared. Their mode structures and continuum
 calculations used different resolutions, which can shift the inferred
 continuum-crossing location away from the corresponding mode-structure spike.
 After updated continuum files arrive, rerun the visual review and recompute
-continuum-derived metadata before merging `tae_like_3new.csv`.
+continuum-derived metadata before merging the affected N75 replacement rows.
 
 Changed only the fresh full-data refit stage in `scripts/cnn_raw.py` to use
 per-batch `OneCycleLR` and gradient clipping. Split training still uses
@@ -1086,8 +1090,8 @@ now state the active amplitude convention.
 
 Data update: `nstxuG121123N75` has not been refreshed yet, so its earlier
 continuum/mode-provenance concern remains blocking and its staged labels should
-not be merged. This means `training_labels/tae_like_3new.csv` remains
-unfinished as a whole because it includes `nstxuG121123N75`.
+not be merged. This means `training_labels/additions/tae_like_3new.csv`
+remains unfinished as a whole because it includes `nstxuG121123N75`.
 
 `nstx_135388` has been updated in `$CFS/m314/nova2/data`, and a new shot
 `nstxuG121123J38` has been added there. For both shots, all modes were labeled
@@ -1099,14 +1103,14 @@ and split into TAE-like and EAE-like lists under their respective
 - `nstxuG121123J38`: `174` TAE-like modes, `446` EAE-like modes, `620` total
   modes.
 
-Created review-stage labeled TAE-like lists in `training_labels/` by matching
-the per-shot split `tae_like.csv` rows to the corresponding
+Created review-stage labeled TAE-like lists in `training_labels/additions/` by
+matching the per-shot split `tae_like.csv` rows to the corresponding
 `*_mode_labels_clean.csv` files and converting Flux absolute paths to relative
 `shot/N/file` paths:
 
-- `training_labels/tae_like_nstx_135388.csv`: `344` rows, `122` good,
+- `training_labels/additions/tae_like_nstx_135388.csv`: `344` rows, `122` good,
   `222` bad after final manual review.
-- `training_labels/tae_like_nstxuG121123J38.csv`: `174` rows, `6` good,
+- `training_labels/additions/tae_like_nstxuG121123J38.csv`: `174` rows, `6` good,
   `168` bad after final manual review.
 
 These files use the same full schema as `tae_like_train.csv`, with `family`
@@ -1152,10 +1156,10 @@ No read, RF-feature, or CNN-inference errors occurred.
 Merged the accepted two-shot update into `training_labels/tae_like_train.csv`:
 
 - removed the old `nstx_135388` block: `380` rows, `185` good, `195` bad
-- added refreshed `training_labels/tae_like_nstx_135388.csv`: `344` rows,
-  `122` good, `222` bad
-- added `training_labels/tae_like_nstxuG121123J38.csv`: `174` rows, `6` good,
-  `168` bad
+- added refreshed `training_labels/additions/tae_like_nstx_135388.csv`:
+  `344` rows, `122` good, `222` bad
+- added `training_labels/additions/tae_like_nstxuG121123J38.csv`: `174` rows,
+  `6` good, `168` bad
 
 The active training list then had `2263` rows: `592` good and `1671` bad across
 11 shots. Validation after the merge found the expected schema, no duplicate
@@ -1169,21 +1173,22 @@ At this point both RF and raw-CNN checkpoints still reflected the previous
 2125-row / 10-shot training list, so retraining was pending before reporting
 new production model metrics.
 
-Split the usable part of `training_labels/tae_like_3new.csv` into
-`training_labels/tae_like_2new.csv` by excluding `nstxuG121123N75` and keeping
-only the already-reviewed `nstxuG121123Q62` and `nstxuG142301Y93` rows. The
-new two-shot list restores the full training schema from the per-shot split
-metadata in `$CFS/m314/nova2/metadata`:
+Split the usable part of `training_labels/additions/tae_like_3new.csv` into
+`training_labels/additions/tae_like_2new.csv` by excluding `nstxuG121123N75`
+and keeping only the already-reviewed `nstxuG121123Q62` and
+`nstxuG142301Y93` rows. The new two-shot list restores the full training
+schema from the per-shot split metadata in `$CFS/m314/nova2/metadata`:
 
 - `nstxuG121123Q62`: `241` rows, `13` good, `228` bad
 - `nstxuG142301Y93`: `106` rows, `1` good, `105` bad
 
-Merged `tae_like_2new.csv` into `training_labels/tae_like_train.csv`. The
-active training list now has `2610` rows: `606` good and `2004` bad across 13
-shots. Validation found the expected schema, no duplicate paths, no absolute
-paths, no unresolved files under `$CFS/m314/nova2/data`, and consistent family
-labels. The original `tae_like_3new.csv` remains unmerged as a reference only
-because it still includes blocked `nstxuG121123N75` rows.
+Merged `training_labels/additions/tae_like_2new.csv` into
+`training_labels/tae_like_train.csv`. The active training list now has `2610`
+rows: `606` good and `2004` bad across 13 shots. Validation found the expected
+schema, no duplicate paths, no absolute paths, no unresolved files under
+`$CFS/m314/nova2/data`, and consistent family labels. The original
+`training_labels/additions/tae_like_3new.csv` remains unmerged as a reference
+only because it still includes blocked `nstxuG121123N75` rows.
 
 Retrained RF on the current `training_labels/tae_like_train.csv` list and
 saved:
@@ -1204,6 +1209,11 @@ RF 5-fold OOF audit:
 - accuracy `0.951`
 - GOOD precision/recall/F1 `0.933 / 0.850 / 0.889`
 - strong suspect rows: `43`
+
+Moved component and staged review lists under `training_labels/additions/` so
+the root of `training_labels/` contains only the active
+`tae_like_train.csv`, this README, and archive directories. The active training
+CSV and its row contents were not changed by this reorganization.
 
 Raw CNN retraining is still pending because the current shell has no CUDA
 device or Slurm GPU allocation.

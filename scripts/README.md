@@ -293,14 +293,14 @@ The active expanded-set RF checkpoint is
 `models/nova_mode_classifier.joblib`. Previous four-shot RF checkpoints are
 archived under `models/old_4shots_models/`.
 
-The component six-shot list is `training_labels/tae_like_6new.csv`, with
+The component six-shot list is `training_labels/additions/tae_like_6new.csv`, with
 relative `$NOVA_DATA` paths and the same full schema as `tae_like_train.csv`.
 For interactive review, `label_modes_fast.py` can use it with `--mode-list`:
 
 ```bash
 python "$NOVA_REPO/scripts/label_modes_fast.py" \
   "$NOVA_DATA/nstxuE202855A01t020/N1" \
-  --mode-list "$NOVA_REPO/training_labels/tae_like_6new.csv" \
+  --mode-list "$NOVA_REPO/training_labels/additions/tae_like_6new.csv" \
   --rf-model "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
@@ -586,7 +586,7 @@ For the staged six-shot NSTX-U label list:
 
 ```bash
 python "$NOVA_REPO/viz/view_modes_csv.py" \
-  /path/to/nova2/metadata/tae_like_6new.csv \
+  "$NOVA_REPO/training_labels/additions/tae_like_6new.csv" \
   --base_dir "$NOVA_DATA"
 ```
 

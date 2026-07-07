@@ -36,15 +36,26 @@ The active raw-CNN checkpoint was trained before the 2026-07-06 merges, on the
 previous 2125-row / 10-shot version; CNN retraining is pending a GPU
 allocation.
 
-### `tae_like_4old.csv`
+## Addition / component lists
+
+Component and staged review lists live under `training_labels/additions/` so
+the root of `training_labels/` only carries the active training list, this
+README, and archive directories.
+
+### `additions/tae_like_4old.csv`
 
 Backup copy of the original four-shot TAE-like training list before the
 six-shot merge.
 
-### `tae_like_6new.csv`
+### `additions/tae_like_6new.csv`
 
 Reviewed six-shot NSTX-U TAE-like list that was appended to
 `tae_like_train.csv`.
+
+### `additions/tae_like_copy.csv`
+
+Backup copy of the previous 2125-row / 10-shot active training list before the
+2026-07-06 merges. It contains 678 `good` and 1447 `bad` rows.
 
 The bare filename `tae_like.csv` is intentionally not used for the canonical
 training list anymore, because `split_tae_eae.py` and `sort_shot_mixed.py`
@@ -85,7 +96,7 @@ lists as active files.
 
 Six additional NSTX-U shots have a cleaned staged TAE-like label list:
 
-- `tae_like_6new.csv`
+- `additions/tae_like_6new.csv`
 
 This list uses the same full schema as `tae_like_train.csv`. The `family`
 column is set to `tae` for `good` rows and `none` for `bad` rows;
@@ -111,32 +122,32 @@ Checked staged-label summary:
   during labeling; these are intentionally excluded from training
 
 The shared metadata CSVs currently contain absolute source paths from the
-labeling environment. The staged `training_labels/tae_like_6new.csv` file uses
-relative `$NOVA_DATA` paths and is kept as the reviewed six-shot component
-list.
+labeling environment. The staged
+`training_labels/additions/tae_like_6new.csv` file uses relative `$NOVA_DATA`
+paths and is kept as the reviewed six-shot component list.
 
 Example review command for one `N` directory:
 
 ```bash
 python "$NOVA_REPO/scripts/label_modes_fast.py" \
   "$NOVA_DATA/nstxuE202855A01t020/N1" \
-  --mode-list "$NOVA_REPO/training_labels/tae_like_6new.csv" \
-  --rf-model "$NOVA_MODELS/nova_rf_tae_like_full.joblib"
+  --mode-list "$NOVA_REPO/training_labels/additions/tae_like_6new.csv" \
+  --rf-model "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
 ## Three-shot NSTX-U review list
 
 Three additional NSTX-U G-case shots have a separate review-stage list:
 
-- `tae_like_3new.csv`
+- `additions/tae_like_3new.csv`
 
 This original combined list is not merged into `tae_like_train.csv` as-is. It
 is intentionally still blocked because it includes `nstxuG121123N75`, whose
 modes still need recalculation with the corrected q profile. The already
 reviewed `nstxuG121123Q62` and `nstxuG142301Y93` rows were split into
-`tae_like_2new.csv` and merged into the active training list. After the N75
-recalculation, review the affected labels again before creating a replacement
-N75 component.
+`additions/tae_like_2new.csv` and merged into the active training list. After
+the N75 recalculation, review the affected labels again before creating a
+replacement N75 component.
 
 Current checked contents:
 - 523 labeled modes
@@ -162,15 +173,15 @@ Example review command:
 
 ```bash
 python "$NOVA_REPO/viz/view_modes_csv.py" \
-  "$NOVA_REPO/training_labels/tae_like_3new.csv" \
+  "$NOVA_REPO/training_labels/additions/tae_like_3new.csv" \
   --base_dir "$NOVA_DATA"
 ```
 
-### `tae_like_2new.csv`
+### `additions/tae_like_2new.csv`
 
-Reviewed two-shot component split from `tae_like_3new.csv`, excluding blocked
-`nstxuG121123N75`. This list uses the full active training schema and has been
-merged into `tae_like_train.csv`.
+Reviewed two-shot component split from `additions/tae_like_3new.csv`,
+excluding blocked `nstxuG121123N75`. This list uses the full active training
+schema and has been merged into `tae_like_train.csv`.
 
 Current checked contents:
 - 347 labeled modes
@@ -187,19 +198,19 @@ Two additional TAE-like review-stage lists were generated from the per-shot
 `*_tae_eae_split/tae_like.csv` files in `$CFS/m314/nova2/data` and the
 corresponding `*_mode_labels_clean.csv` hand labels:
 
-- `tae_like_nstx_135388.csv`
-- `tae_like_nstxuG121123J38.csv`
+- `additions/tae_like_nstx_135388.csv`
+- `additions/tae_like_nstxuG121123J38.csv`
 
 These lists were accepted for training and merged into `tae_like_train.csv` on
 2026-07-06. They use relative `$NOVA_DATA` paths and the same full schema as
 the active training list:
 `path,validity,family,signed_delta,fraction_below_upper2,gap_region,error`.
 The source split CSVs still contain Flux/DiTw absolute paths; the staged
-review files in this directory do not.
+review files under `additions/` do not.
 
 Current checked contents after final manual review:
-- `tae_like_nstx_135388.csv`: 344 TAE-like rows, 122 `good`, 222 `bad`
-- `tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 6 `good`, 168 `bad`
+- `additions/tae_like_nstx_135388.csv`: 344 TAE-like rows, 122 `good`, 222 `bad`
+- `additions/tae_like_nstxuG121123J38.csv`: 174 TAE-like rows, 6 `good`, 168 `bad`
 
 Merge details:
 - old `nstx_135388` rows removed from `tae_like_train.csv`: 380 rows, 185
@@ -214,10 +225,10 @@ Example review commands:
 
 ```bash
 python "$NOVA_REPO/viz/view_modes_csv.py" \
-  "$NOVA_REPO/training_labels/tae_like_nstx_135388.csv" \
+  "$NOVA_REPO/training_labels/additions/tae_like_nstx_135388.csv" \
   --base_dir "$NOVA_DATA"
 
 python "$NOVA_REPO/viz/view_modes_csv.py" \
-  "$NOVA_REPO/training_labels/tae_like_nstxuG121123J38.csv" \
+  "$NOVA_REPO/training_labels/additions/tae_like_nstxuG121123J38.csv" \
   --base_dir "$NOVA_DATA"
 ```
