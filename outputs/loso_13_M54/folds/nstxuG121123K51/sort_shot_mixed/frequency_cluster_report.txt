@@ -1,0 +1,44 @@
+Close-frequency cluster report for selected NOVA modes
+  Used parameters: rel_freq_tol=0.02  sim_tol=0.9  r_tol=0.1  width_tol=0.05
+===========================================================================
+
+n=8  cluster=2  size=2  omega_range=[6.7844, 6.84768]  d_omega/omega=0.00928389
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N8/egn08w.4603E+02
+               omega=6.7844  score=0.412413  r0=0.4530  dr=0.2661
+  Compare: egn08w.4689E+02  vs  egn08w.4603E+02  cos=0.032  dr0=0.3352  ddr=0.2201  rel_domega=0.0093  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N8/egn08w.4689E+02
+               omega=6.84768  score=0.313333  r0=0.1179  dr=0.0460
+---------------------------------------------------------------------------
+
+n=9  cluster=4  size=3  omega_range=[6.72776, 6.8541]  d_omega/omega=0.0186042
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N9/egn09w.4552E+02
+               omega=6.74678  score=0.946667  r0=0.1769  dr=0.0769
+  Compare: egn09w.4526E+02  vs  egn09w.4552E+02  cos=0.077  dr0=0.2807  ddr=0.1568  rel_domega=0.0028  freq_close=True  same=False
+  Compare: egn09w.4698E+02  vs  egn09w.4552E+02  cos=0.089  dr0=0.0017  ddr=0.0043  rel_domega=0.0159  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N9/egn09w.4526E+02
+               omega=6.72776  score=0.943170  r0=0.4575  dr=0.2337
+  Compare: egn09w.4698E+02  vs  egn09w.4526E+02  cos=0.082  dr0=0.2790  ddr=0.1611  rel_domega=0.0188  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N9/egn09w.4698E+02
+               omega=6.8541  score=0.315000  r0=0.1785  dr=0.0725
+---------------------------------------------------------------------------
+
+n=10  cluster=5  size=3  omega_range=[6.69151, 6.82355]  d_omega/omega=0.0195406
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N10/egn10w.4557E+02
+               omega=6.7506  score=0.943333  r0=0.1514  dr=0.0663
+  Compare: egn10w.4478E+02  vs  egn10w.4557E+02  cos=0.024  dr0=0.3114  ddr=0.1972  rel_domega=0.0088  freq_close=True  same=False
+  Compare: egn10w.4656E+02  vs  egn10w.4557E+02  cos=0.265  dr0=0.0838  ddr=0.0932  rel_domega=0.0108  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N10/egn10w.4478E+02
+               omega=6.69151  score=0.917856  r0=0.4627  dr=0.2635
+  Compare: egn10w.4656E+02  vs  egn10w.4478E+02  cos=0.165  dr0=0.2276  ddr=0.1039  rel_domega=0.0197  freq_close=True  same=False
+  type_group=3
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N10/egn10w.4656E+02
+               omega=6.82355  score=0.416667  r0=0.2351  dr=0.1595
+---------------------------------------------------------------------------
+

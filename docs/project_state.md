@@ -1232,3 +1232,15 @@ is detected: zero predicted GOOD modes with GOOD labels present, near-all-BAD
 or near-all-GOOD predictions, or nearly constant `p_good`. The saved checkpoint
 metadata still records `final_prediction_health`, now including exact
 predicted/true GOOD counts.
+
+Adapted `scripts/run_loso_10.py` for the current 13-shot active training list.
+The filename is kept for compatibility, but the driver now infers the number
+of held-out shots from `--train_csv`, defaults to `outputs/loso_<N shots>`, and
+writes a `run_config.json` with the CNN shape/recipe metadata. For the current
+raw-CNN harmonic-window check, run separate output/work roots:
+
+- `outputs/loso_13_M54` with `--cnn_m_target 54`
+- `outputs/loso_13_M100` with `--cnn_m_target 100`
+
+Use those LOSO totals, rather than the single held-out split, before changing
+the production raw-CNN `M_target` or the RF/CNN fusion policy.

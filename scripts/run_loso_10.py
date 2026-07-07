@@ -2,9 +2,9 @@
 """
 Run leave-one-shot-out checks for the expanded TAE-like training set.
 
-The driver keeps small, versionable evaluation CSVs under outputs/loso_10 by
-default, while model checkpoints and training logs go to $NOVA_RUN/loso_10 or
-$SCRATCH/nova_s/loso_10. It intentionally calls the existing RF, raw-CNN, and
+The driver keeps small, versionable evaluation CSVs under outputs/loso_<N> by
+default, while model checkpoints and training logs go to $NOVA_RUN/loso_<N> or
+$SCRATCH/nova_s/loso_<N>. It intentionally calls the existing RF, raw-CNN, and
 mixed-shot sorter scripts rather than duplicating their preprocessing logic.
 """
 
@@ -31,18 +31,19 @@ def default_repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def default_out_root(repo_root: Path) -> Path:
-    return repo_root / "outputs" / "loso_10"
+def default_out_root(repo_root: Path, n_shots: int) -> Path:
+    return repo_root / "outputs" / f"loso_{n_shots}"
 
 
 def default_work_root(out_root: Path) -> Path:
+    run_name = out_root.name
     nova_run = os.environ.get("NOVA_RUN")
     if nova_run:
-        return Path(nova_run).expanduser() / "loso_10"
+        return Path(nova_run).expanduser() / run_name
 
     scratch = os.environ.get("SCRATCH")
     if scratch:
-        return Path(scratch).expanduser() / "nova_s" / "loso_10"
+        return Path(scratch).expanduser() / "nova_s" / run_name
 
     return out_root / "work"
 
@@ -179,6 +180,11 @@ def prepare_loso_splits(
     return fold_shots
 
 
+def count_training_shots(train_csv: Path) -> int:
+    _, rows, _ = read_training_rows(train_csv)
+    return len({shot_from_mode_path(row["path"]) for row in rows})
+
+
 def read_existing_fold_shots(out_root: Path) -> list[str]:
     folds_dir = out_root / "folds"
     if not folds_dir.is_dir():
@@ -230,6 +236,33 @@ def resolve_launch_prefix(args: argparse.Namespace, launch: str) -> list[str]:
 
 def command_to_string(cmd: Sequence[str]) -> str:
     return " ".join(subprocess.list2cmdline([part]) for part in cmd)
+
+
+def write_run_config(args: argparse.Namespace, fold_shots: Sequence[str]) -> None:
+    config = {
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "repo_root": str(args.repo_root),
+        "train_csv": str(args.train_csv),
+        "out_root": str(args.out_root),
+        "work_root": str(args.work_root),
+        "data_dir": str(args.data_dir),
+        "shot_root": str(args.shot_root),
+        "steps": args.steps,
+        "folds": list(fold_shots),
+        "n_folds": len(fold_shots),
+        "seed": args.seed,
+        "cnn_m_target": args.cnn_m_target,
+        "cnn_r_target": args.cnn_r_target,
+        "cnn_epochs": args.cnn_epochs,
+        "cnn_batch_size": args.cnn_batch_size,
+        "cnn_lr": args.cnn_lr,
+        "cnn_test_frac": args.cnn_test_frac,
+        "cnn_normalize": args.cnn_normalize,
+        "cnn_pos_weight": args.cnn_pos_weight,
+        "cnn_refit_full_before_save": args.cnn_refit_full_before_save,
+        "model_eval_threshold": args.model_eval_threshold,
+    }
+    (args.out_root / "run_config.json").write_text(json.dumps(config, indent=2) + "\n")
 
 
 def run_logged(
@@ -539,19 +572,31 @@ def aggregate_outputs(args: argparse.Namespace, fold_shots: Sequence[str]) -> No
 
 def build_arg_parser() -> argparse.ArgumentParser:
     repo_root = default_repo_root()
-    out_root = default_out_root(repo_root)
-    work_root = default_work_root(out_root)
 
     ap = argparse.ArgumentParser(
         description=(
-            "Create 10-shot LOSO splits, retrain RF and raw CNN per fold, "
+            "Create LOSO splits for all shots in the training CSV, retrain RF "
+            "and raw CNN per fold, "
             "run sort_shot_mixed.py on held-out shots, and aggregate metrics."
         )
     )
     ap.add_argument("--repo_root", type=Path, default=repo_root)
     ap.add_argument("--train_csv", type=Path, default=repo_root / "training_labels" / "tae_like_train.csv")
-    ap.add_argument("--out_root", type=Path, default=out_root)
-    ap.add_argument("--work_root", type=Path, default=work_root)
+    ap.add_argument(
+        "--out_root",
+        type=Path,
+        default=None,
+        help="Output root for split/evaluation CSVs (default: outputs/loso_<N shots>)",
+    )
+    ap.add_argument(
+        "--work_root",
+        type=Path,
+        default=None,
+        help=(
+            "Root for checkpoints/logs (default: $NOVA_RUN/<out name>, "
+            "$SCRATCH/nova_s/<out name>, or <out_root>/work)"
+        ),
+    )
     ap.add_argument("--data_dir", type=Path, default=Path(os.environ.get("NOVA_DATA", "")) if os.environ.get("NOVA_DATA") else None)
     ap.add_argument("--shot_root", type=Path, default=None, help="Root containing held-out shot directories (default: --data_dir)")
     ap.add_argument("--steps", type=parse_steps, default=list(STEP_NAMES), help="Comma list: all, split, rf, cnn, sort, aggregate")
@@ -594,7 +639,12 @@ def main() -> None:
     args = build_arg_parser().parse_args()
     args.repo_root = args.repo_root.expanduser().resolve()
     args.train_csv = args.train_csv.expanduser().resolve()
+    n_train_shots = count_training_shots(args.train_csv)
+    if args.out_root is None:
+        args.out_root = default_out_root(args.repo_root, n_train_shots)
     args.out_root = args.out_root.expanduser().resolve()
+    if args.work_root is None:
+        args.work_root = default_work_root(args.out_root)
     args.work_root = args.work_root.expanduser().resolve()
     if args.data_dir is None:
         raise SystemExit("--data_dir is required when $NOVA_DATA is not set")
@@ -616,6 +666,8 @@ def main() -> None:
     print(f"work_root: {args.work_root}")
     print(f"data_dir:  {args.data_dir}")
     print(f"steps:     {', '.join(args.steps)}")
+    print(f"n_shots:   {n_train_shots}")
+    print(f"M_target:  {args.cnn_m_target}")
 
     fold_shots: list[str]
     if "split" in args.steps:
@@ -630,6 +682,7 @@ def main() -> None:
             fold_shots = [shot for shot in fold_shots if shot in selected_folds]
 
     print(f"folds:     {', '.join(fold_shots)}")
+    write_run_config(args, fold_shots)
 
     for shot in fold_shots:
         if "rf" in args.steps:

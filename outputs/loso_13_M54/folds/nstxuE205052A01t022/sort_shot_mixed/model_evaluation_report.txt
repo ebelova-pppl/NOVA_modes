@@ -1,0 +1,68 @@
+Model evaluation against labeled TAE-side rows
+========================================================================
+shot: nstxuE205052A01t022
+label_csv: /global/u2/e/ebelova/src_nova/outputs/loso_13_M54/folds/nstxuE205052A01t022/test.csv
+cnn_checkpoint_kind: cnn_raw
+rf_cnn_eval_threshold: 0.5
+combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy
+n_label_rows_read: 293
+n_label_rows_for_shot: 293
+n_label_rows_used: 293
+n_label_rows_skipped: 0
+n_duplicate_label_keys: 0
+n_scored_rows: 295
+n_matched_scored_rows: 293
+n_unmatched_scored_rows: 2
+n_labeled_rows_not_scored: 0
+
+Unmatched scored rows, first 20:
+  nstxuE205052A01t022/N1/egn01w.1071E+02
+  nstxuE205052A01t022/N9/egn09w.8919E+01
+
+------------------------------------------------------------------------
+rf confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[213   6]
+ [ 17  57]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9261    0.9726    0.9488       219
+        good     0.9048    0.7703    0.8321        74
+
+    accuracy                         0.9215       293
+   macro avg     0.9154    0.8714    0.8904       293
+weighted avg     0.9207    0.9215    0.9193       293
+
+
+------------------------------------------------------------------------
+cnn confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[209  10]
+ [ 18  56]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9207    0.9543    0.9372       219
+        good     0.8485    0.7568    0.8000        74
+
+    accuracy                         0.9044       293
+   macro avg     0.8846    0.8555    0.8686       293
+weighted avg     0.9025    0.9044    0.9026       293
+
+
+------------------------------------------------------------------------
+combined_policy confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[213   6]
+ [ 15  59]]
+
+              precision    recall  f1-score   support
+
+         bad     0.9342    0.9726    0.9530       219
+        good     0.9077    0.7973    0.8489        74
+
+    accuracy                         0.9283       293
+   macro avg     0.9210    0.8850    0.9010       293
+weighted avg     0.9275    0.9283    0.9267       293
+

@@ -845,7 +845,9 @@ lost.
 
 ## `run_loso_10.py`
 
-Driver for expanded 10-shot leave-one-shot-out checks. It:
+Driver for leave-one-shot-out checks over all shots in the selected training
+CSV. The filename is historical; with the current `tae_like_train.csv` it
+creates 13 folds. It:
 
 - creates one `train.csv` and `test.csv` split per held-out shot from
   `training_labels/tae_like_train.csv`,
@@ -854,18 +856,50 @@ Driver for expanded 10-shot leave-one-shot-out checks. It:
 - runs `sort_shot_mixed.py` on the held-out shot with `--label_csv`, and
 - aggregates RF-only, CNN-only, and combined-policy metrics.
 
-Small split/evaluation files are written under `outputs/loso_10/` by default.
-Model checkpoints and training logs are written under `$NOVA_RUN/loso_10`, or
-`$SCRATCH/nova_s/loso_10` when `$NOVA_RUN` is not set.
+Small split/evaluation files are written under `outputs/loso_<N shots>/` by
+default. Model checkpoints and training logs are written under
+`$NOVA_RUN/<output-name>`, or `$SCRATCH/nova_s/<output-name>` when `$NOVA_RUN`
+is not set. For parameter comparisons, use separate output/work roots.
+
+Current 13-shot raw-CNN `M_target` comparison:
+
+```bash
+# From inside an interactive GPU allocation.
+cd "$NOVA_REPO"
+source configs/paths/nova_paths.nersc.sh
+
+python -u scripts/run_loso_10.py \
+  --steps all \
+  --out_root outputs/loso_13_M54 \
+  --work_root "$SCRATCH/nova_s/loso_13_M54" \
+  --cnn_launch srun \
+  --cnn_device cuda \
+  --sort_device cpu \
+  --cnn_batch_size 8 \
+  --cnn_m_target 54 \
+  --cnn_cache_data
+
+python -u scripts/run_loso_10.py \
+  --steps all \
+  --out_root outputs/loso_13_M100 \
+  --work_root "$SCRATCH/nova_s/loso_13_M100" \
+  --cnn_launch srun \
+  --cnn_device cuda \
+  --sort_device cpu \
+  --cnn_batch_size 8 \
+  --cnn_m_target 100 \
+  --cnn_cache_data
+```
 
 NERSC batch run:
 
 ```bash
 cd "$NOVA_REPO"
-sbatch scripts/run_loso_10.sbatch
+CNN_M_TARGET=54  LOSO_TAG=loso_13_M54  sbatch scripts/run_loso_10.sbatch
+CNN_M_TARGET=100 LOSO_TAG=loso_13_M100 sbatch scripts/run_loso_10.sbatch
 ```
 
-Equivalent interactive run after a GPU allocation:
+Generic interactive run after a GPU allocation:
 
 ```bash
 salloc --nodes 1 --qos interactive --time 4:00:00 --constraint gpu --gpus 1 --account m314_g
@@ -873,8 +907,6 @@ cd "$NOVA_REPO"
 source configs/paths/nova_paths.nersc.sh
 python -u scripts/run_loso_10.py \
   --steps all \
-  --out_root outputs/loso_10 \
-  --work_root "$SCRATCH/nova_s/loso_10" \
   --cnn_launch srun \
   --cnn_device cuda \
   --sort_device cpu \
@@ -885,25 +917,33 @@ python -u scripts/run_loso_10.py \
 Useful partial/resume commands:
 
 ```bash
-# Only create the 10 fold split lists.
-python scripts/run_loso_10.py --steps split --out_root outputs/loso_10
+# Only create the fold split lists.
+python scripts/run_loso_10.py --steps split --out_root outputs/loso_13_M100 --cnn_m_target 100
 
 # Resume a failed run without repeating completed RF/CNN/sort folds.
-python scripts/run_loso_10.py --steps all --skip_existing --cnn_launch srun --cnn_device cuda
+python scripts/run_loso_10.py \
+  --steps all \
+  --out_root outputs/loso_13_M100 \
+  --work_root "$SCRATCH/nova_s/loso_13_M100" \
+  --cnn_m_target 100 \
+  --skip_existing \
+  --cnn_launch srun \
+  --cnn_device cuda
 
 # Re-aggregate after manually rerunning one fold.
-python scripts/run_loso_10.py --steps aggregate --out_root outputs/loso_10
+python scripts/run_loso_10.py --steps aggregate --out_root outputs/loso_13_M100
 ```
 
 Main aggregate outputs:
 
-- `outputs/loso_10/loso_split_counts.csv`
-- `outputs/loso_10/loso_model_evaluation_summary.csv`
-- `outputs/loso_10/loso_model_evaluation_totals.csv`
-- `outputs/loso_10/loso_shot_summary.csv`
+- `outputs/<run-name>/loso_split_counts.csv`
+- `outputs/<run-name>/loso_model_evaluation_summary.csv`
+- `outputs/<run-name>/loso_model_evaluation_totals.csv`
+- `outputs/<run-name>/loso_shot_summary.csv`
+- `outputs/<run-name>/run_config.json`
 
 Per-fold sorter outputs live under
-`outputs/loso_10/folds/<heldout-shot>/sort_shot_mixed/`.
+`outputs/<run-name>/folds/<heldout-shot>/sort_shot_mixed/`.
 
 ---
 
