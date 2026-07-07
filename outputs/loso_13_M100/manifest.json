@@ -1,0 +1,36 @@
+{
+  "created_utc": "2026-07-07T20:19:59.604541+00:00",
+  "train_csv": "/global/u2/e/ebelova/src_nova/training_labels/tae_like_train.csv",
+  "label_field": "validity",
+  "n_rows": 2610,
+  "shots": [
+    "nstx_120113",
+    "nstx_135388",
+    "nstx_141711",
+    "nstxuE202855A01t020",
+    "nstxuE204669M03t025",
+    "nstxuE205052A01t022",
+    "nstxuG121123J38",
+    "nstxuG121123K51",
+    "nstxuG121123Q62",
+    "nstxuG133964S31",
+    "nstxuG142301H47",
+    "nstxuG142301Y93",
+    "nstxu_204202"
+  ],
+  "fold_shots": [
+    "nstx_120113",
+    "nstx_135388",
+    "nstx_141711",
+    "nstxuE202855A01t020",
+    "nstxuE204669M03t025",
+    "nstxuE205052A01t022",
+    "nstxuG121123J38",
+    "nstxuG121123K51",
+    "nstxuG121123Q62",
+    "nstxuG133964S31",
+    "nstxuG142301H47",
+    "nstxuG142301Y93",
+    "nstxu_204202"
+  ]
+}

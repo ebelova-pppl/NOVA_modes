@@ -1244,3 +1244,38 @@ raw-CNN harmonic-window check, run separate output/work roots:
 
 Use those LOSO totals, rather than the single held-out split, before changing
 the production raw-CNN `M_target` or the RF/CNN fusion policy.
+
+The 13-shot `M_target=54` LOSO run completed under `outputs/loso_13_M54`.
+Aggregate metrics from `loso_model_evaluation_totals.csv`:
+
+- CNN: CM `[[1899, 105], [108, 498]]`, accuracy `0.918`, GOOD
+  precision/recall/F1 `0.826 / 0.822 / 0.824`
+- combined policy: CM `[[1948, 56], [116, 490]]`, accuracy `0.934`, GOOD
+  precision/recall/F1 `0.897 / 0.809 / 0.851`
+- RF: CM `[[1957, 47], [134, 472]]`, accuracy `0.931`, GOOD
+  precision/recall/F1 `0.909 / 0.779 / 0.839`
+
+Runtime was about 92 minutes. Log timestamps show approximately 29 minutes in
+RF training, 48 minutes in raw-CNN training, and 15 minutes in sorting. The
+slowest CNN folds were dominated by repeated `$NOVA_DATA` file loading for
+`--cache_data`, especially before the filesystem cache warmed up; several
+later folds loaded the same scale of data much faster.
+
+Filtered aggregate checks from the same M54 LOSO run were written to:
+
+- `outputs/loso_13_M54/loso_model_evaluation_totals_nonG_7shots.csv`
+- `outputs/loso_13_M54/loso_model_evaluation_totals_nstxuG_6shots.csv`
+
+For the non-G subset (the four older shots plus the three `nstxuE*` shots),
+the held-out set has `1638` modes: `546` good and `1092` bad. Metrics:
+
+- CNN: CM `[[1031, 61], [82, 464]]`, accuracy `0.913`, GOOD
+  precision/recall/F1 `0.884 / 0.850 / 0.866`
+- combined policy: CM `[[1057, 35], [82, 464]]`, accuracy `0.929`, GOOD
+  precision/recall/F1 `0.930 / 0.850 / 0.888`
+- RF: CM `[[1064, 28], [98, 448]]`, accuracy `0.923`, GOOD
+  precision/recall/F1 `0.941 / 0.821 / 0.877`
+
+This confirms that the `nstxuG*` folds are a major source of the poorer
+aggregate GOOD precision/recall. On the non-G subset, combined policy keeps
+the CNN GOOD recall while cutting false positives nearly in half.

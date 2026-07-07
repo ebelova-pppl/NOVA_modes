@@ -1,0 +1,3 @@
+path,shot,n,ntor,nr,nhar,omega,gamma_d,status,gap_region,signed_delta,fraction_below_upper2,p_rf_good,p_cnn_good,p_avg,final_label,tier,model_disagreement,near_threshold,large_score_gap,selected_final,rejection_reason,error_message
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301Y93/N9/egn09w.1633E+02,nstxuG142301Y93,9,9,201,101,4.041342298545517,-0.0001408665062594719,scored,tae_like,0.877345399529447,0.8940391898994684,0.42,1.0,0.71,good,flagged_cnn_rescue,True,True,True,True,,
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301Y93/N10/egn10w.1625E+02,nstxuG142301Y93,10,10,201,101,4.03153112544856,-3.17170985563128e-05,scored,tae_like,0.8412984500929115,0.8730734424136829,0.41333333333333333,0.9986605644226074,0.7059969488779704,good,flagged_cnn_rescue,True,True,True,True,,

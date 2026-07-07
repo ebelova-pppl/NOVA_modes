@@ -1,0 +1,86 @@
+Model evaluation against labeled TAE-side rows
+========================================================================
+shot: nstx_141711
+label_csv: /global/u2/e/ebelova/src_nova/outputs/loso_13_M100/folds/nstx_141711/test.csv
+cnn_checkpoint_kind: cnn_raw
+rf_cnn_eval_threshold: 0.5
+combined_policy_label: uses the script's gold/silver/CNN-rescue fusion policy
+n_label_rows_read: 256
+n_label_rows_for_shot: 256
+n_label_rows_used: 256
+n_label_rows_skipped: 0
+n_duplicate_label_keys: 0
+n_scored_rows: 289
+n_matched_scored_rows: 256
+n_unmatched_scored_rows: 33
+n_labeled_rows_not_scored: 0
+
+Unmatched scored rows, first 20:
+  nstx_141711/N1/egn01w.2634E+02
+  nstx_141711/N1/egn01w.2684E+02
+  nstx_141711/N1/egn01w.2708E+02
+  nstx_141711/N1/egn01w.2733E+02
+  nstx_141711/N1/egn01w.2756E+02
+  nstx_141711/N1/egn01w.2780E+02
+  nstx_141711/N1/egn01w.2803E+02
+  nstx_141711/N1/egn01w.2826E+02
+  nstx_141711/N1/egn01w.2849E+02
+  nstx_141711/N1/egn01w.2872E+02
+  nstx_141711/N1/egn01w.2894E+02
+  nstx_141711/N1/egn01w.2916E+02
+  nstx_141711/N1/egn01w.2938E+02
+  nstx_141711/N1/egn01w.2961E+02
+  nstx_141711/N1/egn01w.2982E+02
+  nstx_141711/N1/egn01w.3003E+02
+  nstx_141711/N1/egn01w.3024E+02
+  nstx_141711/N1/egn01w.3045E+02
+  nstx_141711/N1/egn01w.3066E+02
+  nstx_141711/N1/egn01w.3087E+02
+
+------------------------------------------------------------------------
+rf confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[159   1]
+ [ 29  67]]
+
+              precision    recall  f1-score   support
+
+         bad     0.8457    0.9938    0.9138       160
+        good     0.9853    0.6979    0.8171        96
+
+    accuracy                         0.8828       256
+   macro avg     0.9155    0.8458    0.8654       256
+weighted avg     0.8981    0.8828    0.8775       256
+
+
+------------------------------------------------------------------------
+cnn confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[157   3]
+ [ 26  70]]
+
+              precision    recall  f1-score   support
+
+         bad     0.8579    0.9812    0.9155       160
+        good     0.9589    0.7292    0.8284        96
+
+    accuracy                         0.8867       256
+   macro avg     0.9084    0.8552    0.8719       256
+weighted avg     0.8958    0.8867    0.8828       256
+
+
+------------------------------------------------------------------------
+combined_policy confusion matrix/report
+Rows=true [bad, good]; columns=pred [bad, good]
+[[159   1]
+ [ 26  70]]
+
+              precision    recall  f1-score   support
+
+         bad     0.8595    0.9938    0.9217       160
+        good     0.9859    0.7292    0.8383        96
+
+    accuracy                         0.8945       256
+   macro avg     0.9227    0.8615    0.8800       256
+weighted avg     0.9069    0.8945    0.8905       256
+

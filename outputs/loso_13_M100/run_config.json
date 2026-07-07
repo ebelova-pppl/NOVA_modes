@@ -1,0 +1,43 @@
+{
+  "created_utc": "2026-07-07T20:19:59.613934+00:00",
+  "repo_root": "/global/u2/e/ebelova/src_nova",
+  "train_csv": "/global/u2/e/ebelova/src_nova/training_labels/tae_like_train.csv",
+  "out_root": "/global/u2/e/ebelova/src_nova/outputs/loso_13_M100",
+  "work_root": "/pscratch/sd/e/ebelova/nova_s/loso_13_M100",
+  "data_dir": "/global/cfs/cdirs/m314/nova2/data",
+  "shot_root": "/global/cfs/cdirs/m314/nova2/data",
+  "steps": [
+    "split",
+    "rf",
+    "cnn",
+    "sort",
+    "aggregate"
+  ],
+  "folds": [
+    "nstx_120113",
+    "nstx_135388",
+    "nstx_141711",
+    "nstxuE202855A01t020",
+    "nstxuE204669M03t025",
+    "nstxuE205052A01t022",
+    "nstxuG121123J38",
+    "nstxuG121123K51",
+    "nstxuG121123Q62",
+    "nstxuG133964S31",
+    "nstxuG142301H47",
+    "nstxuG142301Y93",
+    "nstxu_204202"
+  ],
+  "n_folds": 13,
+  "seed": 42,
+  "cnn_m_target": 100,
+  "cnn_r_target": 201,
+  "cnn_epochs": 80,
+  "cnn_batch_size": 8,
+  "cnn_lr": 0.02,
+  "cnn_test_frac": 0.2,
+  "cnn_normalize": "robust",
+  "cnn_pos_weight": null,
+  "cnn_refit_full_before_save": true,
+  "model_eval_threshold": 0.5
+}

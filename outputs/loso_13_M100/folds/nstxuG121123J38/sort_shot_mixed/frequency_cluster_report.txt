@@ -1,0 +1,23 @@
+Close-frequency cluster report for selected NOVA modes
+  Used parameters: rel_freq_tol=0.02  sim_tol=0.9  r_tol=0.1  width_tol=0.05
+===========================================================================
+
+n=10  cluster=4  size=2  omega_range=[4.23555, 4.23719]  d_omega/omega=0.000388059
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123J38/N10/egn10w.1795E+02
+               omega=4.23719  score=0.973279  r0=0.7903  dr=0.1110
+    [DROP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123J38/N10/egn10w.1794E+02
+               omega=4.23555  score=0.280000  r0=0.7756  dr=0.1248
+  Compare: egn10w.1794E+02  vs  egn10w.1795E+02  cos=0.984  dr0=0.0147  ddr=0.0139  rel_domega=0.0004  freq_close=True  same=True
+---------------------------------------------------------------------------
+
+n=10  cluster=10  size=2  omega_range=[5.96594, 6.08104]  d_omega/omega=0.0191086
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123J38/N10/egn10w.3559E+02
+               omega=5.96594  score=0.738333  r0=0.1201  dr=0.0380
+  Compare: egn10w.3698E+02  vs  egn10w.3559E+02  cos=0.061  dr0=0.0644  ddr=0.0110  rel_domega=0.0193  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuG121123J38/N10/egn10w.3698E+02
+               omega=6.08104  score=0.266667  r0=0.1845  dr=0.0490
+---------------------------------------------------------------------------
+

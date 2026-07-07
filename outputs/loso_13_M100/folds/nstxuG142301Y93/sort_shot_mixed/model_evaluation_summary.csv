@@ -1,0 +1,4 @@
+model,n_matched,tn_bad,fp_bad_as_good,fn_good_as_bad,tp_good,accuracy,precision_good,recall_good,f1_good
+rf,106,105,0,1,0,0.9905660377358491,,0.0,
+cnn,106,100,5,1,0,0.9433962264150944,0.0,0.0,
+combined_policy,106,103,2,1,0,0.9716981132075472,0.0,0.0,

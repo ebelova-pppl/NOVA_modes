@@ -1,0 +1,74 @@
+Close-frequency cluster report for selected NOVA modes
+  Used parameters: rel_freq_tol=0.02  sim_tol=0.9  r_tol=0.1  width_tol=0.05
+===========================================================================
+
+n=7  cluster=4  size=2  omega_range=[1.12861, 1.14819]  d_omega/omega=0.017194
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N7/egn07w.1274E+01
+               omega=1.12861  score=0.951667  r0=0.5962  dr=0.2914
+  Compare: egn07w.1318E+01  vs  egn07w.1274E+01  cos=0.008  dr0=0.2043  ddr=0.2428  rel_domega=0.0173  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N7/egn07w.1318E+01
+               omega=1.14819  score=0.825000  r0=0.3919  dr=0.0486
+---------------------------------------------------------------------------
+
+n=7  cluster=5  size=2  omega_range=[1.202, 1.22128]  d_omega/omega=0.0159166
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N7/egn07w.1492E+01
+               omega=1.22128  score=0.945000  r0=0.6952  dr=0.3276
+  Compare: egn07w.1445E+01  vs  egn07w.1492E+01  cos=0.822  dr0=0.0222  ddr=0.0047  rel_domega=0.0158  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N7/egn07w.1445E+01
+               omega=1.202  score=0.936667  r0=0.6729  dr=0.3229
+---------------------------------------------------------------------------
+
+n=8  cluster=2  size=2  omega_range=[1.13902, 1.15231]  d_omega/omega=0.0115985
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N8/egn08w.1328E+01
+               omega=1.15231  score=0.860000  r0=0.3803  dr=0.0418
+  Compare: egn08w.1297E+01  vs  egn08w.1328E+01  cos=0.007  dr0=0.2509  ddr=0.3229  rel_domega=0.0115  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N8/egn08w.1297E+01
+               omega=1.13902  score=0.851667  r0=0.6312  dr=0.3647
+---------------------------------------------------------------------------
+
+n=8  cluster=3  size=2  omega_range=[1.2296, 1.25335]  d_omega/omega=0.0191376
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N8/egn08w.1571E+01
+               omega=1.25335  score=0.918333  r0=0.6991  dr=0.3102
+  Compare: egn08w.1512E+01  vs  egn08w.1571E+01  cos=0.571  dr0=0.1063  ddr=0.0486  rel_domega=0.0190  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N8/egn08w.1512E+01
+               omega=1.2296  score=0.796667  r0=0.8054  dr=0.3589
+---------------------------------------------------------------------------
+
+n=9  cluster=2  size=2  omega_range=[1.13885, 1.1555]  d_omega/omega=0.0145105
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N9/egn09w.1297E+01
+               omega=1.13885  score=0.881667  r0=0.5932  dr=0.2645
+  Compare: egn09w.1335E+01  vs  egn09w.1297E+01  cos=0.005  dr0=0.2219  ddr=0.2275  rel_domega=0.0146  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N9/egn09w.1335E+01
+               omega=1.1555  score=0.840000  r0=0.3714  dr=0.0371
+---------------------------------------------------------------------------
+
+n=9  cluster=3  size=2  omega_range=[1.20812, 1.23191]  d_omega/omega=0.0194985
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N9/egn09w.1460E+01
+               omega=1.20812  score=0.921667  r0=0.6626  dr=0.2868
+  Compare: egn09w.1518E+01  vs  egn09w.1460E+01  cos=0.758  dr0=0.0620  ddr=0.0425  rel_domega=0.0197  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N9/egn09w.1518E+01
+               omega=1.23191  score=0.781667  r0=0.7246  dr=0.3293
+---------------------------------------------------------------------------
+
+n=10  cluster=3  size=2  omega_range=[1.20935, 1.21809]  d_omega/omega=0.0071995
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N10/egn10w.1463E+01
+               omega=1.20935  score=0.861667  r0=0.6918  dr=0.2960
+  Compare: egn10w.1484E+01  vs  egn10w.1463E+01  cos=0.684  dr0=0.0175  ddr=0.0199  rel_domega=0.0072  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N10/egn10w.1484E+01
+               omega=1.21809  score=0.821667  r0=0.6742  dr=0.2761
+---------------------------------------------------------------------------
+

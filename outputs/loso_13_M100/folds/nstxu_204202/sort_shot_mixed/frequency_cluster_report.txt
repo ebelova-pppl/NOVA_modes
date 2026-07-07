@@ -1,0 +1,13 @@
+Close-frequency cluster report for selected NOVA modes
+  Used parameters: rel_freq_tol=0.02  sim_tol=0.9  r_tol=0.1  width_tol=0.05
+===========================================================================
+
+n=9  cluster=10  size=2  omega_range=[5.61258, 5.6764]  d_omega/omega=0.0113071
+  type_group=1
+    [KEEP] path=/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N9/egn09w.3150E+02
+               omega=5.61258  score=0.983333  r0=0.8037  dr=0.1895
+    [DROP] path=/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N9/egn09w.3222E+02
+               omega=5.6764  score=0.266667  r0=0.8049  dr=0.1922
+  Compare: egn09w.3222E+02  vs  egn09w.3150E+02  cos=0.992  dr0=0.0012  ddr=0.0026  rel_domega=0.0114  freq_close=True  same=True
+---------------------------------------------------------------------------
+
