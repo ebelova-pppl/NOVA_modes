@@ -265,6 +265,9 @@ class Config:
 
 @dataclass(frozen=True)
 class PredictionHealth:
+    n_samples: int
+    n_true_good: int
+    n_predicted_good: int
     predicted_good_fraction: float
     true_good_fraction: float
     prob_mean: float
@@ -295,15 +298,24 @@ def summarize_prediction_health(
 
     predicted_good_fraction = float(np.mean(probs >= threshold))
     true_good_fraction = float(np.mean(y_true == 1))
+    n_samples = int(probs.size)
+    n_predicted_good = int(np.count_nonzero(probs >= threshold))
+    n_true_good = int(np.count_nonzero(y_true == 1))
+    n_true_bad = n_samples - n_true_good
     prob_std = float(np.std(probs))
     reasons = []
 
-    if (
+    if n_true_good > 0 and n_predicted_good == 0:
+        reasons.append("zero predicted GOOD modes")
+    elif (
         true_good_fraction >= COLLAPSE_CLASS_FRACTION
         and predicted_good_fraction < COLLAPSE_CLASS_FRACTION
     ):
         reasons.append("near-all-bad predictions")
-    if (
+
+    if n_true_bad > 0 and n_predicted_good == n_samples:
+        reasons.append("zero predicted BAD modes")
+    elif (
         (1.0 - true_good_fraction) >= COLLAPSE_CLASS_FRACTION
         and predicted_good_fraction > 1.0 - COLLAPSE_CLASS_FRACTION
     ):
@@ -312,6 +324,9 @@ def summarize_prediction_health(
         reasons.append("near-constant probabilities")
 
     return PredictionHealth(
+        n_samples=n_samples,
+        n_true_good=n_true_good,
+        n_predicted_good=n_predicted_good,
         predicted_good_fraction=predicted_good_fraction,
         true_good_fraction=true_good_fraction,
         prob_mean=float(np.mean(probs)),
@@ -327,20 +342,21 @@ def report_prediction_health(
     epoch: int,
     health: PredictionHealth,
 ) -> None:
+    if epoch < COLLAPSE_CHECK_START_EPOCH or not health.collapse_detected:
+        return
+
     print(
-        f"{stage} prediction health | predicted_good="
-        f"{health.predicted_good_fraction:.4f} | true_good="
-        f"{health.true_good_fraction:.4f} | p_good mean/std="
-        f"{health.prob_mean:.4f}/{health.prob_std:.4f} | "
-        f"range=[{health.prob_min:.4f}, {health.prob_max:.4f}]",
+        f"WARNING: {stage.lower()} prediction collapse at epoch {epoch}: "
+        f"{'; '.join(health.collapse_reasons)}. "
+        f"predicted_good={health.n_predicted_good}/{health.n_samples} "
+        f"({health.predicted_good_fraction:.4f}), "
+        f"true_good={health.n_true_good}/{health.n_samples} "
+        f"({health.true_good_fraction:.4f}), "
+        f"p_good mean/std={health.prob_mean:.4f}/{health.prob_std:.4f}, "
+        f"range=[{health.prob_min:.4f}, {health.prob_max:.4f}]. "
+        "The model may be stalled.",
         flush=True,
     )
-    if epoch >= COLLAPSE_CHECK_START_EPOCH and health.collapse_detected:
-        print(
-            f"WARNING: {stage.lower()} prediction collapse at epoch {epoch}: "
-            f"{'; '.join(health.collapse_reasons)}. The model may be stalled.",
-            flush=True,
-        )
 
 
 def parse_optional_positive_float(value: str) -> float | None:
@@ -755,6 +771,9 @@ def main():
                 None
                 if final_prediction_health is None
                 else {
+                    "n_samples": final_prediction_health.n_samples,
+                    "n_true_good": final_prediction_health.n_true_good,
+                    "n_predicted_good": final_prediction_health.n_predicted_good,
                     "predicted_good_fraction": final_prediction_health.predicted_good_fraction,
                     "true_good_fraction": final_prediction_health.true_good_fraction,
                     "prob_mean": final_prediction_health.prob_mean,
