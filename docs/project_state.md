@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-07-06)
+### Project state (current snapshot, updated 2026-07-07)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -862,18 +862,20 @@ the completed symmetric 10-shot LOSO result above remains the generalization
 check used for fusion-policy decisions.
 
 Added prediction-collapse monitoring to `scripts/cnn_raw.py`. At the normal
-epoch-reporting cadence, both split evaluation and full-data refit now report
-the predicted GOOD fraction, true GOOD fraction, `p_good` mean/standard
-deviation, and probability range. Starting at epoch 5, warnings identify:
+epoch-reporting cadence, both split evaluation and full-data refit compute
+prediction-health diagnostics but keep healthy checks silent. Starting at
+epoch 5, warnings identify:
 
+- zero predicted GOOD modes when GOOD labels are present;
 - predicted GOOD fraction below `0.02` when GOOD labels are present;
 - predicted GOOD fraction above `0.98` when BAD labels are present;
 - `p_good` standard deviation below `0.001`.
 
+Warnings include predicted/true GOOD counts and `p_good` summary statistics.
 The full refit uses a non-shuffled evaluation loader for these checks. Its
-final diagnostics and collapse status are saved as
-`final_prediction_health` in the checkpoint, preventing another stalled model
-from looking healthy solely because the training loop completed.
+final diagnostics and collapse status are saved as `final_prediction_health`
+in the checkpoint, preventing another stalled model from looking healthy solely
+because the training loop completed.
 
 ### 2026-06-20
 
@@ -1220,3 +1222,13 @@ Current raw-CNN held-out split check:
 
 This is broadly similar to the current RF split/OOF checks. Updated LOSO
 checks are still needed before changing the RF/CNN fusion policy.
+
+### 2026-07-07
+
+Made the `cnn_raw.py` prediction-health checks warning-only to reduce training
+log clutter. The script still checks split-test and full-fit predictions at
+the normal epoch-reporting cadence, but it only prints when collapse/stalling
+is detected: zero predicted GOOD modes with GOOD labels present, near-all-BAD
+or near-all-GOOD predictions, or nearly constant `p_good`. The saved checkpoint
+metadata still records `final_prediction_health`, now including exact
+predicted/true GOOD counts.
