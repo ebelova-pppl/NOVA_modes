@@ -1279,3 +1279,46 @@ the held-out set has `1638` modes: `546` good and `1092` bad. Metrics:
 This confirms that the `nstxuG*` folds are a major source of the poorer
 aggregate GOOD precision/recall. On the non-G subset, combined policy keeps
 the CNN GOOD recall while cutting false positives nearly in half.
+
+The 13-shot `M_target=100` LOSO run completed under `outputs/loso_13_M100`.
+Aggregate metrics:
+
+- CNN: CM `[[1908, 96], [90, 516]]`, accuracy `0.929`, GOOD
+  precision/recall/F1 `0.843 / 0.851 / 0.847`
+- combined policy: CM `[[1948, 56], [112, 494]]`, accuracy `0.936`, GOOD
+  precision/recall/F1 `0.898 / 0.815 / 0.855`
+- RF: unchanged from M54, CM `[[1957, 47], [134, 472]]`, accuracy `0.931`,
+  GOOD precision/recall/F1 `0.909 / 0.779 / 0.839`
+
+Relative to M54, M100 improves raw CNN globally: 9 fewer false positives, 18
+fewer false negatives, +0.010 accuracy, and +0.024 GOOD F1. The combined
+policy improves only slightly: same false positives, 4 fewer false negatives,
+and +0.004 GOOD F1.
+
+Filtered M100 aggregate checks were written to:
+
+- `outputs/loso_13_M100/loso_model_evaluation_totals_nonG_7shots.csv`
+- `outputs/loso_13_M100/loso_model_evaluation_totals_nstxuG_6shots.csv`
+
+For the non-G subset, M100 improves both CNN and combined policy:
+
+- CNN: CM `[[1042, 50], [65, 481]]`, accuracy `0.930`, GOOD
+  precision/recall/F1 `0.906 / 0.881 / 0.893`
+- combined policy: CM `[[1059, 33], [78, 468]]`, accuracy `0.932`, GOOD
+  precision/recall/F1 `0.934 / 0.857 / 0.894`
+- RF: CM `[[1064, 28], [98, 448]]`, accuracy `0.923`, GOOD
+  precision/recall/F1 `0.941 / 0.821 / 0.877`
+
+For the `nstxuG*` subset, M100 does not materially solve GOOD detection:
+
+- CNN: CM `[[866, 46], [25, 35]]`, accuracy `0.927`, GOOD
+  precision/recall/F1 `0.432 / 0.583 / 0.496`
+- combined policy: CM `[[889, 23], [34, 26]]`, accuracy `0.941`, GOOD
+  precision/recall/F1 `0.531 / 0.433 / 0.477`
+- RF: CM `[[893, 19], [36, 24]]`, accuracy `0.943`, GOOD
+  precision/recall/F1 `0.558 / 0.400 / 0.466`
+
+Interpretation: M100 is a better raw-CNN harmonic window for the non-G regime
+and improves the all-shot M54 result, but the G-shot regime likely needs
+separate calibration/policy or additional physics-aware features rather than
+only a larger `M_target`.
