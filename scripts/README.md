@@ -104,7 +104,7 @@ free/total GPU memory before training. All three CNN trainers accept
 
 ```bash
 export NOVA_TORCH_DEVICE=cuda
-python "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 8
+python "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 32
 ```
 
 Inside a Perlmutter interactive allocation, launch the Python process with
@@ -112,7 +112,7 @@ Inside a Perlmutter interactive allocation, launch the Python process with
 
 ```bash
 salloc --nodes 1 --qos interactive --time 1:00:00 --constraint gpu --gpus 1 --account m314_g
-srun --nodes 1 --ntasks 1 --cpus-per-task 1 --gpus-per-task 1 python -u "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 8
+srun --nodes 1 --ntasks 1 --cpus-per-task 1 --gpus-per-task 1 python -u "$NOVA_REPO/scripts/cnn_raw.py" --batch_size 32
 ```
 
 If CUDA reports out-of-memory for these small CNNs, first check the printed
@@ -122,7 +122,7 @@ set `NOVA_TORCH_DEVICE=cpu` for the older trainers.
 
 After sourcing `configs/paths/nova_paths.nersc.sh`, `nova_gpu_smoke` runs a
 small Torch CUDA allocation through `srun` and prints timing for device report,
-first tensor allocation, matmul, and CPU copy. `nova_run_cnn_raw --batch_size 8`
+first tensor allocation, matmul, and CPU copy. `nova_run_cnn_raw --batch_size 32`
 runs the raw CNN through the same Slurm launch path. The helpers default to
 `NOVA_CPUS_PER_TASK=1`; if you set a larger value, request matching CPUs in the
 `salloc` command.
@@ -143,7 +143,7 @@ conda activate /p/hym/conda_envs/nova-perlmutter
 cd /path/to/your/NOVA_modes
 source configs/paths/nova_paths.flux.csh
 nova_cpu_smoke
-nova_run_cnn_raw --batch_size 8 --cache_data
+nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
 Bash users should source `$(conda info --base)/etc/profile.d/conda.sh` before
@@ -174,14 +174,16 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 `--cache_data` to preprocess the train/test tensors once and keep them in RAM:
 
 ```bash
-nova_run_cnn_raw --batch_size 8 --cache_data
+nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
-Current 13-shot TAE-like raw-CNN retraining check on
+Current 13-shot TAE-like raw-CNN retraining checks on
 `training_labels/tae_like_train.csv`:
 
-- `cnn_raw.py`: accuracy=`0.954`, CM=`[[394, 6], [18, 103]]`, GOOD
-  precision/recall/F1=`0.945 / 0.851 / 0.896`
+- `cnn_raw.py`, `M_target=100`, batch size 32: accuracy=`0.971`,
+  CM=`[[394, 6], [9, 112]]`, GOOD precision/recall/F1=`0.949 / 0.926 / 0.937`
+- previous `M_target=54` check: accuracy=`0.954`, CM=`[[394, 6], [18, 103]]`,
+  GOOD precision/recall/F1=`0.945 / 0.851 / 0.896`
 
 Previous expanded 10-shot TAE-like raw-CNN retraining check:
 
@@ -861,7 +863,7 @@ default. Model checkpoints and training logs are written under
 `$NOVA_RUN/<output-name>`, or `$SCRATCH/nova_s/<output-name>` when `$NOVA_RUN`
 is not set. For parameter comparisons, use separate output/work roots.
 
-Current 13-shot raw-CNN `M_target` comparison:
+Current 13-shot raw-CNN `M_target` / batch-size comparison:
 
 ```bash
 # From inside an interactive GPU allocation.
@@ -891,13 +893,19 @@ python -u scripts/run_loso_10.py \
   --cnn_cache_data
 ```
 
-NERSC batch run:
+NERSC batch run with the current defaults:
 
 ```bash
 cd "$NOVA_REPO"
-CNN_M_TARGET=54  LOSO_TAG=loso_13_M54  sbatch scripts/run_loso_10.sbatch
-CNN_M_TARGET=100 LOSO_TAG=loso_13_M100 sbatch scripts/run_loso_10.sbatch
+sbatch scripts/run_loso_10.sbatch
 ```
+
+The raw-CNN default `M_target` is now 100, and the LOSO driver defaults to
+`--cnn_batch_size 32`. The historical `outputs/loso_13_M100` comparison used
+`--cnn_batch_size 8`; `outputs/loso_13_M100_bs32` repeats the M100 LOSO check
+with batch size 32. The Slurm wrapper's default `LOSO_TAG` is
+`loso_13_M100_bs32`. To reproduce the older M54 or M100 batch-8 runs, pass
+`--cnn_batch_size 8` and the desired `--cnn_m_target` explicitly.
 
 Generic interactive run after a GPU allocation:
 
@@ -910,7 +918,6 @@ python -u scripts/run_loso_10.py \
   --cnn_launch srun \
   --cnn_device cuda \
   --sort_device cpu \
-  --cnn_batch_size 8 \
   --cnn_cache_data
 ```
 
@@ -918,20 +925,24 @@ Useful partial/resume commands:
 
 ```bash
 # Only create the fold split lists.
-python scripts/run_loso_10.py --steps split --out_root outputs/loso_13_M100 --cnn_m_target 100
+python scripts/run_loso_10.py --steps split --out_root outputs/loso_13_M100_bs32
 
 # Resume a failed run without repeating completed RF/CNN/sort folds.
 python scripts/run_loso_10.py \
   --steps all \
-  --out_root outputs/loso_13_M100 \
-  --work_root "$SCRATCH/nova_s/loso_13_M100" \
-  --cnn_m_target 100 \
+  --out_root outputs/loso_13_M100_bs32 \
+  --work_root "$SCRATCH/nova_s/loso_13_M100_bs32" \
   --skip_existing \
   --cnn_launch srun \
   --cnn_device cuda
 
-# Re-aggregate after manually rerunning one fold.
-python scripts/run_loso_10.py --steps aggregate --out_root outputs/loso_13_M100
+# Re-aggregate after manually rerunning one fold. Pass the same CNN options
+# used by the original run if it did not use the current defaults.
+python scripts/run_loso_10.py \
+  --steps aggregate \
+  --out_root outputs/loso_13_M100_bs32 \
+  --cnn_m_target 100 \
+  --cnn_batch_size 32
 ```
 
 Main aggregate outputs:

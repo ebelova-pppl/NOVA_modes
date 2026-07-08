@@ -80,7 +80,7 @@ def seed_everything(seed: int) -> None:
     torch.backends.cudnn.benchmark = False
 
 
-def pad_or_crop(mode: np.ndarray, Mt: int = 54, Rt: int = 201) -> np.ndarray:
+def pad_or_crop(mode: np.ndarray, Mt: int = 100, Rt: int = 201) -> np.ndarray:
     mode = np.asarray(mode, dtype=np.float32)
     n_m, n_r = mode.shape
     out = np.zeros((Mt, Rt), dtype=np.float32)
@@ -95,7 +95,7 @@ class NovaModeDataset(Dataset):
         self,
         items,
         normalize: str = "robust",
-        M_target: int = 54,
+        M_target: int = 100,
         R_target: int = 201,
         cache_data: bool = False,
     ):
@@ -252,7 +252,7 @@ class Config:
     normalize: str = "robust"
     eval_threshold: float = 0.5
     model_out: str = "nova_cnn.pt"
-    M_target: int = 54
+    M_target: int = 100
     R_target: int = 201
     device: str | None = None
     cache_data: bool = False
@@ -431,7 +431,7 @@ def parse_args() -> Config:
         default=0.5,
         help="Probability threshold used for final metrics and saved checkpoint",
     )
-    ap.add_argument("--M_target", type=int, default=54, help="Poloidal harmonics kept after m-axis pad/crop")
+    ap.add_argument("--M_target", type=int, default=100, help="Poloidal harmonics kept after m-axis pad/crop")
     ap.add_argument("--R_target", type=int, default=201, help="Radial grid size after interpolation")
     ap.add_argument(
         "--device",

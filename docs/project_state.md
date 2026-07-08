@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-07-07)
+### Project state (current snapshot, updated 2026-07-08)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -75,11 +75,13 @@ Notes:
     -	Active checkpoint: `models/nova_cnn_raw.pt`
     -	Checkpoint status: retrained on the current 2610-row / 13-shot active
       list
-    -	Current 13-shot held-out accuracy: 0.954
-    -	Current 13-shot held-out CM: `[[394, 6], [18, 103]]`
-    -	Current GOOD precision/recall/F1: 0.945 / 0.851 / 0.896
-    -	Similar held-out performance to the current RF check; LOSO still needed
-      to judge shot-to-shot generalization and fusion policy
+    -	Current default raw preprocessing: `M_target=100`, `R_target=201`
+    -	Latest 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
+      accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
+    -	Previous 13-shot M54 held-out split check: CM `[[394, 6], [18, 103]]`,
+      accuracy 0.954, GOOD precision/recall/F1 0.945 / 0.851 / 0.896
+    -	LOSO remains the main check for shot-to-shot generalization and fusion
+      policy
 3.	CNN (straightened)
     -	Ridge-aligned representation (2M+1, r)
     -	Previous four-shot checkpoint archived under `models/old_4shots_models/`
@@ -186,8 +188,10 @@ From cont_features.py:
 ## Current tasks
 - Keep `training_labels/additions/tae_like_3new.csv` out of training until
   `nstxuG121123N75` is recalculated and its labels are reviewed again.
-- Run updated 13-shot LOSO checks before deciding whether to retune the
-  RF-leaning fusion thresholds.
+- Decide whether to retune the RF/CNN fusion thresholds after comparing the
+  13-shot M100 LOSO runs. M100 is now the raw-CNN default; batch-size evidence
+  is mixed, with the single held-out split favoring batch 32 but LOSO favoring
+  batch 8 for CNN recall/F1.
 - Recheck the three new G-case shots after corrected continuum files arrive.
 - Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
  
@@ -1322,3 +1326,37 @@ Interpretation: M100 is a better raw-CNN harmonic window for the non-G regime
 and improves the all-shot M54 result, but the G-shot regime likely needs
 separate calibration/policy or additional physics-aware features rather than
 only a larger `M_target`.
+
+### 2026-07-08
+
+Changed the raw-CNN default harmonic window from `M_target=54` to
+`M_target=100`. The LOSO driver now also defaults to `--cnn_m_target 100`,
+and its default CNN batch size is `--cnn_batch_size 32`; the Slurm wrapper
+uses the same current defaults. Older M54 and batch-8 checks can still be
+reproduced by passing those options explicitly.
+
+The `outputs/loso_13_M100_bs32` LOSO run repeated the M100 check with
+`--cnn_batch_size 32`. Compared with the previous M100 batch-8 LOSO run:
+
+- CNN batch 8: CM `[[1908, 96], [90, 516]]`, accuracy `0.929`, GOOD
+  precision/recall/F1 `0.843 / 0.851 / 0.847`
+- CNN batch 32: CM `[[1900, 104], [97, 509]]`, accuracy `0.923`, GOOD
+  precision/recall/F1 `0.830 / 0.840 / 0.835`
+- Combined policy batch 8: CM `[[1948, 56], [112, 494]]`, accuracy `0.936`,
+  GOOD precision/recall/F1 `0.898 / 0.815 / 0.855`
+- Combined policy batch 32: CM `[[1951, 53], [115, 491]]`, accuracy `0.936`,
+  GOOD precision/recall/F1 `0.903 / 0.810 / 0.854`
+
+Interpretation: the single 13-shot held-out split favored M100 batch 32, but
+LOSO did not. In LOSO, batch 32 added 8 CNN false positives and 7 false
+negatives relative to batch 8. The combined policy was nearly unchanged:
+batch 32 removed 3 false positives but added 3 false negatives. Keep M100 as
+the default input window; treat batch size as an optimization/calibration
+setting rather than a settled science result.
+
+Subset breakdown for CNN-only M100 LOSO:
+
+- non-G seven-shot subset: batch 8 CM `[[1042, 50], [65, 481]]`, GOOD F1
+  `0.893`; batch 32 CM `[[1038, 54], [69, 477]]`, GOOD F1 `0.886`
+- `nstxuG*` six-shot subset: batch 8 CM `[[866, 46], [25, 35]]`, GOOD F1
+  `0.496`; batch 32 CM `[[862, 50], [28, 32]]`, GOOD F1 `0.451`

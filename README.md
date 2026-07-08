@@ -81,9 +81,10 @@ Current best models
   retrained on the current 2610-row / 13-shot `tae_like_train.csv` list.
 - Current RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
-- Current raw-CNN 13-shot held-out split check: CM `[[394, 6], [18, 103]]`,
-  accuracy `0.954`, GOOD recall `0.851`, GOOD precision `0.945`, GOOD F1
-  `0.896`.
+- Latest raw-CNN 13-shot held-out split check with `M_target=100`: CM
+  `[[394, 6], [9, 112]]`, accuracy `0.971`, GOOD recall `0.926`, GOOD
+  precision `0.949`, GOOD F1 `0.937`. The raw-CNN default harmonic window is
+  now `M_target=100`.
 - Previous production raw-CNN 10-shot held-out check: CM
   `[[290, 5], [8, 121]]`, accuracy `0.969`, GOOD recall `0.938`, GOOD
   precision `0.960`, GOOD F1 `0.949`. That saved checkpoint was then refit on

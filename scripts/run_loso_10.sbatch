@@ -15,8 +15,8 @@ cd "${SLURM_SUBMIT_DIR:-$PWD}"
 module load pytorch
 source configs/paths/nova_paths.nersc.sh
 
-CNN_M_TARGET="${CNN_M_TARGET:-54}"
-LOSO_TAG="${LOSO_TAG:-loso_13_M${CNN_M_TARGET}}"
+CNN_M_TARGET="${CNN_M_TARGET:-100}"
+LOSO_TAG="${LOSO_TAG:-loso_13_M${CNN_M_TARGET}_bs32}"
 
 python -u scripts/run_loso_10.py \
   --steps all \
@@ -25,7 +25,7 @@ python -u scripts/run_loso_10.py \
   --cnn_launch srun \
   --cnn_device cuda \
   --sort_device cpu \
-  --cnn_batch_size 8 \
+  --cnn_batch_size 32 \
   --cnn_m_target "$CNN_M_TARGET" \
   --cnn_cache_data \
   "$@"
