@@ -78,7 +78,8 @@ Model families
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. Both RF and raw-CNN checkpoints have been
-  retrained on the current 2610-row / 13-shot `tae_like_train.csv` list.
+  retrained on the current 2610-row / 13-shot `tae_like_train.csv` list. The
+  raw-CNN checkpoint is a full-list refit with `M_target=100`.
 - Current RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
 - Latest raw-CNN 13-shot held-out split check with `M_target=100`: CM
@@ -103,17 +104,19 @@ Current best models
 
 ## Classify new NSTX-U shots on Flux (no training)
 
-For a user who only wants to sort new NSTX-U NOVA output, do **not** train new
-models. The production workflow is to pull the current repository, use the
-version-controlled active models, and run `scripts/sort_shot_mixed.py` once per
-shot:
+For a user who only wants to sort new NSTX-U E-like NOVA output, do **not**
+train new models. The production workflow is to pull the current repository,
+use the version-controlled active models, and run `scripts/sort_shot_mixed.py`
+once per shot:
 
 - RF model: `models/nova_mode_classifier.joblib`
 - raw-CNN model: `models/nova_cnn_raw.pt`
 - sorter: `scripts/sort_shot_mixed.py`
 
 Do not use checkpoints from `models/old_4shots_models/` for new production
-sorting.
+sorting. NSTX-U G-case shots are currently treated as a separate regime and
+should not be used for routine NOVA-C candidate selection until the G-shot
+policy is retuned.
 
 Default Flux shell is usually `tcsh`:
 

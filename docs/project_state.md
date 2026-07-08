@@ -74,7 +74,8 @@ Notes:
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
     -	Checkpoint status: retrained on the current 2610-row / 13-shot active
-      list
+      list as a full-CSV refit with `M_target=100`, `R_target=201`, batch size
+      32, robust normalization, and no final prediction-collapse warning
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
@@ -188,10 +189,12 @@ From cont_features.py:
 ## Current tasks
 - Keep `training_labels/additions/tae_like_3new.csv` out of training until
   `nstxuG121123N75` is recalculated and its labels are reviewed again.
-- Decide whether to retune the RF/CNN fusion thresholds after comparing the
-  13-shot M100 LOSO runs. M100 is now the raw-CNN default; batch-size evidence
-  is mixed, with the single held-out split favoring batch 32 but LOSO favoring
-  batch 8 for CNN recall/F1.
+- Use the current RF and M100 raw-CNN checkpoints through `sort_shot_mixed.py`
+  for NSTX-U E-like shot classification and NOVA-C growth-rate candidate
+  selection.
+- Keep NSTX-U G-case shots out of routine production sorting for now. Decide
+  whether to retune the G-shot policy with more same-regime examples,
+  additional gap-geometry features, or both.
 - Recheck the three new G-case shots after corrected continuum files arrive.
 - Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
  
@@ -1360,3 +1363,18 @@ Subset breakdown for CNN-only M100 LOSO:
   `0.893`; batch 32 CM `[[1038, 54], [69, 477]]`, GOOD F1 `0.886`
 - `nstxuG*` six-shot subset: batch 8 CM `[[866, 46], [25, 35]]`, GOOD F1
   `0.496`; batch 32 CM `[[862, 50], [28, 32]]`, GOOD F1 `0.451`
+
+The active `models/nova_cnn_raw.pt` checkpoint was retrained as a full-list
+production refit with `M_target=100`, batch size 32, robust normalization, and
+the current 2610-row training list. Checkpoint metadata reports
+`saved_training_scope=full_csv_refit`, final prediction health of 606 predicted
+GOOD out of 2610 modes, matching the 606 true GOOD labels, and
+`collapse_detected=False`.
+
+Production-use decision: use the active RF plus raw-CNN models through
+`scripts/sort_shot_mixed.py` for NSTX-U E-like shots to select modes for
+NOVA-C growth-rate calculations. Leave NSTX-U G-case shots out of this
+production path for now because the TAE-gap geometry is physically different
+and the LOSO checks show much weaker GOOD-mode detection. Next G-shot work is
+to add more same-regime labeled examples and/or add explicit gap-width /
+gap-geometry features before revisiting the fusion policy.
