@@ -1392,6 +1392,10 @@ scored-mode CSV outputs, including `good_tae_final.csv`. These are the same
 normalized radial centroid and RMS radial width used in the RF feature schema
 and are intended for comparing candidate mode locations with beam-ion density
 profiles before deciding whether a NOVA-C growth-rate calculation is needed.
+The `rf_vs_cnn_pgood.png` plot was also changed from a single scatter plot to
+a two-panel count-density plus jittered tier-scatter diagnostic so saturated
+probabilities near 0 and 1 are easier to count and the legend no longer covers
+the main data region.
 
 ### 2026-07-09
 

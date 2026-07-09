@@ -868,6 +868,7 @@ def write_outputs(
 
 
 def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
     try:
         import matplotlib.pyplot as plt
     except Exception as exc:
@@ -919,6 +920,8 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
         print(f"[plots] Failed RF/CNN histogram plot: {type(exc).__name__}: {exc}")
 
     try:
+        from matplotlib.colors import LogNorm
+
         colors = {
             "gold_good": "#1b9e77",
             "silver_good": "#66a61e",
@@ -927,27 +930,82 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
             "flagged_cnn_rescue": "#1f78b4",
             "flagged_borderline_or_disagreement": "#7570b3",
         }
-        fig, ax = plt.subplots(figsize=(6, 6))
+        score_rows = [
+            row
+            for row in scored_rows
+            if isinstance(row.get("p_rf_good"), (int, float, np.integer, np.floating))
+            and isinstance(row.get("p_cnn_good"), (int, float, np.integer, np.floating))
+        ]
+        rf_scores = np.asarray([float(row["p_rf_good"]) for row in score_rows], dtype=float)
+        cnn_scores = np.asarray([float(row["p_cnn_good"]) for row in score_rows], dtype=float)
+
+        fig, (count_ax, tier_ax) = plt.subplots(
+            1,
+            2,
+            figsize=(11.5, 5.2),
+            sharex=True,
+            sharey=True,
+        )
+        bins = np.linspace(0.0, 1.0, 31)
+        counts, xedges, yedges = np.histogram2d(rf_scores, cnn_scores, bins=[bins, bins])
+        count_mesh = np.ma.masked_where(counts.T <= 0, counts.T)
+        if np.any(counts > 0):
+            mesh = count_ax.pcolormesh(
+                xedges,
+                yedges,
+                count_mesh,
+                cmap="magma",
+                norm=LogNorm(vmin=1, vmax=float(np.max(counts))),
+                shading="auto",
+            )
+            cbar = fig.colorbar(mesh, ax=count_ax, fraction=0.046, pad=0.04)
+            cbar.set_label("modes per bin", fontsize=8)
+            cbar.ax.tick_params(labelsize=7)
+        count_ax.set_title("Binned count density", fontsize=10)
+
+        rng = np.random.default_rng(0)
+        jitter = 0.008
         for tier in colors:
             tier_rows = [row for row in scored_rows if row.get("tier") == tier]
             if not tier_rows:
                 continue
-            ax.scatter(
-                finite_values(tier_rows, "p_rf_good"),
-                finite_values(tier_rows, "p_cnn_good"),
-                s=18,
-                alpha=0.75,
-                label=tier,
+            x = finite_values(tier_rows, "p_rf_good")
+            y = finite_values(tier_rows, "p_cnn_good")
+            if x.size == 0 or y.size == 0:
+                continue
+            tier_ax.scatter(
+                np.clip(x + rng.uniform(-jitter, jitter, size=x.size), 0.0, 1.0),
+                np.clip(y + rng.uniform(-jitter, jitter, size=y.size), 0.0, 1.0),
+                s=16,
+                alpha=0.58,
+                label=f"{tier} ({len(tier_rows)})",
                 color=colors[tier],
+                edgecolors="none",
             )
-        ax.set_xlabel("p_rf_good")
-        ax.set_ylabel("p_cnn_good")
-        ax.set_xlim(0.0, 1.0)
-        ax.set_ylim(0.0, 1.0)
-        ax.set_title(f"{plot_subject}: RF vs CNN GOOD scores")
-        ax.legend(fontsize=8)
-        fig.tight_layout()
-        fig.savefig(out_dir / "rf_vs_cnn_pgood.png", dpi=150)
+        tier_ax.set_title("Tier scatter, jittered", fontsize=10)
+
+        for ax in (count_ax, tier_ax):
+            ax.axvline(0.5, color="0.25", linewidth=0.8, linestyle="--", alpha=0.65)
+            ax.axhline(0.5, color="0.25", linewidth=0.8, linestyle="--", alpha=0.65)
+            ax.axvline(0.7, color="#1b9e77", linewidth=0.7, linestyle=":", alpha=0.75)
+            ax.axhline(0.6, color="#1b9e77", linewidth=0.7, linestyle=":", alpha=0.75)
+            ax.set_xlabel("p_rf_good")
+            ax.set_xlim(0.0, 1.0)
+            ax.set_ylim(-0.1, 1.1)
+            ax.grid(alpha=0.18, linewidth=0.5)
+        count_ax.set_ylabel("p_cnn_good")
+        tier_ax.legend(
+            title="tier (count)",
+            fontsize=7,
+            title_fontsize=8,
+            loc="upper left",
+            bbox_to_anchor=(1.02, 1.0),
+            borderaxespad=0.0,
+            frameon=False,
+        )
+        fig.suptitle(f"{plot_subject}: RF vs CNN GOOD scores", fontsize=12)
+        fig.tight_layout(rect=(0, 0, 0.84, 0.96))
+        fig.savefig(out_dir / "rf_vs_cnn_pgood.png", dpi=150, bbox_inches="tight")
         plt.close(fig)
     except Exception as exc:
         print(f"[plots] Failed RF-vs-CNN scatter plot: {type(exc).__name__}: {exc}")

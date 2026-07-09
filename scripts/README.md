@@ -789,7 +789,10 @@ RF and raw-CNN checkpoints for E-like production sorting. Do not switch to a
 G-shot policy from these defaults without a dedicated G-regime check.
 
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
-side-by-side in `hist_p_good_by_n.png`.
+side-by-side in `hist_p_good_by_n.png`. The `rf_vs_cnn_pgood.png` diagnostic
+uses a two-panel view: a log-scaled binned count-density panel to show how many
+modes pile up near score edges, and a jittered tier-colored scatter panel with
+the legend outside the data region.
 
 `--cnn_model_kind` defaults to `auto`, so `sort_shot_mixed.py` can use raw,
 straightened, or hybrid CNN checkpoints that contain `model_type` metadata.
