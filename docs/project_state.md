@@ -14,6 +14,14 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
       `nstxuG142301Y93`
     - mode paths stored relative to `$NOVA_DATA` when possible
     - example entry: `nstx_120113/N5/egn05w.1234E+02,good`
+- Derived non-G / E-production comparison list:
+    - `training_labels/tae_like_train_7.csv`
+    - 1638 labeled modes: 546 `good`, 1092 `bad`
+    - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
+      `nstxuE202855A01t020`, `nstxuE204669M03t025`,
+      `nstxuE205052A01t022`
+    - created from `tae_like_train.csv` by excluding all `nstxuG*` shots for
+      7-shot LOSO checks of the non-G / E-like production regime
 - Archived historical lists:
     - older TAE-only lists: `training_labels/old_4shots_tae_only_labels/`
     - previous four-shot mixed TAE/EAE lists: `training_labels/old_4shots_mixed_labels/`

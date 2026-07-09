@@ -858,6 +858,10 @@ creates 13 folds. It:
 - runs `sort_shot_mixed.py` on the held-out shot with `--label_csv`, and
 - aggregates RF-only, CNN-only, and combined-policy metrics.
 
+For the non-G / NSTX-U E-like production-regime comparison, use
+`--train_csv training_labels/tae_like_train_7.csv`; this derived list excludes
+all `nstxuG*` shots and creates 7 LOSO folds.
+
 Small split/evaluation files are written under `outputs/loso_<N shots>/` by
 default. Model checkpoints and training logs are written under
 `$NOVA_RUN/<output-name>`, or `$SCRATCH/nova_s/<output-name>` when `$NOVA_RUN`
