@@ -37,6 +37,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 
 from cnn_infer_common import load_cnn_classifier
 from cont_features import load_datcon_for_mode
+from mode_features import radial_centroid, radial_width
 from mode_csv import read_mode_csv_entries
 from nova_mode_loader import load_mode_from_nova
 from sort_shot import (
@@ -59,6 +60,8 @@ ALL_OUTPUT_FIELDS = [
     "nhar",
     "omega",
     "gamma_d",
+    "rad_loc",
+    "rad_width",
     "status",
     "gap_region",
     "signed_delta",
@@ -575,6 +578,8 @@ def write_labeled_evaluation_outputs(
         dtype=int,
     )
     model_names = ["rf", "cnn", "combined_policy"]
+    report_labels = np.asarray([0, 1], dtype=int)
+    report_target_names = ["bad", "good"]
     metric_rows: list[dict[str, Any]] = []
     prediction_rows: list[dict[str, Any]] = []
 
@@ -664,17 +669,16 @@ def write_labeled_evaluation_outputs(
             fp.write("\n" + "-" * 72 + "\n")
             fp.write(f"{model_name} confusion matrix/report\n")
             fp.write("Rows=true [bad, good]; columns=pred [bad, good]\n")
-            fp.write(str(confusion_matrix(y_true, y_pred, labels=[0, 1])) + "\n\n")
-            fp.write(
-                classification_report(
-                    y_true,
-                    y_pred,
-                    labels=[0, 1],
-                    target_names=["bad", "good"],
-                    digits=4,
-                    zero_division=0,
-                )
+            fp.write(str(confusion_matrix(y_true, y_pred, labels=report_labels)) + "\n\n")
+            report_text = classification_report(
+                y_true=y_true,
+                y_pred=y_pred,
+                labels=report_labels,
+                target_names=report_target_names,
+                digits=4,
+                zero_division=0,
             )
+            fp.write(str(report_text))
             fp.write("\n")
 
 
@@ -1053,6 +1057,14 @@ def main() -> None:
                     "nhar": bundle["nhar"],
                     "omega": bundle["omega"],
                     "gamma_d": bundle["gamma_d"],
+                }
+            )
+            r_grid = np.linspace(0.0, 1.0, bundle["nr"])
+            rad_loc = float(radial_centroid(bundle["mode"], r_grid))
+            row.update(
+                {
+                    "rad_loc": rad_loc,
+                    "rad_width": float(radial_width(bundle["mode"], r_grid, rad_loc)),
                 }
             )
 

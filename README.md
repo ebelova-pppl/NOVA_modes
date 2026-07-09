@@ -195,6 +195,8 @@ does not move or modify the input modes; it writes CSV outputs and reports into
 Most useful outputs:
 
 - `good_tae_final.csv` — final deduplicated GOOD TAE-like modes.
+  Includes `rad_loc` and `rad_width` for comparing the mode location/width
+  with beam-ion density profiles before launching NOVA-C growth-rate runs.
 - `good_tae_unchecked.csv` — GOOD TAE-like modes before duplicate removal.
 - `bad_tae_like.csv` — TAE-like modes rejected by the RF/CNN policy.
 - `eae_like.csv` — modes routed away as EAE-like, not RF/CNN-scored as TAEs.

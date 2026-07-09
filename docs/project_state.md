@@ -1386,3 +1386,40 @@ production path for now because the TAE-gap geometry is physically different
 and the LOSO checks show much weaker GOOD-mode detection. Next G-shot work is
 to add more same-regime labeled examples and/or add explicit gap-width /
 gap-geometry features before revisiting the fusion policy.
+
+`scripts/sort_shot_mixed.py` now writes `rad_loc` and `rad_width` to its
+scored-mode CSV outputs, including `good_tae_final.csv`. These are the same
+normalized radial centroid and RMS radial width used in the RF feature schema
+and are intended for comparing candidate mode locations with beam-ion density
+profiles before deciding whether a NOVA-C growth-rate calculation is needed.
+
+### 2026-07-09
+
+The non-G / E-production 7-shot list `training_labels/tae_like_train_7.csv`
+was used for a dedicated M100 batch-32 LOSO run under
+`outputs/loso_7_M100_bs32`. The run used 7 folds, `M_target=100`,
+`R_target=201`, batch size 32, robust normalization, and full-CNN refits.
+Aggregate metrics:
+
+- CNN: CM `[[1025, 67], [74, 472]]`, accuracy `0.914`, GOOD
+  precision/recall/F1 `0.876 / 0.864 / 0.870`
+- combined policy: CM `[[1053, 39], [65, 481]]`, accuracy `0.937`, GOOD
+  precision/recall/F1 `0.925 / 0.881 / 0.902`
+- RF: CM `[[1059, 33], [75, 471]]`, accuracy `0.934`, GOOD
+  precision/recall/F1 `0.935 / 0.863 / 0.897`
+
+Compared with evaluating the 13-shot M100 batch-32 LOSO only on the same
+seven non-G held-out shots, removing G shots from training had mixed effects:
+
+- CNN got worse: +13 false positives, +5 false negatives, GOOD F1
+  `0.886 -> 0.870`
+- combined policy improved slightly: +7 false positives but -15 false
+  negatives, GOOD F1 `0.893 -> 0.902`
+- RF improved: +5 false positives but -23 false negatives, GOOD F1
+  `0.877 -> 0.897`
+
+Interpretation: excluding G shots does not help CNN-only in this M100 batch-32
+LOSO check, but it does make the RF and combined policy less conservative on
+non-G / E-like cases and improves GOOD recall. The dedicated 7-shot combined
+policy is currently the best matched check for E-like production sorting, but
+the gap relative to the 13-shot combined policy is modest.

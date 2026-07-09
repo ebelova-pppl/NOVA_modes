@@ -712,11 +712,10 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints are trained on the
-current 13-shot TAE-like list. The default RF-leaning fusion policy was chosen
-from four-shot LOSO checks. The symmetric-recipe 10-shot LOSO check in
-`outputs/loso_10_onecycle_both/` makes raw CNN strongest overall. The current
-combined policy still has better GOOD recall on the sparse NSTX-U G-case group,
-so an updated 13-shot LOSO check should guide any fusion-threshold retuning.
+current 13-shot TAE-like list. The current production use is NSTX-U E-like
+shot sorting for NOVA-C candidate selection. NSTX-U G-case shots are treated
+as a separate regime for now because their narrow, strongly varying TAE gap
+gives sparse GOOD-mode labels and weaker LOSO performance.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
@@ -737,6 +736,12 @@ It also writes `all_modes_scored.csv`, `tae_like_all.csv`,
 `shot_summary_wide.csv`, `shot_summary_by_n.csv`,
 `frequency_cluster_report.txt`, and
 `frequency_clusters.csv` for auditability.
+
+The scored-mode CSVs include `rad_loc` and `rad_width`, the same normalized
+radial centroid and RMS radial width used by the RF feature schema. In
+`good_tae_final.csv`, these columns can be compared with beam-ion density
+profiles to deprioritize edge-localized modes whose beam drive is expected to
+be small.
 
 When `--label_csv` is provided for a labeled validation shot, it also writes:
 
@@ -779,7 +784,9 @@ more stable held-out-shot ranker, while the CNN still provided useful
 high-confidence rescues. The expanded 10-shot LOSO check gave the current
 policy and RF-only the same aggregate accuracy (`0.9299`), with the combined
 policy trading three extra false positives for three fewer false negatives.
-Repeat the LOSO check on the 13-shot active set before changing this policy.
+Follow-up 13-shot and 7-shot LOSO checks support keeping the current full-set
+RF and raw-CNN checkpoints for E-like production sorting. Do not switch to a
+G-shot policy from these defaults without a dedicated G-regime check.
 
 With `--make_plots`, the RF and CNN per-`n` score histograms are written
 side-by-side in `hist_p_good_by_n.png`.
