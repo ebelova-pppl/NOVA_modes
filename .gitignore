@@ -27,7 +27,7 @@ tmp*
 
 # Figures
 PLOTS/
-*.png
+#*.png
 
 # System
 .DS_Store
