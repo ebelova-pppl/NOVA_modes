@@ -1,0 +1,64 @@
+Close-frequency cluster report for selected NOVA modes
+  Used parameters: rel_freq_tol=0.02  sim_tol=0.9  r_tol=0.1  width_tol=0.05
+===========================================================================
+
+n=4  cluster=1  size=2  omega_range=[1.3356, 1.35476]  d_omega/omega=0.0142431
+  type_group=1
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N4/egn04w.1784E+01
+               omega=1.3356  score=0.939639  r0=0.5593  dr=0.3675
+  Compare: egn04w.1835E+01  vs  egn04w.1784E+01  cos=0.379  dr0=0.0057  ddr=0.1679  rel_domega=0.0143  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N4/egn04w.1835E+01
+               omega=1.35476  score=0.746650  r0=0.5536  dr=0.5354
+---------------------------------------------------------------------------
+
+n=5  cluster=1  size=2  omega_range=[1.29205, 1.3066]  d_omega/omega=0.0111998
+  type_group=1
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N5/egn05w.1707E+01
+               omega=1.3066  score=0.443363  r0=0.6403  dr=0.3962
+  Compare: egn05w.1669E+01  vs  egn05w.1707E+01  cos=0.246  dr0=0.1330  ddr=0.0664  rel_domega=0.0111  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N5/egn05w.1669E+01
+               omega=1.29205  score=0.441667  r0=0.5073  dr=0.3298
+---------------------------------------------------------------------------
+
+n=6  cluster=2  size=2  omega_range=[1.4261, 1.45221]  d_omega/omega=0.0181435
+  type_group=1
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N6/egn06w.2109E+01
+               omega=1.45221  score=0.886657  r0=0.5252  dr=0.3411
+  Compare: egn06w.2034E+01  vs  egn06w.2109E+01  cos=0.047  dr0=0.0179  ddr=0.0828  rel_domega=0.0180  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N6/egn06w.2034E+01
+               omega=1.4261  score=0.763333  r0=0.5431  dr=0.4239
+---------------------------------------------------------------------------
+
+n=8  cluster=4  size=2  omega_range=[1.48173, 1.49335]  d_omega/omega=0.00781185
+  type_group=1
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N8/egn08w.2196E+01
+               omega=1.48173  score=0.444324  r0=0.5887  dr=0.4380
+  Compare: egn08w.2230E+01  vs  egn08w.2196E+01  cos=0.673  dr0=0.0310  ddr=0.0360  rel_domega=0.0078  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N8/egn08w.2230E+01
+               omega=1.49335  score=0.337271  r0=0.6197  dr=0.4740
+---------------------------------------------------------------------------
+
+n=9  cluster=2  size=2  omega_range=[1.48133, 1.50193]  d_omega/omega=0.0138113
+  type_group=1
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N9/egn09w.2256E+01
+               omega=1.50193  score=0.853584  r0=0.5270  dr=0.3560
+  Compare: egn09w.2194E+01  vs  egn09w.2256E+01  cos=0.044  dr0=0.0941  ddr=0.0876  rel_domega=0.0137  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N9/egn09w.2194E+01
+               omega=1.48133  score=0.331887  r0=0.6211  dr=0.4436
+---------------------------------------------------------------------------
+
+n=10  cluster=2  size=2  omega_range=[1.53653, 1.56327]  d_omega/omega=0.0172575
+  type_group=1
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N10/egn10w.2444E+01
+               omega=1.56327  score=0.437719  r0=0.6089  dr=0.3954
+  Compare: egn10w.2361E+01  vs  egn10w.2444E+01  cos=0.151  dr0=0.0749  ddr=0.0579  rel_domega=0.0171  freq_close=True  same=False
+  type_group=2
+    [KEEP] path=/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuE205040A01t016/N10/egn10w.2361E+01
+               omega=1.53653  score=0.326760  r0=0.5340  dr=0.3375
+---------------------------------------------------------------------------
+
