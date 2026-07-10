@@ -713,8 +713,8 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints are trained on the
 current 13-shot TAE-like list. The current production use is NSTX-U E-like
-shot sorting for NOVA-C candidate selection. NSTX-U G-case shots are treated
-as a separate regime for now because their narrow, strongly varying TAE gap
+shot sorting for NOVA-C candidate selection. **NSTX-U G-case shots are treated
+as a separate regime** for now because their narrow, strongly varying TAE gap
 gives sparse GOOD-mode labels and weaker LOSO performance.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
@@ -724,8 +724,8 @@ the first and last mode are separated by more than `--rel_freq_tol`.
 
 The main outputs are:
 
-- `good_tae_unchecked.csv`
 - `good_tae_final.csv`
+- `good_tae_unchecked.csv`
 - `bad_tae_like.csv`
 - `flagged_tae_like.csv`
 - `eae_like.csv`
@@ -819,6 +819,24 @@ close-frequency duplicate removal, not the RF/CNN fusion labels.
 
 ### Usage
 
+For production runs (new shots from /p/nstxdigtwin/energetic_particles/nova/DiTw):
+```bash
+$ python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+   --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
+   --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
+   --cnn_model_kind cnn_raw \
+   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME" \
+   --device cpu \
+   --make_plots
+```
+where env defined by (tcsh):
+setenv SHOT_NAME nstxuE205040A01t016
+setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
+setenv NOVA_SORT_OUT path_to_output_dir
+
+
+At NERSC:
 ```bash
 python sort_shot_mixed.py \
   --shot_dir /path/to/nstx_135388 \
@@ -836,15 +854,6 @@ python $NOVA_REPO/scripts/sort_shot_mixed.py \
   --cnn_model $NOVA_REPO/models/nova_cnn_raw.pt \
   --out_dir $NOVA_RUN_ROOT/sort_out_nstx_135388 \
   --label_csv $NOVA_REPO/training_labels/tae_like_train.csv \
-  --make_plots
-```
-For production runs (new shots from /u/ngorelen/work/nova/DiTw/projdisk):
-```bash
-python $NOVA_REPO/scripts/sort_shot_mixed.py \
-  --shot_dir /u/ngorelen/work/nova/DiTw/projdisk/nstxuE202855A01t020 \
-  --rf_model $NOVA_REPO/models/nova_mode_classifier.joblib \
-  --cnn_model $NOVA_REPO/models/nova_cnn_raw.pt \
-  --out_dir path/to/sort_nstxuE202855A01t02 \
   --make_plots
 ```
 
