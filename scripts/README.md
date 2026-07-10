@@ -831,10 +831,11 @@ $ python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
    --make_plots
 ```
 where env defined by (tcsh):
-setenv SHOT_NAME nstxuE205040A01t016
-setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
-setenv NOVA_SORT_OUT path_to_output_dir
-
+```bash
+  setenv SHOT_NAME nstxuE205040A01t016
+  setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
+  setenv NOVA_SORT_OUT path_to_output_dir
+```
 
 At NERSC:
 ```bash
