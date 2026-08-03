@@ -24,15 +24,15 @@ Columns:
 
 Current checked contents:
 - 2610 labeled modes
-- labels: 604 `good`, 2006 `bad`
+- labels: 601 `good`, 2009 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
   `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
   `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`
 
 This is the list to use when retraining the expanded RF and CNN models.
-The active RF and raw-CNN checkpoints predate the 2026-08-02 H47 label
-correction; retraining on the current 2610-row / 13-shot list is pending.
+The active RF and raw-CNN checkpoints predate the 2026-08-02 G-shot label
+corrections; retraining on the current 2610-row / 13-shot list is pending.
 
 ## Addition / component lists
 
@@ -111,7 +111,7 @@ Related metadata/audit files in the shared `nova2/metadata` area:
 The six-shot list has been merged into `tae_like_train.csv`.
 
 Checked staged-label summary:
-- cleaned staged list: 1040 rows, 250 `good`, 790 `bad`
+- cleaned staged list: 1040 rows, 248 `good`, 792 `bad`
 - not-cleaned staged list: 1041 rows, with one duplicate mode
 - all cleaned staged paths resolve to files under `$NOVA_DATA` by
   `shot/N/file` suffix
@@ -149,10 +149,10 @@ replacement N75 component.
 
 Current checked contents:
 - 523 labeled modes
-- labels: 14 `good`, 509 `bad`
+- labels: 13 `good`, 510 `bad`
 - shots: `nstxuG121123Q62`, `nstxuG121123N75`, `nstxuG142301Y93`
 - per-shot counts:
-  - `nstxuG121123Q62`: 241 rows, 13 `good`, 228 `bad`
+  - `nstxuG121123Q62`: 241 rows, 12 `good`, 229 `bad`
   - `nstxuG121123N75`: 176 rows, 0 `good`, 176 `bad`; blocked pending
     recalculation
   - `nstxuG142301Y93`: 106 rows, 1 `good`, 105 `bad`
@@ -183,8 +183,8 @@ schema and has been merged into `tae_like_train.csv`.
 
 Current checked contents:
 - 347 labeled modes
-- labels: 14 `good`, 333 `bad`
-- `nstxuG121123Q62`: 241 rows, 13 `good`, 228 `bad`
+- labels: 13 `good`, 334 `bad`
+- `nstxuG121123Q62`: 241 rows, 12 `good`, 229 `bad`
 - `nstxuG142301Y93`: 106 rows, 1 `good`, 105 `bad`
 - paths are relative to `$NOVA_DATA`
 - no duplicate paths

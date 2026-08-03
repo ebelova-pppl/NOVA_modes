@@ -6,7 +6,7 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 ## Data
 - Active version-controlled training list:
     - `training_labels/tae_like_train.csv`
-    - 2610 labeled TAE-like modes: 604 `good`, 2006 `bad`
+    - 2610 labeled TAE-like modes: 601 `good`, 2009 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`, `nstxuG121123K51`, `nstxuG133964S31`,
@@ -81,8 +81,8 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: full-CSV refit predating the 2026-08-02 H47 label
-      correction; retraining on the current active list is pending
+    -	Checkpoint status: full-CSV refit predating the 2026-08-02 G-shot label
+      corrections; retraining on the current active list is pending
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
@@ -1431,14 +1431,42 @@ the gap relative to the 13-shot combined policy is modest.
 ### 2026-08-02
 
 During review of shared RF/CNN false negatives in the NSTX-U G-shot LOSO
-results, two modes were manually reclassified from `good,tae` to `bad,none`:
+results, five modes were manually reclassified from `good,tae` to `bad,none`:
 
 - `nstxuG142301H47/N10/egn10w.1503E+02`
 - `nstxuG121123K51/N8/egn08w.2347E+02`
+- `nstxuG121123Q62/N3/egn03w.1586E+02`
+- `nstxuG142301H47/N9/egn09w.1283E+02`
+- `nstxuG121123K51/N9/egn09w.2153E+02`
 
 These corrections were applied to the active
-`training_labels/tae_like_train.csv` list and its source component
-`training_labels/additions/tae_like_6new.csv`. The active list remains 2610
-rows and now contains 604 `good` and 2006 `bad` labels. Existing RF, raw-CNN,
-and LOSO metrics predate these corrections; retraining and revalidation are
-pending.
+`training_labels/tae_like_train.csv` list and the corresponding source
+component lists under `training_labels/additions/`. The active list remains
+2610 rows and now contains 601 `good` and 2009 `bad` labels. Existing RF,
+raw-CNN, and LOSO metrics predate these corrections; retraining and
+revalidation are pending. `nstxuG121123K51/N9/egn09w.2937E+02` remains
+`good,tae` pending further review of its spiky structure and small amplitude
+at the continuum crossing.
+
+
+### 2026-08-03
+
+Compared the small-radius `N=8` Alfvén-continuum gap topology for all seven
+non-G and six G shots in the active 13-shot set. Generated normalized and
+absolute-frequency comparison figures:
+
+- `outputs/gshot_error_diagnostics/n8_continuum_gap_G_vs_nonG.png`
+- `outputs/gshot_error_diagnostics/n8_continuum_gap_G_vs_nonG_absolute.png`
+
+The normalized figure divides each shot by its median gap-center frequency
+over `0.05 <= r <= 0.45` and reports the median relative gap width over
+`0.05 <= r <= 0.25`. Each panel also shows the current number of GOOD-labeled
+`N=8` modes in large type for presentation use. The comparison supports
+continuum topology/location as
+an important G-shot failure variable: K51 and H47, which contain all nine
+strict continuum-extremum-localized shared RF/CNN false negatives, show
+pronounced repeated inner-radius extrema. Gap width alone does not separate
+the regimes; the G-shot inner-width range overlaps the non-G range. The
+comparison is not a universal G/non-G separator, however: NSTX 135388 and
+E202855 also have clear small-radius continuum extrema, while some G shots
+are comparatively monotonic.
