@@ -200,9 +200,16 @@ From cont_features.py:
   for NSTX-U E-like shot classification and NOVA-C growth-rate candidate
   selection.
 - Keep NSTX-U G-case shots out of routine production sorting for now. Decide
-  whether to retune the G-shot policy with more same-regime examples,
-  additional gap-geometry features, or both.
-- Recheck the three new G-case shots after corrected continuum files arrive.
+  whether to retune the G-shot policy after the J38 label audit and dedicated
+  gap-topology / mode-extremum feature ablations.
+- Re-audit the J38 modes whose radius and frequency align with prominent
+  continuum extrema; J38 was labeled in a separate later pass and may use a
+  more conservative policy than K51.
+- Add shared continuum-topology and mode-extremum features for an RF LOSO
+  ablation before changing the production schema. If they help, test a small
+  numerical 1D-continuum branch fused with the raw-mode CNN; do not use
+  rendered plot images as network inputs.
+- Recheck `nstxuG121123N75` after recalculation with the corrected q profile.
 - Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
  
 ## Next tasks
@@ -1461,12 +1468,91 @@ absolute-frequency comparison figures:
 The normalized figure divides each shot by its median gap-center frequency
 over `0.05 <= r <= 0.45` and reports the median relative gap width over
 `0.05 <= r <= 0.25`. Each panel also shows the current number of GOOD-labeled
-`N=8` modes in large type for presentation use. The comparison supports
-continuum topology/location as
-an important G-shot failure variable: K51 and H47, which contain all nine
+`N=8` modes in large type for presentation use. The comparison supports continuum topology/location as an important G-shot
+failure variable: K51 and H47, which contain all nine
 strict continuum-extremum-localized shared RF/CNN false negatives, show
 pronounced repeated inner-radius extrema. Gap width alone does not separate
 the regimes; the G-shot inner-width range overlaps the non-G range. The
 comparison is not a universal G/non-G separator, however: NSTX 135388 and
 E202855 also have clear small-radius continuum extrema, while some G shots
 are comparatively monotonic.
+
+
+#### G-shot working conclusions after manual FN review
+
+The active six-shot G subset contains 972 modes: 55 `good` and 917 `bad`.
+Five original GOOD labels were corrected to BAD during the false-negative
+review. Existing M100 LOSO predictions have not been retrained, but applying
+the corrected labels to those saved predictions gives:
+
+- raw CNN: 20 G-shot false negatives, 14 (70%) strictly
+  continuum-extremum-localized;
+- RF: 31 false negatives, 11 (35%) extremum-localized;
+- combined policy: 29 false negatives, 10 (34%) extremum-localized;
+- RF/CNN shared rejects: 11 false negatives, 9 (82%)
+  extremum-localized;
+- distinct GOOD modes missed by either model: 40, of which 16 (40%) are
+  extremum-localized.
+
+The strict diagnostic used a mode radial-amplitude maximum within `dr <= 0.02`
+of a local lower-boundary maximum or upper-boundary minimum and a relative
+mode/extremum frequency mismatch no larger than 3%. For the nine shared RF/CNN
+cases, the radial agreement is stronger (`dr <= 0.005`). The two shared-reject
+exceptions are `nstxuG121123K51/N9/egn09w.2937E+02`, whose main amplitude is
+far from the frequency-matching extremum, and
+`nstxuG142301Y93/N9/egn09w.1539E+02`, which has only a partial/broader radial
+association.
+
+The current physical working picture has two continuum regimes:
+
+1. A narrow, mostly monotonic/sloping inner gap supports few or no TAEs. At
+   `N=8`, S31 has median relative gap width 9.5%, normalized center-frequency
+   change +18.6%, edge monotonicity 0.82, and zero GOOD modes; Q62 has width
+   12.9%, center change +27.4%, monotonicity 0.79, and zero GOOD modes.
+2. A wider, wavy gap can create radial wells at local continuum extrema and
+   support a distinct class of narrow modes localized at those extrema. At
+   `N=8`, K51 has width 38.6%, monotonicity 0.22, and 6 GOOD modes; H47 has
+   width 37.2%, monotonicity 0.31, and 2 GOOD modes. These two shots contain
+   all nine strict extremum-localized shared RF/CNN false negatives.
+
+These are tendencies, not sufficient rules. Non-G NSTX 135388 and E202855
+also have wavy inner continua and many GOOD modes. J38 has K51-like topology
+at `N=8` (31.5% width and 0.39 monotonicity) but zero `N=8` GOOD labels and
+only 6 GOOD among 174 TAE-like candidates overall, compared with 27 among 208
+for K51. Over `N=7-10`, the candidate counts are nearly equal (123 J38 versus
+128 K51), but J38 has fewer prominent inner wells (12 versus 19) and only one
+GOOD mode satisfying the coarse extremum-alignment test, versus 12 for K51.
+The same coarse geometry flags 19 BAD-labeled high-`n` J38 modes, so manual
+review is needed to distinguish genuinely numerical structures from a
+label-policy difference. K51 belongs to the earlier six-shot review, whereas
+J38 was labeled in a separate later pass.
+
+Model interpretation:
+
+- The raw CNN does not receive continuum data. It can only learn that the
+  narrow, localized, often sign-changing morphology resembles numerical junk.
+- The RF receives closest-approach, distance, and crossing-amplitude features,
+  but no explicit gap width, slope/monotonicity, local-extremum prominence, or
+  mode-to-extremum match. A tangency at a continuum minimum/maximum may also
+  produce no ordinary crossing and may have small amplitude exactly at the
+  contact.
+- Continuum topology alone must not label a mode: the important condition is
+  joint radial and frequency alignment between a coherent mode and a
+  sufficiently prominent inner extremum.
+
+Proposed first RF experiment: compute the physical-frequency boundaries
+`sqrt(low2)` and `sqrt(high2)` over `0.05 <= r <= 0.40` and add robust relative
+gap width, binned center-frequency change, lower/upper edge monotonicity,
+prominent-well count/depth/radius, mode-to-extremum radial and frequency
+distance, and mode energy near the extremum. Thresholds such as 15% width or
+0.75 monotonicity are provisional diagnostics from the `N=8` comparison, not
+production cuts. Evaluate baseline, topology-only, and topology-plus-alignment
+schemas with shot-wise LOSO and report G and non-G subsets separately.
+
+For a CNN follow-up, feed numerical continuum arrays rather than PNG plots.
+A small 1D branch can ingest normalized lower/upper boundaries, the normalized
+mode-frequency line, and a validity mask on the same radial grid; concatenate
+its embedding with the raw-mode CNN embedding. This is different from the
+existing hybrid CNN, which receives continuum summary scalars but not the full
+gap topology. Given only 55 G-shot GOOD examples, perform the RF ablation and
+J38 audit first.
