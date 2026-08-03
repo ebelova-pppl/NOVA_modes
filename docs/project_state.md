@@ -1,12 +1,12 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-07-08)
+### Project state (current snapshot, updated 2026-08-02)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
 - Active version-controlled training list:
     - `training_labels/tae_like_train.csv`
-    - 2610 labeled TAE-like modes: 606 `good`, 2004 `bad`
+    - 2610 labeled TAE-like modes: 604 `good`, 2006 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`, `nstxuG121123K51`, `nstxuG133964S31`,
@@ -71,8 +71,8 @@ Notes:
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Checkpoint status: retrained on the current 2610-row / 13-shot active
-      list after the `training_labels/additions/tae_like_2new.csv` merge
+    -	Checkpoint status: trained before the 2026-08-02 G-shot label corrections;
+      retraining on the current 2610-row / 13-shot active list is pending
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
     -	Current 13-shot OOF accuracy: 0.951
     -	Current 13-shot OOF CM: `[[1967, 37], [91, 515]]`
@@ -81,9 +81,8 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: retrained on the current 2610-row / 13-shot active
-      list as a full-CSV refit with `M_target=100`, `R_target=201`, batch size
-      32, robust normalization, and no final prediction-collapse warning
+    -	Checkpoint status: full-CSV refit predating the 2026-08-02 H47 label
+      correction; retraining on the current active list is pending
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
@@ -1427,3 +1426,19 @@ LOSO check, but it does make the RF and combined policy less conservative on
 non-G / E-like cases and improves GOOD recall. The dedicated 7-shot combined
 policy is currently the best matched check for E-like production sorting, but
 the gap relative to the 13-shot combined policy is modest.
+
+
+### 2026-08-02
+
+During review of shared RF/CNN false negatives in the NSTX-U G-shot LOSO
+results, two modes were manually reclassified from `good,tae` to `bad,none`:
+
+- `nstxuG142301H47/N10/egn10w.1503E+02`
+- `nstxuG121123K51/N8/egn08w.2347E+02`
+
+These corrections were applied to the active
+`training_labels/tae_like_train.csv` list and its source component
+`training_labels/additions/tae_like_6new.csv`. The active list remains 2610
+rows and now contains 604 `good` and 2006 `bad` labels. Existing RF, raw-CNN,
+and LOSO metrics predate these corrections; retraining and revalidation are
+pending.

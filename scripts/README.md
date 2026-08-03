@@ -711,8 +711,9 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
   optional diagnostic plots.
 
 Current operational note: this is the main large-shot sorting path for the
-active models. The top-level RF and raw-CNN checkpoints are trained on the
-current 13-shot TAE-like list. The current production use is NSTX-U E-like
+active models. The top-level RF and raw-CNN checkpoints were trained on the
+13-shot TAE-like list before the 2026-08-02 G-shot label corrections; retraining
+on the corrected list is pending. The current production use is NSTX-U E-like
 shot sorting for NOVA-C candidate selection. **NSTX-U G-case shots are treated
 as a separate regime** for now because their narrow, strongly varying TAE gap
 gives sparse GOOD-mode labels and weaker LOSO performance.

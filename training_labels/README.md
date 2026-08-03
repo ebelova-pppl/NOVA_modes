@@ -24,15 +24,15 @@ Columns:
 
 Current checked contents:
 - 2610 labeled modes
-- labels: 606 `good`, 2004 `bad`
+- labels: 604 `good`, 2006 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
   `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
   `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`
 
 This is the list to use when retraining the expanded RF and CNN models.
-The active RF and raw-CNN checkpoints have both been retrained on this
-2610-row / 13-shot list.
+The active RF and raw-CNN checkpoints predate the 2026-08-02 H47 label
+correction; retraining on the current 2610-row / 13-shot list is pending.
 
 ## Addition / component lists
 
@@ -111,7 +111,7 @@ Related metadata/audit files in the shared `nova2/metadata` area:
 The six-shot list has been merged into `tae_like_train.csv`.
 
 Checked staged-label summary:
-- cleaned staged list: 1040 rows, 252 `good`, 788 `bad`
+- cleaned staged list: 1040 rows, 250 `good`, 790 `bad`
 - not-cleaned staged list: 1041 rows, with one duplicate mode
 - all cleaned staged paths resolve to files under `$NOVA_DATA` by
   `shot/N/file` suffix
