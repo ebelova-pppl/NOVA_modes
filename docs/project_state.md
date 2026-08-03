@@ -1464,6 +1464,7 @@ absolute-frequency comparison figures:
 
 - `outputs/gshot_error_diagnostics/n8_continuum_gap_G_vs_nonG.png`
 - `outputs/gshot_error_diagnostics/n8_continuum_gap_G_vs_nonG_absolute.png`
+- `outputs/gshot_error_diagnostics/n10_continuum_gap_G_vs_nonG_absolute_common_range.png`
 
 The normalized figure divides each shot by its median gap-center frequency
 over `0.05 <= r <= 0.45` and reports the median relative gap width over
@@ -1476,6 +1477,14 @@ the regimes; the G-shot inner-width range overlaps the non-G range. The
 comparison is not a universal G/non-G separator, however: NSTX 135388 and
 E202855 also have clear small-radius continuum extrema, while some G shots
 are comparatively monotonic.
+
+The `N=10` companion uses physical (non-normalized) frequencies, the full
+`0 <= r <= 1` axis range, and one common frequency axis (`0.0723` to `19.998`)
+determined from the minimum and maximum retained continuum values across all
+13 shots. Each panel is annotated with its current number of GOOD-labeled
+`N=10` TAEs using presentation-size text. The unphysical E205052 endpoint at
+`r=0.99` is omitted; the shared maximum is then set by the NSTX 141711 upper
+boundary at `r=0.71`.
 
 
 #### G-shot working conclusions after manual FN review
