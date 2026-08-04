@@ -1841,3 +1841,122 @@ or numerical-junk structure, although label statistics alone cannot prove the
 causal mechanism. It also explains why moving `r_star` to maximum `W(r)` was
 harmful: that change forced many otherwise displaced GOOD modes to acquire
 small `S` and large `W_star`, erasing the useful interaction.
+
+
+### 2026-08-04: multi-`n` G-shot training-candidate scan
+
+Scanned all 41 usable `nstxuG*` shots in the DiTw archive to find additional
+training shots with K51-like continuum topology. The initial `N=8` comparison
+was used only as a probe; candidate selection was then repeated independently
+for every `N=6-10`. Over `0.05 <= r <= 0.40`, an `N` is provisionally called
+suitable when the median relative gap width is at least 25%, the mean
+lower/upper edge monotonicity is at most 0.50, and the smoothed boundaries
+contain at least one lower-maximum/upper-minimum pair. These are screening
+thresholds, not physical label rules.
+
+Sixteen shots satisfy the topology screen at all five `N` values, including
+the already labeled K51 and H47 references, leaving 14 new consistently
+wide/wavy candidates. Applying the existing upper-boundary TAE/EAE frequency
+split gives the following largest new `N=6-10` TAE-region pools:
+
+- M21: 243 of 442 modes;
+- E55: 183 of 456;
+- B12: 128 of 461;
+- R42: 122 of 611;
+- B37: 117 of 315;
+- F62: 108 of 441;
+- E34: 103 of 657;
+- V21: 102 of 631;
+- W29: 89 of 702.
+
+These counts are only a frequency prefilter (`below_upper2` plus `mixed`), not
+predicted or hand-labeled GOOD counts. In particular, the pool can still
+contain continuum-crossing and numerical modes. The useful first labeling
+tranche is M21, E55, B37, and F62 as wide/wavy cases with a strong outer
+upper-boundary downturn, plus B12 as a weak-downturn control and W29 as the
+closest K51-like normalized multi-`n` shape among the high-raw-count new
+shots. B37 illustrates why `N=8` must not be the labeling target: it has no
+`N=8` mode files but has 117 TAE-region candidates across the other values of
+`N`. N75 remains excluded pending the previously identified recalculation and
+review.
+
+Generated diagnostics are under `outputs/gshot_candidate_selection/`:
+
+- `n6_10_gshot_continuum_by_n.csv`: per-shot, per-`N` topology metrics;
+- `n6_10_gshot_continuum_summary.csv`: topology consistency summary;
+- `n6_10_gshot_tae_region_counts.csv`: complete counts for the 16 shots that
+  pass at every `N=6-10`;
+- `n6_10_gshot_recommended_shortlist.csv`: balanced six-shot first tranche;
+- `n6_10_gshot_candidate_yield_vs_shape.png`: yield versus K51 shape distance,
+  colored by outer upper-boundary downturn.
+
+Next, build a per-mode review list for the shortlisted shots, prioritize modes
+localized near inner extrema, reject modes with material secondary continuum
+crossings, and add only hand-verified labels. Any claimed model improvement
+must still be evaluated with shot-wise holdout so that adding many modes from
+a few new shots does not inflate random-fold performance.
+
+
+### 2026-08-04: extremum-localization and secondary-crossing screen
+
+Refined the six-shot G training shortlist at the individual-mode level over
+`N=6-10`. Modes were first restricted to the existing TAE frequency region
+(`below_upper2` plus `mixed`). The established extremum geometry uses the
+maximum of `W(r)`, `ext_dr <= 0.02`, and a matched upper minimum or lower
+maximum over `0.03 <= r <= 0.40`. The focused review pool allows the known
+K51 N10/4656 edge case by requiring `0 <= ext_df_gap <= 0.04`, and requires at
+least 25% of integrated mode energy within `|r-r_ext| <= 0.03`.
+
+A secondary crossing is any interpolated lower/upper continuum root more than
+0.03 in radius from the matched extremum. Its amplitude is measured by
+`W_peak`, radial mode energy normalized to the mode-energy maximum. The main
+screen requires the maximum secondary `W_peak < 0.01`. This retains known
+K51/H47 GOOD extrema modes with remote crossings at roughly 0.2-0.9% of peak
+energy. Sensitivity counts were also made at 0.1% and 5%; the new-shot ranking
+is stable over that range.
+
+The screen substantially changes the preferred shots:
+
+| shot | TAE region | strict 3% geometry | localized gap-side | clean at 1% | distinct extrema sites | 0.1% / 1% / 5% |
+|---|---:|---:|---:|---:|---:|---:|
+| B12 | 128 | 48 | 38 | 25 | 17 | 17 / 25 / 28 |
+| W29 | 89 | 47 | 54 | 12 | 10 | 8 / 12 / 16 |
+| E55 | 183 | 14 | 12 | 11 | 5 | 9 / 11 / 12 |
+| F62 | 108 | 6 | 6 | 5 | 5 | 2 / 5 / 6 |
+| B37 | 117 | 2 | 2 | 2 | 2 | 1 / 2 / 2 |
+| M21 | 243 | 25 | 5 | 1 | 1 | 0 / 1 / 4 |
+
+B12 is the strongest first shot: its 25 candidates occupy 17 sites and cover
+both lower maxima (16 modes) and upper minima (9 modes), closely matching the
+labeled K51 reference with 23 candidates at 15 sites. W29 is the next most
+diverse, with 12 modes at 10 sites across `N=6-10`. E55 has 11 candidates but
+less independent topology coverage: six occupy the same `N=8`, `r=0.125`
+lower-maximum site. F62 is a useful smaller follow-up. B37 and especially M21
+should be deprioritized despite their initially promising raw frequency pools.
+
+The reference calibration also shows why this remains a review prioritizer,
+not an automatic GOOD label. At the 1% screen, K51 has 9 GOOD, 12 BAD, and 2
+currently unlabeled candidates; H47 has 5 GOOD, 8 BAD, and 2 unlabeled. The
+remaining BAD cases can still have junk-like mode morphology or other defects
+not captured by continuum geometry and crossing amplitude.
+
+Generated artifacts under `outputs/gshot_candidate_selection/`:
+
+- `n6_10_extremum_mode_audit.csv`: all TAE-region modes with matched-extremum
+  and crossing diagnostics;
+- `n6_10_extremum_review_candidates.csv`: 56 new-shot candidates passing the
+  1% screen, ready for plot review;
+- `n6_10_extremum_shot_summary.csv`: nested counts and reference-label audit;
+- `n6_10_extremum_recommended_shots.csv`: refined shot priorities;
+- `n6_10_extremum_candidate_counts.png`: count and threshold-sensitivity plot.
+
+Recommended order for manual plot review is B12 first, then W29 and E55, with
+F62 as a smaller follow-up. Review must still reject spiky/junk modes and any
+case whose secondary crossing has material amplitude not captured reliably by
+the scalar screen.
+
+
+Gap-plot normalization convention: never divide the boundaries point by point
+by the radius-dependent center `c(r) = 0.5 * (u(r) + l(r))`, because that hides
+radial variation. If normalization is useful, divide the full panel by one
+clearly stated scalar mean or median of `c(r)` over a fixed radial interval.

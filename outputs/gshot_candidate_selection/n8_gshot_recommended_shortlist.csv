@@ -1,0 +1,9 @@
+priority,shot,reason,n8_tae_like,n8_raw,n7_10_tae_like,n7_10_raw,median_relative_width,edge_monotonicity,inner_shape_rmse_to_K51,upper_outer_change_rel
+1,nstxuG142301Q91,highest N8 TAE-region yield; strong outer downturn,39,72,143,345,0.348137,0.135076,0.076748,-0.602280
+2,nstxuG142301E55,high N8 TAE-region yield; wide gap and strong downturn,32,83,160,376,0.402982,0.169266,0.074605,-0.586067
+3,nstxuG142301F62,high N8 TAE-region yield; widest gap and strong downturn,30,111,95,382,0.445115,0.256578,0.082070,-0.541843
+4,nstxuG121123B12,high yield; K51-like inner topology but weak outer downturn control,24,99,127,433,0.441909,0.212352,0.069066,-0.056412
+5,nstxuG142301V21,wide/wavy; large raw pool and moderate outer downturn,21,153,102,631,0.402697,0.304062,0.079431,-0.296222
+6,nstxuG142301E34,wide/wavy; large raw pool and moderate outer downturn,21,155,75,505,0.417032,0.249762,0.086662,-0.261627
+7,nstxuG142301W29,closest K51-like inner shape among downturn candidates,17,137,76,581,0.390314,0.245320,0.045553,-0.303277
+8,nstxuG142301F66,moderate yield; narrower K51-like wavy gap and strong downturn,18,70,65,293,0.308991,0.360081,0.077223,-0.520971

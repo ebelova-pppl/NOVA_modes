@@ -1,0 +1,9 @@
+shot,role,tae_region,geometry_3pct,localized_gap_side_4pct,robust_W_lt_0p001,robust_W_lt_0p01,robust_W_lt_0p05,robust_0p01_by_n,labeled_good_tae_region,labeled_bad_tae_region,errors,robust_0p01_distinct_extrema_sites,robust_0p01_max_modes_per_site,robust_0p01_lower_max,robust_0p01_upper_min,robust_0p01_median_energy_frac,robust_0p01_median_secondary_W,robust_0p01_labeled_good,robust_0p01_labeled_bad,robust_0p01_unlabeled
+nstxuG142301M21,candidate,243,25,5,0,1,4,N6:0;N7:0;N8:0;N9:0;N10:1,0,0,0,1,1,1,0,0.37430861952611133,0.008608366107799411,0,0,1
+nstxuG142301E55,candidate,183,14,12,9,11,12,N6:2;N7:1;N8:7;N9:1;N10:0,0,0,0,5,6,11,0,0.7014272753040128,4.742320231689189e-05,0,0,11
+nstxuG142301B37,candidate,117,2,2,1,2,2,N6:1;N7:0;N8:0;N9:1;N10:0,0,0,0,2,1,2,0,0.9733026940208025,0.0009316965651942302,0,0,2
+nstxuG142301F62,candidate,108,6,6,2,5,6,N6:2;N7:1;N8:2;N9:0;N10:0,0,0,0,5,1,5,0,0.9328139550394124,0.002503448860829648,0,0,5
+nstxuG121123B12,candidate,128,48,38,17,25,28,N6:0;N7:7;N8:3;N9:6;N10:9,0,0,0,17,3,16,9,0.929504152937932,7.823121139186346e-05,0,0,25
+nstxuG142301W29,candidate,89,47,54,8,12,16,N6:1;N7:2;N8:3;N9:3;N10:3,0,0,0,10,2,11,1,0.9762639491797622,0.00038037748431528134,0,0,12
+nstxuG121123K51,reference,136,44,41,20,23,26,N6:0;N7:1;N8:4;N9:8;N10:10,25,92,0,15,3,14,9,0.9535031359851438,1.443862023937283e-06,9,12,2
+nstxuG142301H47,reference,138,64,65,9,15,21,N6:2;N7:4;N8:4;N9:4;N10:1,9,124,0,9,2,12,3,0.9768667225607719,0.00019158275299122,5,8,2

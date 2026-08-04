@@ -1,0 +1,7 @@
+priority,tier,shot,reason,tae_region,geometry_3pct,localized_gap_side_4pct,clean_W_lt_0p001,clean_W_lt_0p01,clean_W_lt_0p05,distinct_extrema_sites,max_modes_per_site,lower_max,upper_min,clean_by_n,median_extremum_energy_frac,median_secondary_crossing_W
+1,focus,nstxuG121123B12,largest and most diverse clean pool; both lower maxima and upper minima; K51-like site richness,128,48,38,17,25,28,17,3,16,9,N6:0;N7:7;N8:3;N9:6;N10:9,0.929504152937932,7.823121139186346e-05
+2,focus,nstxuG142301W29,second-largest diverse pool across all N=6-10; closest K51 continuum shape,89,47,54,8,12,16,10,2,11,1,N6:1;N7:2;N8:3;N9:3;N10:3,0.9762639491797622,0.00038037748431528134
+3,focus,nstxuG142301E55,"11 clean modes, but six occupy one N=8 lower-maximum site",183,14,12,9,11,12,5,6,11,0,N6:2;N7:1;N8:7;N9:1;N10:0,0.7014272753040128,4.742320231689189e-05
+4,secondary,nstxuG142301F62,five clean modes at five distinct sites,108,6,6,2,5,6,5,1,5,0,N6:2;N7:1;N8:2;N9:0;N10:0,0.9328139550394124,0.002503448860829648
+5,deprioritize,nstxuG142301B37,only two clean candidates after crossing screen,117,2,2,1,2,2,2,1,2,0,N6:1;N7:0;N8:0;N9:1;N10:0,0.9733026940208025,0.0009316965651942302
+6,deprioritize,nstxuG142301M21,large frequency pool collapses to one clean extremum candidate,243,25,5,0,1,4,1,1,1,0,N6:0;N7:0;N8:0;N9:0;N10:1,0.37430861952611133,0.008608366107799411
