@@ -1,12 +1,12 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-02)
+### Project state (current snapshot, updated 2026-08-03)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
 - Active version-controlled training list:
     - `training_labels/tae_like_train.csv`
-    - 2610 labeled TAE-like modes: 601 `good`, 2009 `bad`
+    - 2610 labeled TAE-like modes: 603 `good`, 2007 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`, `nstxuG121123K51`, `nstxuG133964S31`,
@@ -71,7 +71,7 @@ Notes:
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Checkpoint status: trained before the 2026-08-02 G-shot label corrections;
+    -	Checkpoint status: trained before the current G-shot label corrections;
       retraining on the current 2610-row / 13-shot active list is pending
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
     -	Current 13-shot OOF accuracy: 0.951
@@ -81,8 +81,7 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: full-CSV refit predating the 2026-08-02 G-shot label
-      corrections; retraining on the current active list is pending
+    -	Checkpoint status: full-CSV refit predating the current G-shot label corrections; retraining on the current active list is pending
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
@@ -200,11 +199,11 @@ From cont_features.py:
   for NSTX-U E-like shot classification and NOVA-C growth-rate candidate
   selection.
 - Keep NSTX-U G-case shots out of routine production sorting for now. Decide
-  whether to retune the G-shot policy after the J38 label audit and dedicated
-  gap-topology / mode-extremum feature ablations.
-- Re-audit the J38 modes whose radius and frequency align with prominent
-  continuum extrema; J38 was labeled in a separate later pass and may use a
-  more conservative policy than K51.
+  whether to retune the G-shot policy after dedicated gap-topology /
+  mode-extremum feature ablations.
+- Treat the current J38 audit as complete: retain only coherent extremum modes
+  without a material secondary continuum crossing, and revisit the remaining
+  junk-like extrema candidates only if the labeling policy changes.
 - Add shared continuum-topology and mode-extremum features for an RF LOSO
   ablation before changing the production schema. If they help, test a small
   numerical 1D-continuum branch fused with the raw-mode CNN; do not use
@@ -1470,8 +1469,8 @@ The normalized figure divides each shot by its median gap-center frequency
 over `0.05 <= r <= 0.45` and reports the median relative gap width over
 `0.05 <= r <= 0.25`. Each panel also shows the current number of GOOD-labeled
 `N=8` modes in large type for presentation use. The comparison supports continuum topology/location as an important G-shot
-failure variable: K51 and H47, which contain all nine
-strict continuum-extremum-localized shared RF/CNN false negatives, show
+failure variable: K51 and H47 contain nine of the ten strict
+continuum-extremum-localized shared RF/CNN false negatives and show
 pronounced repeated inner-radius extrema. Gap width alone does not separate
 the regimes; the G-shot inner-width range overlaps the non-G range. The
 comparison is not a universal G/non-G separator, however: NSTX 135388 and
@@ -1486,26 +1485,51 @@ determined from the minimum and maximum retained continuum values across all
 `r=0.99` is omitted; the shared maximum is then set by the NSTX 141711 upper
 boundary at `r=0.71`.
 
+The J38 audit reclassified
+`nstxuG121123J38/N10/egn10w.3596E+02` from `bad,none` to `good,tae`. It is
+a coherent companion to the already-GOOD `egn10w.3559E+02`: both localize at
+the upper-continuum minimum near `r=0.115`, their frequencies differ by only
+0.52%, and their only outer crossings occur near `r=0.85`, where
+peak-normalized mode energy is negligible (`0` and `1.9e-4`, respectively).
+
+The K51 follow-up likewise reclassified
+`nstxuG121123K51/N10/egn10w.4656E+02` from `bad,none` to `good,tae`.
+Its radial-energy maximum coincides with the upper-continuum minimum at
+`r=0.240`; the neighboring already-GOOD `egn10w.4703E+02` peaks at the
+preceding minimum at `r=0.135`, and their frequencies differ by only 0.50%.
+The only continuum crossing for `4656` is at `r=0.825`, where
+peak-normalized mode energy is `1.68e-4`. Its mode/extremum frequency mismatch
+is 3.21%, just outside the provisional 3% cutoff used for the strict
+diagnostic count; the label decision follows the physical review rather than
+changing that audit threshold.
+
+This supports a refined validity rule: a coherent extremum-localized mode may
+be GOOD provided it has no material secondary continuum crossing; a purely
+mathematical crossing in a region of negligible mode amplitude is acceptable.
+The active list now has 603 `good` and 2007 `bad` labels; the G subset has 57
+`good` and 915 `bad`.
+
 
 #### G-shot working conclusions after manual FN review
 
-The active six-shot G subset contains 972 modes: 55 `good` and 917 `bad`.
+The active six-shot G subset contains 972 modes: 57 `good` and 915 `bad`.
 Five original GOOD labels were corrected to BAD during the false-negative
-review. Existing M100 LOSO predictions have not been retrained, but applying
+review, and later J38 and K51 audits corrected two BAD labels to GOOD.
+Existing M100 LOSO predictions have not been retrained, but applying
 the corrected labels to those saved predictions gives:
 
-- raw CNN: 20 G-shot false negatives, 14 (70%) strictly
+- raw CNN: 22 G-shot false negatives, 15 (68%) strictly
   continuum-extremum-localized;
-- RF: 31 false negatives, 11 (35%) extremum-localized;
-- combined policy: 29 false negatives, 10 (34%) extremum-localized;
-- RF/CNN shared rejects: 11 false negatives, 9 (82%)
+- RF: 32 false negatives, 12 (38%) extremum-localized;
+- combined policy: 30 false negatives, 11 (37%) extremum-localized;
+- RF/CNN shared rejects: 12 false negatives, 10 (83%)
   extremum-localized;
-- distinct GOOD modes missed by either model: 40, of which 16 (40%) are
+- distinct GOOD modes missed by either model: 42, of which 17 (40%) are
   extremum-localized.
 
 The strict diagnostic used a mode radial-amplitude maximum within `dr <= 0.02`
 of a local lower-boundary maximum or upper-boundary minimum and a relative
-mode/extremum frequency mismatch no larger than 3%. For the nine shared RF/CNN
+mode/extremum frequency mismatch no larger than 3%. For the ten shared RF/CNN
 cases, the radial agreement is stronger (`dr <= 0.005`). The two shared-reject
 exceptions are `nstxuG121123K51/N9/egn09w.2937E+02`, whose main amplitude is
 far from the frequency-matching extremum, and
@@ -1522,19 +1546,21 @@ The current physical working picture has two continuum regimes:
    support a distinct class of narrow modes localized at those extrema. At
    `N=8`, K51 has width 38.6%, monotonicity 0.22, and 6 GOOD modes; H47 has
    width 37.2%, monotonicity 0.31, and 2 GOOD modes. These two shots contain
-   all nine strict extremum-localized shared RF/CNN false negatives.
+   nine of the ten strict extremum-localized shared RF/CNN false negatives;
+   the corrected J38 N10/3596 mode is the tenth.
 
 These are tendencies, not sufficient rules. Non-G NSTX 135388 and E202855
 also have wavy inner continua and many GOOD modes. J38 has K51-like topology
 at `N=8` (31.5% width and 0.39 monotonicity) but zero `N=8` GOOD labels and
-only 6 GOOD among 174 TAE-like candidates overall, compared with 27 among 208
+only 7 GOOD among 174 TAE-like candidates overall, compared with 28 among 208
 for K51. Over `N=7-10`, the candidate counts are nearly equal (123 J38 versus
-128 K51), but J38 has fewer prominent inner wells (12 versus 19) and only one
-GOOD mode satisfying the coarse extremum-alignment test, versus 12 for K51.
-The same coarse geometry flags 19 BAD-labeled high-`n` J38 modes, so manual
-review is needed to distinguish genuinely numerical structures from a
-label-policy difference. K51 belongs to the earlier six-shot review, whereas
-J38 was labeled in a separate later pass.
+128 K51), but J38 has fewer prominent inner wells (12 versus 19) and two
+GOOD modes satisfying the coarse extremum-alignment test, versus 13 for K51.
+The completed audit leaves 18 BAD-labeled high-`n` J38 modes meeting the coarse
+geometry criterion; these were retained as BAD because they cross the
+continuum materially elsewhere or have clearly junk-like structure. K51
+belongs to the earlier six-shot review, whereas J38 was labeled in a separate
+later pass.
 
 Model interpretation:
 
@@ -1545,15 +1571,17 @@ Model interpretation:
   mode-to-extremum match. A tangency at a continuum minimum/maximum may also
   produce no ordinary crossing and may have small amplitude exactly at the
   contact.
-- Continuum topology alone must not label a mode: the important condition is
+- Continuum topology alone must not label a mode: the important conditions are
   joint radial and frequency alignment between a coherent mode and a
-  sufficiently prominent inner extremum.
+  sufficiently prominent inner extremum, plus no secondary continuum crossing
+  where the mode has material amplitude.
 
 Proposed first RF experiment: compute the physical-frequency boundaries
 `sqrt(low2)` and `sqrt(high2)` over `0.05 <= r <= 0.40` and add robust relative
 gap width, binned center-frequency change, lower/upper edge monotonicity,
 prominent-well count/depth/radius, mode-to-extremum radial and frequency
-distance, and mode energy near the extremum. Thresholds such as 15% width or
+distance, mode energy near the extremum, and maximum mode energy at secondary
+continuum crossings. Thresholds such as 15% width or
 0.75 monotonicity are provisional diagnostics from the `N=8` comparison, not
 production cuts. Evaluate baseline, topology-only, and topology-plus-alignment
 schemas with shot-wise LOSO and report G and non-G subsets separately.
@@ -1563,5 +1591,4 @@ A small 1D branch can ingest normalized lower/upper boundaries, the normalized
 mode-frequency line, and a validity mask on the same radial grid; concatenate
 its embedding with the raw-mode CNN embedding. This is different from the
 existing hybrid CNN, which receives continuum summary scalars but not the full
-gap topology. Given only 55 G-shot GOOD examples, perform the RF ablation and
-J38 audit first.
+gap topology. Given only 57 G-shot GOOD examples, perform the RF ablation before expanding the CNN.

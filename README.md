@@ -78,8 +78,8 @@ Model families
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. Both checkpoints were trained on the 2610-row /
-  13-shot list before the 2026-08-02 G-shot label corrections; retraining on the
-  current 601-GOOD / 2009-BAD list is pending. The raw-CNN checkpoint is a
+  13-shot list before the current G-shot label corrections; retraining on the
+  current 603-GOOD / 2007-BAD list is pending. The raw-CNN checkpoint is a
   full-list refit with `M_target=100`.
 - Current RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
