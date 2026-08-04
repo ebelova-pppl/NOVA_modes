@@ -8,15 +8,29 @@ import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = REPO_ROOT / "src"
+SCRIPTS_DIR = REPO_ROOT / "scripts"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 from cont_features import (  # noqa: E402
     CROSSING_FEATURE_DEFAULTS,
+    EXTREMUM_FEATURE_DEFAULTS,
     continuum_crossing_features,
     continuum_crossing_records,
+    continuum_extremum_features,
+    continuum_scalars,
 )
-from mode_features import compute_features_for_mode, get_feature_names  # noqa: E402
+from mode_features import (  # noqa: E402
+    compute_features_for_mode,
+    get_feature_names,
+    get_feature_schema_version,
+)
+from rf_train_classify import (  # noqa: E402
+    attach_feature_metadata,
+    validate_model_feature_schema,
+)
 
 
 class ContinuumCrossingFeatureTests(unittest.TestCase):
@@ -112,10 +126,161 @@ class ContinuumCrossingFeatureTests(unittest.TestCase):
             )
 
 
+class ContinuumExtremumFeatureTests(unittest.TestCase):
+    def setUp(self):
+        self.r = np.linspace(0.0, 1.0, 201)
+
+    def test_upper_minimum_uses_W_peak_and_gap_side_sign(self):
+        mode = np.exp(-((self.r - 0.20) / 0.025) ** 2)[None, :]
+        lower = np.full_like(self.r, 0.5)
+        upper = 1.2 + 4.0 * (self.r - 0.20) ** 2
+
+        features = continuum_extremum_features(
+            mode, 1.19, lower**2, upper**2, r=self.r
+        )
+
+        self.assertAlmostEqual(features["ext_dr"], 0.0)
+        self.assertAlmostEqual(features["ext_df_gap"], (1.2 - 1.19) / 1.19)
+        self.assertGreater(features["ext_energy_frac"], 0.95)
+
+    def test_lower_maximum_has_same_positive_gap_side_sign(self):
+        mode = np.exp(-((self.r - 0.25) / 0.025) ** 2)[None, :]
+        lower = 0.8 - 2.0 * (self.r - 0.25) ** 2
+        upper = np.full_like(self.r, 1.4)
+
+        features = continuum_extremum_features(
+            mode, 0.81, lower**2, upper**2, r=self.r
+        )
+
+        self.assertAlmostEqual(features["ext_dr"], 0.0)
+        self.assertAlmostEqual(features["ext_df_gap"], (0.81 - 0.8) / 0.81)
+        self.assertGreater(features["ext_energy_frac"], 0.95)
+
+    def test_energy_fraction_is_small_for_mode_away_from_extremum(self):
+        mode = np.exp(-((self.r - 0.45) / 0.025) ** 2)[None, :]
+        lower = np.full_like(self.r, 0.5)
+        upper = 1.2 + 4.0 * (self.r - 0.20) ** 2
+
+        features = continuum_extremum_features(
+            mode, 1.19, lower**2, upper**2, r=self.r
+        )
+
+        self.assertAlmostEqual(features["ext_dr"], 0.25)
+        self.assertLess(features["ext_energy_frac"], 1e-6)
+
+    def test_energy_fraction_uses_total_mode_energy(self):
+        centered = np.exp(-((self.r - 0.20) / 0.02) ** 2)
+        remote = np.exp(-((self.r - 0.60) / 0.02) ** 2)
+        mode = np.stack([centered, remote])
+        lower = np.full_like(self.r, 0.5)
+        upper = 1.2 + 4.0 * (self.r - 0.20) ** 2
+
+        features = continuum_extremum_features(
+            mode, 1.19, lower**2, upper**2, r=self.r
+        )
+
+        self.assertGreater(features["ext_energy_frac"], 0.45)
+        self.assertLess(features["ext_energy_frac"], 0.51)
+
+    def test_zero_mode_returns_safe_defaults(self):
+        lower = 0.8 - 2.0 * (self.r - 0.25) ** 2
+        upper = np.full_like(self.r, 1.4)
+        self.assertEqual(
+            continuum_extremum_features(
+                np.zeros((2, self.r.size)), 0.81, lower**2, upper**2, r=self.r
+            ),
+            EXTREMUM_FEATURE_DEFAULTS,
+        )
+
+    def test_no_inner_extremum_returns_safe_defaults(self):
+        mode = np.ones((2, self.r.size))
+        lower2 = np.full_like(self.r, 0.5**2)
+        upper2 = np.full_like(self.r, 1.5**2)
+
+        self.assertEqual(
+            continuum_extremum_features(mode, 1.0, lower2, upper2, r=self.r),
+            EXTREMUM_FEATURE_DEFAULTS,
+        )
+
+
+class ContinuumScalarTests(unittest.TestCase):
+    def test_energy_tie_selects_largest_radius_with_maximum_W(self):
+        r = np.linspace(0.0, 1.0, 5)
+        mode = np.sqrt(np.array([[0.0, 1.0, 4.0, 4.0, 0.0]]))
+        low2 = np.zeros(5)
+        high2 = np.full(5, 2.0)
+
+        legacy = continuum_scalars(mode, 1.0, low2, high2, r=r)
+        energy_tie = continuum_scalars(
+            mode,
+            1.0,
+            low2,
+            high2,
+            r=r,
+            r_star_energy_tie=True,
+        )
+
+        self.assertAlmostEqual(legacy["r_star"], 0.0)
+        self.assertAlmostEqual(energy_tie["r_star"], 0.75)
+        self.assertEqual(legacy["delta2_eff"], energy_tie["delta2_eff"])
+        self.assertGreater(energy_tie["W_star"], legacy["W_star"])
+
+
 class RFFeatureSchemaTests(unittest.TestCase):
     def setUp(self):
         self.mode = np.arange(15, dtype=float).reshape(3, 5) / 14.0
         self.extra = {"omega": 1.0, "gamma_d": 0.01, "ntor": 3}
+
+    def test_energy_tie_has_distinct_schema_version(self):
+        legacy = get_feature_schema_version()
+        energy_tie = get_feature_schema_version(r_star_energy_tie=True)
+        combined = get_feature_schema_version(
+            include_extremum_features=True,
+            r_star_energy_tie=True,
+        )
+
+        self.assertNotEqual(legacy, energy_tie)
+        self.assertTrue(energy_tie.endswith("_rstar_energy_tie_v1"))
+        self.assertTrue(combined.endswith("_rstar_energy_tie_v1"))
+
+    def test_energy_tie_checkpoint_metadata_is_validated(self):
+        clf = type("DummyRF", (), {"n_features_in_": 22})()
+        names = get_feature_names()
+        attach_feature_metadata(
+            clf,
+            names,
+            r_star_energy_tie=True,
+        )
+
+        validate_model_feature_schema(
+            clf,
+            names,
+            r_star_energy_tie=True,
+        )
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            validate_model_feature_schema(clf, names)
+
+    def test_feature_builder_propagates_energy_tie_option(self):
+        low2 = np.zeros(5)
+        high2 = np.full(5, 2.0)
+        with tempfile.TemporaryDirectory() as tmp:
+            n_dir = Path(tmp) / "N3"
+            n_dir.mkdir()
+            lines = ["1 5"]
+            lines.extend(f"{low} {high}" for low, high in zip(low2, high2))
+            (n_dir / "datcon3").write_text("\n".join(lines) + "\n")
+            extra = dict(self.extra, path=str(n_dir / "egn03w.test"))
+
+            legacy = compute_features_for_mode(self.mode, extra)
+            energy_tie = compute_features_for_mode(
+                self.mode,
+                extra,
+                r_star_energy_tie=True,
+            )
+
+        r_star_index = get_feature_names().index("r_star")
+        self.assertAlmostEqual(legacy[r_star_index], 0.0)
+        self.assertAlmostEqual(energy_tie[r_star_index], 1.0)
 
     def test_production_and_experimental_schema_lengths(self):
         production = compute_features_for_mode(self.mode, self.extra)
@@ -133,6 +298,35 @@ class RFFeatureSchemaTests(unittest.TestCase):
         self.assertEqual(experimental.size, 28)
         np.testing.assert_allclose(experimental[:22], production)
         np.testing.assert_allclose(experimental[22:], 0.0)
+
+    def test_extremum_schema_lengths_and_fallback_order(self):
+        extremum = compute_features_for_mode(
+            self.mode,
+            self.extra,
+            include_extremum_features=True,
+        )
+        combined = compute_features_for_mode(
+            self.mode,
+            self.extra,
+            include_crossing_features=True,
+            include_extremum_features=True,
+        )
+
+        extremum_names = get_feature_names(include_extremum_features=True)
+        combined_names = get_feature_names(
+            include_crossing_features=True,
+            include_extremum_features=True,
+        )
+        self.assertEqual(len(extremum_names), 25)
+        self.assertEqual(len(combined_names), 31)
+        self.assertEqual(
+            extremum_names[-3:],
+            ["ext_dr", "ext_df_gap", "ext_energy_frac"],
+        )
+        self.assertEqual(extremum.size, 25)
+        self.assertEqual(combined.size, 31)
+        np.testing.assert_allclose(extremum[-3:], [1.0, 1.0, 0.0])
+        np.testing.assert_allclose(combined[-3:], [1.0, 1.0, 0.0])
 
     def test_active_checkpoint_accepts_production_vector(self):
         model_path = REPO_ROOT / "models" / "nova_mode_classifier.joblib"

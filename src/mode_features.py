@@ -3,7 +3,9 @@ import os
 
 from cont_features import (
     CROSSING_FEATURE_DEFAULTS,
+    EXTREMUM_FEATURE_DEFAULTS,
     continuum_crossing_features,
+    continuum_extremum_features,
     continuum_scalars,
     load_datcon_for_mode,
     warn_once_per_dir,
@@ -42,21 +44,49 @@ EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES = (
     "W_star_high_shear",
     "W_star_high_shear_sum",
 )
+EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES = (
+    "ext_dr",
+    "ext_df_gap",
+    "ext_energy_frac",
+)
 RF_SCHEMA_VERSION = "rf_w_star_max_22_v2"
 EXPERIMENTAL_CROSSING_RF_SCHEMA_VERSION = "rf_all_crossings_28_v2"
+EXPERIMENTAL_EXTREMUM_RF_SCHEMA_VERSION = "rf_extremum_energy_25_v2"
+EXPERIMENTAL_CROSSING_EXTREMUM_RF_SCHEMA_VERSION = (
+    "rf_all_crossings_extremum_energy_31_v2"
+)
+R_STAR_ENERGY_TIE_SCHEMA_SUFFIX = "_rstar_energy_tie_v1"
 
 
-def get_feature_names(include_crossing_features=False):
+def get_feature_names(
+    include_crossing_features=False,
+    include_extremum_features=False,
+):
     names = RF_FEATURE_NAMES
     if include_crossing_features:
         names += EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+    if include_extremum_features:
+        names += EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES
     return list(names)
 
 
-def get_feature_schema_version(include_crossing_features=False):
-    if include_crossing_features:
-        return EXPERIMENTAL_CROSSING_RF_SCHEMA_VERSION
-    return RF_SCHEMA_VERSION
+def get_feature_schema_version(
+    include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
+):
+    if include_crossing_features and include_extremum_features:
+        version = EXPERIMENTAL_CROSSING_EXTREMUM_RF_SCHEMA_VERSION
+    elif include_crossing_features:
+        version = EXPERIMENTAL_CROSSING_RF_SCHEMA_VERSION
+    elif include_extremum_features:
+        version = EXPERIMENTAL_EXTREMUM_RF_SCHEMA_VERSION
+    else:
+        version = RF_SCHEMA_VERSION
+
+    if r_star_energy_tie:
+        version += R_STAR_ENERGY_TIE_SCHEMA_SUFFIX
+    return version
 
 def radial_centroid(mode, r):
     """
@@ -80,6 +110,8 @@ def compute_features_for_mode(
     mode,
     extra_info=None,
     include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
     r_shear0=0.2,
 ):
     """
@@ -182,6 +214,10 @@ def compute_features_for_mode(
         CROSSING_FEATURE_DEFAULTS[name]
         for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
     ]
+    experimental_extremum_fallback = [
+        EXTREMUM_FEATURE_DEFAULTS[name]
+        for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES
+    ]
 
     mode_path = extra_info.get("path") if extra_info else None
     omega = float(extra_info.get("omega")) if extra_info and "omega" in extra_info else None
@@ -190,7 +226,14 @@ def compute_features_for_mode(
         try:
             #low2, high2, i1, i2 = load_datcon_for_mode(mode_path, n_r=n_r)  # load datcon
             low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)  # load datcon
-            cont = continuum_scalars(mode, omega, low2, high2, r=r)
+            cont = continuum_scalars(
+                mode,
+                omega,
+                low2,
+                high2,
+                r=r,
+                r_star_energy_tie=r_star_energy_tie,
+            )
             continuum_values = [
                 cont["r_star"],
                 cont["delta2_eff"],
@@ -211,6 +254,18 @@ def compute_features_for_mode(
                     crossing[name]
                     for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
                 )
+            if include_extremum_features:
+                extremum = continuum_extremum_features(
+                    mode,
+                    omega,
+                    low2,
+                    high2,
+                    r=r,
+                )
+                continuum_values.extend(
+                    extremum[name]
+                    for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES
+                )
             features = np.append(features, continuum_values)
         except FileNotFoundError:
             warn_once_per_dir(
@@ -227,6 +282,8 @@ def compute_features_for_mode(
             features = np.append(features, promoted_crossing_fallback)
             if include_crossing_features:
                 features = np.append(features, experimental_crossing_fallback)
+            if include_extremum_features:
+                features = np.append(features, experimental_extremum_fallback)
         except Exception as e:
             warn_once_per_dir(
                 mode_path,
@@ -239,11 +296,15 @@ def compute_features_for_mode(
             features = np.append(features, promoted_crossing_fallback)
             if include_crossing_features:
                 features = np.append(features, experimental_crossing_fallback)
+            if include_extremum_features:
+                features = np.append(features, experimental_extremum_fallback)
     else:
         features = np.append(features, cont_fallback)
         features = np.append(features, promoted_crossing_fallback)
         if include_crossing_features:
             features = np.append(features, experimental_crossing_fallback)
+        if include_extremum_features:
+            features = np.append(features, experimental_extremum_fallback)
 
 
     return features

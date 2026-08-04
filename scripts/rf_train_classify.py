@@ -101,6 +101,8 @@ def build_feature_matrix(
     modes,
     extra_infos,
     include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
     r_shear0=0.2,
 ):
     """
@@ -112,6 +114,8 @@ def build_feature_matrix(
             m,
             extra_info,
             include_crossing_features=include_crossing_features,
+            include_extremum_features=include_extremum_features,
+            r_star_energy_tie=r_star_energy_tie,
             r_shear0=r_shear0,
         )
         for m, extra_info in zip(modes, extra_infos)
@@ -218,14 +222,20 @@ def attach_feature_metadata(
     clf,
     feature_names,
     include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
     r_shear0=0.2,
 ):
     """Attach lightweight schema metadata while keeping a plain sklearn pipeline."""
     clf.nova_feature_names_ = list(feature_names)
     clf.nova_feature_schema_version_ = get_feature_schema_version(
-        include_crossing_features
+        include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+        r_star_energy_tie=r_star_energy_tie,
     )
     clf.nova_include_crossing_features_ = bool(include_crossing_features)
+    clf.nova_include_extremum_features_ = bool(include_extremum_features)
+    clf.nova_r_star_energy_tie_ = bool(r_star_energy_tie)
     clf.nova_r_shear0_ = float(r_shear0)
     return clf
 
@@ -234,16 +244,16 @@ def validate_model_feature_schema(
     clf,
     feature_names,
     include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
     r_shear0=0.2,
 ):
     expected_count = getattr(clf, "n_features_in_", None)
     if expected_count is not None and expected_count != len(feature_names):
-        if expected_count == 28 and len(feature_names) == 22:
-            action = "Add --crossing-features for this experimental model."
-        elif expected_count == 22 and len(feature_names) == 28:
-            action = "Remove --crossing-features for the production model."
-        else:
-            action = "Select the feature schema used to train this model."
+        action = (
+            "Select the same --crossing-features, --extremum-features, and "
+            "--r-star-energy-tie options used to train this model."
+        )
         raise ValueError(
             f"RF model expects {expected_count} features, but the selected schema "
             f"builds {len(feature_names)}. {action}"
@@ -255,6 +265,18 @@ def validate_model_feature_schema(
             "Selected feature names do not match the schema stored in the RF model."
         )
 
+    expected_schema = get_feature_schema_version(
+        include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+        r_star_energy_tie=r_star_energy_tie,
+    )
+    saved_schema = getattr(clf, "nova_feature_schema_version_", None)
+    if saved_schema is not None and saved_schema != expected_schema:
+        raise ValueError(
+            f"RF model schema {saved_schema!r} does not match the selected "
+            f"schema {expected_schema!r}."
+        )
+
     saved_crossing = getattr(clf, "nova_include_crossing_features_", None)
     if saved_crossing is not None and bool(saved_crossing) != bool(
         include_crossing_features
@@ -262,6 +284,25 @@ def validate_model_feature_schema(
         raise ValueError(
             "The RF model crossing-feature setting does not match the CLI. "
             "Add or remove --crossing-features as appropriate."
+        )
+
+    saved_extremum = getattr(clf, "nova_include_extremum_features_", None)
+    if saved_extremum is not None and bool(saved_extremum) != bool(
+        include_extremum_features
+    ):
+        raise ValueError(
+            "The RF model extremum-feature setting does not match the CLI. "
+            "Add or remove --extremum-features as appropriate."
+        )
+
+    saved_r_star_energy_tie = getattr(clf, "nova_r_star_energy_tie_", None)
+    if (
+        saved_r_star_energy_tie is not None
+        and bool(saved_r_star_energy_tie) != bool(r_star_energy_tie)
+    ):
+        raise ValueError(
+            "The RF model r_star tie-break setting does not match the CLI. "
+            "Add or remove --r-star-energy-tie as appropriate."
         )
 
     saved_r_shear0 = getattr(clf, "nova_r_shear0_", None)
@@ -280,6 +321,8 @@ def classify_mode_file(
     clf,
     path,
     include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
     r_shear0=0.2,
 ):
     """
@@ -295,17 +338,24 @@ def classify_mode_file(
         "ntor": ntor,
         "path": path,
     }
-    feature_names = get_feature_names(include_crossing_features)
+    feature_names = get_feature_names(
+        include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+    )
     validate_model_feature_schema(
         clf,
         feature_names,
         include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+        r_star_energy_tie=r_star_energy_tie,
         r_shear0=r_shear0,
     )
     X = compute_features_for_mode(
         mode,
         extra_info,
         include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+        r_star_energy_tie=r_star_energy_tie,
         r_shear0=r_shear0,
     ).reshape(1, -1)
     prob_good = clf.predict_proba(X)[0, 1]
@@ -333,8 +383,8 @@ if __name__ == "__main__":
         default=None,
         help=(
             "Path to save the trained model. Defaults to "
-            "nova_mode_classifier.joblib for the production schema or "
-            "nova_mode_classifier_crossing.joblib with --crossing-features."
+            "nova_mode_classifier.joblib for the production schema; "
+            "experimental feature options add descriptive filename tags."
         ),
     )
     parser.add_argument(
@@ -360,6 +410,23 @@ if __name__ == "__main__":
         ),
     )
     parser.add_argument(
+        "--extremum-features",
+        action="store_true",
+        help=(
+            "Opt in to the experimental three-feature inner continuum-extremum "
+            "extension (25 features with the production schema)."
+        ),
+    )
+    parser.add_argument(
+        "--r-star-energy-tie",
+        action="store_true",
+        help=(
+            "Opt in to selecting r_star from tied minimum gap-distance "
+            "points by maximum W(r), with larger radius breaking equal-energy "
+            "ties. Requires a checkpoint trained with the same option."
+        ),
+    )
+    parser.add_argument(
         "--r_shear0",
         type=float,
         default=0.2,
@@ -374,11 +441,15 @@ if __name__ == "__main__":
     bundle_out = args.bundle_out
     if args.train_csv:
         if model_out is None:
-            model_out = (
-                "nova_mode_classifier_crossing.joblib"
-                if args.crossing_features
-                else "nova_mode_classifier.joblib"
-            )
+            tags = []
+            if args.crossing_features:
+                tags.append("crossing")
+            if args.extremum_features:
+                tags.append("extremum")
+            if args.r_star_energy_tie:
+                tags.append("rstar_energy_tie")
+            suffix = f"_{'_'.join(tags)}" if tags else ""
+            model_out = f"nova_mode_classifier{suffix}.joblib"
         model_out_path = Path(model_out)
         active_model_path = (
             Path(__file__).resolve().parents[1]
@@ -386,12 +457,16 @@ if __name__ == "__main__":
             / "nova_mode_classifier.joblib"
         )
         if (
-            args.crossing_features
+            (
+                args.crossing_features
+                or args.extremum_features
+                or args.r_star_energy_tie
+            )
             and model_out_path.expanduser().resolve() == active_model_path.resolve()
         ):
             raise ValueError(
                 "Refusing to overwrite the active legacy RF checkpoint with an "
-                "experimental crossing-feature model. Choose a different --model_out."
+                "experimental feature model. Choose a different --model_out."
             )
         if bundle_out is None:
             bundle_out = str(
@@ -405,9 +480,14 @@ if __name__ == "__main__":
             modes,
             extra_infos,
             include_crossing_features=args.crossing_features,
+            include_extremum_features=args.extremum_features,
+            r_star_energy_tie=args.r_star_energy_tie,
             r_shear0=args.r_shear0,
         )
-        feature_names = get_feature_names(args.crossing_features)
+        feature_names = get_feature_names(
+            include_crossing_features=args.crossing_features,
+            include_extremum_features=args.extremum_features,
+        )
         if len(feature_names) != X.shape[1]:
             raise ValueError(
                 f"Feature-name count {len(feature_names)} does not match "
@@ -424,6 +504,8 @@ if __name__ == "__main__":
             clf,
             feature_names,
             include_crossing_features=args.crossing_features,
+            include_extremum_features=args.extremum_features,
+            r_star_energy_tie=args.r_star_energy_tie,
             r_shear0=args.r_shear0,
         )
 
@@ -436,9 +518,13 @@ if __name__ == "__main__":
                 "y_train": y,
                 "feature_names": feature_names,
                 "feature_schema_version": get_feature_schema_version(
-                    args.crossing_features
+                    include_crossing_features=args.crossing_features,
+                    include_extremum_features=args.extremum_features,
+                    r_star_energy_tie=args.r_star_energy_tie,
                 ),
                 "include_crossing_features": bool(args.crossing_features),
+                "include_extremum_features": bool(args.extremum_features),
+                "r_star_energy_tie": bool(args.r_star_energy_tie),
                 "r_shear0": float(args.r_shear0),
             },
             bundle_out,
@@ -453,6 +539,8 @@ if __name__ == "__main__":
             clf,
             args.classify,
             include_crossing_features=args.crossing_features,
+            include_extremum_features=args.extremum_features,
+            r_star_energy_tie=args.r_star_energy_tie,
             r_shear0=args.r_shear0,
         )
         print(f"File: {args.classify}")

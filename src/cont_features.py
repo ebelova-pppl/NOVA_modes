@@ -2,6 +2,7 @@ import os
 import numpy as np
 import re
 import warnings
+from scipy.signal import find_peaks
 
 _WARNED_DATCON_DIRS = set()
 DATCON_INVALID_SENTINEL_MIN = 999.0
@@ -17,6 +18,17 @@ CROSSING_FEATURE_DEFAULTS = {
     "W_star_high_shear": 0.0,
     "W_star_high_shear_sum": 0.0,
 }
+EXTREMUM_FEATURE_DEFAULTS = {
+    "ext_dr": 1.0,
+    "ext_df_gap": 1.0,
+    "ext_energy_frac": 0.0,
+}
+EXTREMUM_R_MIN = 0.03
+EXTREMUM_R_MAX = 0.40
+EXTREMUM_DR_SCALE = 0.02
+EXTREMUM_DF_SCALE = 0.03
+EXTREMUM_ENERGY_HALF_WIDTH = 0.03
+EXTREMUM_SMOOTHING_KERNEL = np.array([1.0, 2.0, 3.0, 2.0, 1.0]) / 9.0
 
 def warn_once_per_dir(mode_path: str, msg: str):
     d = os.path.dirname(os.path.abspath(mode_path))
@@ -358,7 +370,220 @@ def continuum_crossing_features(
     }
 
 
-def continuum_scalars(mode, omega, low2_full, high2_full, r=None, alpha=1.0):
+def _finite_blocks(mask):
+    """Yield inclusive-exclusive slices for contiguous True blocks."""
+    indices = np.flatnonzero(mask)
+    if indices.size == 0:
+        return
+
+    start = int(indices[0])
+    previous = start
+    for index in indices[1:]:
+        index = int(index)
+        if index != previous + 1:
+            yield slice(start, previous + 1)
+            start = index
+        previous = index
+    yield slice(start, previous + 1)
+
+
+def _smooth_finite_blocks(values, kernel=EXTREMUM_SMOOTHING_KERNEL):
+    """Smooth finite continuum blocks without bridging missing-data gaps."""
+    values = np.asarray(values, dtype=float)
+    kernel = np.asarray(kernel, dtype=float)
+    if kernel.ndim != 1 or kernel.size % 2 != 1 or kernel.size < 1:
+        raise ValueError("extremum smoothing kernel must have positive odd length")
+    if not np.isfinite(kernel).all() or float(np.sum(kernel)) <= 0.0:
+        raise ValueError("extremum smoothing kernel must be finite with positive sum")
+    kernel = kernel / np.sum(kernel)
+
+    smoothed = np.full_like(values, np.nan)
+    half_width = kernel.size // 2
+    for block in _finite_blocks(np.isfinite(values)):
+        block_values = values[block]
+        if block_values.size == 1:
+            smoothed[block] = block_values
+            continue
+        padded = np.pad(block_values, half_width, mode="edge")
+        smoothed[block] = np.convolve(padded, kernel, mode="valid")
+    return smoothed
+
+
+def _extremum_candidates(boundary, smoothed, r, omega, kind, r_min, r_max):
+    """Return upper-minimum or lower-maximum candidates in the inner region."""
+    search_mask = (
+        np.isfinite(boundary)
+        & np.isfinite(smoothed)
+        & (r >= r_min)
+        & (r <= r_max)
+    )
+    candidates = []
+    for block in _finite_blocks(search_mask):
+        block_indices = np.arange(r.size)[block]
+        # Endpoints of a valid/search block are deliberately excluded by
+        # find_peaks, avoiding datcon-boundary artifacts.
+        signal = smoothed[block]
+        if kind == "upper_min":
+            signal = -signal
+        peaks, properties = find_peaks(signal, prominence=0.0)
+        for local_index, prominence in zip(peaks, properties["prominences"]):
+            index = int(block_indices[local_index])
+            frequency = float(boundary[index])
+            if kind == "upper_min":
+                df_gap = (frequency - omega) / omega
+            else:
+                df_gap = (omega - frequency) / omega
+            candidates.append(
+                {
+                    "kind": kind,
+                    "index": index,
+                    "r_ext": float(r[index]),
+                    "frequency": frequency,
+                    "df_gap": float(df_gap),
+                    "prom_rel": float(prominence / abs(omega)),
+                }
+            )
+    return candidates
+
+
+def _energy_fraction_in_window(radial_energy, r, center, half_width):
+    """Return the fraction of integrated radial energy near ``center``."""
+    radial_energy = np.asarray(radial_energy, dtype=float)
+    if radial_energy.size == 1:
+        return 1.0
+
+    total = float(
+        np.sum(
+            0.5 * (radial_energy[:-1] + radial_energy[1:]) * np.diff(r)
+        )
+    )
+    if not np.isfinite(total) or total <= 0.0:
+        return 0.0
+
+    left = max(float(r[0]), center - half_width)
+    right = min(float(r[-1]), center + half_width)
+    if right <= left:
+        return 0.0
+
+    interior = (r > left) & (r < right)
+    r_window = np.concatenate(([left], r[interior], [right]))
+    energy_window = np.interp(r_window, r, radial_energy)
+    local = float(
+        np.sum(
+            0.5
+            * (energy_window[:-1] + energy_window[1:])
+            * np.diff(r_window)
+        )
+    )
+    return float(np.clip(local / total, 0.0, 1.0))
+
+
+def continuum_extremum_features(
+    mode,
+    omega,
+    low2_full,
+    high2_full,
+    r=None,
+    r_min=EXTREMUM_R_MIN,
+    r_max=EXTREMUM_R_MAX,
+    dr_scale=EXTREMUM_DR_SCALE,
+    df_scale=EXTREMUM_DF_SCALE,
+    energy_half_width=EXTREMUM_ENERGY_HALF_WIDTH,
+):
+    """Measure joint mode alignment with an inner continuum-gap extremum.
+
+    The established radial mode-energy notation is
+    ``W(r) = sum_m |xi_m(r)|^2``. The mode location used here is the maximum
+    of W(r), not its centroid. Candidate extrema are minima of the physical
+    upper boundary ``sqrt(high2)`` and maxima of the physical lower boundary
+    ``sqrt(low2)``. The candidate with the smallest normalized joint radial
+    and frequency mismatch is returned.
+
+    ``ext_df_gap`` uses one sign convention for both boundary types: positive
+    values place the mode frequency on the local gap side of the extremum,
+    zero is tangency, and negative values place it on the continuum side.
+    ``ext_energy_frac`` is the fraction of integrated W(r) within a fixed
+    radial half-width of the matched extremum.
+    """
+    mode, omega, low2, high2, r = _validate_crossing_inputs(
+        mode, omega, low2_full, high2_full, r
+    )
+    r_min = float(r_min)
+    r_max = float(r_max)
+    dr_scale = float(dr_scale)
+    df_scale = float(df_scale)
+    energy_half_width = float(energy_half_width)
+    if not np.isfinite(r_min) or not np.isfinite(r_max) or r_min >= r_max:
+        raise ValueError(f"invalid extremum radial interval: [{r_min}, {r_max}]")
+    if not np.isfinite(dr_scale) or dr_scale <= 0.0:
+        raise ValueError(f"extremum dr_scale must be positive, got {dr_scale}")
+    if not np.isfinite(df_scale) or df_scale <= 0.0:
+        raise ValueError(f"extremum df_scale must be positive, got {df_scale}")
+    if not np.isfinite(energy_half_width) or energy_half_width <= 0.0:
+        raise ValueError(
+            "extremum energy_half_width must be positive, "
+            f"got {energy_half_width}"
+        )
+    if omega <= 0.0:
+        raise ValueError("omega must be positive for relative extremum features")
+
+    radial_energy = np.sum(np.abs(mode) ** 2, axis=0)
+    if float(np.max(radial_energy)) <= 0.0:
+        return dict(EXTREMUM_FEATURE_DEFAULTS)
+    r_peak = float(r[int(np.argmax(radial_energy))])
+    low = np.sqrt(np.where(low2 >= 0.0, low2, np.nan))
+    high = np.sqrt(np.where(high2 >= 0.0, high2, np.nan))
+    low_smoothed = _smooth_finite_blocks(low)
+    high_smoothed = _smooth_finite_blocks(high)
+
+    candidates = _extremum_candidates(
+        high, high_smoothed, r, omega, "upper_min", r_min, r_max
+    )
+    candidates.extend(
+        _extremum_candidates(
+            low, low_smoothed, r, omega, "lower_max", r_min, r_max
+        )
+    )
+    if not candidates:
+        return dict(EXTREMUM_FEATURE_DEFAULTS)
+
+    for candidate in candidates:
+        candidate["dr"] = abs(r_peak - candidate["r_ext"])
+        candidate["match_score"] = (
+            (candidate["dr"] / dr_scale) ** 2
+            + (abs(candidate["df_gap"]) / df_scale) ** 2
+        )
+
+    matched = min(
+        candidates,
+        key=lambda item: (
+            item["match_score"],
+            -item["prom_rel"],
+            item["r_ext"],
+            item["kind"],
+        ),
+    )
+    return {
+        "ext_dr": float(matched["dr"]),
+        "ext_df_gap": float(matched["df_gap"]),
+        "ext_energy_frac": _energy_fraction_in_window(
+            radial_energy,
+            r,
+            matched["r_ext"],
+            energy_half_width,
+        ),
+    }
+
+
+def continuum_scalars(
+    mode,
+    omega,
+    low2_full,
+    high2_full,
+    r=None,
+    alpha=1.0,
+    r_star_energy_tie=False,
+):
     """
     Compute continuum-aware scalars from mode + datcon band.
     Uses omega^2 comparison because datcon stores omega_A^2.
@@ -394,8 +619,13 @@ def continuum_scalars(mode, omega, low2_full, high2_full, r=None, alpha=1.0):
     delta2_min = float(np.nanmin(dist2))
     delta2_eff = float(np.nansum(dist2 * w) / wsum)
 
-    # Closest approach radius (global)
-    i_star = int(np.nanargmin(dist2))
+    # Closest gap-distance radius. The legacy behavior takes the first tied
+    # minimum; the opt-in rule selects the tied point with the largest W(r).
+    if r_star_energy_tie:
+        tied = np.flatnonzero(np.isfinite(dist2) & (dist2 == delta2_min))
+        i_star = int(max(tied, key=lambda index: (w[index], r[index])))
+    else:
+        i_star = int(np.nanargmin(dist2))
     r_star = float(r[i_star])
 
     # Does it intersect the band anywhere?

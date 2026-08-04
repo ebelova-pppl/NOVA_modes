@@ -83,6 +83,11 @@ Current best models
   full-list refit with `M_target=100`.
 - Current RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
+- An opt-in 25-feature RF experiment adds inner continuum-extremum radial
+  mismatch, signed frequency clearance, and the fraction of total mode energy
+  within `|r-r_e| <= 0.03`. It reduced shuffled-fold FN from `92` to `89`, but
+  true shot-wise LOSO FN remained `130` and G-shot FN changed `31 -> 32`. The
+  active 22-feature model is unchanged; see `docs/project_state.md`.
 - Latest raw-CNN 13-shot held-out split check with `M_target=100`: CM
   `[[394, 6], [9, 112]]`, accuracy `0.971`, GOOD recall `0.926`, GOOD
   precision `0.949`, GOOD F1 `0.937`. The raw-CNN default harmonic window is

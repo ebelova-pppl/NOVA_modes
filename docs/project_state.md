@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-03)
+### Project state (current snapshot, updated 2026-08-04)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -106,6 +106,9 @@ From cont_features.py:
 -	W_star — mode energy near resonance
 -	W_star_max — largest peak-normalized mode energy at an interpolated
   lower/upper continuum-boundary crossing
+- Experimental inner-extremum extension: `ext_dr`, `ext_df_gap`, and
+  `ext_energy_frac`; these are opt-in and are not part of the active RF
+  checkpoint
 
 ## Current scripts
 ### Common
@@ -204,9 +207,13 @@ From cont_features.py:
 - Treat the current J38 audit as complete: retain only coherent extremum modes
   without a material secondary continuum crossing, and revisit the remaining
   junk-like extrema candidates only if the labeling policy changes.
-- Add shared continuum-topology and mode-extremum features for an RF LOSO
-  ablation before changing the production schema. If they help, test a small
-  numerical 1D-continuum branch fused with the raw-mode CNN; do not use
+- Keep the three-feature inner-extremum RF schema experimental. Replacing
+  continuum prominence with local mode-energy fraction improved shuffled folds
+  and removed the overall LOSO regression, but did not reduce G-shot LOSO FN.
+  Do not replace the production 22-feature checkpoint without a stronger
+  cross-shot result.
+- If a later RF refinement establishes transferable continuum geometry, test a
+  small numerical 1D-continuum branch fused with the raw-mode CNN; do not use
   rendered plot images as network inputs.
 - Recheck `nstxuG121123N75` after recalculation with the corrected q profile.
 - Retrain straightened CNN and hybrid CNN on the expanded active list if they are still useful for comparison.
@@ -1592,3 +1599,245 @@ mode-frequency line, and a validity mask on the same radial grid; concatenate
 its embedding with the raw-mode CNN embedding. This is different from the
 existing hybrid CNN, which receives continuum summary scalars but not the full
 gap topology. Given only 57 G-shot GOOD examples, perform the RF ablation before expanding the CNN.
+
+
+### 2026-08-04: minimal inner-extremum RF ablation
+
+Implemented a three-feature opt-in RF extension targeted at the manually
+validated small-radius continuum-extremum TAEs. The implementation keeps the
+existing repository notation `W(r) = sum_m |xi_m(r)|^2` and defines
+`r_peak = argmax W(r)`. It lightly smooths the physical-frequency boundaries
+`u(r) = sqrt(high2)` and `l(r) = sqrt(low2)`, finds upper minima and lower
+maxima over `0.03 <= r <= 0.40`, and jointly matches them to the mode using
+the audited `dr=0.02` and relative-frequency `df=0.03` scales. The added
+features are:
+
+- `ext_dr`: absolute radial separation between `r_peak` and the matched
+  extremum;
+- `ext_df_gap`: signed relative frequency clearance, defined so positive is
+  on the local gap side for either an upper minimum or lower maximum;
+- `ext_prom_rel`: matched-extremum prominence divided by `abs(omega)`.
+
+`src/cont_features.py` owns the shared calculation, `src/mode_features.py`
+adds the opt-in `rf_extremum_25_v1` schema, and the RF trainer and OOF checker
+accept `--extremum-features`. The production `rf_w_star_max_22_v2` schema and
+active checkpoint are unchanged. The three new positive-match features reuse
+the existing production `W_star_max` as the material-crossing evidence rather
+than adding another correlated crossing scalar. Synthetic upper-minimum,
+lower-maximum, no-extremum, fallback-order, and 22/25/28/31 schema tests pass.
+
+Real-mode checks recover the intended geometry. Examples `(ext_dr,
+ext_df_gap, ext_prom_rel)` are J38 N10/3559 `(0, 0.0063, 0.1118)`, J38
+N10/3596 `(0.005, 0.0011, 0.1113)`, K51 N10/4703
+`(0.005, 0.0041, 0.1239)`, and H47 N9/1283
+`(0.005, 0.0247, 0.0273)`. The K51 N9/2937 non-matching exception has
+`ext_dr=0.485` and `ext_df_gap=0.173`.
+
+On the corrected 2610-row active list, identical seeded shuffled five-fold
+checks gave:
+
+- production 22 features: CM `[[1971, 36], [92, 511]]`, accuracy `0.9510`,
+  GOOD precision/recall/F1 `0.9342 / 0.8474 / 0.8887`;
+- production plus three extremum features: CM `[[1970, 37], [90, 513]]`,
+  accuracy `0.9513`, GOOD precision/recall/F1
+  `0.9327 / 0.8507 / 0.8899`.
+
+Within the six G shots, shuffled-fold FN improved `32 -> 30`, at the cost of
+FP increasing `7 -> 9`. True 13-fold leave-one-shot-out did not confirm the
+improvement:
+
+- production 22 features: CM `[[1965, 42], [130, 473]]`, accuracy `0.9341`,
+  GOOD precision/recall/F1 `0.9184 / 0.7844 / 0.8462`;
+- production plus extremum features: CM `[[1966, 41], [133, 470]]`, accuracy
+  `0.9333`, GOOD precision/recall/F1 `0.9198 / 0.7794 / 0.8438`.
+
+For G shots alone, LOSO CM changed from `[[900, 15], [31, 26]]` to
+`[[900, 15], [32, 25]]`; among the 20 G-shot GOOD modes satisfying the strict
+`ext_dr <= 0.02` and `abs(ext_df_gap) <= 0.03` geometry, FN changed
+`11 -> 12`. The features raised the held-out probabilities of several target
+modes without crossing the 0.5 decision threshold: J38 N10/3559
+`0.423 -> 0.443`, J38 N10/3596 `0.210 -> 0.260`, and K51 N10/4703
+`0.073 -> 0.110`. The only G-shot GOOD classification changed at threshold
+was H47 N9/1817, a regression from `0.510` to `0.497`. In a full fit, feature
+importance ranked `ext_df_gap` 11th, `ext_dr` 22nd, and `ext_prom_rel` 25th.
+
+Conclusion: the three measurements correctly encode the manual physical rule
+and provide a weak probability shift in the desired direction for some modes,
+but they are not sufficient for cross-shot rescue. Keep the implementation for
+controlled follow-up experiments, but do not promote the 25-feature schema or
+replace the active RF checkpoint.
+
+
+### 2026-08-04: replace extremum prominence with local mode energy
+
+Replaced the learned `ext_prom_rel` scalar in the opt-in extremum schema with
+
+`ext_energy_frac = integral_[|r-r_e| <= 0.03] W(r) dr / integral W(r) dr`,
+
+where `W(r) = sum_m |xi_m(r)|^2` and `r_e` is the same jointly matched upper
+minimum or lower maximum used by `ext_dr` and `ext_df_gap`. The integral
+interpolates the two window boundaries on the radial grid. The no-extremum
+fallback remains `(1, 1, 0)`. Continuum prominence is retained only as an
+internal deterministic tie-breaker when matching otherwise equivalent extrema;
+it is no longer supplied to the RF.
+
+Because the third feature changed meaning, the experimental schemas are now
+`rf_extremum_energy_25_v2` and
+`rf_all_crossings_extremum_energy_31_v2`. Focused tests cover a centered narrow
+mode, a displaced mode, a two-lobe mode with half its energy near the
+extremum, both continuum-boundary types, safe fallbacks, and feature ordering.
+The active 22-feature schema and checkpoint remain unchanged.
+
+On the corrected 2610-row list, identical seeded shuffled five-fold checks
+gave:
+
+- production 22 features: CM `[[1971, 36], [92, 511]]`;
+- production plus the energy-fraction extrema features: CM
+  `[[1972, 35], [89, 514]]`, accuracy `0.9525`, GOOD precision/recall/F1
+  `0.9362 / 0.8524 / 0.8924`.
+
+For the six G shots in shuffled folds, the CM changed from
+`[[908, 7], [32, 25]]` to `[[908, 7], [30, 27]]`. Thus the local-energy
+version preserved the two-FN G improvement without the two extra FP produced
+by the original prominence version.
+
+True 13-fold leave-one-shot-out again did not show a G-shot recall gain:
+
+- production 22 features: CM `[[1965, 42], [130, 473]]`;
+- energy-fraction extrema features: CM `[[1967, 40], [130, 473]]`, accuracy
+  `0.9349`, GOOD precision/recall/F1 `0.9220 / 0.7844 / 0.8477`;
+- G shots: baseline `[[900, 15], [31, 26]]`, energy version
+  `[[901, 14], [32, 25]]`;
+- non-G shots: baseline `[[1065, 27], [99, 447]]`, energy version
+  `[[1066, 26], [98, 448]]`;
+- the 20 G-shot GOOD modes satisfying `ext_dr <= 0.02` and
+  `abs(ext_df_gap) <= 0.03` remained at 11 FN and 9 TP.
+
+The replacement is nevertheless better behaved than the prominence version,
+which had worsened overall LOSO FN from 130 to 133. In a full-data fit,
+`ext_df_gap` ranked 11th at `2.318%`, `ext_dr` ranked 23rd at `1.133%`, and
+`ext_energy_frac` ranked 24th at `1.058%`; together the three contributed
+`4.510%`. The energy fraction is slightly more informative and more directly
+mode-specific than prominence, but its weak importance suggests substantial
+redundancy with `ext_dr`, `rad_width`, and other localization features. Keep
+the v2 implementation for controlled experiments, but do not promote it to
+the production RF based on this result.
+
+
+### 2026-08-04: `W_star` / `W_star_max` semantic audit
+
+Reviewed the production continuum features after the inner-extremum work. The
+legacy `r_star`, `S`, and `W_star` block is not a strict crossing calculation.
+`band_distance` is zero wherever the mode frequency lies between the stored
+lower and upper TAE-gap boundaries, and `r_star = nanargmin(dist2)` therefore
+selects the first minimum-distance grid point. `W_star` is the fraction of
+total radial mode energy within one mode width of that point, not the pointwise
+amplitude stated in the older script documentation. These quantities are best
+interpreted as gap-membership / gap-violation features, not crossing features.
+
+`W_star_max` separately evaluates interpolated lower/upper boundary roots. It
+accepts strict sign changes and exact grid equalities, so an exact tangency
+would be counted as a crossing while a near-tangency without a sign change
+would not. A full audit of all 2610 labeled modes found zero exact boundary
+equalities. Consequently, changing only `W_star_max` to sign-change-only would
+produce an identical feature matrix on the current dataset.
+
+A read-only ablation tested a coherent strict-crossing reinterpretation of the
+legacy block. For each mode, the boundary root with the largest peak-normalized
+energy defined `r_star`; `S` and the local integrated `W_star` were recomputed
+at that root, and modes without a root used a negative sentinel. The existing
+`W_star_max` supplied the pointwise crossing energy. Of 2610 modes, 2160 had a
+strict crossing and 450 did not. Results were:
+
+- shuffled five-fold baseline: `[[1971, 36], [92, 511]]`;
+- shuffled strict-crossing block: `[[1967, 40], [91, 512]]`;
+- shuffled strict-crossing plus extrema: `[[1970, 37], [91, 512]]`;
+- 13-shot LOSO baseline: `[[1965, 42], [130, 473]]`;
+- LOSO strict-crossing block: `[[1957, 50], [139, 464]]`;
+- LOSO strict-crossing plus extrema: `[[1962, 45], [141, 462]]`.
+
+For G shots, shuffled FN changed from 32 to 30, or 29 with extrema features,
+but LOSO FN worsened from 31 to 39, or 38 with extrema features. No repository
+feature behavior was changed. The result supports keeping gap overlap and
+strict crossing as separate concepts: retain the legacy numerical block for
+now, interpret or rename it accurately, and use `W_star_max` for material
+crossings plus `ext_df_gap` / `ext_energy_frac` for extremum contact. A later
+ablation could improve the arbitrary first-minimum tie in `r_star` by choosing
+the minimum-distance radius most aligned with the mode energy, without
+misrepresenting it as a strict crossing.
+
+
+### 2026-08-04: energy-aligned minimum-distance `r_star` ablation
+
+Implemented an opt-in alternative to the legacy first-minimum `r_star` rule.
+The calculation still requires the global minimum of `band_distance`; among
+all radial grid points tied at that minimum, it selects the point with maximum
+`W(r) = sum_m |xi_m(r)|^2`, with larger radius resolving equal-energy ties.
+`S` and `W_star` are then evaluated using that selected radius. `delta2_eff` and
+all crossing/extremum calculations are unchanged.
+
+The option is exposed as `--r-star-energy-tie` in the RF trainer/classifier and
+OOF checker. Because it changes feature values without changing feature names
+or count, checkpoints record `nova_r_star_energy_tie_` and schema versions add
+the suffix `_rstar_energy_tie_v1`; inference rejects a mismatched checkpoint.
+Experimental default model filenames include `rstar_energy_tie`, and overwrite
+protection prevents this option from replacing the active checkpoint. The
+production default remains the legacy first-minimum rule.
+
+Focused tests verify maximum-energy selection, larger-radius resolution of
+equal-energy ties, end-to-end feature-builder propagation, distinct schema
+versioning, and checkpoint metadata rejection on mismatch. Shuffled five-fold
+results on the corrected 2610-row list were:
+
+- production baseline: `[[1971, 36], [92, 511]]`;
+- energy-aligned `r_star`: `[[1964, 43], [97, 506]]`;
+- energy-aligned `r_star` plus extrema features:
+  `[[1968, 39], [96, 507]]`.
+
+For G shots in shuffled folds, baseline `[[908, 7], [32, 25]]` changed to
+`[[903, 12], [32, 25]]`, or `[[905, 10], [32, 25]]` with extrema features.
+There was no G recall gain. True 13-shot LOSO was substantially worse:
+
+- production baseline: `[[1965, 42], [130, 473]]`;
+- energy-aligned `r_star`: `[[1960, 47], [142, 461]]`;
+- energy-aligned `r_star` plus extrema features:
+  `[[1964, 43], [134, 469]]`.
+
+G-shot LOSO changed from baseline `[[900, 15], [31, 26]]` to
+`[[897, 18], [37, 20]]`, or `[[901, 14], [36, 21]]` with extrema features.
+Among the 20 strict extremum-aligned G-shot GOOD modes, both new variants had
+14 FN / 6 TP versus baseline 11 FN / 9 TP.
+
+In a full fit of the 22-feature energy-aligned schema, importance shifted to
+`W_star_max` at `17.99%`; `r_star` ranked ninth at `4.65%`, while `W_star` and
+`S` fell to `1.39%` and `1.17%`. Selecting the mode-energy maximum within a
+broad zero-distance interval makes `S` small and `W_star` large for many good
+and bad modes alike, removing useful variation from the legacy first-entry
+geometry. Keep the implementation opt-in for reproducibility, but do not
+promote it or retrain the active RF with this rule based on current evidence.
+
+
+### 2026-08-04: inner-boundary interpretation of legacy `r_star`
+
+Checked whether the predictive legacy first-minimum rule is capturing numerical
+or boundary-condition problems near the magnetic axis. All 2610 labeled modes
+have their first valid `datcon` point at `r=0.01`; 1169 modes select exactly
+that point as legacy `r_star`. Selecting the first valid radius alone is not a
+BAD indicator: those 1169 modes are 74.0% BAD versus 76.9% BAD in the full
+imbalanced list. The interaction with mode localization is highly diagnostic:
+
+- `r_star <= 0.02` and `rad_loc <= 0.10`: 233 BAD / 4 GOOD, or 98.3% BAD;
+- `r_star <= 0.02` and `W_star >= 0.30`: 335 BAD / 16 GOOD, or 95.4% BAD;
+- within G shots, first-valid `r_star` and `W_star >= 0.30`: 122 BAD / 0 GOOD;
+- within non-G shots, the same condition: 209 BAD / 16 GOOD, or 92.9% BAD.
+
+GOOD modes overall have median `r_star=0.01` but median `rad_loc=0.686`,
+`S=5.14`, and `W_star` effectively zero. BAD modes have median
+`rad_loc=0.444`, `S=1.65`, and `W_star=0.249`. Thus the useful signal is not
+simply that the frequency lies inside the gap at the inner boundary. It is the
+combination of an inner gap-entry anchor with substantial mode energy near
+that anchor. This is consistent with the RF learning core boundary-condition
+or numerical-junk structure, although label statistics alone cannot prove the
+causal mechanism. It also explains why moving `r_star` to maximum `W(r)` was
+harmful: that change forced many otherwise displaced GOOD modes to acquire
+small `S` and large `W_star`, erasing the useful interaction.

@@ -354,17 +354,49 @@ so those edge points do not contaminate continuum features or TAE/EAE splitting.
 
 When available, the following scalars are appended to the feature vector:
 
-- `delta2_eff`: mode-weighted effective squared distance (`delta_omega^2`) from the continuum
-- `r_star`: radius of closest continuum approach / crossing
-- `S`: normalized separation between mode and `r_star`, `S = (rad_loc - r_star) / rad_width`
-- `W_star`: mode amplitude² at `r = r_star`
+- `delta2_eff`: mode-weighted squared distance outside the local interval
+  between the stored lower and upper TAE-gap boundaries; it is zero inside
+  that interval
+- `r_star`: first radial grid point attaining the minimum of that gap-distance
+  quantity; it is not necessarily a continuum crossing
+- `S`: absolute separation between the mode centroid and `r_star`, normalized
+  by the mode radial width
+- `W_star`: fraction of total radial mode energy within one mode width of
+  `r_star`
 - `W_star_max`: largest peak-normalized radial mode energy at any interpolated
-  lower/upper continuum-boundary crossing
+  lower/upper continuum-boundary root
 
 The current production RF schema has 22 features. It removes the raw `omega`
 feature used by the previous checkpoint and adds `W_star_max`. Missing or
 invalid continuum data use the existing safe fallback, with
 `W_star_max = 0`.
+
+#### Experimental energy-aligned `r_star` tie break
+
+`--r-star-energy-tie` preserves the minimum gap-distance condition but, when
+several radial points share that minimum, selects the point with maximum
+`W(r)`. Equal-energy ties use the larger radius. This changes `r_star`, `S`,
+and `W_star` without changing the 22 feature names, so checkpoints and bundles
+store a distinct `_rstar_energy_tie_v1` schema suffix and classification must
+use the same option. The active checkpoint retains the legacy first-minimum
+rule.
+
+Example shuffled-fold check:
+
+```bash
+python scripts/rf_oof_check.py training_labels/tae_like_train.csv \
+  --model_in models/nova_mode_classifier.joblib \
+  --r-star-energy-tie \
+  --out_oof rf_rstar_energy_oof.csv \
+  --out_suspects rf_rstar_energy_suspects.csv
+```
+
+On the corrected 2610-row list, this rule worsened shuffled five-fold FN from
+`92` to `97` and true shot-wise LOSO FN from `130` to `142`; G-shot LOSO FN
+changed `31 -> 37`. Combining it with the three extrema features gave LOSO FN
+`134` overall and `36` for G shots, still worse than baseline. Keep this option
+for reproducibility only; do not use it with the active checkpoint or promote
+it without new evidence.
 
 #### Experimental boundary-crossing RF features
 
@@ -417,7 +449,48 @@ improve OOF performance. They were strongly correlated with `W_star_max`. The
 promoted production configuration is the previous feature set minus `omega`,
 plus `W_star_max`.
 
-Synthetic crossing and schema checks use only standard-library `unittest`:
+#### Experimental inner-extremum RF features
+
+`--extremum-features` appends three mode-to-continuum-alignment scalars to the
+production vector, producing the opt-in 25-feature
+`rf_extremum_energy_25_v2` schema:
+
+- `ext_dr`: distance between `r_peak = argmax W(r)` and the jointly matched
+  inner upper-boundary minimum or lower-boundary maximum;
+- `ext_df_gap`: signed relative frequency clearance, positive on the local gap
+  side for either boundary type;
+- `ext_energy_frac`: fraction of integrated `W(r)` within
+  `|r-r_e| <= 0.03` of the matched extremum.
+
+The search uses physical-frequency boundaries over `0.03 <= r <= 0.40` and
+the fixed audit scales `dr=0.02` and `abs(df)=0.03` to select one joint match.
+The scales choose the candidate; they do not classify it. The local-energy
+fraction uses a fixed radial half-width of `0.03`. Missing continuum or no
+detected inner extremum uses the deterministic fallback `(1, 1, 0)`.
+
+Example same-fold ablation:
+
+```bash
+python scripts/rf_oof_check.py training_labels/tae_like_train.csv \
+  --model_in models/nova_mode_classifier.joblib \
+  --extremum-features \
+  --out_oof rf_extremum_oof.csv \
+  --out_suspects rf_extremum_suspects.csv
+```
+
+Experimental training uses the same option and defaults to
+`nova_mode_classifier_extremum.joblib`; classification with that checkpoint
+must also pass `--extremum-features`. The option can be combined with
+`--crossing-features`, producing a 31-feature schema. Experimental schemas are
+not supported by the shot sorters or interactive labeling workflow.
+
+On the corrected 2610-row list, shuffled five-fold FN changed `92 -> 89`.
+True 13-fold shot-held-out FN remained `130`, while FP improved `42 -> 40`;
+G-shot FN changed `31 -> 32`. The active 22-feature checkpoint was therefore
+not replaced. See `docs/project_state.md` for the full matrices and the earlier
+prominence-feature comparison.
+
+Synthetic crossing, extremum, and schema checks use `unittest`:
 
 ```bash
 PYTHONPATH="$NOVA_REPO/src" python -m unittest discover \

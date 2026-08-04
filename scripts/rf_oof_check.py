@@ -33,6 +33,8 @@ def read_train_csv(csv_path: str):
 def build_X(
     paths,
     include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
     r_shear0=0.2,
 ):
     X = []
@@ -49,6 +51,8 @@ def build_X(
                 mode,
                 extra_info=extra,
                 include_crossing_features=include_crossing_features,
+                include_extremum_features=include_extremum_features,
+                r_star_energy_tie=r_star_energy_tie,
                 r_shear0=r_shear0,
             ).astype(float)
             X.append(feats)
@@ -138,6 +142,22 @@ def main():
         ),
     )
     ap.add_argument(
+        "--extremum-features",
+        action="store_true",
+        help=(
+            "Use the experimental three-feature inner continuum-extremum "
+            "extension (25 features with the production schema)."
+        ),
+    )
+    ap.add_argument(
+        "--r-star-energy-tie",
+        action="store_true",
+        help=(
+            "Select r_star from tied minimum gap-distance points by maximum "
+            "W(r), with larger radius breaking equal-energy ties."
+        ),
+    )
+    ap.add_argument(
         "--r_shear0",
         type=float,
         default=0.2,
@@ -157,19 +177,25 @@ def main():
     X = build_X(
         paths,
         include_crossing_features=args.crossing_features,
+        include_extremum_features=args.extremum_features,
+        r_star_energy_tie=args.r_star_energy_tie,
         r_shear0=args.r_shear0,
     )
-    feature_names = get_feature_names(args.crossing_features)
+    feature_names = get_feature_names(
+        include_crossing_features=args.crossing_features,
+        include_extremum_features=args.extremum_features,
+    )
     if len(feature_names) != X.shape[1]:
         raise ValueError(
             f"Feature-name count {len(feature_names)} does not match "
             f"feature matrix width {X.shape[1]}"
         )
-    print(
-        "Built X:",
-        X.shape,
-        f"schema={get_feature_schema_version(args.crossing_features)}",
+    schema_version = get_feature_schema_version(
+        include_crossing_features=args.crossing_features,
+        include_extremum_features=args.extremum_features,
+        r_star_energy_tie=args.r_star_energy_tie,
     )
+    print("Built X:", X.shape, f"schema={schema_version}")
 
     p_oof = oof_predict_proba(clf, X, y, n_splits=args.splits, seed=args.seed)
 
