@@ -26,8 +26,9 @@ The current active good/bad training list is the expanded
 TAE-like set, the reviewed six-shot NSTX-U TAE-like set, refreshed
 `nstx_135388` labels, the new `nstxuG121123J38` labels, and the reviewed
 `nstxuG121123Q62` / `nstxuG142301Y93` labels, plus the reviewed
-`nstxuG121123B12` labels. It currently has 2745 rows across 14 shots. Older
-four-shot TAE-only and mixed TAE/EAE lists are archived under
+`nstxuG121123B12` and `nstxuG142301W29` labels. It currently has
+2903 rows across 15 shots. Older four-shot TAE-only and mixed TAE/EAE lists are
+archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
 
@@ -299,9 +300,8 @@ Most recent RF OOF check, run on the 13-shot list before merging B12:
 - output: `outputs/rf_oof_13shots/`
 
 The active expanded-set RF checkpoint is
-`models/nova_mode_classifier.joblib`; it also predates the B12 merge and must
-be retrained to include the new shot. Previous four-shot RF checkpoints are
-archived under `models/old_4shots_models/`.
+`models/nova_mode_classifier.joblib`; it also predates the B12 and W29 merges
+and must be retrained to include the new shots. Previous four-shot RF checkpoints are archived under `models/old_4shots_models/`.
 
 The component six-shot list is `training_labels/additions/tae_like_6new.csv`, with
 relative `$NOVA_DATA` paths and the same full schema as `tae_like_train.csv`.
@@ -786,11 +786,12 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints were trained on the
-13-shot TAE-like list before the current G-shot label corrections; retraining
-on the corrected list is pending. The current production use is NSTX-U E-like
-shot sorting for NOVA-C candidate selection. **NSTX-U G-case shots are treated
-as a separate regime** for now because their narrow, strongly varying TAE gap
-gives sparse GOOD-mode labels and weaker LOSO performance.
+13-shot TAE-like list before the current G-shot label corrections and B12/W29
+merges; retraining on the current 15-shot list is pending. The current
+production use is NSTX-U E-like shot sorting for NOVA-C candidate selection.
+**NSTX-U G-case shots are treated as a separate regime** for now because
+their narrow, strongly varying TAE gap gives sparse GOOD-mode labels and
+weaker LOSO performance.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
@@ -944,7 +945,7 @@ lost.
 
 Driver for leave-one-shot-out checks over all shots in the selected training
 CSV. The filename is historical; with the current `tae_like_train.csv` it
-creates 13 folds. It:
+creates 15 folds. It:
 
 - creates one `train.csv` and `test.csv` split per held-out shot from
   `training_labels/tae_like_train.csv`,

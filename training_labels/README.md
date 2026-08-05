@@ -23,18 +23,18 @@ Columns:
 - `error`
 
 Current checked contents:
-- 2745 labeled modes
-- labels: 622 `good`, 2123 `bad`
+- 2903 labeled modes
+- labels: 629 `good`, 2274 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
   `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
   `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`,
-  `nstxuG121123B12`
+  `nstxuG121123B12`, `nstxuG142301W29`
 
 This is the list to use when retraining the expanded RF and CNN models.
 The active RF and raw-CNN checkpoints predate the current G-shot label
-corrections and B12 merge; retraining on the current 2745-row / 14-shot list
-is pending.
+corrections and B12/W29 merges; retraining on the current 2903-row / 15-shot
+list is pending.
 
 ## Addition / component lists
 
@@ -73,6 +73,18 @@ The bare filename `tae_like.csv` is intentionally not used for the canonical
 training list anymore, because `split_tae_eae.py` and `sort_shot_mixed.py`
 write TAE-like output/audit files with that name in their own output
 directories.
+
+### `additions/tae_like_nstxuG142301W29.csv`
+
+Reviewed W29 TAE-like component merged into `tae_like_train.csv` on
+2026-08-05. It uses relative `$NOVA_DATA` paths and the full active schema.
+
+The component covers all 158 modes in the W29 `tae_like.csv`: 7 `good` and
+151 `bad`, with no `skip` decisions. Exact manifest coverage, unique paths,
+allowed labels, family consistency, empty error fields, and file resolution
+under `$NOVA_DATA` were verified before merging. The two difficult retained
+physics modes, `N5/egn05w.2505E+02` and `N8/egn08w.2847E+02`, are both GOOD
+with low review confidence.
 
 ## Archived four-shot lists
 

@@ -1,0 +1,12 @@
+To check % token or context used type: 
+```text
+/status
+```
+in VSCode chat box
+
+It shows:
+    Context/token usage for the current chat
+    Remaining context capacity
+    Rate-limit usage
+    Active model and chat ID
+For overall account usage and remaining limits, open the Codex usage dashboard

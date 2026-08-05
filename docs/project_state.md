@@ -6,12 +6,12 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
 ## Data
 - Active version-controlled training list:
     - `training_labels/tae_like_train.csv`
-    - 2745 labeled TAE-like modes: 622 `good`, 2123 `bad`
+    - 2903 labeled TAE-like modes: 629 `good`, 2274 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`, `nstxuG121123K51`, `nstxuG133964S31`,
       `nstxuG142301H47`, `nstxuG121123J38`, `nstxuG121123Q62`,
-      `nstxuG142301Y93`, `nstxuG121123B12`
+      `nstxuG142301Y93`, `nstxuG121123B12`, `nstxuG142301W29`
     - mode paths stored relative to `$NOVA_DATA` when possible
     - example entry: `nstx_120113/N5/egn05w.1234E+02,good`
 - Derived non-G / E-production comparison list:
@@ -38,6 +38,8 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
       `training_labels/additions/tae_like_2new.csv`
     - reviewed `nstxuG121123B12` copy:
       `training_labels/additions/tae_like_nstxuG121123B12.csv`
+    - reviewed `nstxuG142301W29` copy:
+      `training_labels/additions/tae_like_nstxuG142301W29.csv`
 - Staged lists not yet merged:
     - `training_labels/additions/tae_like_3new.csv`: three additional NSTX-U G-case
       shots kept as the original combined reference. Do not merge this file
@@ -74,8 +76,8 @@ Notes:
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
     -	Checkpoint status: trained before the current G-shot label corrections
-      and B12 merge; retraining on the current 2745-row / 14-shot active list
-      is pending
+      and B12/W29 merges; retraining on the current 2903-row / 15-shot active
+      list is pending
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
     -	Latest pre-B12 13-shot OOF accuracy: 0.951
     -	Latest pre-B12 13-shot OOF CM: `[[1967, 37], [91, 515]]`
@@ -85,7 +87,7 @@ Notes:
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
     -	Checkpoint status: full-CSV refit predating the current G-shot label
-      corrections and B12 merge; retraining on the current active list is
+      corrections and B12/W29 merges; retraining on the current active list is
       pending
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest pre-B12 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
@@ -2146,3 +2148,56 @@ repository NOVA loader and continuum calculations. A fresh-context agent then
 used the skill for a blind two-mode B12 review, independently classified both
 modes BAD with high confidence, and reported no exposure to target-shot labels
 or model output. No labels or model checkpoints were changed by this work.
+
+### 2026-08-05: W29 blind human-agent labeling comparison
+
+Prepared and independently reviewed all 158 rows in the W29 TAE-like split.
+The Codex review used only raw signed harmonics, W(r), absolute continuum,
+true sign-change crossings, and deterministic extremum diagnostics; no RF,
+CNN, or prior W29 label file was used. Before sealing, the human reviewer
+stated that all 14 N=1 modes were BAD, so those rows are explicitly marked
+`prior_seen=true` and excluded from clean statistics. The remaining 144 rows
+are a clean blind comparison. The sealed agent list has SHA-256
+`c0192dd7c2e84201fbc9d7d42c152dc35e03677f8fe7b8ab6389a1d8a2562c98`.
+
+After completing the initially missed 22 N=5 rows, the human list covered the
+same 158 modes exactly. Overall agreement was 149/158 (94.30%, Cohen kappa
+0.5004); clean agreement was 135/144 (93.75%, kappa 0.4977). Disagreements
+were eight agent-GOOD/human-BAD and one agent-BAD/human-GOOD. Confidence was
+well calibrated: high-confidence agreement was 134/134, medium 10/13, and low
+5/11. Post-comparison raw review indicates that the agent was too permissive
+when favorable extremum geometry coincided with an unresolved radial spike or
+near-axis ringing. The human-GOOD decision for N8/egn08w.2847E+02 is
+defensible because its principal inner structure is coherent and its true
+crossings occur in a low-amplitude outer tail.
+
+Preserved the immutable sealed list, SHA-256 sidecar, label-free missing-N5
+audit list, and detailed human-agent comparison in the W29 split directory.
+No W29 labels have been merged into the canonical training list, and no model
+has been retrained on W29.
+
+Post-seal adjudication retained N5/egn05w.2505E+02 and
+N8/egn08w.2847E+02 as GOOD with low confidence for physics reasons. The N5
+working human label was changed from BAD to GOOD; N8 was already GOOD. The
+sealed blind reviews and original comparison remain unchanged as audit
+artifacts. The working W29 list now contains 7 GOOD and 151 BAD modes.
+After exact coverage and uniqueness validation against `tae_like.csv`, this
+adjudicated list was promoted unchanged to the shot-local `mode_labels_clean.csv` for
+consistency with other shots. It has not yet been merged into the canonical
+training list.
+
+### 2026-08-05: W29 merged into the active training list
+
+Created `training_labels/additions/tae_like_nstxuG142301W29.csv` by joining
+the final W29 `mode_labels_clean.csv` decisions to the split metadata and
+converting paths to relative `shot/N/file` form. The component covers all 158
+TAE-like modes: 7 GOOD and 151 BAD, with no SKIP rows.
+
+Appended the reviewed W29 component to `training_labels/tae_like_train.csv`.
+The active list now contains 2903 unique rows across 15 shots: 629 GOOD and
+2274 BAD. Validation found the expected full schema, exact W29 manifest
+coverage, no duplicate or absolute paths, all files resolvable under
+`/p/hym/ebelova/NOVA/data_mixed`, empty error fields, and consistent family
+labels (`tae` for GOOD and `none` for BAD). All 2745 pre-existing rows remain
+byte-for-byte unchanged. The saved RF and CNN checkpoints have not yet been
+retrained on this 15-shot list.
