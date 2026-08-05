@@ -1,17 +1,17 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-04)
+### Project state (current snapshot, updated 2026-08-05)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
 - Active version-controlled training list:
     - `training_labels/tae_like_train.csv`
-    - 2610 labeled TAE-like modes: 603 `good`, 2007 `bad`
+    - 2745 labeled TAE-like modes: 622 `good`, 2123 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`, `nstxuG121123K51`, `nstxuG133964S31`,
       `nstxuG142301H47`, `nstxuG121123J38`, `nstxuG121123Q62`,
-      `nstxuG142301Y93`
+      `nstxuG142301Y93`, `nstxuG121123B12`
     - mode paths stored relative to `$NOVA_DATA` when possible
     - example entry: `nstx_120113/N5/egn05w.1234E+02,good`
 - Derived non-G / E-production comparison list:
@@ -36,6 +36,8 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
       `training_labels/additions/tae_like_nstxuG121123J38.csv`
     - reviewed two-shot G-case copy:
       `training_labels/additions/tae_like_2new.csv`
+    - reviewed `nstxuG121123B12` copy:
+      `training_labels/additions/tae_like_nstxuG121123B12.csv`
 - Staged lists not yet merged:
     - `training_labels/additions/tae_like_3new.csv`: three additional NSTX-U G-case
       shots kept as the original combined reference. Do not merge this file
@@ -71,19 +73,22 @@ Notes:
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Checkpoint status: trained before the current G-shot label corrections;
-      retraining on the current 2610-row / 13-shot active list is pending
+    -	Checkpoint status: trained before the current G-shot label corrections
+      and B12 merge; retraining on the current 2745-row / 14-shot active list
+      is pending
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
-    -	Current 13-shot OOF accuracy: 0.951
-    -	Current 13-shot OOF CM: `[[1967, 37], [91, 515]]`
-    -	Current GOOD precision/recall/F1: 0.933 / 0.850 / 0.889
+    -	Latest pre-B12 13-shot OOF accuracy: 0.951
+    -	Latest pre-B12 13-shot OOF CM: `[[1967, 37], [91, 515]]`
+    -	Latest pre-B12 GOOD precision/recall/F1: 0.933 / 0.850 / 0.889
     -	Most interpretable baseline
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: full-CSV refit predating the current G-shot label corrections; retraining on the current active list is pending
+    -	Checkpoint status: full-CSV refit predating the current G-shot label
+      corrections and B12 merge; retraining on the current active list is
+      pending
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
-    -	Latest 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
+    -	Latest pre-B12 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
     -	Previous 13-shot M54 held-out split check: CM `[[394, 6], [18, 103]]`,
       accuracy 0.954, GOOD precision/recall/F1 0.945 / 0.851 / 0.896
@@ -1960,3 +1965,160 @@ Gap-plot normalization convention: never divide the boundaries point by point
 by the radius-dependent center `c(r) = 0.5 * (u(r) + l(r))`, because that hides
 radial variation. If normalization is useful, divide the full panel by one
 clearly stated scalar mean or median of `c(r)` over a fixed radial interval.
+
+
+### 2026-08-04: first B12 manual review
+
+Manually reviewed the 25 B12 modes selected by the 1% secondary-crossing
+screen. Twelve are confirmed `good,tae`: review indices 5, 6, 7, 10, 12, 16,
+20, 22, 23, and 24 are clear narrow extrema TAEs, while 15 and 25 are physical
+but wider/more global TAEs. Twelve are confirmed `bad,none` because their
+radial structure is much too narrow to be physical and/or has excessive
+near-axis boundary structure. Only index 18 remains pending and may be GOOD.
+
+Index 14 is `N9/egn09w.2347E+02`. It otherwise looks coherent but has a spike
+near `r=0`; its maximum `W/W_peak` over `r <= 0.03` is 3.59% and 2.40% of its
+integrated energy lies in that axis window. It is confirmed BAD because this
+axis spike is unacceptable and would cause problems for NOVA-C. Index 18 is
+`N10/egn10w.1550E+02`. It looks plausible but crosses the lower continuum at
+`r=0.1973`, only 0.103 from its extremum/peak at `r=0.300`; the crossing has
+`W/W_peak=0.00563`, equivalent to 7.5% of peak amplitude, and 0.73% of total
+mode energy lies within 0.03 of the crossing. Thus it passes the provisional
+1% pointwise-energy cutoff but is reasonably left pending because that
+crossing is within the inner mode envelope rather than in a remote tail.
+
+The active training-label list has not been changed. The decisions are staged
+in `outputs/gshot_candidate_selection/nstxuG121123B12_manual_review.csv`; the
+24 resolved rows are also in
+`nstxuG121123B12_confirmed_labels_staging.csv`. This first review confirms that
+continuum geometry plus crossing amplitude is useful for prioritization but
+cannot recognize the ultra-narrow and near-axis numerical structures that
+dominate the remaining false candidates.
+
+
+### 2026-08-04: B12 current TAE-only label transfer
+
+The current B12 files were copied into the isolated mixed-data working area
+and split into 136 TAE-like and 501 EAE-like modes. The May all-family hand
+labels are preserved as `mode_labels_clean_all.csv`. Matching by stable
+`shot/N/file` suffix transfers 74 May TAE-region labels; the recent 25-mode
+review independently confirms 14 of those labels and supplies 10 new resolved
+labels. There are no conflicts.
+
+Seeded current-path `mode_labels.csv` and `mode_labels_clean.csv` in the mixed
+B12 directory with 84 TAE-region decisions: 33 GOOD, 44 BAD, and 7 SKIP.
+Fifty-two current TAE-like modes remain unlabeled, including review index 18.
+Forty-two May-only labels point to mode files newer than the May label snapshot
+and have not yet been reconfirmed. The combined manual workload is therefore
+94 modes: 42 rechecks plus 52 missing labels, distributed as N7=21, N8=19,
+N9=22, and N10=32.
+
+The split directory now contains `tae_like_label_transfer_audit.csv`,
+`tae_like_existing_labels_to_check.csv`,
+`tae_like_labels_needing_recheck.csv`, `tae_like_missing_labels.csv`, and the
+ordered combined `tae_like_labels_to_review.csv`. The canonical repository
+training list has not been changed. After the 94-mode pass, overlay the new
+current-review labels on the 84-row seed; this replaces all flagged May labels
+and fills all missing decisions while retaining the 42 safe seed labels.
+
+
+### 2026-08-04: B12 independent blind-label comparison checkpoint
+
+Created a label-free 94-mode manifest and diagnostic sheets for an independent
+Codex-versus-human labeling comparison. The blind sheets show signed mode
+harmonics, the `W(r)` envelope, absolute-frequency continuum boundaries,
+matched extrema, and continuum crossings, but contain no May label or label
+provenance. The already discussed 25-mode set was used only to calibrate the
+visual morphology policy before the blind pass.
+
+Codex completed one forced GOOD/BAD decision for all 94 review modes, with a
+confidence and compact reason, and sealed the result separately at
+`/p/hym/ebelova/NOVA/data_mixed/nstxuG121123B12_tae_eae_split/codex_blind_labels_SEALED.csv`.
+Its SHA-256 commitment is
+`f029527222237e69a44c8c20ae9fa5692fb8d9ded082368ea3d2cfc8f3ce4ff4`.
+`N10/egn10w.1550E+02` is explicitly marked `prior_seen` and must be excluded
+from the clean independent-agreement statistic. No blind decision has been
+merged into the B12 working labels or the canonical training list; comparison
+waits for the independent human pass.
+
+
+### 2026-08-04: B12 blind-label comparison
+
+The completed human review covers exactly the same 94 paths as the sealed
+Codex list, and the sealed SHA-256 commitment verified before comparison.
+Overall agreement is 91/94 (96.8%). Excluding the previously discussed
+`N10/egn10w.1550E+02`, clean independent agreement is 90/93 (96.8%), with
+Cohen kappa 0.711 despite the strong BAD-class imbalance. All three
+disagreements are human GOOD versus Codex BAD; there are no Codex-only GOOD
+calls.
+
+The disagreements are `N7/egn07w.1888E+02`,
+`N10/egn10w.1565E+02`, and `N10/egn10w.2629E+02`. Reinspection supports the
+human GOOD decision for N10/1565: its crossings all have negligible mode
+energy, including only 0.003% of integrated energy beyond the outermost
+crossing. N10/2629 is also defensible as GOOD: its outer crossing has
+`W/W_peak=0.00503`, 0.26% of integrated energy within +/-0.03, and 0.84%
+beyond the crossing. The Codex pass was too conservative about its small
+outer tail.
+
+N7/1888 remains a real GOOD-versus-SKIP policy case. It places 89% of its
+integrated energy near the lower-continuum maximum, but its detached inner
+crossing reaches `W/W_peak=0.03697` and contains 1.88% of total energy within
++/-0.03. The May label was SKIP and the initial current human pass called it
+GOOD. After comparison, the agreed final resolution is SKIP; the isolated
+`mode_labels_current_review.csv` has been updated accordingly.
+
+The human recheck was not generally permissive: among the 42 modes carrying
+May labels but newer mode files, 24 labels changed: 19 May GOOD to current BAD
+and five SKIP to BAD. No May BAD or SKIP mode was promoted to GOOD. No
+review labels have yet been merged into the canonical training list.
+
+
+### 2026-08-05: remaining unchanged May-labeled B12 modes
+
+The full current B12 shot contains 575 exact filename matches to the May label
+snapshot. Of those, 513 source files predate the May labels and are treated as
+unchanged: 18 TAE-like and 495 EAE-like. The immediate TAE-only workflow has
+18 unchanged May-labeled modes that were not part of either the 25-mode
+candidate review or the completed 94-mode pass. Their May labels are 17 BAD
+and one SKIP, with no GOOD labels.
+
+Created
+`tae_like_unchanged_may_labels_to_review.csv` in the isolated split directory
+to review these 18 modes separately. The list spans N=1,2,3,4,6,7,8,9,10. No
+labels from this additional pass have yet been merged.
+
+
+### 2026-08-05: consolidated B12 TAE labels
+
+The additional 18 unchanged May-labeled TAE-like modes were all rechecked and
+classified BAD. Combined the 24 resolved modes from the first candidate
+review, the 94-mode main review, and this 18-mode pass into the active B12
+working labels. These three source lists are disjoint and cover all 136 rows
+of the current split `tae_like.csv`, with no missing paths, duplicates, extra
+paths, or conflicting decisions.
+
+The authoritative B12 TAE-only list is now
+`/p/hym/ebelova/NOVA/data_mixed/nstxuG121123B12/mode_labels_clean.csv`, ordered
+exactly like the split manifest. It contains 116 BAD, 19 GOOD, and one SKIP
+(`N7/egn07w.1888E+02`). `mode_labels.csv` is synchronized to the same content
+so that the labeler working file is not stale. The preserved May all-family
+backup `mode_labels_clean_all.csv` is unchanged. B12 has not yet been added to
+the canonical repository training list.
+
+
+### 2026-08-05: B12 merged into the active training list
+
+Created `training_labels/additions/tae_like_nstxuG121123B12.csv` by joining
+the final B12 working labels to the current split metadata and converting the
+mode paths to relative `shot/N/file` form. The one SKIP decision is retained
+in the full per-shot label file but excluded from training, leaving 135 B12
+training rows: 19 GOOD and 116 BAD.
+
+Appended the reviewed B12 addition to
+`training_labels/tae_like_train.csv`. The active list now contains 2745 unique
+rows across 14 shots: 622 GOOD and 2123 BAD. Validation found the expected
+full schema, no duplicate or absolute paths, all 2745 files resolvable under
+`/p/hym/ebelova/NOVA/data_mixed`, empty error fields, and consistent family
+labels (`tae` for GOOD and `none` for BAD). The saved RF and CNN checkpoints
+have not yet been retrained on this 14-shot list.

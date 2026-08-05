@@ -25,8 +25,9 @@ The current active good/bad training list is the expanded
 `training_labels/tae_like_train.csv`, which combines the original four-shot
 TAE-like set, the reviewed six-shot NSTX-U TAE-like set, refreshed
 `nstx_135388` labels, the new `nstxuG121123J38` labels, and the reviewed
-`nstxuG121123Q62` / `nstxuG142301Y93` labels. It currently has 2610 rows
-across 13 shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
+`nstxuG121123Q62` / `nstxuG142301Y93` labels, plus the reviewed
+`nstxuG121123B12` labels. It currently has 2745 rows across 14 shots. Older
+four-shot TAE-only and mixed TAE/EAE lists are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
 
@@ -177,8 +178,7 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
-Current 13-shot TAE-like raw-CNN retraining checks on
-`training_labels/tae_like_train.csv`:
+Most recent pre-B12 13-shot TAE-like raw-CNN retraining checks:
 
 - `cnn_raw.py`, `M_target=100`, batch size 32: accuracy=`0.971`,
   CM=`[[394, 6], [9, 112]]`, GOOD precision/recall/F1=`0.949 / 0.926 / 0.937`
@@ -291,7 +291,7 @@ python "$NOVA_REPO/scripts/rf_train_classify.py" \
   --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
-Current 13-shot RF OOF check after merging `tae_like_2new.csv`:
+Most recent RF OOF check, run on the 13-shot list before merging B12:
 
 - CM=`[[1967, 37], [91, 515]]`
 - accuracy=`0.951`
@@ -299,7 +299,8 @@ Current 13-shot RF OOF check after merging `tae_like_2new.csv`:
 - output: `outputs/rf_oof_13shots/`
 
 The active expanded-set RF checkpoint is
-`models/nova_mode_classifier.joblib`. Previous four-shot RF checkpoints are
+`models/nova_mode_classifier.joblib`; it also predates the B12 merge and must
+be retrained to include the new shot. Previous four-shot RF checkpoints are
 archived under `models/old_4shots_models/`.
 
 The component six-shot list is `training_labels/additions/tae_like_6new.csv`, with
@@ -961,7 +962,7 @@ default. Model checkpoints and training logs are written under
 `$NOVA_RUN/<output-name>`, or `$SCRATCH/nova_s/<output-name>` when `$NOVA_RUN`
 is not set. For parameter comparisons, use separate output/work roots.
 
-Current 13-shot raw-CNN `M_target` / batch-size comparison:
+Pre-B12 13-shot raw-CNN `M_target` / batch-size comparison:
 
 ```bash
 # From inside an interactive GPU allocation.
