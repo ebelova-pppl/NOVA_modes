@@ -2122,3 +2122,27 @@ full schema, no duplicate or absolute paths, all 2745 files resolvable under
 `/p/hym/ebelova/NOVA/data_mixed`, empty error fields, and consistent family
 labels (`tae` for GOOD and `none` for BAD). The saved RF and CNN checkpoints
 have not yet been retrained on this 14-shot list.
+
+
+
+### 2026-08-05: repository skill for blind TAE-like labeling
+
+Created the repo-scoped Codex skill
+`.agents/skills/label-tae-like-modes/` for independent physics-based review of
+TAE-like modes. Its non-negotiable blind-review policy forbids RF, CNN,
+ensemble, probability, and all other classifier output, and also forbids any
+previous human or automated labels for the target shot until the independent
+decisions are sealed. Accidental exposure is recorded as `prior_seen` and
+excluded from clean agreement statistics.
+
+The skill includes a detailed continuum/morphology policy and deterministic
+utilities to reject contaminated manifests, create blind decision templates,
+render raw signed-mode and absolute-continuum diagnostics, validate and seal a
+complete review with SHA-256, and compare with a human list only after sealing.
+Synthetic tests verified contamination rejection, exact-coverage sealing,
+hash verification, clean-agreement exclusion, and disagreement reporting. A
+one-mode B12 smoke test verified the model-free diagnostic renderer using the
+repository NOVA loader and continuum calculations. A fresh-context agent then
+used the skill for a blind two-mode B12 review, independently classified both
+modes BAD with high confidence, and reported no exposure to target-shot labels
+or model output. No labels or model checkpoints were changed by this work.

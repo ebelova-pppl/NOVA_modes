@@ -23,16 +23,18 @@ Columns:
 - `error`
 
 Current checked contents:
-- 2610 labeled modes
-- labels: 603 `good`, 2007 `bad`
+- 2745 labeled modes
+- labels: 622 `good`, 2123 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
   `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
-  `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`
+  `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`,
+  `nstxuG121123B12`
 
 This is the list to use when retraining the expanded RF and CNN models.
 The active RF and raw-CNN checkpoints predate the current G-shot label
-corrections; retraining on the current 2610-row / 13-shot list is pending.
+corrections and B12 merge; retraining on the current 2745-row / 14-shot list
+is pending.
 
 ## Addition / component lists
 
@@ -54,6 +56,18 @@ Reviewed six-shot NSTX-U TAE-like list that was appended to
 
 Backup copy of the previous 2125-row / 10-shot active training list before the
 2026-07-06 merges. It contains 678 `good` and 1447 `bad` rows.
+
+### `additions/tae_like_nstxuG121123B12.csv`
+
+Reviewed B12 TAE-like component merged into `tae_like_train.csv` on
+2026-08-05. It uses relative `$NOVA_DATA` paths and the full active schema.
+
+The complete per-shot review covers all 136 modes in the current B12
+`tae_like.csv`: 19 `good`, 116 `bad`, and one `skip`
+(`N7/egn07w.1888E+02`). Because `skip` modes are excluded from model training,
+the component and canonical training lists contain 135 B12 rows: 19 `good`
+and 116 `bad`. Validation found no duplicate paths or family/validity
+mismatches, and every component path resolves under `$NOVA_DATA`.
 
 The bare filename `tae_like.csv` is intentionally not used for the canonical
 training list anymore, because `split_tae_eae.py` and `sort_shot_mixed.py`
