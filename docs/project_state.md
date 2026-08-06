@@ -2201,3 +2201,61 @@ coverage, no duplicate or absolute paths, all files resolvable under
 labels (`tae` for GOOD and `none` for BAD). All 2745 pre-existing rows remain
 byte-for-byte unchanged. The saved RF and CNN checkpoints have not yet been
 retrained on this 15-shot list.
+
+### 2026-08-06: 15-shot LOSO after B12/W29 merge
+
+User ran the 15-shot LOSO check after adding the targeted B12 and W29 G-shot
+labels. Results are under `outputs/loso_15_B12_W29_M100_bs8/`, with work files
+under `$SCRATCH/nova_sc` / `$SCRATCH/nova_s` depending on the run environment.
+The run is directly comparable to the previous `outputs/loso_13_M100` check:
+both used seed 42, raw-CNN `M_target=100`, `R_target=201`, 80 epochs, batch
+size 8, learning rate 0.02, robust normalization, no positive-class weighting,
+and full-CNN refits before sorting.
+
+Aggregate 15-shot held-out metrics:
+
+- CNN: CM `[[2162, 112], [94, 535]]`, accuracy `0.9290`, GOOD
+  precision/recall/F1 `0.8269 / 0.8506 / 0.8386`.
+- Combined policy: CM `[[2228, 46], [117, 512]]`, accuracy `0.9439`, GOOD
+  precision/recall/F1 `0.9176 / 0.8140 / 0.8627`.
+- RF: CM `[[2233, 41], [142, 487]]`, accuracy `0.9370`, GOOD
+  precision/recall/F1 `0.9223 / 0.7742 / 0.8418`.
+
+The old 13-shot LOSO outputs predate the August G-label corrections, so the
+cleanest comparison re-scores the saved 13-shot predictions against the
+current active labels for the old 13 shots. On those same old 13 held-out
+shots, adding B12/W29 to the training folds changed the metrics as follows:
+
+- CNN: CM `[[1911, 96], [87, 516]]` -> `[[1902, 105], [81, 522]]`; GOOD F1
+  `0.8494 -> 0.8488`. Recall improved slightly (`0.8557 -> 0.8657`) but
+  precision fell (`0.8431 -> 0.8325`).
+- Combined policy: CM `[[1952, 55], [108, 495]]` -> `[[1965, 42], [108, 495]]`;
+  GOOD F1 `0.8586 -> 0.8684`. The improvement comes from 13 fewer false
+  positives with the same number of false negatives.
+- RF: CM `[[1961, 46], [130, 473]]` -> `[[1969, 38], [132, 471]]`; GOOD F1
+  `0.8431 -> 0.8471`. Precision improved while recall changed little.
+
+Subset interpretation:
+
+- Old six G shots only, current labels: CNN GOOD F1 improved
+  `0.507 -> 0.643`, with GOOD recall `0.614 -> 0.807`; combined policy
+  improved `0.509 -> 0.594`; RF improved `0.500 -> 0.526`. This is the
+  clearest evidence that the targeted B12/W29 extremum-localized TAE labels
+  improved transfer in the G-shot regime.
+- Seven non-G shots only: CNN GOOD F1 decreased `0.893 -> 0.876`;
+  combined policy stayed essentially unchanged, `0.894 -> 0.895`; RF also
+  stayed essentially unchanged, `0.877 -> 0.877`. Thus the targeted G-shot
+  labels did not materially improve non-G performance and did not harm the
+  production combined policy.
+- New B12/W29 held-out folds alone: CNN GOOD precision/recall/F1
+  `0.650 / 0.500 / 0.565`; combined policy `0.810 / 0.654 / 0.723`; RF
+  `0.842 / 0.615 / 0.711`. B12 is handled better than W29; W29 remains a
+  difficult sparse-GOOD shot.
+
+Conclusion: adding B12 and W29 had the intended selective effect. It made the
+G-shot regime noticeably better, especially for raw-CNN GOOD recall and for
+the combined policy's G-shot F1, while leaving non-G RF/combined performance
+essentially stable. The result supports retaining B12/W29 in the active
+training list and continuing targeted G-shot labeling, but the new shots are
+not sufficient to make G-shot sorting routine-production ready without
+review or a G-specific policy/calibration pass.
