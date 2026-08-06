@@ -9,6 +9,12 @@ DATCON_INVALID_SENTINEL_MIN = 999.0
 DATCON_TAIL_SPIKE_FACTOR = 3.0
 DATCON_TAIL_SPIKE_ABS_MIN = 50.0
 DATCON_TAIL_LOOKBACK = 4
+DATCON_JOINT_TAIL_LOOKBACK = 4
+DATCON_JOINT_TAIL_MAX_POINTS = 16
+DATCON_JOINT_TAIL_JUMP_FACTOR = 2.0
+DATCON_JOINT_TAIL_SLOPE_FACTOR = 5.0
+DATCON_JOINT_TAIL_FREQ_ABS_MIN = np.sqrt(DATCON_TAIL_SPIKE_ABS_MIN)
+DATCON_JOINT_TAIL_STEP_ABS_MIN = 1.0
 CROSSING_FEATURE_DEFAULTS = {
     "n_cross": 0,
     "r_star_max": 0.0,
@@ -97,6 +103,108 @@ def _trim_trailing_datcon_spikes(values: np.ndarray) -> np.ndarray:
 
     return arr
 
+
+def _repair_joint_trailing_datcon_spikes(
+    low2_values: np.ndarray,
+    high2_values: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Replace paired bogus outer-tail blow-ups with a constant interior value.
+
+    Some datcon files use explicit ~1000 sentinels, but others leave one or
+    more finite-looking outer points where both lower and upper boundaries
+    jump upward together. Work in physical-frequency units for detection and
+    replace the suspicious finite tail by the average of the last few reliable
+    interior boundary values. Missing sentinel regions remain NaN.
+    """
+    low2 = np.asarray(low2_values, dtype=float).copy()
+    high2 = np.asarray(high2_values, dtype=float).copy()
+    if low2.shape != high2.shape or low2.ndim != 1:
+        return low2, high2
+
+    low = np.sqrt(np.where(low2 >= 0.0, low2, np.nan))
+    high = np.sqrt(np.where(high2 >= 0.0, high2, np.nan))
+    paired = np.isfinite(low) & np.isfinite(high) & (high >= low)
+    if np.count_nonzero(paired) < DATCON_JOINT_TAIL_LOOKBACK + 2:
+        return low2, high2
+
+    paired_idx = np.flatnonzero(paired)
+    blocks = []
+    start = int(paired_idx[0])
+    prev = start
+    for idx in paired_idx[1:]:
+        idx = int(idx)
+        if idx != prev + 1:
+            blocks.append(np.arange(start, prev + 1))
+            start = idx
+        prev = idx
+    blocks.append(np.arange(start, prev + 1))
+
+    block = blocks[-1]
+    if block.size < DATCON_JOINT_TAIL_LOOKBACK + 2:
+        return low2, high2
+
+    first_candidate_pos = max(
+        DATCON_JOINT_TAIL_LOOKBACK,
+        block.size - DATCON_JOINT_TAIL_MAX_POINTS,
+    )
+    bad_start = None
+
+    for pos in range(first_candidate_pos, block.size):
+        idx = int(block[pos])
+        prev_idx = block[pos - DATCON_JOINT_TAIL_LOOKBACK:pos]
+        prev_low = low[prev_idx]
+        prev_high = high[prev_idx]
+        if not (np.all(np.isfinite(prev_low)) and np.all(np.isfinite(prev_high))):
+            continue
+
+        prev_low_mean = float(np.mean(prev_low))
+        prev_high_mean = float(np.mean(prev_high))
+        if prev_low_mean <= 0.0 or prev_high_mean <= 0.0:
+            continue
+
+        low_step = float(low[idx] - low[int(block[pos - 1])])
+        high_step = float(high[idx] - high[int(block[pos - 1])])
+        prev_low_slope = float(np.median(np.abs(np.diff(prev_low))))
+        prev_high_slope = float(np.median(np.abs(np.diff(prev_high))))
+
+        low_jump = (
+            low[idx] > DATCON_JOINT_TAIL_JUMP_FACTOR * prev_low_mean
+            and low[idx] > DATCON_JOINT_TAIL_FREQ_ABS_MIN
+            and low_step > max(
+                DATCON_JOINT_TAIL_STEP_ABS_MIN,
+                DATCON_JOINT_TAIL_SLOPE_FACTOR * prev_low_slope,
+            )
+        )
+        high_jump = (
+            high[idx] > DATCON_JOINT_TAIL_JUMP_FACTOR * prev_high_mean
+            and high[idx] > DATCON_JOINT_TAIL_FREQ_ABS_MIN
+            and high_step > max(
+                DATCON_JOINT_TAIL_STEP_ABS_MIN,
+                DATCON_JOINT_TAIL_SLOPE_FACTOR * prev_high_slope,
+            )
+        )
+        if low_jump and high_jump:
+            bad_start = pos
+            break
+
+    if bad_start is None:
+        return low2, high2
+
+    reliable_idx = block[bad_start - DATCON_JOINT_TAIL_LOOKBACK:bad_start]
+    fill_low = float(np.mean(low[reliable_idx]))
+    fill_high = float(np.mean(high[reliable_idx]))
+    if not (np.isfinite(fill_low) and np.isfinite(fill_high)):
+        return low2, high2
+    if fill_high < fill_low:
+        fill_high = fill_low
+
+    repair_idx = block[bad_start:]
+    low2[repair_idx] = fill_low**2
+    high2[repair_idx] = fill_high**2
+    return low2, high2
+
+
 def load_datcon_for_mode(mode_path: str, n_r: int):
     """
     Loads datcon from the same N* directory as the mode file.
@@ -134,8 +242,11 @@ def load_datcon_for_mode(mode_path: str, n_r: int):
             f"expected ({expected}, 2+)"
         )
 
-    low2 = _trim_trailing_datcon_spikes(_mask_datcon_invalid(data[:, 0]))
-    high2 = _trim_trailing_datcon_spikes(_mask_datcon_invalid(data[:, 1]))
+    low2 = _mask_datcon_invalid(data[:, 0])
+    high2 = _mask_datcon_invalid(data[:, 1])
+    low2, high2 = _repair_joint_trailing_datcon_spikes(low2, high2)
+    low2 = _trim_trailing_datcon_spikes(low2)
+    high2 = _trim_trailing_datcon_spikes(high2)
 
     # Build full arrays on the mode's radial grid
     low2_full = np.full(n_r, np.nan, dtype=float)

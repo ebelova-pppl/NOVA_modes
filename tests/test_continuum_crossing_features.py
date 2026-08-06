@@ -21,6 +21,7 @@ from cont_features import (  # noqa: E402
     continuum_crossing_records,
     continuum_extremum_features,
     continuum_scalars,
+    load_datcon_for_mode,
 )
 from mode_features import (  # noqa: E402
     compute_features_for_mode,
@@ -31,6 +32,7 @@ from rf_train_classify import (  # noqa: E402
     attach_feature_metadata,
     validate_model_feature_schema,
 )
+from cnn_infer_common import build_continuum_channel_array  # noqa: E402
 
 
 class ContinuumCrossingFeatureTests(unittest.TestCase):
@@ -204,6 +206,99 @@ class ContinuumExtremumFeatureTests(unittest.TestCase):
 
 
 class ContinuumScalarTests(unittest.TestCase):
+    def test_datcon_loader_repairs_joint_outer_tail_spike(self):
+        lower = np.array([1.00, 1.04, 1.02, 1.06, 1.03, 14.0, 18.0, 22.0])
+        upper = np.array([2.00, 2.05, 2.02, 2.08, 2.04, 20.0, 25.0, 30.0])
+        with tempfile.TemporaryDirectory() as tmp:
+            n_dir = Path(tmp) / "N3"
+            n_dir.mkdir()
+            lines = ["1 8"]
+            lines.extend(f"{low**2} {high**2}" for low, high in zip(lower, upper))
+            (n_dir / "datcon3").write_text("\n".join(lines) + "\n")
+
+            low2, high2, *_ = load_datcon_for_mode(str(n_dir / "egn03w.test"), n_r=8)
+
+        expected_lower = np.mean(lower[1:5])
+        expected_upper = np.mean(upper[1:5])
+        np.testing.assert_allclose(np.sqrt(low2[:5]), lower[:5])
+        np.testing.assert_allclose(np.sqrt(high2[:5]), upper[:5])
+        np.testing.assert_allclose(np.sqrt(low2[5:]), expected_lower)
+        np.testing.assert_allclose(np.sqrt(high2[5:]), expected_upper)
+
+    def test_datcon_loader_leaves_normal_outer_tail_unchanged(self):
+        lower = np.array([1.00, 1.04, 1.08, 1.12, 1.18, 1.24, 1.31, 1.39])
+        upper = np.array([2.00, 2.05, 2.11, 2.18, 2.26, 2.35, 2.45, 2.56])
+        with tempfile.TemporaryDirectory() as tmp:
+            n_dir = Path(tmp) / "N3"
+            n_dir.mkdir()
+            lines = ["1 8"]
+            lines.extend(f"{low**2} {high**2}" for low, high in zip(lower, upper))
+            (n_dir / "datcon3").write_text("\n".join(lines) + "\n")
+
+            low2, high2, *_ = load_datcon_for_mode(str(n_dir / "egn03w.test"), n_r=8)
+
+        np.testing.assert_allclose(np.sqrt(low2), lower)
+        np.testing.assert_allclose(np.sqrt(high2), upper)
+
+    def test_cnn_continuum_channels_signs_and_broadcast(self):
+        lower = np.array([0.8, 0.8, 0.8])
+        upper = np.array([1.2, 1.2, 1.2])
+        with tempfile.TemporaryDirectory() as tmp:
+            n_dir = Path(tmp) / "N3"
+            n_dir.mkdir()
+            lines = ["1 3"]
+            lines.extend(f"{low**2} {high**2}" for low, high in zip(lower, upper))
+            (n_dir / "datcon3").write_text("\n".join(lines) + "\n")
+            path = str(n_dir / "egn03w.test")
+
+            inside = build_continuum_channel_array(
+                path, 1.0, n_r=3, M_target=2, R_target=3
+            )
+            above = build_continuum_channel_array(
+                path, 1.3, n_r=3, M_target=2, R_target=3
+            )
+            below = build_continuum_channel_array(
+                path, 0.7, n_r=3, M_target=2, R_target=3
+            )
+
+        self.assertEqual(inside.shape, (2, 2, 3))
+        np.testing.assert_allclose(inside[0], 0.2, rtol=1e-6)
+        np.testing.assert_allclose(inside[1], 0.2, rtol=1e-6)
+        self.assertTrue(np.all(above[0] < 0.0))
+        self.assertTrue(np.all(above[1] > 0.0))
+        self.assertTrue(np.all(below[0] > 0.0))
+        self.assertTrue(np.all(below[1] < 0.0))
+
+    def test_cnn_continuum_channels_clip_and_missing_fallback(self):
+        lower = np.array([0.1, 0.1, 0.1])
+        upper = np.array([10.0, 10.0, 10.0])
+        with tempfile.TemporaryDirectory() as tmp:
+            n_dir = Path(tmp) / "N3"
+            n_dir.mkdir()
+            lines = ["1 3"]
+            lines.extend(f"{low**2} {high**2}" for low, high in zip(lower, upper))
+            (n_dir / "datcon3").write_text("\n".join(lines) + "\n")
+
+            clipped = build_continuum_channel_array(
+                str(n_dir / "egn03w.test"),
+                1.0,
+                n_r=3,
+                M_target=2,
+                R_target=3,
+                clip=2.0,
+            )
+            missing = build_continuum_channel_array(
+                str(n_dir / "missing" / "egn03w.test"),
+                1.0,
+                n_r=3,
+                M_target=2,
+                R_target=3,
+            )
+
+        self.assertLessEqual(float(np.max(clipped)), 2.0)
+        self.assertGreaterEqual(float(np.min(clipped)), -2.0)
+        np.testing.assert_allclose(missing, 0.0)
+
     def test_energy_tie_selects_largest_radius_with_maximum_W(self):
         r = np.linspace(0.0, 1.0, 5)
         mode = np.sqrt(np.array([[0.0, 1.0, 4.0, 4.0, 0.0]]))

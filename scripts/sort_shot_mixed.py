@@ -144,7 +144,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--cnn_model", required=True, help="CNN checkpoint .pt path")
     ap.add_argument(
         "--cnn_model_kind",
-        choices=["auto", "cnn_raw", "cnn_straightened", "cnn_hybrid"],
+        choices=["auto", "cnn_raw", "cnn_raw_continuum", "cnn_straightened", "cnn_hybrid"],
         default="auto",
         help="CNN checkpoint kind. Use auto for checkpoints with model_type metadata.",
     )

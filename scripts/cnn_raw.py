@@ -15,9 +15,13 @@ import torch.nn as nn
 from sklearn.metrics import classification_report, confusion_matrix
 from torch.utils.data import DataLoader, Dataset
 
-from cnn_infer_common import CHECKPOINT_VERSION, build_raw_preprocess_metadata
+from cnn_infer_common import (
+    CHECKPOINT_VERSION,
+    CONTINUUM_CHANNEL_CLIP_DEFAULT,
+    build_raw_image_array,
+    build_raw_preprocess_metadata,
+)
 from mode_csv import read_mode_csv_entries
-from mode_transform import resample_r
 from nova_mode_loader import load_mode_from_nova
 from torch_runtime import print_torch_device_report, select_torch_device
 
@@ -80,16 +84,6 @@ def seed_everything(seed: int) -> None:
     torch.backends.cudnn.benchmark = False
 
 
-def pad_or_crop(mode: np.ndarray, Mt: int = 100, Rt: int = 201) -> np.ndarray:
-    mode = np.asarray(mode, dtype=np.float32)
-    n_m, n_r = mode.shape
-    out = np.zeros((Mt, Rt), dtype=np.float32)
-    mmin = min(n_m, Mt)
-    rmin = min(n_r, Rt)
-    out[:mmin, :rmin] = mode[:mmin, :rmin]
-    return out
-
-
 class NovaModeDataset(Dataset):
     def __init__(
         self,
@@ -97,12 +91,16 @@ class NovaModeDataset(Dataset):
         normalize: str = "robust",
         M_target: int = 100,
         R_target: int = 201,
+        continuum_channels: bool = False,
+        continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
         cache_data: bool = False,
     ):
         self.items = items
         self.normalize = normalize
         self.M_target = M_target
         self.R_target = R_target
+        self.continuum_channels = continuum_channels
+        self.continuum_clip = continuum_clip
         self.cached_samples = None
         if cache_data:
             t0 = time.perf_counter()
@@ -113,24 +111,6 @@ class NovaModeDataset(Dataset):
                 flush=True,
             )
 
-    def _normalize(self, x):
-        if self.normalize == "none":
-            return x
-        if self.normalize == "robust":
-            med = float(np.median(x))
-            mad = float(np.median(np.abs(x - med)))
-            if mad < 1e-3:
-                return x - med
-            return (x - med) / (mad + 1e-8)
-        if self.normalize == "maxabs":
-            s = float(np.max(np.abs(x))) + 1e-8
-            return x / s
-        if self.normalize == "standard":
-            mu = float(np.mean(x))
-            sig = float(np.std(x)) + 1e-8
-            return (x - mu) / sig
-        raise ValueError("normalize must be none|standard|robust|maxabs")
-
     def __len__(self):
         return len(self.items)
 
@@ -138,10 +118,16 @@ class NovaModeDataset(Dataset):
         it = self.items[idx]
         mode, omega, gamma_d, ntor = load_mode_from_nova(it["path"])
 
-        mode = resample_r(mode, R_target=self.R_target)
-        mode = pad_or_crop(mode, Mt=self.M_target, Rt=self.R_target)
-        x = mode[None, :, :]
-        x = self._normalize(x)
+        x = build_raw_image_array(
+            it["path"],
+            mode,
+            omega,
+            normalize=self.normalize,
+            M_target=self.M_target,
+            R_target=self.R_target,
+            continuum_channels=self.continuum_channels,
+            continuum_clip=self.continuum_clip,
+        )
 
         y = torch.tensor(it["label"], dtype=torch.long)
         return torch.from_numpy(x), y, it["path"]
@@ -254,6 +240,8 @@ class Config:
     model_out: str = "nova_cnn.pt"
     M_target: int = 100
     R_target: int = 201
+    continuum_channels: bool = False
+    continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT
     device: str | None = None
     cache_data: bool = False
     refit_full_before_save: bool = False
@@ -434,6 +422,24 @@ def parse_args() -> Config:
     ap.add_argument("--M_target", type=int, default=100, help="Poloidal harmonics kept after m-axis pad/crop")
     ap.add_argument("--R_target", type=int, default=201, help="Radial grid size after interpolation")
     ap.add_argument(
+        "--continuum_channels",
+        action="store_true",
+        help=(
+            "Experimental: append two broadcast continuum channels to the raw "
+            "mode image: du=(sqrt(high2)-omega)/omega and "
+            "dl=(omega-sqrt(low2))/omega."
+        ),
+    )
+    ap.add_argument(
+        "--continuum_clip",
+        type=float,
+        default=CONTINUUM_CHANNEL_CLIP_DEFAULT,
+        help=(
+            "Clip value for experimental continuum channels, applied as "
+            "[-value, value] after radial interpolation (default: 5.0)."
+        ),
+    )
+    ap.add_argument(
         "--device",
         default=os.environ.get("NOVA_TORCH_DEVICE"),
         help="Torch device, e.g. cpu, cuda, cuda:0 (default: $NOVA_TORCH_DEVICE or auto)",
@@ -545,6 +551,8 @@ def main():
 
     if cfg.lr <= 0.0:
         raise ValueError("--lr must be positive")
+    if cfg.continuum_clip <= 0.0 or not np.isfinite(cfg.continuum_clip):
+        raise ValueError("--continuum_clip must be positive and finite")
     if cfg.onecycle_div_factor <= 0.0:
         raise ValueError("--onecycle_div_factor must be positive")
     if cfg.onecycle_final_div_factor <= 0.0:
@@ -560,7 +568,22 @@ def main():
     print(f"Training CSV: {cfg.train_csv}")
     print(f"Data dir: {cfg.data_dir or '$NOVA_DATA'}")
     print(f"Total modes: {len(items)} | Train: {len(train_items)} | Test: {len(test_items)}")
-    print(f"Raw preprocessing: R_target={cfg.R_target}, M_target={cfg.M_target}")
+    if cfg.continuum_channels:
+        input_channels = 3
+        model_type = "cnn_raw_continuum"
+    else:
+        input_channels = 1
+        model_type = "cnn_raw"
+    print(
+        f"Raw preprocessing: R_target={cfg.R_target}, M_target={cfg.M_target}, "
+        f"input_channels={input_channels}, continuum_channels={cfg.continuum_channels}"
+    )
+    if cfg.continuum_channels:
+        print(
+            "Continuum channels: du=(sqrt(high2)-omega)/omega, "
+            "dl=(omega-sqrt(low2))/omega, "
+            f"clip=+/-{cfg.continuum_clip:g}"
+        )
     print(f"Training recipe: {describe_training_recipe(cfg)}")
     if train_pos_weight is None:
         print("Loss pos_weight: none")
@@ -572,6 +595,8 @@ def main():
         normalize=cfg.normalize,
         M_target=cfg.M_target,
         R_target=cfg.R_target,
+        continuum_channels=cfg.continuum_channels,
+        continuum_clip=cfg.continuum_clip,
         cache_data=cfg.cache_data,
     )
     test_ds = NovaModeDataset(
@@ -579,6 +604,8 @@ def main():
         normalize=cfg.normalize,
         M_target=cfg.M_target,
         R_target=cfg.R_target,
+        continuum_channels=cfg.continuum_channels,
+        continuum_clip=cfg.continuum_clip,
         cache_data=cfg.cache_data,
     )
 
@@ -588,7 +615,7 @@ def main():
     device = select_torch_device(cfg.device)
     print_torch_device_report(device)
 
-    model = SmallCNN(in_ch=1).to(device)
+    model = SmallCNN(in_ch=input_channels).to(device)
     opt, sched = build_onecycle_training(model, train_loader, cfg)
 
     best_acc = -1.0
@@ -662,6 +689,8 @@ def main():
     preprocess_meta = build_raw_preprocess_metadata(
         R_target=cfg.R_target,
         M_target=cfg.M_target,
+        continuum_channels=cfg.continuum_channels,
+        continuum_clip=cfg.continuum_clip,
     )
 
     model_to_save = model
@@ -688,6 +717,8 @@ def main():
             normalize=cfg.normalize,
             M_target=cfg.M_target,
             R_target=cfg.R_target,
+            continuum_channels=cfg.continuum_channels,
+            continuum_clip=cfg.continuum_clip,
             cache_data=cfg.cache_data,
         )
         seed_everything(cfg.seed)
@@ -698,7 +729,7 @@ def main():
             shuffle=False,
             num_workers=0,
         )
-        final_model = SmallCNN(in_ch=1).to(device)
+        final_model = SmallCNN(in_ch=input_channels).to(device)
         final_opt, final_sched = build_onecycle_training(final_model, full_loader, cfg)
 
         for ep in range(1, cfg.epochs + 1):
@@ -784,7 +815,10 @@ def main():
                     "collapse_reasons": list(final_prediction_health.collapse_reasons),
                 }
             ),
-            "model_type": "cnn_raw",
+            "model_type": model_type,
+            "input_channels": input_channels,
+            "continuum_channels": cfg.continuum_channels,
+            "continuum_clip": cfg.continuum_clip,
             "checkpoint_version": CHECKPOINT_VERSION,
             "preprocess": preprocess_meta,
             **preprocess_meta,

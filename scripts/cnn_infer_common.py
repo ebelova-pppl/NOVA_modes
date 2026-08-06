@@ -29,7 +29,13 @@ RAW_PREPROCESS_DEFAULTS = {
 }
 
 CHECKPOINT_VERSION = 2
-SUPPORTED_MODEL_KINDS = {"cnn_raw", "cnn_straightened", "cnn_hybrid"}
+CONTINUUM_CHANNEL_CLIP_DEFAULT = 5.0
+SUPPORTED_MODEL_KINDS = {
+    "cnn_raw",
+    "cnn_raw_continuum",
+    "cnn_straightened",
+    "cnn_hybrid",
+}
 _WARNED_LEGACY_CHECKPOINTS: set[str] = set()
 
 
@@ -128,10 +134,14 @@ def build_raw_preprocess_metadata(
     *,
     R_target: int,
     M_target: int,
+    continuum_channels: bool = False,
+    continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
 ) -> dict[str, Any]:
     return {
         "R_target": int(R_target),
         "M_target": int(M_target),
+        "continuum_channels": bool(continuum_channels),
+        "continuum_clip": float(continuum_clip),
     }
 
 
@@ -200,6 +210,17 @@ def resolve_raw_preprocess_metadata(
 
     resolved["R_target"] = int(resolved["R_target"])
     resolved["M_target"] = int(resolved["M_target"])
+    continuum_channels = preprocess_block.get("continuum_channels")
+    if continuum_channels is None:
+        continuum_channels = checkpoint.get("continuum_channels", False)
+    continuum_clip = preprocess_block.get("continuum_clip")
+    if continuum_clip is None:
+        continuum_clip = checkpoint.get(
+            "continuum_clip",
+            CONTINUUM_CHANNEL_CLIP_DEFAULT,
+        )
+    resolved["continuum_channels"] = bool(continuum_channels)
+    resolved["continuum_clip"] = float(continuum_clip)
 
     if missing:
         warning_key = f"{checkpoint_path or '<checkpoint>'}:raw:{','.join(missing)}"
@@ -226,6 +247,107 @@ def pad_or_crop_raw(mode: np.ndarray, M_target: int = 54, R_target: int = 201) -
     rmin = min(n_r, R_target)
     out[:mmin, :rmin] = mode[:mmin, :rmin]
     return out
+
+
+def _interp_finite_1d(values: np.ndarray, R_target: int) -> np.ndarray:
+    arr = np.asarray(values, dtype=np.float32)
+    out = np.zeros(R_target, dtype=np.float32)
+    valid = np.isfinite(arr)
+    if not np.any(valid):
+        return out
+    if np.count_nonzero(valid) == 1:
+        out.fill(float(arr[valid][0]))
+        return out
+
+    r_src = np.linspace(0.0, 1.0, arr.size, dtype=np.float32)
+    r_tgt = np.linspace(0.0, 1.0, R_target, dtype=np.float32)
+    return np.interp(r_tgt, r_src[valid], arr[valid]).astype(np.float32)
+
+
+def build_continuum_channel_array(
+    mode_path: str,
+    omega: float,
+    *,
+    n_r: int,
+    M_target: int,
+    R_target: int,
+    clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
+) -> np.ndarray:
+    """
+    Build broadcasted ``du`` and ``dl`` continuum channels for raw-CNN input.
+
+    ``du = (sqrt(high2) - omega) / omega`` and
+    ``dl = (omega - sqrt(low2)) / omega``. Positive values for both channels
+    mean the mode frequency lies inside the local gap. Missing continuum data
+    falls back to zero-valued channels for this first two-channel experiment.
+    """
+    omega_value = float(omega)
+    if not np.isfinite(omega_value) or omega_value == 0.0:
+        raise ValueError(f"omega must be finite and nonzero, got {omega}")
+    if not np.isfinite(clip) or float(clip) <= 0.0:
+        raise ValueError(f"continuum clip must be positive and finite, got {clip}")
+
+    try:
+        low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)
+    except Exception:
+        return np.zeros((2, M_target, R_target), dtype=np.float32)
+
+    valid = (
+        np.isfinite(low2)
+        & np.isfinite(high2)
+        & (low2 >= 0.0)
+        & (high2 >= 0.0)
+        & (high2 >= low2)
+    )
+    if not np.any(valid):
+        return np.zeros((2, M_target, R_target), dtype=np.float32)
+
+    low = np.full(n_r, np.nan, dtype=np.float32)
+    high = np.full(n_r, np.nan, dtype=np.float32)
+    low[valid] = np.sqrt(low2[valid]).astype(np.float32)
+    high[valid] = np.sqrt(high2[valid]).astype(np.float32)
+    du = (high - omega_value) / omega_value
+    dl = (omega_value - low) / omega_value
+
+    du_rs = np.clip(_interp_finite_1d(du, R_target), -clip, clip)
+    dl_rs = np.clip(_interp_finite_1d(dl, R_target), -clip, clip)
+    channels = np.stack([du_rs, dl_rs]).astype(np.float32)
+    return np.broadcast_to(channels[:, None, :], (2, M_target, R_target)).copy()
+
+
+def build_raw_image_array(
+    mode_path: str,
+    mode: np.ndarray,
+    omega: float,
+    *,
+    normalize: str,
+    M_target: int,
+    R_target: int,
+    continuum_channels: bool = False,
+    continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
+) -> np.ndarray:
+    mode_rs = resample_r(mode, R_target=R_target)
+    x_img = pad_or_crop_raw(
+        mode_rs,
+        M_target=M_target,
+        R_target=R_target,
+    )
+    x_img = x_img[None, :, :]
+    x_img = normalize_mode_array(x_img, normalize)
+    x_img = np.asarray(x_img, dtype=np.float32)
+
+    if not continuum_channels:
+        return x_img
+
+    cont_channels = build_continuum_channel_array(
+        mode_path,
+        omega,
+        n_r=mode.shape[1],
+        M_target=M_target,
+        R_target=R_target,
+        clip=continuum_clip,
+    )
+    return np.concatenate([x_img, cont_channels], axis=0).astype(np.float32)
 
 
 class SmallCNN(nn.Module):
@@ -346,7 +468,7 @@ def infer_checkpoint_kind(
         if model_kind not in SUPPORTED_MODEL_KINDS:
             raise UnsupportedCheckpointError(
                 f"Unsupported model kind '{model_kind}'. "
-                f"Expected one of: auto, cnn_raw, cnn_straightened, cnn_hybrid."
+                f"Expected one of: auto, {', '.join(sorted(SUPPORTED_MODEL_KINDS))}."
             )
         return model_kind
 
@@ -364,6 +486,8 @@ def infer_checkpoint_kind(
     model_type = checkpoint.get("model_type")
     if model_type in {"cnn_hybrid", "hybrid", "hybrid_cnn"}:
         return "cnn_hybrid"
+    if model_type in {"cnn_raw_continuum", "raw_continuum"}:
+        return "cnn_raw_continuum"
     if model_type in {"cnn_straightened", "straightened"}:
         return "cnn_straightened"
     if model_type in {"cnn_raw", "raw"}:
@@ -372,6 +496,8 @@ def infer_checkpoint_kind(
     if "preprocess" in checkpoint:
         preprocess = checkpoint.get("preprocess")
         if isinstance(preprocess, Mapping) and "M_target" in preprocess:
+            if bool(preprocess.get("continuum_channels", False)):
+                return "cnn_raw_continuum"
             return "cnn_raw"
         return "cnn_straightened"
     if "M_target" in checkpoint:
@@ -383,6 +509,8 @@ def infer_checkpoint_kind(
         name = Path(checkpoint_path).name.lower()
         if "hybrid" in name:
             return "cnn_hybrid"
+        if "continuum" in name and "raw" in name:
+            return "cnn_raw_continuum"
         if "straight" in name:
             return "cnn_straightened"
         if "raw" in name:
@@ -423,15 +551,30 @@ class LoadedCNNClassifier:
     scalars_mu: np.ndarray | None = None
     scalars_sig: np.ndarray | None = None
 
-    def _prepare_image_tensor(self, mode: np.ndarray) -> torch.Tensor:
-        mode_rs = resample_r(mode, R_target=self.preprocess["R_target"])
-        if self.checkpoint_kind == "cnn_raw":
-            x_img = pad_or_crop_raw(
-                mode_rs,
+    def _prepare_image_tensor(
+        self,
+        mode_path: str,
+        mode: np.ndarray,
+        omega: float,
+    ) -> torch.Tensor:
+        if self.checkpoint_kind in {"cnn_raw", "cnn_raw_continuum"}:
+            x_img = build_raw_image_array(
+                mode_path,
+                mode,
+                omega,
+                normalize=self.normalize,
                 M_target=self.preprocess["M_target"],
                 R_target=self.preprocess["R_target"],
+                continuum_channels=bool(self.preprocess.get("continuum_channels", False)),
+                continuum_clip=float(
+                    self.preprocess.get(
+                        "continuum_clip",
+                        CONTINUUM_CHANNEL_CLIP_DEFAULT,
+                    )
+                ),
             )
         else:
+            mode_rs = resample_r(mode, R_target=self.preprocess["R_target"])
             x_img, _mc, _mc_int = straighten_mode_window(
                 mode_rs,
                 M=self.preprocess["M"],
@@ -439,8 +582,8 @@ class LoadedCNNClassifier:
                 median_k=self.preprocess["median_k"],
                 max_step=self.preprocess["max_step"],
             )
-        x_img = x_img[None, :, :]
-        x_img = normalize_mode_array(x_img, self.normalize)
+            x_img = x_img[None, :, :]
+            x_img = normalize_mode_array(x_img, self.normalize)
         return torch.from_numpy(np.asarray(x_img, dtype=np.float32)).unsqueeze(0).to(self.device)
 
     def predict(
@@ -452,7 +595,7 @@ class LoadedCNNClassifier:
     ) -> dict[str, Any]:
         resolved_mode_path = str(Path(mode_path).expanduser())
         mode, omega, gamma_d, ntor = load_mode_from_nova(resolved_mode_path)
-        x_img = self._prepare_image_tensor(mode)
+        x_img = self._prepare_image_tensor(resolved_mode_path, mode, omega)
 
         with torch.no_grad():
             if self.checkpoint_kind == "cnn_hybrid":
@@ -505,7 +648,7 @@ def load_cnn_classifier(
         model_kind=model_kind,
         checkpoint_path=resolved_checkpoint_path,
     )
-    if checkpoint_kind == "cnn_raw":
+    if checkpoint_kind in {"cnn_raw", "cnn_raw_continuum"}:
         preprocess = resolve_raw_preprocess_metadata(
             checkpoint,
             checkpoint_path=resolved_checkpoint_path,
@@ -526,7 +669,8 @@ def load_cnn_classifier(
         scalars_mu = None if scalars_mu_raw is None else np.asarray(scalars_mu_raw, dtype=np.float32)
         scalars_sig = None if scalars_sig_raw is None else np.asarray(scalars_sig_raw, dtype=np.float32)
     else:
-        model = SmallCNN(in_ch=1)
+        in_ch = 3 if checkpoint_kind == "cnn_raw_continuum" else 1
+        model = SmallCNN(in_ch=in_ch)
         scalars_mu = None
         scalars_sig = None
 

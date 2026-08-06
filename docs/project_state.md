@@ -2259,3 +2259,80 @@ essentially stable. The result supports retaining B12/W29 in the active
 training list and continuing targeted G-shot labeling, but the new shots are
 not sufficient to make G-shot sorting routine-production ready without
 review or a G-specific policy/calibration pass.
+
+### 2026-08-06: shared datcon outer-tail repair
+
+Added a conservative shared cleanup in `src/cont_features.py` for bogus
+outer-boundary datcon tails before developing continuum-aware CNN inputs.
+Existing handling already masks explicit NOVA sentinel values above `999`.
+The new paired repair works after sentinel masking, in physical-frequency
+space: if both `sqrt(low2)` and `sqrt(high2)` jump upward together in the
+outer finite tail with a large local slope, the suspicious finite tail is
+replaced by a constant extension equal to the average of the previous few
+reliable interior points. Explicit sentinel / missing regions remain `NaN`,
+and the older one-boundary trailing-spike trim still runs afterward.
+
+This is intentionally conservative and shared through `load_datcon_for_mode`,
+so RF features, TAE/EAE splitting, sorting, plotting, and the planned
+continuum-CNN channel construction all see the same repaired continuum arrays.
+Because the loader behavior changed, any RF/CNN model comparisons after this
+point should be treated as using a new continuum-cleaning version and should
+be retrained/revalidated before replacing production checkpoints.
+
+Focused tests were added for repairing a joint outer-tail blow-up and leaving
+a normal smooth outer tail unchanged. `python -m unittest
+tests/test_continuum_crossing_features.py` passed: 26 tests OK after the
+continuum-channel tests below were added. The test
+process printed unrelated MUNGE authentication warnings, but exited
+successfully.
+
+A read-only scan of the active 15-shot training list found 146 unique datcon
+files, all present under `/global/cfs/cdirs/m314/nova2/data`. The new paired
+repair changed 13 of them relative to the previous sentinel-plus-one-sided
+trim behavior. Most repairs affected one outer radial point; two S31 files
+affected two outer points.
+
+### 2026-08-06: experimental raw CNN with continuum channels
+
+Added an experimental continuum-aware variant of the raw CNN without changing
+the default production raw-CNN path. Passing `--continuum_channels` to
+`scripts/cnn_raw.py` changes the input from one channel to three channels:
+
+- channel 0: normalized raw signed mode image, as before;
+- channel 1: `du(r) = (sqrt(high2) - omega) / omega`, broadcast over the
+  harmonic axis;
+- channel 2: `dl(r) = (omega - sqrt(low2)) / omega`, broadcast over the
+  harmonic axis.
+
+Inside the local TAE gap both continuum channels are positive; upper/lower
+continuum crossings occur where `du=0` / `dl=0`. The mode channel is normalized
+with the existing per-image normalization, but the continuum channels are only
+radially interpolated, clipped to `--continuum_clip` (default `5.0`), and kept
+in physical relative-frequency units. Missing or unusable datcon input falls
+back to zero-valued continuum channels for this first two-channel experiment;
+a separate validity mask channel remains a possible follow-up if needed.
+
+The shared implementation lives in `scripts/cnn_infer_common.py` so training
+and inference use the same preprocessing. Continuum-aware checkpoints save
+`model_type=cnn_raw_continuum`, `input_channels=3`, `continuum_channels=True`,
+and the continuum clip value. `cnn_classify.py` auto-detects the new checkpoint
+kind, `sort_shot_mixed.py` accepts `--cnn_model_kind cnn_raw_continuum`, and
+`scripts/run_loso_10.py` accepts `--cnn_continuum_channels` plus
+`--cnn_continuum_clip` for LOSO experiments.
+
+Validation so far:
+
+- `python -m unittest tests/test_continuum_crossing_features.py` passed:
+  26 tests OK. New tests cover continuum-channel sign convention, broadcast
+  shape, clipping, missing-datcon fallback, and the shared datcon tail repair.
+- `python -m py_compile scripts/cnn_raw.py scripts/cnn_infer_common.py
+  scripts/cnn_classify.py scripts/sort_shot_mixed.py scripts/run_loso_10.py`
+  passed.
+- A one-epoch CPU smoke train with `--continuum_channels` on the
+  `nstx_120113` LOSO test fold saved `/tmp/nova_cnn_raw_continuum_smoke.pt`
+  with `model_type=cnn_raw_continuum`; `scripts/cnn_classify.py` successfully
+  loaded it in auto mode and produced a prediction.
+
+No production checkpoint has been replaced. The next meaningful check is a
+15-shot LOSO run comparing this continuum-channel raw CNN against the current
+raw-CNN baseline, with all-shot, non-G, old-G, B12/W29, and all-G summaries.
