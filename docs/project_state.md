@@ -2336,3 +2336,53 @@ Validation so far:
 No production checkpoint has been replaced. The next meaningful check is a
 15-shot LOSO run comparing this continuum-channel raw CNN against the current
 raw-CNN baseline, with all-shot, non-G, old-G, B12/W29, and all-G summaries.
+
+### 2026-08-06: 15-shot continuum-channel raw-CNN LOSO result
+
+User ran the experimental continuum-channel LOSO under
+`outputs/loso_15_raw_continuum_M100_bs8/`. The configuration matches the
+previous no-continuum 15-shot run in `outputs/loso_15_B12_W29_M100_bs8` except
+for `cnn_continuum_channels=True` and `cnn_continuum_clip=5.0`: seed 42,
+`M_target=100`, `R_target=201`, 80 epochs, batch size 8, LR 0.02, robust
+normalization, no positive-class weighting, cached data, and full-CNN refits.
+
+Aggregate continuum-channel metrics:
+
+- CNN: CM `[[2188, 86], [105, 524]]`, accuracy `0.9342`, GOOD
+  precision/recall/F1 `0.8590 / 0.8331 / 0.8458`.
+- Combined policy: CM `[[2226, 48], [121, 508]]`, accuracy `0.9418`, GOOD
+  precision/recall/F1 `0.9137 / 0.8076 / 0.8574`.
+- RF: CM `[[2231, 43], [135, 494]]`, accuracy `0.9387`, GOOD
+  precision/recall/F1 `0.9199 / 0.7854 / 0.8473`. RF changed slightly
+  relative to the previous run because the shared datcon outer-tail repair now
+  affects RF feature construction; RF numbers are not a pure continuum-CNN
+  comparison.
+
+Compared with the no-continuum raw CNN:
+
+- All 15 shots: CNN F1 improved slightly `0.8386 -> 0.8458`, driven by fewer
+  false positives (`112 -> 86`) despite more false negatives (`94 -> 105`).
+- Seven non-G shots: CNN F1 improved `0.8758 -> 0.8903`; false positives fell
+  `65 -> 46`, while false negatives were essentially unchanged (`70 -> 71`).
+- Old six G shots: CNN worsened substantially, F1 `0.6434 -> 0.5333`; false
+  negatives increased `11 -> 25` and GOOD recall fell `0.807 -> 0.561`.
+- New targeted B12/W29 folds: CNN improved, F1 `0.5652 -> 0.6538`; false
+  negatives fell `13 -> 9`, with B12 improving strongly and W29 changing only
+  modestly.
+- All eight G shots together: CNN worsened, F1 `0.6243 -> 0.5698`; the B12/W29
+  gain did not compensate for the old-G regression.
+
+The combined RF/CNN policy did not benefit from the continuum-channel CNN:
+all-shot F1 changed `0.8627 -> 0.8574`, non-G remained essentially unchanged
+(`0.8951 -> 0.8940`), old-G worsened `0.5941 -> 0.5400`, and B12/W29 was
+unchanged at `0.7234`.
+
+Interpretation: the two continuum-distance image channels make the CNN more
+conservative and improve non-G precision, but they do not provide a robust
+G-shot rescue. They help the newly targeted B12/W29 extrema-localized examples
+but hurt transfer to several older G shots, especially Q62, K51, and H47.
+Do not promote this continuum-channel raw CNN or retune the production fusion
+policy from this result alone. Useful follow-ups are to inspect old-G modes
+whose CNN score dropped sharply, try a validity-mask channel or different
+continuum scaling/clipping, and compare against a small 1D continuum branch
+instead of broadcasting continuum arrays across the harmonic axis.
