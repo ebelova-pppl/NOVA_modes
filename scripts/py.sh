@@ -24,3 +24,25 @@ done
 
 # To view the results, you can use the following command:
 python viz/view_modes_csv.py "$SHOT/mode_labels_clean.csv" --topk 100 
+
+#########################
+# To run GPU LOSO test on Perlmutter (with continuum option) use:
+
+salloc -A m314_g -C gpu -q interactive -N 1 \
+  --gpus=1 --cpus-per-task=1 -t 04:00:00
+  cd "$NOVA_REPO"
+module load pytorch
+source configs/paths/nova_paths.nersc.sh
+python -u scripts/run_loso_10.py \
+  --steps all \
+  --train_csv training_labels/tae_like_train.csv \
+  --out_root outputs/loso_15_raw_continuum_branch_M100_bs8 \
+  --work_root "$SCRATCH/nova_s/loso_15_raw_continuum_branch_M100_bs8" \
+  --cnn_launch srun \
+  --cnn_device cuda \
+  --sort_device cpu \
+  --cnn_batch_size 8 \
+  --cnn_m_target 100 \
+  --cnn_continuum_branch \
+  --cnn_cache_data \
+  --cnn_refit_full_before_save
