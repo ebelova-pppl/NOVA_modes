@@ -60,15 +60,19 @@ preprocessing options. The raw CNN resamples the radial grid to `--R_target`
 before padding/cropping the raw harmonic axis to `--M_target`.
 When `--data_dir` is provided, relative mode paths in the training CSV are
 resolved relative to that directory instead of requiring `$NOVA_DATA`.
-For continuum-aware experiments, `cnn_raw.py` accepts `--continuum_channels`.
-This changes the raw-CNN input from one channel to three channels by appending
-two broadcast continuum arrays:
-`du=(sqrt(high2)-omega)/omega` and `dl=(omega-sqrt(low2))/omega`. The mode
-channel keeps the selected per-image normalization, while the continuum
-channels are clipped to `--continuum_clip` (default `5.0`) and are not
-standardized away. Checkpoints from this path save
-`model_type=cnn_raw_continuum`; use `--cnn_model_kind cnn_raw_continuum` or
-`auto` for inference.
+For continuum-aware experiments, `cnn_raw.py` accepts `--continuum_branch`.
+The raw signed mode remains a one-channel `(m,r)` image. A separate 1D branch
+receives four radius-aligned arrays: peak-normalized
+`W(r)=sum_m|xi_m(r)|^2`, `du=(sqrt(high2)-omega)/omega`,
+`dl=(omega-sqrt(low2))/omega`, and a continuum-validity mask. The mode trunk
+is collapsed only over the harmonic axis, then concatenated with the 1D
+continuum features at the corresponding radial bins before radial pooling.
+`du` and `dl` are clipped to `--continuum_clip` (default `5.0`). Missing
+continuum gives zero `du`, `dl`, and mask values while preserving `W(r)`.
+Checkpoints save `model_type=cnn_raw_continuum_branch`; use
+`--cnn_model_kind cnn_raw_continuum_branch` or `auto` for inference. The
+retired broadcast-channel checkpoints remain loadable as
+`cnn_raw_continuum`, but `cnn_raw.py` no longer trains that architecture.
 `cnn_raw.py` uses one shared OneCycleLR plus gradient-clipping recipe for both
 split training and the optional production full-data refit. The raw CNN
 default `--lr=0.02` is the OneCycle peak LR, chosen from a small sweep because
@@ -157,17 +161,17 @@ nova_cpu_smoke
 nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
-Experimental continuum-channel LOSO can be run through the same LOSO driver:
+Experimental continuum-branch LOSO can be run through the same LOSO driver:
 
 ```bash
 python "$NOVA_REPO/scripts/run_loso_10.py" \
   --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
   --data_dir "$NOVA_DATA" \
-  --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_M100_bs8" \
-  --work_root "$SCRATCH/nova_s/loso_15_raw_continuum_M100_bs8" \
+  --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_branch_M100_bs8" \
+  --work_root "$SCRATCH/nova_s/loso_15_raw_continuum_branch_M100_bs8" \
   --cnn_batch_size 8 \
   --cnn_m_target 100 \
-  --cnn_continuum_channels
+  --cnn_continuum_branch
 ```
 
 Bash users should source `$(conda info --base)/etc/profile.d/conda.sh` before

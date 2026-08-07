@@ -18,6 +18,8 @@ from torch.utils.data import DataLoader, Dataset
 from cnn_infer_common import (
     CHECKPOINT_VERSION,
     CONTINUUM_CHANNEL_CLIP_DEFAULT,
+    ContinuumBranchCNN,
+    build_continuum_branch_array,
     build_raw_image_array,
     build_raw_preprocess_metadata,
 )
@@ -91,7 +93,7 @@ class NovaModeDataset(Dataset):
         normalize: str = "robust",
         M_target: int = 100,
         R_target: int = 201,
-        continuum_channels: bool = False,
+        continuum_branch: bool = False,
         continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
         cache_data: bool = False,
     ):
@@ -99,7 +101,7 @@ class NovaModeDataset(Dataset):
         self.normalize = normalize
         self.M_target = M_target
         self.R_target = R_target
-        self.continuum_channels = continuum_channels
+        self.continuum_branch = continuum_branch
         self.continuum_clip = continuum_clip
         self.cached_samples = None
         if cache_data:
@@ -125,11 +127,23 @@ class NovaModeDataset(Dataset):
             normalize=self.normalize,
             M_target=self.M_target,
             R_target=self.R_target,
-            continuum_channels=self.continuum_channels,
-            continuum_clip=self.continuum_clip,
         )
 
         y = torch.tensor(it["label"], dtype=torch.long)
+        if self.continuum_branch:
+            x_continuum = build_continuum_branch_array(
+                it["path"],
+                mode,
+                omega,
+                R_target=self.R_target,
+                clip=self.continuum_clip,
+            )
+            return (
+                torch.from_numpy(x),
+                torch.from_numpy(x_continuum),
+                y,
+                it["path"],
+            )
         return torch.from_numpy(x), y, it["path"]
 
     def __getitem__(self, idx):
@@ -174,6 +188,7 @@ def train_epoch(
     device,
     pos_weight: float | None = None,
     *,
+    continuum_branch: bool = False,
     batch_scheduler=None,
     grad_clip_norm: float | None = None,
 ):
@@ -184,12 +199,17 @@ def train_epoch(
     loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight_tensor)
     total = 0.0
     n = 0
-    for x, y, _paths in loader:
-        x = x.to(device)
+    for batch in loader:
+        if continuum_branch:
+            x, x_continuum, y, _paths = batch
+            model_inputs = (x.to(device), x_continuum.to(device))
+        else:
+            x, y, _paths = batch
+            model_inputs = (x.to(device),)
         y = y.float().to(device)
 
         opt.zero_grad()
-        logits = model(x)
+        logits = model(*model_inputs)
         loss = loss_fn(logits, y)
         loss.backward()
         if grad_clip_norm is not None:
@@ -198,21 +218,32 @@ def train_epoch(
         if batch_scheduler is not None:
             batch_scheduler.step()
 
-        total += float(loss.item()) * x.size(0)
-        n += x.size(0)
+        total += float(loss.item()) * y.size(0)
+        n += y.size(0)
     return total / max(n, 1)
 
 
 @torch.no_grad()
-def eval_model(model, loader, device, thr: float = 0.5):
+def eval_model(
+    model,
+    loader,
+    device,
+    thr: float = 0.5,
+    *,
+    continuum_branch: bool = False,
+):
     model.eval()
     probs_all = []
     y_all = []
     paths_all = []
 
-    for x, y, paths in loader:
-        x = x.to(device)
-        logits = model(x)
+    for batch in loader:
+        if continuum_branch:
+            x, x_continuum, y, paths = batch
+            logits = model(x.to(device), x_continuum.to(device))
+        else:
+            x, y, paths = batch
+            logits = model(x.to(device))
         probs = torch.sigmoid(logits).cpu().numpy()
         probs_all.append(probs)
         y_all.append(y.numpy())
@@ -240,7 +271,7 @@ class Config:
     model_out: str = "nova_cnn.pt"
     M_target: int = 100
     R_target: int = 201
-    continuum_channels: bool = False
+    continuum_branch: bool = False
     continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT
     device: str | None = None
     cache_data: bool = False
@@ -422,12 +453,12 @@ def parse_args() -> Config:
     ap.add_argument("--M_target", type=int, default=100, help="Poloidal harmonics kept after m-axis pad/crop")
     ap.add_argument("--R_target", type=int, default=201, help="Radial grid size after interpolation")
     ap.add_argument(
-        "--continuum_channels",
+        "--continuum_branch",
         action="store_true",
         help=(
-            "Experimental: append two broadcast continuum channels to the raw "
-            "mode image: du=(sqrt(high2)-omega)/omega and "
-            "dl=(omega-sqrt(low2))/omega."
+            "Experimental: add a radius-aligned 1D branch containing normalized "
+            "mode energy W(r), du=(sqrt(high2)-omega)/omega, "
+            "dl=(omega-sqrt(low2))/omega, and a continuum-validity mask."
         ),
     )
     ap.add_argument(
@@ -435,7 +466,7 @@ def parse_args() -> Config:
         type=float,
         default=CONTINUUM_CHANNEL_CLIP_DEFAULT,
         help=(
-            "Clip value for experimental continuum channels, applied as "
+            "Clip value for experimental continuum du/dl inputs, applied as "
             "[-value, value] after radial interpolation (default: 5.0)."
         ),
     )
@@ -568,20 +599,19 @@ def main():
     print(f"Training CSV: {cfg.train_csv}")
     print(f"Data dir: {cfg.data_dir or '$NOVA_DATA'}")
     print(f"Total modes: {len(items)} | Train: {len(train_items)} | Test: {len(test_items)}")
-    if cfg.continuum_channels:
-        input_channels = 3
-        model_type = "cnn_raw_continuum"
+    if cfg.continuum_branch:
+        model_type = "cnn_raw_continuum_branch"
     else:
-        input_channels = 1
         model_type = "cnn_raw"
     print(
         f"Raw preprocessing: R_target={cfg.R_target}, M_target={cfg.M_target}, "
-        f"input_channels={input_channels}, continuum_channels={cfg.continuum_channels}"
+        f"input_channels=1, continuum_branch={cfg.continuum_branch}"
     )
-    if cfg.continuum_channels:
+    if cfg.continuum_branch:
         print(
-            "Continuum channels: du=(sqrt(high2)-omega)/omega, "
-            "dl=(omega-sqrt(low2))/omega, "
+            "Continuum branch: W_norm=sum_m|xi_m|^2/max(W), "
+            "du=(sqrt(high2)-omega)/omega, "
+            "dl=(omega-sqrt(low2))/omega, validity mask, "
             f"clip=+/-{cfg.continuum_clip:g}"
         )
     print(f"Training recipe: {describe_training_recipe(cfg)}")
@@ -595,7 +625,7 @@ def main():
         normalize=cfg.normalize,
         M_target=cfg.M_target,
         R_target=cfg.R_target,
-        continuum_channels=cfg.continuum_channels,
+        continuum_branch=cfg.continuum_branch,
         continuum_clip=cfg.continuum_clip,
         cache_data=cfg.cache_data,
     )
@@ -604,7 +634,7 @@ def main():
         normalize=cfg.normalize,
         M_target=cfg.M_target,
         R_target=cfg.R_target,
-        continuum_channels=cfg.continuum_channels,
+        continuum_branch=cfg.continuum_branch,
         continuum_clip=cfg.continuum_clip,
         cache_data=cfg.cache_data,
     )
@@ -615,7 +645,10 @@ def main():
     device = select_torch_device(cfg.device)
     print_torch_device_report(device)
 
-    model = SmallCNN(in_ch=input_channels).to(device)
+    if cfg.continuum_branch:
+        model = ContinuumBranchCNN().to(device)
+    else:
+        model = SmallCNN(in_ch=1).to(device)
     opt, sched = build_onecycle_training(model, train_loader, cfg)
 
     best_acc = -1.0
@@ -630,10 +663,17 @@ def main():
             opt,
             device,
             pos_weight=train_pos_weight,
+            continuum_branch=cfg.continuum_branch,
             batch_scheduler=sched,
             grad_clip_norm=cfg.grad_clip_norm,
         )
-        acc, probs, y_true, _ = eval_model(model, test_loader, device, thr=cfg.eval_threshold)
+        acc, probs, y_true, _ = eval_model(
+            model,
+            test_loader,
+            device,
+            thr=cfg.eval_threshold,
+            continuum_branch=cfg.continuum_branch,
+        )
 
         if acc > best_acc:
             best_acc = acc
@@ -656,7 +696,13 @@ def main():
     if best_state is not None:
         model.load_state_dict(best_state)
 
-    acc, probs, y_true, paths = eval_model(model, test_loader, device, thr=cfg.eval_threshold)
+    acc, probs, y_true, paths = eval_model(
+        model,
+        test_loader,
+        device,
+        thr=cfg.eval_threshold,
+        continuum_branch=cfg.continuum_branch,
+    )
     y_pred = (probs >= cfg.eval_threshold).astype(int)
 
     wrong = np.where(y_pred != y_true)[0]
@@ -689,7 +735,7 @@ def main():
     preprocess_meta = build_raw_preprocess_metadata(
         R_target=cfg.R_target,
         M_target=cfg.M_target,
-        continuum_channels=cfg.continuum_channels,
+        continuum_branch=cfg.continuum_branch,
         continuum_clip=cfg.continuum_clip,
     )
 
@@ -717,7 +763,7 @@ def main():
             normalize=cfg.normalize,
             M_target=cfg.M_target,
             R_target=cfg.R_target,
-            continuum_channels=cfg.continuum_channels,
+            continuum_branch=cfg.continuum_branch,
             continuum_clip=cfg.continuum_clip,
             cache_data=cfg.cache_data,
         )
@@ -729,7 +775,10 @@ def main():
             shuffle=False,
             num_workers=0,
         )
-        final_model = SmallCNN(in_ch=input_channels).to(device)
+        if cfg.continuum_branch:
+            final_model = ContinuumBranchCNN().to(device)
+        else:
+            final_model = SmallCNN(in_ch=1).to(device)
         final_opt, final_sched = build_onecycle_training(final_model, full_loader, cfg)
 
         for ep in range(1, cfg.epochs + 1):
@@ -740,6 +789,7 @@ def main():
                 final_opt,
                 device,
                 pos_weight=final_pos_weight,
+                continuum_branch=cfg.continuum_branch,
                 batch_scheduler=final_sched,
                 grad_clip_norm=cfg.grad_clip_norm,
             )
@@ -751,6 +801,7 @@ def main():
                     full_eval_loader,
                     device,
                     thr=cfg.eval_threshold,
+                    continuum_branch=cfg.continuum_branch,
                 )
                 final_prediction_health = summarize_prediction_health(
                     full_probs,
@@ -816,8 +867,14 @@ def main():
                 }
             ),
             "model_type": model_type,
-            "input_channels": input_channels,
-            "continuum_channels": cfg.continuum_channels,
+            "input_channels": 1,
+            "continuum_branch": cfg.continuum_branch,
+            "continuum_input_channels": 4 if cfg.continuum_branch else 0,
+            "continuum_features": (
+                ["W_norm", "du", "dl", "valid_mask"]
+                if cfg.continuum_branch
+                else []
+            ),
             "continuum_clip": cfg.continuum_clip,
             "checkpoint_version": CHECKPOINT_VERSION,
             "preprocess": preprocess_meta,

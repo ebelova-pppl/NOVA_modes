@@ -259,7 +259,7 @@ def write_run_config(args: argparse.Namespace, fold_shots: Sequence[str]) -> Non
         "cnn_test_frac": args.cnn_test_frac,
         "cnn_normalize": args.cnn_normalize,
         "cnn_pos_weight": args.cnn_pos_weight,
-        "cnn_continuum_channels": args.cnn_continuum_channels,
+        "cnn_continuum_branch": args.cnn_continuum_branch,
         "cnn_continuum_clip": args.cnn_continuum_clip,
         "cnn_refit_full_before_save": args.cnn_refit_full_before_save,
         "model_eval_threshold": args.model_eval_threshold,
@@ -376,8 +376,8 @@ def run_cnn_fold(args: argparse.Namespace, shot: str, env: dict[str, str]) -> No
         "--device",
         args.cnn_device,
     ]
-    if args.cnn_continuum_channels:
-        cmd.append("--continuum_channels")
+    if args.cnn_continuum_branch:
+        cmd.append("--continuum_branch")
         cmd.extend(["--continuum_clip", str(args.cnn_continuum_clip)])
     if args.cnn_pos_weight:
         cmd.extend(["--pos_weight", args.cnn_pos_weight])
@@ -410,7 +410,7 @@ def run_sort_fold(args: argparse.Namespace, shot: str, env: dict[str, str]) -> N
         "--cnn_model",
         str(paths["cnn_model"]),
         "--cnn_model_kind",
-        "cnn_raw_continuum" if args.cnn_continuum_channels else "cnn_raw",
+        "cnn_raw_continuum_branch" if args.cnn_continuum_branch else "cnn_raw",
         "--out_dir",
         str(paths["sort_dir"]),
         "--label_csv",
@@ -625,19 +625,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--cnn_m_target", type=int, default=100)
     ap.add_argument("--cnn_r_target", type=int, default=201)
     ap.add_argument(
-        "--cnn_continuum_channels",
+        "--cnn_continuum_branch",
         action="store_true",
         help=(
-            "Train/evaluate the experimental raw CNN with two extra continuum "
-            "image channels: du=(sqrt(high2)-omega)/omega and "
-            "dl=(omega-sqrt(low2))/omega."
+            "Train/evaluate the experimental raw CNN with a radius-aligned 1D "
+            "branch containing W(r), du, dl, and a validity mask."
         ),
     )
     ap.add_argument(
         "--cnn_continuum_clip",
         type=float,
         default=5.0,
-        help="Clip value for experimental continuum channels (default: 5.0)",
+        help="Clip value for experimental continuum-branch du/dl inputs (default: 5.0)",
     )
     ap.add_argument("--cnn_cache_data", action="store_true")
     ap.add_argument(
@@ -688,7 +687,7 @@ def main() -> None:
     print(f"steps:     {', '.join(args.steps)}")
     print(f"n_shots:   {n_train_shots}")
     print(f"M_target:  {args.cnn_m_target}")
-    print(f"continuum channels: {args.cnn_continuum_channels}")
+    print(f"continuum branch: {args.cnn_continuum_branch}")
 
     fold_shots: list[str]
     if "split" in args.steps:

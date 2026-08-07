@@ -33,6 +33,7 @@ CONTINUUM_CHANNEL_CLIP_DEFAULT = 5.0
 SUPPORTED_MODEL_KINDS = {
     "cnn_raw",
     "cnn_raw_continuum",
+    "cnn_raw_continuum_branch",
     "cnn_straightened",
     "cnn_hybrid",
 }
@@ -135,12 +136,14 @@ def build_raw_preprocess_metadata(
     R_target: int,
     M_target: int,
     continuum_channels: bool = False,
+    continuum_branch: bool = False,
     continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
 ) -> dict[str, Any]:
     return {
         "R_target": int(R_target),
         "M_target": int(M_target),
         "continuum_channels": bool(continuum_channels),
+        "continuum_branch": bool(continuum_branch),
         "continuum_clip": float(continuum_clip),
     }
 
@@ -213,6 +216,9 @@ def resolve_raw_preprocess_metadata(
     continuum_channels = preprocess_block.get("continuum_channels")
     if continuum_channels is None:
         continuum_channels = checkpoint.get("continuum_channels", False)
+    continuum_branch = preprocess_block.get("continuum_branch")
+    if continuum_branch is None:
+        continuum_branch = checkpoint.get("continuum_branch", False)
     continuum_clip = preprocess_block.get("continuum_clip")
     if continuum_clip is None:
         continuum_clip = checkpoint.get(
@@ -220,6 +226,7 @@ def resolve_raw_preprocess_metadata(
             CONTINUUM_CHANNEL_CLIP_DEFAULT,
         )
     resolved["continuum_channels"] = bool(continuum_channels)
+    resolved["continuum_branch"] = bool(continuum_branch)
     resolved["continuum_clip"] = float(continuum_clip)
 
     if missing:
@@ -315,6 +322,70 @@ def build_continuum_channel_array(
     return np.broadcast_to(channels[:, None, :], (2, M_target, R_target)).copy()
 
 
+def build_continuum_branch_array(
+    mode_path: str,
+    mode: np.ndarray,
+    omega: float,
+    *,
+    R_target: int,
+    clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
+) -> np.ndarray:
+    """Build ``W_norm``, ``du``, ``dl``, and validity-mask radial channels."""
+    mode = np.asarray(mode)
+    if mode.ndim != 2 or mode.shape[1] < 1:
+        raise ValueError(f"mode must be a nonempty 2D array, got shape {mode.shape}")
+
+    omega_value = float(omega)
+    if not np.isfinite(omega_value) or omega_value <= 0.0:
+        raise ValueError(f"omega must be positive and finite, got {omega}")
+    if not np.isfinite(clip) or float(clip) <= 0.0:
+        raise ValueError(f"continuum clip must be positive and finite, got {clip}")
+
+    mode_rs = resample_r(mode, R_target=R_target)
+    radial_energy = np.sum(np.abs(mode_rs) ** 2, axis=0)
+    peak_energy = float(np.max(radial_energy))
+    if peak_energy > 0.0:
+        w_norm = radial_energy / peak_energy
+    else:
+        w_norm = np.zeros(R_target, dtype=np.float32)
+
+    branch = np.zeros((4, R_target), dtype=np.float32)
+    branch[0] = np.asarray(w_norm, dtype=np.float32)
+
+    try:
+        low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=mode.shape[1])
+    except Exception:
+        return branch
+
+    valid = (
+        np.isfinite(low2)
+        & np.isfinite(high2)
+        & (low2 >= 0.0)
+        & (high2 >= 0.0)
+        & (high2 >= low2)
+    )
+    if not np.any(valid):
+        return branch
+
+    low = np.full(mode.shape[1], np.nan, dtype=np.float32)
+    high = np.full(mode.shape[1], np.nan, dtype=np.float32)
+    low[valid] = np.sqrt(low2[valid]).astype(np.float32)
+    high[valid] = np.sqrt(high2[valid]).astype(np.float32)
+    du = (high - omega_value) / omega_value
+    dl = (omega_value - low) / omega_value
+
+    nearest_src = np.rint(
+        np.linspace(0.0, valid.size - 1, R_target, dtype=np.float32)
+    ).astype(int)
+    valid_rs = valid[nearest_src]
+    branch[1] = np.clip(_interp_finite_1d(du, R_target), -clip, clip)
+    branch[2] = np.clip(_interp_finite_1d(dl, R_target), -clip, clip)
+    branch[1, ~valid_rs] = 0.0
+    branch[2, ~valid_rs] = 0.0
+    branch[3] = valid_rs.astype(np.float32)
+    return branch
+
+
 def build_raw_image_array(
     mode_path: str,
     mode: np.ndarray,
@@ -377,6 +448,60 @@ class SmallCNN(nn.Module):
         x = self.pool(x)
         x = self.head(x).squeeze(1)
         return x
+
+
+class ContinuumBranchCNN(nn.Module):
+    """Raw mode-image CNN with radius-aligned continuum feature fusion."""
+
+    def __init__(self):
+        super().__init__()
+        self.mode_features = nn.Sequential(
+            nn.Conv2d(1, 16, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+        )
+        self.continuum_features = nn.Sequential(
+            nn.Conv1d(4, 8, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool1d(2),
+            nn.Conv1d(8, 16, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool1d(2),
+            nn.Conv1d(16, 16, kernel_size=3, padding=1),
+            nn.ReLU(),
+        )
+        self.fusion = nn.Sequential(
+            nn.Conv1d(64 + 16, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+        )
+        self.pool = nn.AdaptiveAvgPool1d(1)
+        self.head = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Dropout(p=0.2),
+            nn.Linear(32, 1),
+        )
+
+    def forward(
+        self,
+        x_img: torch.Tensor,
+        x_continuum: torch.Tensor,
+    ) -> torch.Tensor:
+        z_mode = self.mode_features(x_img).mean(dim=2)
+        z_continuum = self.continuum_features(x_continuum)
+        if z_mode.shape[-1] != z_continuum.shape[-1]:
+            raise ValueError(
+                "Mode and continuum radial feature grids do not align: "
+                f"{z_mode.shape[-1]} != {z_continuum.shape[-1]}"
+            )
+        z = self.fusion(torch.cat([z_mode, z_continuum], dim=1))
+        return self.head(self.pool(z)).squeeze(1)
 
 
 class HybridCNN(nn.Module):
@@ -454,7 +579,19 @@ def _looks_like_model_state_dict(payload: Mapping[str, Any]) -> bool:
     if not payload:
         return False
     prefixes = {str(key).split(".")[0] for key in payload}
-    if not (prefixes & {"features", "head", "img_fc", "sc_fc", "module"}):
+    if not (
+        prefixes
+        & {
+            "features",
+            "mode_features",
+            "continuum_features",
+            "fusion",
+            "head",
+            "img_fc",
+            "sc_fc",
+            "module",
+        }
+    ):
         return False
     return all(torch.is_tensor(value) for value in payload.values())
 
@@ -482,10 +619,17 @@ def infer_checkpoint_kind(
         or "sc_fc" in prefixes
     ):
         return "cnn_hybrid"
+    if {"mode_features", "continuum_features", "fusion"}.issubset(prefixes):
+        return "cnn_raw_continuum_branch"
 
     model_type = checkpoint.get("model_type")
     if model_type in {"cnn_hybrid", "hybrid", "hybrid_cnn"}:
         return "cnn_hybrid"
+    if model_type in {
+        "cnn_raw_continuum_branch",
+        "raw_continuum_branch",
+    }:
+        return "cnn_raw_continuum_branch"
     if model_type in {"cnn_raw_continuum", "raw_continuum"}:
         return "cnn_raw_continuum"
     if model_type in {"cnn_straightened", "straightened"}:
@@ -496,6 +640,8 @@ def infer_checkpoint_kind(
     if "preprocess" in checkpoint:
         preprocess = checkpoint.get("preprocess")
         if isinstance(preprocess, Mapping) and "M_target" in preprocess:
+            if bool(preprocess.get("continuum_branch", False)):
+                return "cnn_raw_continuum_branch"
             if bool(preprocess.get("continuum_channels", False)):
                 return "cnn_raw_continuum"
             return "cnn_raw"
@@ -509,6 +655,8 @@ def infer_checkpoint_kind(
         name = Path(checkpoint_path).name.lower()
         if "hybrid" in name:
             return "cnn_hybrid"
+        if "continuum_branch" in name and "raw" in name:
+            return "cnn_raw_continuum_branch"
         if "continuum" in name and "raw" in name:
             return "cnn_raw_continuum"
         if "straight" in name:
@@ -521,8 +669,7 @@ def infer_checkpoint_kind(
 
     raise UnsupportedCheckpointError(
         "Checkpoint does not look like a supported CNN checkpoint. "
-        "If this is an older checkpoint, pass --model_kind cnn_raw, "
-        "--model_kind cnn_straightened, or --model_kind cnn_hybrid."
+        "If this is an older checkpoint, pass an explicit --model_kind."
     )
 
 
@@ -557,7 +704,11 @@ class LoadedCNNClassifier:
         mode: np.ndarray,
         omega: float,
     ) -> torch.Tensor:
-        if self.checkpoint_kind in {"cnn_raw", "cnn_raw_continuum"}:
+        if self.checkpoint_kind in {
+            "cnn_raw",
+            "cnn_raw_continuum",
+            "cnn_raw_continuum_branch",
+        }:
             x_img = build_raw_image_array(
                 mode_path,
                 mode,
@@ -598,7 +749,24 @@ class LoadedCNNClassifier:
         x_img = self._prepare_image_tensor(resolved_mode_path, mode, omega)
 
         with torch.no_grad():
-            if self.checkpoint_kind == "cnn_hybrid":
+            if self.checkpoint_kind == "cnn_raw_continuum_branch":
+                x_continuum = build_continuum_branch_array(
+                    resolved_mode_path,
+                    mode,
+                    omega,
+                    R_target=self.preprocess["R_target"],
+                    clip=float(
+                        self.preprocess.get(
+                            "continuum_clip",
+                            CONTINUUM_CHANNEL_CLIP_DEFAULT,
+                        )
+                    ),
+                )
+                x_continuum_t = (
+                    torch.from_numpy(x_continuum).unsqueeze(0).to(self.device)
+                )
+                logits = self.model(x_img, x_continuum_t)
+            elif self.checkpoint_kind == "cnn_hybrid":
                 mode_rs = resample_r(mode, R_target=self.preprocess["R_target"])
                 x_sc = build_hybrid_scalar_vector(
                     resolved_mode_path,
@@ -648,7 +816,11 @@ def load_cnn_classifier(
         model_kind=model_kind,
         checkpoint_path=resolved_checkpoint_path,
     )
-    if checkpoint_kind in {"cnn_raw", "cnn_raw_continuum"}:
+    if checkpoint_kind in {
+        "cnn_raw",
+        "cnn_raw_continuum",
+        "cnn_raw_continuum_branch",
+    }:
         preprocess = resolve_raw_preprocess_metadata(
             checkpoint,
             checkpoint_path=resolved_checkpoint_path,
@@ -668,6 +840,10 @@ def load_cnn_classifier(
         scalars_sig_raw = checkpoint.get("scalars_sig")
         scalars_mu = None if scalars_mu_raw is None else np.asarray(scalars_mu_raw, dtype=np.float32)
         scalars_sig = None if scalars_sig_raw is None else np.asarray(scalars_sig_raw, dtype=np.float32)
+    elif checkpoint_kind == "cnn_raw_continuum_branch":
+        model = ContinuumBranchCNN()
+        scalars_mu = None
+        scalars_sig = None
     else:
         in_ch = 3 if checkpoint_kind == "cnn_raw_continuum" else 1
         model = SmallCNN(in_ch=in_ch)

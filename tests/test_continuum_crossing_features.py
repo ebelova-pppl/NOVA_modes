@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import torch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -32,7 +33,11 @@ from rf_train_classify import (  # noqa: E402
     attach_feature_metadata,
     validate_model_feature_schema,
 )
-from cnn_infer_common import build_continuum_channel_array  # noqa: E402
+from cnn_infer_common import (  # noqa: E402
+    ContinuumBranchCNN,
+    build_continuum_branch_array,
+    build_continuum_channel_array,
+)
 
 
 class ContinuumCrossingFeatureTests(unittest.TestCase):
@@ -298,6 +303,56 @@ class ContinuumScalarTests(unittest.TestCase):
         self.assertLessEqual(float(np.max(clipped)), 2.0)
         self.assertGreaterEqual(float(np.min(clipped)), -2.0)
         np.testing.assert_allclose(missing, 0.0)
+
+    def test_cnn_continuum_branch_contains_W_du_dl_and_mask(self):
+        lower = np.array([0.8, 0.8, 0.8])
+        upper = np.array([1.2, 1.2, 1.2])
+        mode = np.array(
+            [
+                [0.0, 1.0, 2.0, 1.0, 0.0],
+                [0.0, 2.0, 0.0, 0.0, 0.0],
+            ]
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            n_dir = Path(tmp) / "N3"
+            n_dir.mkdir()
+            lines = ["2 4"]
+            lines.extend(f"{low**2} {high**2}" for low, high in zip(lower, upper))
+            (n_dir / "datcon3").write_text("\n".join(lines) + "\n")
+            branch = build_continuum_branch_array(
+                str(n_dir / "egn03w.test"),
+                mode,
+                1.0,
+                R_target=5,
+            )
+
+        self.assertEqual(branch.shape, (4, 5))
+        np.testing.assert_allclose(branch[0], [0.0, 1.0, 0.8, 0.2, 0.0])
+        np.testing.assert_allclose(branch[1, 1:4], 0.2, rtol=1e-6)
+        np.testing.assert_allclose(branch[2, 1:4], 0.2, rtol=1e-6)
+        np.testing.assert_allclose(branch[1:3, [0, 4]], 0.0)
+        np.testing.assert_array_equal(branch[3], [0.0, 1.0, 1.0, 1.0, 0.0])
+
+    def test_cnn_continuum_branch_missing_datcon_keeps_W(self):
+        mode = np.array([[0.0, 1.0, 2.0, 1.0, 0.0]])
+        branch = build_continuum_branch_array(
+            "/missing/N3/egn03w.test",
+            mode,
+            1.0,
+            R_target=5,
+        )
+
+        np.testing.assert_allclose(branch[0], [0.0, 0.25, 1.0, 0.25, 0.0])
+        np.testing.assert_allclose(branch[1:], 0.0)
+
+    def test_cnn_continuum_branch_model_output_shape(self):
+        model = ContinuumBranchCNN()
+        x_img = torch.zeros((2, 1, 100, 201), dtype=torch.float32)
+        x_continuum = torch.zeros((2, 4, 201), dtype=torch.float32)
+
+        logits = model(x_img, x_continuum)
+
+        self.assertEqual(tuple(logits.shape), (2,))
 
     def test_energy_tie_selects_largest_radius_with_maximum_W(self):
         r = np.linspace(0.0, 1.0, 5)

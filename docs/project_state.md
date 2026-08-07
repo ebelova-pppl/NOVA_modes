@@ -2386,3 +2386,61 @@ policy from this result alone. Useful follow-ups are to inspect old-G modes
 whose CNN score dropped sharply, try a validity-mask channel or different
 continuum scaling/clipping, and compare against a small 1D continuum branch
 instead of broadcasting continuum arrays across the harmonic axis.
+
+### 2026-08-06: radius-aligned 1D continuum branch replaces broadcast training
+
+The broadcast continuum-channel experiment is retired from active training.
+Its `cnn_raw_continuum` checkpoints remain loadable so the completed LOSO run
+can still be inspected, but `scripts/cnn_raw.py` no longer exposes the
+`--continuum_channels` trainer flag.
+
+Added a new experimental `--continuum_branch` raw-CNN variant with checkpoint
+kind `cnn_raw_continuum_branch`. The raw signed mode remains a one-channel
+`(m,r)` image. A separate 1D branch receives four arrays on the same radial
+grid, in this fixed order:
+
+- `W_norm(r) = sum_m |xi_m(r)|^2 / max_r W(r)`;
+- `du(r) = (sqrt(high2(r)) - omega) / omega`;
+- `dl(r) = (omega - sqrt(low2(r))) / omega`;
+- a binary continuum-validity mask.
+
+The cleaned shared datcon loader supplies the boundaries. `du` and `dl` are
+interpolated to `R_target`, clipped to `--continuum_clip` (default `5.0`), and
+set to zero where the resampled mask is invalid. Missing/unreadable datcon
+leaves `du`, `dl`, and the mask at zero while retaining the mode-derived
+`W_norm`, avoiding the old ambiguity in which a zero fallback could look like
+a physical crossing.
+
+The mode trunk retains radial resolution through its two pooling stages and is
+averaged only over the harmonic dimension. The 1D branch uses matching radial
+pooling. Their feature maps are concatenated at corresponding radial bins,
+passed through a fusion convolution, and only then globally pooled for the
+classifier. This lets the network learn whether a continuum crossing and
+material mode amplitude occur at the same radius instead of treating any
+crossing as a global rejection signal.
+
+LOSO wiring now uses `--cnn_continuum_branch`; sorting accepts
+`--cnn_model_kind cnn_raw_continuum_branch`, and run metadata records the new
+flag. Training and inference share the branch-array construction, and new
+checkpoints record the four feature names and continuum clip.
+
+Validation:
+
+- `python -m unittest tests/test_continuum_crossing_features.py` passed: 29
+  tests OK. New coverage checks `W_norm`, `du`/`dl` signs, partial and missing
+  continuum masks, and the two-input model output shape. Unrelated MUNGE
+  authentication warnings were printed, as in earlier runs.
+- Python compilation passed for the raw trainer, shared inference loader,
+  canonical classifier, mixed sorter, and LOSO driver.
+- A cached one-epoch CPU smoke train saved
+  `/tmp/nova_cnn_raw_continuum_branch_smoke.pt`; canonical
+  `scripts/cnn_classify.py` auto-detected it as
+  `cnn_raw_continuum_branch` and completed inference.
+- A LOSO dry run produced the expected `--continuum_branch`, clip, cache, and
+  full-refit command and recorded `cnn_continuum_branch=true` in
+  `run_config.json`.
+
+No production model was replaced. The next scientific check is a matched
+15-shot LOSO run against `outputs/loso_15_B12_W29_M100_bs8`, with special
+attention to old-G recall and whether the B12/W29 gain survives without the
+Q62/K51/H47 regression.
