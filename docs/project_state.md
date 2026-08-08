@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-05)
+### Project state (current snapshot, updated 2026-08-08)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -214,6 +214,10 @@ From cont_features.py:
 - Treat the current J38 audit as complete: retain only coherent extremum modes
   without a material secondary continuum crossing, and revisit the remaining
   junk-like extrema candidates only if the labeling policy changes.
+- Treat the Codex blind audit of training shot `nstxu_204202` as complete.
+  Retained artifacts live under `tests/labels_audit/nstxu_204202/`; the
+  sealed Codex list is provenance-preserving and should not be edited in
+  place.
 - Keep the three-feature inner-extremum RF schema experimental. Replacing
   continuum prominence with local mode-energy fraction improved shuffled folds
   and removed the overall LOSO regression, but did not reduce G-shot LOSO FN.
@@ -2510,3 +2514,88 @@ Validation:
 No production checkpoint was changed. The matched control output should use
 `outputs/loso_15_raw_continuum_branch_zero_M100_bs8` so it cannot overwrite
 the physical-branch run.
+
+### 2026-08-07: NSTX-U 204202 post-seal TAE-like label audit
+
+An independent 275-mode audit of `nstxu_204202` was completed by
+**Codex-terra-High (GPT-5 family)** from the label-free
+`tests/labels_audit/tae_like_audit.csv` manifest. The review used raw signed
+mode-structure and continuum diagnostics only; RF, CNN, ensemble, and other
+classifier outputs were not run or inspected. The review was sealed before
+the human or canonical training labels were opened. The sealed review contains
+76 GOOD, 193 BAD, and 6 SKIP decisions; its SHA-256 is
+`db7ffe80e754e36d28409a728c6dd6d3861723c6d52b95dbf22163a5c8d90ef8`.
+
+After the human labels were revised, all 275 audited paths matched between the
+sealed review, `tests/labels_audit/labels_human_review.csv`, and
+`training_labels/tae_like_train.csv` (the human list has four additional
+non-audit rows). Final comparisons are:
+
+- Codex-terra versus human: 247/275 agreement (89.82%), Cohen's kappa
+  0.7447. Disagreements: BAD->GOOD 5, GOOD->BAD 17, SKIP->BAD 5, and
+  SKIP->GOOD 1.
+- Codex-terra versus training labels: 253/275 agreement (92.00%), Cohen's
+  kappa 0.8069. Disagreements: BAD->GOOD 7, GOOD->BAD 9, SKIP->BAD 5, and
+  SKIP->GOOD 1.
+- Human versus training labels: 265/275 agreement (96.36%), Cohen's kappa
+  0.9043. All 10 disagreements are human BAD versus training GOOD.
+
+The Terra disagreement artifact is retained as
+`tests/labels_audit/nstxu_204202/disagreements_terra_h.csv` when this
+historical review needs to be inspected. No training labels or production
+models were modified from this audit alone; any training-list change requires
+explicit adjudication and approval.
+
+### 2026-08-08: Codex blind re-audit of `nstxu_204202` and skill-policy update
+
+A second independent Codex blind audit of the same 275 `nstxu_204202` training
+shot modes was completed from the path-only audit manifest. This review used
+only raw signed mode structures and continuum diagnostics; no RF, CNN,
+ensemble, classifier outputs, or prior labels were used before sealing. The
+sealed review is kept at
+`tests/labels_audit/nstxu_204202/nstxu_204202_codex_blind_labels_SEALED.csv`
+with SHA-256
+`68e0ad5428426732969658196b339b329b08e427dfa978bac51f03674f0524a6`.
+
+Sealed Codex counts were 64 GOOD, 208 BAD, and 3 SKIP decisions. After
+opening the human review and active training list, the comparison was:
+
+- Codex versus human review: 261/275 agreement (94.91%), Cohen's kappa
+  0.8614. Disagreements: BAD->GOOD 6, GOOD->BAD 5, SKIP->BAD 3. The human
+  list also contains four `nstxu_204202` rows outside the audited manifest.
+- Codex versus `training_labels/tae_like_train.csv`: 260/275 agreement
+  (94.55%), Cohen's kappa 0.8589. Disagreements: BAD->GOOD 11,
+  GOOD->BAD 1, SKIP->BAD 2, SKIP->GOOD 1.
+- The retained disagreement/audit discussion table is
+  `tests/labels_audit/nstxu_204202/nstxu_204202_codex_union_disagreements.csv`.
+  Scratch manifests, raw measurement tables, intermediate comparison CSVs,
+  and diagnostic plot directories were removed to keep `tests/labels_audit/`
+  compact.
+
+Discussion of the disagreements produced several updates to the
+`label-tae-like-modes` skill policy in
+`.agents/skills/label-tae-like-modes/references/labeling-policy.md`:
+
+- Near-axis boundary artifacts should be screened primarily by pointwise
+  normalized amplitude near `r=0`, not only by integrated near-axis energy.
+  Narrow detached axis spikes with appreciable amplitude are BAD even if
+  their integrated energy is small.
+- A continuum crossing inside the connected mode body is BAD even when there
+  is no sharp grid-point spike at the resonance, because the resonant point
+  may fall between radial grid points. Crossings are acceptable only in
+  detached or negligible tails with very small local pointwise and integrated
+  energy.
+- The policy now records four useful TAE morphology families: wide/global
+  modes, edge-localized modes, continuum-extremum-localized modes, and mixed
+  modes. This language prevents over-rejecting physical edge-localized modes
+  whose individual poloidal harmonics become visually narrow or spiky at
+  large radius because of magnetic shear, while the total envelope remains
+  coherent.
+- Narrow modes near a maximum of the lower continuum boundary or minimum of
+  the upper continuum boundary can be GOOD when they nearly touch the
+  continuum extremum without crossing through the connected mode body.
+
+The sealed list remains a blind-review artifact and was not retroactively
+edited after discussion. Any future change to `training_labels/tae_like_train.csv`
+should be made through an explicit adjudicated label update, not by modifying
+the sealed Codex file.

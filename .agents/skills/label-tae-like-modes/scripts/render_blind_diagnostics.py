@@ -63,7 +63,7 @@ def resolve_mode_path(raw_path: str, data_root: Path | None) -> Path:
 def energy_fraction(
     energy: np.ndarray, r: np.ndarray, center: float, half_width: float
 ) -> float:
-    total = float(np.trapz(energy, r))
+    total = float(np.trapezoid(energy, r))
     if total <= 0.0:
         return 0.0
     left = max(float(r[0]), center - half_width)
@@ -73,7 +73,7 @@ def energy_fraction(
     inner_r = r[(r > left) & (r < right)]
     window_r = np.concatenate(([left], inner_r, [right]))
     window_w = np.interp(window_r, r, energy)
-    return float(np.trapz(window_w, window_r) / total)
+    return float(np.trapezoid(window_w, window_r) / total)
 
 
 def safe_filename(blind_id: str, mode_path: Path) -> str:

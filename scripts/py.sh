@@ -22,6 +22,18 @@ for n in 1 2 3 4 5 6 7 8 9 10; do
     --csv_out "$OUT" --no-rf
 done
 
+# On Perlmutter:
+
+SHOT="$NOVA_DATA/nstxu_204202"
+SPLIT="$NOVA_REPO/tests"
+OUT="$NOVA_REPO/tests/labels_human_review.csv"
+
+for n in 1 2 3 4 5 6 7 8 9 10; do
+  python scripts/label_modes_fast.py "$SHOT/N$n" \
+    --mode-list "$SPLIT/tae_like_audit.csv" \
+    --csv_out "$OUT" --no-rf
+done
+
 # To view the results, you can use the following command:
 python viz/view_modes_csv.py "$SHOT/mode_labels_clean.csv" --topk 100 
 

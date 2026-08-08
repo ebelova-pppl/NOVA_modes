@@ -1,0 +1,276 @@
+blind_id,path,validity,confidence,reason,prior_seen,reviewer
+B001,nstxu_204202/N1/egn01w.6355E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.449, E±0.03=8.6%)",false,codex
+B002,nstxu_204202/N1/egn01w.9345E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.488, E±0.03=3.8%)",false,codex
+B003,nstxu_204202/N1/egn01w.9409E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.247, E±0.03=2.6%)",false,codex
+B004,nstxu_204202/N1/egn01w.9473E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.121, E±0.03=2.0%)",false,codex
+B005,nstxu_204202/N1/egn01w.9537E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.110, E±0.03=2.1%)",false,codex
+B006,nstxu_204202/N1/egn01w.9599E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.213, E±0.03=2.8%)",false,codex
+B007,nstxu_204202/N1/egn01w.9659E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.434, E±0.03=4.1%)",false,codex
+B008,nstxu_204202/N1/egn01w.1139E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.030, axis E=51.2%)",false,codex
+B009,nstxu_204202/N1/egn01w.1226E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.025, axis E=54.1%)",false,codex
+B010,nstxu_204202/N1/egn01w.1468E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=95.7%)",false,codex
+B011,nstxu_204202/N1/egn01w.2735E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=84.3%)",false,codex
+B012,nstxu_204202/N1/egn01w.3981E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=16.6%)",false,codex
+B013,nstxu_204202/N1/egn01w.4413E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=36.6%)",false,codex
+B014,nstxu_204202/N1/egn01w.4648E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=17.4%)",false,codex
+B015,nstxu_204202/N2/egn02w.6554E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.136, E±0.03=5.6%)",false,codex
+B016,nstxu_204202/N2/egn02w.6557E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.130, E±0.03=6.2%)",false,codex
+B017,nstxu_204202/N2/egn02w.7267E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=6.6%)",false,codex
+B018,nstxu_204202/N2/egn02w.1421E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.025, axis E=84.7%)",false,codex
+B019,nstxu_204202/N2/egn02w.1429E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.020, axis E=83.1%)",false,codex
+B020,nstxu_204202/N2/egn02w.1705E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=70.8%)",false,codex
+B021,nstxu_204202/N2/egn02w.2199E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.025, axis E=33.6%)",false,codex
+B022,nstxu_204202/N3/egn03w.5199E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.197, E±0.03=30.5%)",false,codex
+B023,nstxu_204202/N3/egn03w.5865E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.219, E±0.03=22.1%)",false,codex
+B024,nstxu_204202/N3/egn03w.6740E+01,bad,high,"unresolved narrow envelope (1 half-max grid points, 2 points above 0.1 Wmax)",false,codex
+B025,nstxu_204202/N3/egn03w.6963E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.503, E±0.03=2.4%)",false,codex
+B026,nstxu_204202/N3/egn03w.7521E+01,skip,low,"borderline continuum interaction in resolved envelope (max W=0.073, E±0.03=2.6%)",false,codex
+B027,nstxu_204202/N3/egn03w.9141E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.020, E±0.03=0.45%)",false,codex
+B028,nstxu_204202/N3/egn03w.1017E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.002, E±0.03=0.07%)",false,codex
+B029,nstxu_204202/N3/egn03w.1359E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.01%)",false,codex
+B030,nstxu_204202/N3/egn03w.1740E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.810, width90=0.379)",false,codex
+B031,nstxu_204202/N3/egn03w.2774E+02,bad,high,"outer-boundary dominated peak (r_peak=0.975, width50=0.015)",false,codex
+B032,nstxu_204202/N3/egn03w.2907E+02,bad,medium,"outer-boundary dominated peak (r_peak=0.295, width50=0.010)",false,codex
+B033,nstxu_204202/N3/egn03w.5040E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.610, E±0.03=13.0%)",false,codex
+B034,nstxu_204202/N3/egn03w.5139E+02,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.291, E±0.03=12.6%)",false,codex
+B035,nstxu_204202/N3/egn03w.5236E+02,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.287, E±0.03=13.6%)",false,codex
+B036,nstxu_204202/N3/egn03w.5330E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.519, E±0.03=14.8%)",false,codex
+B037,nstxu_204202/N3/egn03w.5461E+02,bad,medium,"thin spike-like main envelope (5 half-max points, width50=0.020)",false,codex
+B038,nstxu_204202/N3/egn03w.5470E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 6 points above 0.1 Wmax)",false,codex
+B039,nstxu_204202/N3/egn03w.5830E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.838, E±0.03=20.2%)",false,codex
+B040,nstxu_204202/N3/egn03w.5952E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 7 points above 0.1 Wmax)",false,codex
+B041,nstxu_204202/N4/egn04w.5638E+01,bad,high,"unresolved narrow envelope (1 half-max grid points, 18 points above 0.1 Wmax)",false,codex
+B042,nstxu_204202/N4/egn04w.8247E+01,bad,high,"unresolved narrow envelope (2 half-max grid points, 8 points above 0.1 Wmax)",false,codex
+B043,nstxu_204202/N4/egn04w.8263E+01,bad,medium,"thin spike-like main envelope (6 half-max points, width50=0.035)",false,codex
+B044,nstxu_204202/N4/egn04w.1233E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=95.9%)",false,codex
+B045,nstxu_204202/N4/egn04w.1333E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.020, axis E=96.6%)",false,codex
+B046,nstxu_204202/N4/egn04w.1363E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.685, width90=0.412)",false,codex
+B047,nstxu_204202/N4/egn04w.1754E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.760, width90=0.333)",false,codex
+B048,nstxu_204202/N4/egn04w.2078E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.810, width90=0.347)",false,codex
+B049,nstxu_204202/N4/egn04w.2111E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=80.0%)",false,codex
+B050,nstxu_204202/N4/egn04w.2191E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=97.8%)",false,codex
+B051,nstxu_204202/N4/egn04w.2635E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B052,nstxu_204202/N4/egn04w.4189E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=25.8%)",false,codex
+B053,nstxu_204202/N4/egn04w.5390E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.445, E±0.03=24.3%)",false,codex
+B054,nstxu_204202/N4/egn04w.5498E+02,bad,medium,"thin spike-like main envelope (7 half-max points, width50=0.035)",false,codex
+B055,nstxu_204202/N4/egn04w.5557E+02,bad,high,"outer-boundary dominated peak (r_peak=0.970, width50=0.010)",false,codex
+B056,nstxu_204202/N4/egn04w.5610E+02,bad,medium,"thin spike-like main envelope (5 half-max points, width50=0.025)",false,codex
+B057,nstxu_204202/N4/egn04w.5691E+02,bad,high,"unresolved narrow envelope (2 half-max grid points, 6 points above 0.1 Wmax)",false,codex
+B058,nstxu_204202/N4/egn04w.5978E+02,bad,high,"unresolved narrow envelope (2 half-max grid points, 17 points above 0.1 Wmax)",false,codex
+B059,nstxu_204202/N5/egn05w.5249E+01,bad,high,"unresolved narrow envelope (2 half-max grid points, 4 points above 0.1 Wmax)",false,codex
+B060,nstxu_204202/N5/egn05w.6250E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.346, E±0.03=15.5%)",false,codex
+B061,nstxu_204202/N5/egn05w.6678E+01,bad,high,"unresolved narrow envelope (2 half-max grid points, 31 points above 0.1 Wmax)",false,codex
+B062,nstxu_204202/N5/egn05w.6749E+01,bad,high,"unresolved narrow envelope (1 half-max grid points, 2 points above 0.1 Wmax)",false,codex
+B063,nstxu_204202/N5/egn05w.7010E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.245, E±0.03=11.6%)",false,codex
+B064,nstxu_204202/N5/egn05w.7562E+01,skip,low,"borderline continuum interaction in resolved envelope (max W=0.099, E±0.03=5.3%)",false,codex
+B065,nstxu_204202/N5/egn05w.7666E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.539, E±0.03=9.8%)",false,codex
+B066,nstxu_204202/N5/egn05w.7891E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.485, E±0.03=14.7%)",false,codex
+B067,nstxu_204202/N5/egn05w.9219E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=81.8%)",false,codex
+B068,nstxu_204202/N5/egn05w.1086E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.030, axis E=75.1%)",false,codex
+B069,nstxu_204202/N5/egn05w.1124E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.020, axis E=99.4%)",false,codex
+B070,nstxu_204202/N5/egn05w.1266E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.630, width90=0.368)",false,codex
+B071,nstxu_204202/N5/egn05w.1358E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.695, width90=0.389)",false,codex
+B072,nstxu_204202/N5/egn05w.1651E+02,bad,high,"outer-boundary dominated peak (r_peak=0.960, width50=0.015)",false,codex
+B073,nstxu_204202/N5/egn05w.1894E+02,bad,high,"outer-boundary dominated peak (r_peak=0.975, width50=0.030)",false,codex
+B074,nstxu_204202/N5/egn05w.2135E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.805, width90=0.312)",false,codex
+B075,nstxu_204202/N5/egn05w.2391E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.830, width90=0.314)",false,codex
+B076,nstxu_204202/N5/egn05w.2841E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=98.6%)",false,codex
+B077,nstxu_204202/N5/egn05w.2900E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.020, axis E=83.5%)",false,codex
+B078,nstxu_204202/N5/egn05w.2907E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.870, width90=0.334)",false,codex
+B079,nstxu_204202/N5/egn05w.3044E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.519, E±0.03=35.9%)",false,codex
+B080,nstxu_204202/N5/egn05w.4909E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.413, E±0.03=18.0%)",false,codex
+B081,nstxu_204202/N5/egn05w.5039E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.503, E±0.03=16.7%)",false,codex
+B082,nstxu_204202/N5/egn05w.5423E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.417, E±0.03=10.2%)",false,codex
+B083,nstxu_204202/N5/egn05w.5445E+02,bad,medium,"thin spike-like main envelope (4 half-max points, width50=0.020)",false,codex
+B084,nstxu_204202/N5/egn05w.5473E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 7 points above 0.1 Wmax)",false,codex
+B085,nstxu_204202/N5/egn05w.5612E+02,bad,medium,"thin spike-like main envelope (7 half-max points, width50=0.025)",false,codex
+B086,nstxu_204202/N5/egn05w.5727E+02,bad,medium,"thin spike-like main envelope (4 half-max points, width50=0.020)",false,codex
+B087,nstxu_204202/N5/egn05w.5813E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 3 points above 0.1 Wmax)",false,codex
+B088,nstxu_204202/N5/egn05w.6753E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.535, axis E=35.3%)",false,codex
+B089,nstxu_204202/N6/egn06w.6043E+01,bad,high,"unresolved narrow envelope (2 half-max grid points, 21 points above 0.1 Wmax)",false,codex
+B090,nstxu_204202/N6/egn06w.7662E+01,skip,low,"borderline continuum interaction in resolved envelope (max W=0.052, E±0.03=4.3%)",false,codex
+B091,nstxu_204202/N6/egn06w.7722E+01,bad,high,"unresolved narrow envelope (2 half-max grid points, 3 points above 0.1 Wmax)",false,codex
+B092,nstxu_204202/N6/egn06w.7914E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.011, E±0.03=0.88%)",false,codex
+B093,nstxu_204202/N6/egn06w.8580E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.410, E±0.03=8.1%)",false,codex
+B094,nstxu_204202/N6/egn06w.9143E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.028, E±0.03=0.32%)",false,codex
+B095,nstxu_204202/N6/egn06w.9214E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.261, E±0.03=22.6%)",false,codex
+B096,nstxu_204202/N6/egn06w.9396E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.508, E±0.03=18.6%)",false,codex
+B097,nstxu_204202/N6/egn06w.9561E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.920, E±0.03=14.7%)",false,codex
+B098,nstxu_204202/N6/egn06w.9707E+01,bad,medium,"narrow jagged peak on broader tail (12 half-max points, width50=0.010)",false,codex
+B099,nstxu_204202/N6/egn06w.9833E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.485, E±0.03=16.7%)",false,codex
+B100,nstxu_204202/N6/egn06w.9938E+01,bad,medium,"thin spike-like main envelope (6 half-max points, width50=0.035)",false,codex
+B101,nstxu_204202/N6/egn06w.1001E+02,bad,medium,"thin spike-like main envelope (4 half-max points, width50=0.025)",false,codex
+B102,nstxu_204202/N6/egn06w.1049E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.020, axis E=60.9%)",false,codex
+B103,nstxu_204202/N6/egn06w.1097E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=78.9%)",false,codex
+B104,nstxu_204202/N6/egn06w.1175E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=99.9%)",false,codex
+B105,nstxu_204202/N6/egn06w.1273E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.655, width90=0.375)",false,codex
+B106,nstxu_204202/N6/egn06w.1439E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.665, width90=0.363)",false,codex
+B107,nstxu_204202/N6/egn06w.1618E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.720, width90=0.371)",false,codex
+B108,nstxu_204202/N6/egn06w.1899E+02,bad,high,"outer-boundary dominated peak (r_peak=0.955, width50=0.015)",false,codex
+B109,nstxu_204202/N6/egn06w.2315E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.800, width90=0.288)",false,codex
+B110,nstxu_204202/N6/egn06w.2617E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=43.2%)",false,codex
+B111,nstxu_204202/N6/egn06w.2649E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=62.2%)",false,codex
+B112,nstxu_204202/N6/egn06w.2987E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.005, E±0.03=0.10%)",false,codex
+B113,nstxu_204202/N6/egn06w.4500E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.678, E±0.03=14.0%)",false,codex
+B114,nstxu_204202/N6/egn06w.4624E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.391, E±0.03=14.7%)",false,codex
+B115,nstxu_204202/N6/egn06w.5134E+02,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.272, E±0.03=10.0%)",false,codex
+B116,nstxu_204202/N6/egn06w.5177E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 2 points above 0.1 Wmax)",false,codex
+B117,nstxu_204202/N6/egn06w.5736E+02,bad,medium,"thin spike-like main envelope (4 half-max points, width50=0.015)",false,codex
+B118,nstxu_204202/N6/egn06w.5856E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 8 points above 0.1 Wmax)",false,codex
+B119,nstxu_204202/N6/egn06w.6048E+02,bad,high,"unresolved narrow envelope (2 half-max grid points, 18 points above 0.1 Wmax)",false,codex
+B120,nstxu_204202/N7/egn07w.5229E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=72.5%)",false,codex
+B121,nstxu_204202/N7/egn07w.5281E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=32.3%)",false,codex
+B122,nstxu_204202/N7/egn07w.5606E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.521, E±0.03=6.7%)",false,codex
+B123,nstxu_204202/N7/egn07w.5735E+01,bad,high,"unresolved narrow envelope (1 half-max grid points, 11 points above 0.1 Wmax)",false,codex
+B124,nstxu_204202/N7/egn07w.6822E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.610, axis E=17.9%)",false,codex
+B125,nstxu_204202/N7/egn07w.8196E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=16.5%)",false,codex
+B126,nstxu_204202/N7/egn07w.8631E+01,bad,medium,"thin spike-like main envelope (5 half-max points, width50=0.030)",false,codex
+B127,nstxu_204202/N7/egn07w.8929E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.002, E±0.03=0.18%)",false,codex
+B128,nstxu_204202/N7/egn07w.9477E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.004, E±0.03=0.09%)",false,codex
+B129,nstxu_204202/N7/egn07w.1060E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.01%)",false,codex
+B130,nstxu_204202/N7/egn07w.1138E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.025, axis E=99.3%)",false,codex
+B131,nstxu_204202/N7/egn07w.1162E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B132,nstxu_204202/N7/egn07w.1277E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=97.9%)",false,codex
+B133,nstxu_204202/N7/egn07w.1282E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=38.3%)",false,codex
+B134,nstxu_204202/N7/egn07w.1291E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=79.1%)",false,codex
+B135,nstxu_204202/N7/egn07w.1301E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=87.6%)",false,codex
+B136,nstxu_204202/N7/egn07w.1306E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=94.1%)",false,codex
+B137,nstxu_204202/N7/egn07w.1311E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=50.0%)",false,codex
+B138,nstxu_204202/N7/egn07w.1316E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=97.3%)",false,codex
+B139,nstxu_204202/N7/egn07w.1322E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=97.0%)",false,codex
+B140,nstxu_204202/N7/egn07w.1327E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=80.3%)",false,codex
+B141,nstxu_204202/N7/egn07w.1340E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=99.7%)",false,codex
+B142,nstxu_204202/N7/egn07w.1344E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=99.7%)",false,codex
+B143,nstxu_204202/N7/egn07w.1353E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=99.8%)",false,codex
+B144,nstxu_204202/N7/egn07w.1444E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.680, width90=0.340)",false,codex
+B145,nstxu_204202/N7/egn07w.1602E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=100.0%)",false,codex
+B146,nstxu_204202/N7/egn07w.1667E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.690, width90=0.343)",false,codex
+B147,nstxu_204202/N7/egn07w.1819E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.730, width90=0.357)",false,codex
+B148,nstxu_204202/N7/egn07w.2109E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=34.9%)",false,codex
+B149,nstxu_204202/N7/egn07w.2172E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=79.6%)",false,codex
+B150,nstxu_204202/N7/egn07w.2176E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.005, axis E=85.1%)",false,codex
+B151,nstxu_204202/N7/egn07w.2851E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.001, E±0.03=0.04%)",false,codex
+B152,nstxu_204202/N7/egn07w.3107E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.004, E±0.03=0.07%)",false,codex
+B153,nstxu_204202/N7/egn07w.3718E+02,bad,high,"outer-boundary dominated peak (r_peak=0.955, width50=0.010)",false,codex
+B154,nstxu_204202/N7/egn07w.4336E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.518, E±0.03=11.3%)",false,codex
+B155,nstxu_204202/N7/egn07w.5453E+02,bad,high,"unresolved narrow envelope (2 half-max grid points, 19 points above 0.1 Wmax)",false,codex
+B156,nstxu_204202/N7/egn07w.5724E+02,bad,medium,"thin spike-like main envelope (5 half-max points, width50=0.025)",false,codex
+B157,nstxu_204202/N7/egn07w.5737E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 13 points above 0.1 Wmax)",false,codex
+B158,nstxu_204202/N7/egn07w.5840E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 19 points above 0.1 Wmax)",false,codex
+B159,nstxu_204202/N7/egn07w.6286E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=38.9%)",false,codex
+B160,nstxu_204202/N7/egn07w.6448E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=46.7%)",false,codex
+B161,nstxu_204202/N7/egn07w.6544E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=57.9%)",false,codex
+B162,nstxu_204202/N7/egn07w.6773E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=36.6%)",false,codex
+B163,nstxu_204202/N7/egn07w.6868E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=48.0%)",false,codex
+B164,nstxu_204202/N7/egn07w.7246E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=40.2%)",false,codex
+B165,nstxu_204202/N8/egn08w.5135E+01,bad,medium,"thin spike-like main envelope (6 half-max points, width50=0.020)",false,codex
+B166,nstxu_204202/N8/egn08w.6173E+01,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.498, E±0.03=5.7%)",false,codex
+B167,nstxu_204202/N8/egn08w.6595E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.132, E±0.03=12.1%)",false,codex
+B168,nstxu_204202/N8/egn08w.9247E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.001, E±0.03=0.01%)",false,codex
+B169,nstxu_204202/N8/egn08w.9915E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B170,nstxu_204202/N8/egn08w.1072E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B171,nstxu_204202/N8/egn08w.1192E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B172,nstxu_204202/N8/egn08w.1566E+02,bad,medium,"axis-localized spike/energy concentration (r_peak=0.085, axis E=24.4%)",false,codex
+B173,nstxu_204202/N8/egn08w.1573E+02,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=28.7%)",false,codex
+B174,nstxu_204202/N8/egn08w.1583E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=37.2%)",false,codex
+B175,nstxu_204202/N8/egn08w.1612E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=78.5%)",false,codex
+B176,nstxu_204202/N8/egn08w.1650E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.700, width90=0.323)",false,codex
+B177,nstxu_204202/N8/egn08w.1790E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.705, width90=0.336)",false,codex
+B178,nstxu_204202/N8/egn08w.2025E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B179,nstxu_204202/N8/egn08w.2323E+02,bad,medium,"outer-boundary dominated peak (r_peak=0.945, width50=0.020)",false,codex
+B180,nstxu_204202/N8/egn08w.2651E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B181,nstxu_204202/N8/egn08w.3013E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.01%)",false,codex
+B182,nstxu_204202/N8/egn08w.3306E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.004, E±0.03=0.07%)",false,codex
+B183,nstxu_204202/N8/egn08w.3721E+02,bad,medium,"outer-boundary dominated peak (r_peak=0.925, width50=0.010)",false,codex
+B184,nstxu_204202/N8/egn08w.4253E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 7 points above 0.1 Wmax)",false,codex
+B185,nstxu_204202/N8/egn08w.4276E+02,bad,medium,"unresolved narrow envelope (3 half-max grid points, 16 points above 0.1 Wmax)",false,codex
+B186,nstxu_204202/N8/egn08w.4293E+02,bad,medium,"thin spike-like main envelope (6 half-max points, width50=0.025)",false,codex
+B187,nstxu_204202/N8/egn08w.4585E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.550, E±0.03=21.9%)",false,codex
+B188,nstxu_204202/N8/egn08w.5180E+02,bad,medium,"thin spike-like main envelope (7 half-max points, width50=0.025)",false,codex
+B189,nstxu_204202/N8/egn08w.5262E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 8 points above 0.1 Wmax)",false,codex
+B190,nstxu_204202/N8/egn08w.5579E+02,bad,medium,"thin spike-like main envelope (7 half-max points, width50=0.030)",false,codex
+B191,nstxu_204202/N8/egn08w.5676E+02,bad,medium,"thin spike-like main envelope (4 half-max points, width50=0.010)",false,codex
+B192,nstxu_204202/N8/egn08w.5804E+02,bad,medium,"thin spike-like main envelope (4 half-max points, width50=0.020)",false,codex
+B193,nstxu_204202/N8/egn08w.5882E+02,bad,medium,"unresolved narrow envelope (3 half-max grid points, 23 points above 0.1 Wmax)",false,codex
+B194,nstxu_204202/N8/egn08w.6547E+02,bad,medium,"axis-localized spike/energy concentration (r_peak=0.525, axis E=29.9%)",false,codex
+B195,nstxu_204202/N8/egn08w.7126E+02,bad,medium,"axis-localized spike/energy concentration (r_peak=0.610, axis E=26.4%)",false,codex
+B196,nstxu_204202/N9/egn09w.5255E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=57.2%)",false,codex
+B197,nstxu_204202/N9/egn09w.5840E+01,bad,medium,"narrow jagged peak on broader tail (9 half-max points, width50=0.010)",false,codex
+B198,nstxu_204202/N9/egn09w.5962E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.178, E±0.03=6.7%)",false,codex
+B199,nstxu_204202/N9/egn09w.6129E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.670, axis E=26.7%)",false,codex
+B200,nstxu_204202/N9/egn09w.6742E+01,bad,medium,"true continuum crossing carries appreciable mode energy (max W=0.173, E±0.03=8.5%)",false,codex
+B201,nstxu_204202/N9/egn09w.6922E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=40.3%)",false,codex
+B202,nstxu_204202/N9/egn09w.9539E+01,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.005, E±0.03=0.12%)",false,codex
+B203,nstxu_204202/N9/egn09w.9649E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=99.7%)",false,codex
+B204,nstxu_204202/N9/egn09w.1029E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B205,nstxu_204202/N9/egn09w.1091E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B206,nstxu_204202/N9/egn09w.1197E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B207,nstxu_204202/N9/egn09w.1241E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=99.9%)",false,codex
+B208,nstxu_204202/N9/egn09w.1439E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B209,nstxu_204202/N9/egn09w.1562E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B210,nstxu_204202/N9/egn09w.1804E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.710, width90=0.307)",false,codex
+B211,nstxu_204202/N9/egn09w.1941E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.720, width90=0.319)",false,codex
+B212,nstxu_204202/N9/egn09w.2021E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.025, axis E=98.3%)",false,codex
+B213,nstxu_204202/N9/egn09w.2201E+02,bad,medium,"outer-boundary dominated peak (r_peak=0.935, width50=0.050)",false,codex
+B214,nstxu_204202/N9/egn09w.3150E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B215,nstxu_204202/N9/egn09w.3222E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B216,nstxu_204202/N9/egn09w.3282E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=48.9%)",false,codex
+B217,nstxu_204202/N9/egn09w.3285E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.01%)",false,codex
+B218,nstxu_204202/N9/egn09w.3289E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B219,nstxu_204202/N9/egn09w.3315E+02,bad,high,"outer-boundary dominated peak (r_peak=0.960, width50=0.020)",false,codex
+B220,nstxu_204202/N9/egn09w.3423E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.002, E±0.03=0.07%)",false,codex
+B221,nstxu_204202/N9/egn09w.3727E+02,bad,medium,"thin spike-like main envelope (6 half-max points, width50=0.035)",false,codex
+B222,nstxu_204202/N9/egn09w.3737E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.004, E±0.03=0.30%)",false,codex
+B223,nstxu_204202/N9/egn09w.3911E+02,bad,medium,"outer-boundary dominated peak (r_peak=0.920, width50=0.010)",false,codex
+B224,nstxu_204202/N9/egn09w.4417E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.396, E±0.03=14.3%)",false,codex
+B225,nstxu_204202/N9/egn09w.4979E+02,bad,medium,"unresolved narrow envelope (3 half-max grid points, 20 points above 0.1 Wmax)",false,codex
+B226,nstxu_204202/N9/egn09w.5019E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 3 points above 0.1 Wmax)",false,codex
+B227,nstxu_204202/N9/egn09w.5431E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 20 points above 0.1 Wmax)",false,codex
+B228,nstxu_204202/N10/egn10w.5402E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=46.6%)",false,codex
+B229,nstxu_204202/N10/egn10w.5558E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=85.4%)",false,codex
+B230,nstxu_204202/N10/egn10w.5883E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=34.4%)",false,codex
+B231,nstxu_204202/N10/egn10w.6022E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=17.7%)",false,codex
+B232,nstxu_204202/N10/egn10w.6112E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=30.5%)",false,codex
+B233,nstxu_204202/N10/egn10w.6610E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=32.3%)",false,codex
+B234,nstxu_204202/N10/egn10w.6723E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=99.3%)",false,codex
+B235,nstxu_204202/N10/egn10w.6943E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=87.0%)",false,codex
+B236,nstxu_204202/N10/egn10w.7180E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=17.5%)",false,codex
+B237,nstxu_204202/N10/egn10w.7437E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=19.5%)",false,codex
+B238,nstxu_204202/N10/egn10w.8050E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=8.1%)",false,codex
+B239,nstxu_204202/N10/egn10w.8334E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.500, axis E=20.8%)",false,codex
+B240,nstxu_204202/N10/egn10w.8645E+01,bad,high,"unresolved narrow envelope (1 half-max grid points, 7 points above 0.1 Wmax)",false,codex
+B241,nstxu_204202/N10/egn10w.9186E+01,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=24.3%)",false,codex
+B242,nstxu_204202/N10/egn10w.9591E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=72.0%)",false,codex
+B243,nstxu_204202/N10/egn10w.9791E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=89.8%)",false,codex
+B244,nstxu_204202/N10/egn10w.9884E+01,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=95.3%)",false,codex
+B245,nstxu_204202/N10/egn10w.1012E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=98.7%)",false,codex
+B246,nstxu_204202/N10/egn10w.1018E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=99.9%)",false,codex
+B247,nstxu_204202/N10/egn10w.1026E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.01%)",false,codex
+B248,nstxu_204202/N10/egn10w.1123E+02,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=14.0%)",false,codex
+B249,nstxu_204202/N10/egn10w.1245E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.030, axis E=38.6%)",false,codex
+B250,nstxu_204202/N10/egn10w.1303E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.635, width90=0.359)",false,codex
+B251,nstxu_204202/N10/egn10w.1334E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.020, axis E=95.5%)",false,codex
+B252,nstxu_204202/N10/egn10w.1425E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.640, width90=0.338)",false,codex
+B253,nstxu_204202/N10/egn10w.1568E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.680, width90=0.353)",false,codex
+B254,nstxu_204202/N10/egn10w.1657E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=99.8%)",false,codex
+B255,nstxu_204202/N10/egn10w.1690E+02,bad,medium,"axis-localized spike/energy concentration (r_peak=0.015, axis E=8.9%)",false,codex
+B256,nstxu_204202/N10/egn10w.1915E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.720, width90=0.297)",false,codex
+B257,nstxu_204202/N10/egn10w.2074E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.730, width90=0.305)",false,codex
+B258,nstxu_204202/N10/egn10w.2304E+02,good,high,"resolved coherent envelope with no true continuum crossing (r_peak=0.755, width90=0.302)",false,codex
+B259,nstxu_204202/N10/egn10w.2573E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.015, axis E=100.0%)",false,codex
+B260,nstxu_204202/N10/egn10w.2604E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.005, E±0.03=0.03%)",false,codex
+B261,nstxu_204202/N10/egn10w.2918E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.651, E±0.03=31.5%)",false,codex
+B262,nstxu_204202/N10/egn10w.2928E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.00%)",false,codex
+B263,nstxu_204202/N10/egn10w.3048E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=29.1%)",false,codex
+B264,nstxu_204202/N10/egn10w.3231E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=44.0%)",false,codex
+B265,nstxu_204202/N10/egn10w.3235E+02,bad,medium,"thin spike-like main envelope (5 half-max points, width50=0.010)",false,codex
+B266,nstxu_204202/N10/egn10w.3236E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.000, E±0.03=0.01%)",false,codex
+B267,nstxu_204202/N10/egn10w.3556E+02,good,medium,"resolved coherent envelope; only tiny remote tail crossing (max W=0.003, E±0.03=0.13%)",false,codex
+B268,nstxu_204202/N10/egn10w.3991E+02,bad,medium,"outer-boundary dominated peak (r_peak=0.915, width50=0.010)",false,codex
+B269,nstxu_204202/N10/egn10w.4230E+02,bad,high,"true continuum crossing carries appreciable mode energy (max W=0.622, E±0.03=9.5%)",false,codex
+B270,nstxu_204202/N10/egn10w.5178E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=48.0%)",false,codex
+B271,nstxu_204202/N10/egn10w.5250E+02,bad,medium,"unresolved narrow envelope (3 half-max grid points, 20 points above 0.1 Wmax)",false,codex
+B272,nstxu_204202/N10/egn10w.5322E+02,bad,high,"unresolved narrow envelope (1 half-max grid points, 8 points above 0.1 Wmax)",false,codex
+B273,nstxu_204202/N10/egn10w.5521E+02,bad,medium,"thin spike-like main envelope (7 half-max points, width50=0.020)",false,codex
+B274,nstxu_204202/N10/egn10w.5652E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=27.2%)",false,codex
+B275,nstxu_204202/N10/egn10w.6318E+02,bad,high,"axis-localized spike/energy concentration (r_peak=0.010, axis E=31.3%)",false,codex
