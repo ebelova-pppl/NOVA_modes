@@ -94,6 +94,7 @@ class NovaModeDataset(Dataset):
         M_target: int = 100,
         R_target: int = 201,
         continuum_branch: bool = False,
+        continuum_branch_zero_inputs: bool = False,
         continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
         cache_data: bool = False,
     ):
@@ -102,6 +103,7 @@ class NovaModeDataset(Dataset):
         self.M_target = M_target
         self.R_target = R_target
         self.continuum_branch = continuum_branch
+        self.continuum_branch_zero_inputs = continuum_branch_zero_inputs
         self.continuum_clip = continuum_clip
         self.cached_samples = None
         if cache_data:
@@ -137,6 +139,7 @@ class NovaModeDataset(Dataset):
                 omega,
                 R_target=self.R_target,
                 clip=self.continuum_clip,
+                zero_inputs=self.continuum_branch_zero_inputs,
             )
             return (
                 torch.from_numpy(x),
@@ -272,6 +275,7 @@ class Config:
     M_target: int = 100
     R_target: int = 201
     continuum_branch: bool = False
+    continuum_branch_zero_inputs: bool = False
     continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT
     device: str | None = None
     cache_data: bool = False
@@ -462,6 +466,15 @@ def parse_args() -> Config:
         ),
     )
     ap.add_argument(
+        "--continuum_branch_zero_inputs",
+        action="store_true",
+        help=(
+            "Architecture-only ablation: keep --continuum_branch and its "
+            "fusion/head architecture, but replace W, du, dl, and the validity "
+            "mask with an exact zero tensor during training and inference."
+        ),
+    )
+    ap.add_argument(
         "--continuum_clip",
         type=float,
         default=CONTINUUM_CHANNEL_CLIP_DEFAULT,
@@ -584,6 +597,10 @@ def main():
         raise ValueError("--lr must be positive")
     if cfg.continuum_clip <= 0.0 or not np.isfinite(cfg.continuum_clip):
         raise ValueError("--continuum_clip must be positive and finite")
+    if cfg.continuum_branch_zero_inputs and not cfg.continuum_branch:
+        raise ValueError(
+            "--continuum_branch_zero_inputs requires --continuum_branch"
+        )
     if cfg.onecycle_div_factor <= 0.0:
         raise ValueError("--onecycle_div_factor must be positive")
     if cfg.onecycle_final_div_factor <= 0.0:
@@ -605,15 +622,19 @@ def main():
         model_type = "cnn_raw"
     print(
         f"Raw preprocessing: R_target={cfg.R_target}, M_target={cfg.M_target}, "
-        f"input_channels=1, continuum_branch={cfg.continuum_branch}"
+        f"input_channels=1, continuum_branch={cfg.continuum_branch}, "
+        f"continuum_branch_zero_inputs={cfg.continuum_branch_zero_inputs}"
     )
     if cfg.continuum_branch:
-        print(
-            "Continuum branch: W_norm=sum_m|xi_m|^2/max(W), "
-            "du=(sqrt(high2)-omega)/omega, "
-            "dl=(omega-sqrt(low2))/omega, validity mask, "
-            f"clip=+/-{cfg.continuum_clip:g}"
-        )
+        if cfg.continuum_branch_zero_inputs:
+            print("Continuum branch inputs: all-zero architecture control")
+        else:
+            print(
+                "Continuum branch: W_norm=sum_m|xi_m|^2/max(W), "
+                "du=(sqrt(high2)-omega)/omega, "
+                "dl=(omega-sqrt(low2))/omega, validity mask, "
+                f"clip=+/-{cfg.continuum_clip:g}"
+            )
     print(f"Training recipe: {describe_training_recipe(cfg)}")
     if train_pos_weight is None:
         print("Loss pos_weight: none")
@@ -626,6 +647,7 @@ def main():
         M_target=cfg.M_target,
         R_target=cfg.R_target,
         continuum_branch=cfg.continuum_branch,
+        continuum_branch_zero_inputs=cfg.continuum_branch_zero_inputs,
         continuum_clip=cfg.continuum_clip,
         cache_data=cfg.cache_data,
     )
@@ -635,6 +657,7 @@ def main():
         M_target=cfg.M_target,
         R_target=cfg.R_target,
         continuum_branch=cfg.continuum_branch,
+        continuum_branch_zero_inputs=cfg.continuum_branch_zero_inputs,
         continuum_clip=cfg.continuum_clip,
         cache_data=cfg.cache_data,
     )
@@ -736,6 +759,7 @@ def main():
         R_target=cfg.R_target,
         M_target=cfg.M_target,
         continuum_branch=cfg.continuum_branch,
+        continuum_branch_zero_inputs=cfg.continuum_branch_zero_inputs,
         continuum_clip=cfg.continuum_clip,
     )
 
@@ -764,6 +788,7 @@ def main():
             M_target=cfg.M_target,
             R_target=cfg.R_target,
             continuum_branch=cfg.continuum_branch,
+            continuum_branch_zero_inputs=cfg.continuum_branch_zero_inputs,
             continuum_clip=cfg.continuum_clip,
             cache_data=cfg.cache_data,
         )
@@ -869,6 +894,7 @@ def main():
             "model_type": model_type,
             "input_channels": 1,
             "continuum_branch": cfg.continuum_branch,
+            "continuum_branch_zero_inputs": cfg.continuum_branch_zero_inputs,
             "continuum_input_channels": 4 if cfg.continuum_branch else 0,
             "continuum_features": (
                 ["W_norm", "du", "dl", "valid_mask"]

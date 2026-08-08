@@ -2444,3 +2444,69 @@ No production model was replaced. The next scientific check is a matched
 15-shot LOSO run against `outputs/loso_15_B12_W29_M100_bs8`, with special
 attention to old-G recall and whether the B12/W29 gain survives without the
 Q62/K51/H47 regression.
+
+### 2026-08-07: 15-shot radius-aligned continuum-branch LOSO result
+
+The matched 15-shot run completed under
+`outputs/loso_15_raw_continuum_branch_M100_bs8/`. All 15 folds and 2903
+held-out labeled modes were evaluated with no load failures. Configuration
+matched the no-continuum and broadcast experiments: seed 42, `M_target=100`,
+`R_target=201`, 80 epochs, batch size 8, LR 0.02, robust normalization, no
+positive-class weighting, cached data, and full-data refits.
+
+Aggregate CNN results were worse than both earlier variants:
+
+- no continuum: GOOD precision/recall/F1 `0.827 / 0.851 / 0.839`, FP/FN
+  `112 / 94`;
+- broadcast continuum: `0.859 / 0.833 / 0.846`, FP/FN `86 / 105`;
+- radius-aligned branch: `0.827 / 0.812 / 0.820`, FP/FN `107 / 118`.
+
+The branch partially repaired the broadcast old-G regression but did not
+recover the no-continuum baseline. Old-G F1/FN were `0.643 / 11` for baseline,
+`0.533 / 25` for broadcast, and `0.580 / 17` for the branch. B12/W29 branch
+F1/FN were `0.604 / 10`, between baseline (`0.565 / 13`) and broadcast
+(`0.654 / 9`). Non-G performance worsened to F1 `0.862` and 91 FN, versus
+baseline `0.876` and 70 FN. K51 and B12 improved, but E202855, E205052,
+141711, and Q62 produced the largest false-negative regressions.
+
+The combined policy remained effectively unchanged: baseline GOOD F1 was
+`0.863` with FP/FN `46 / 117`, while the branch gave `0.861` with `49 / 116`.
+Training logs contained no collapse warnings. A threshold sweep did not rescue
+the branch: aggregate average precision fell `0.878 -> 0.834`, and the best
+global branch threshold reached only F1 `0.825`. This indicates weaker ranking,
+not merely shifted calibration. Do not promote this branch.
+
+Interpretation is limited by an architecture confound: the branch experiment
+changed the fusion/head architecture as well as adding `W_norm`, `du`, `dl`,
+and the validity mask. An architecture-only zero-input ablation is needed to
+separate those effects.
+
+### 2026-08-07: architecture-only zero-branch LOSO control
+
+Added `--continuum_branch_zero_inputs` to `scripts/cnn_raw.py` and
+`--cnn_continuum_branch_zero_inputs` to the LOSO driver. The control retains
+the exact `ContinuumBranchCNN` architecture, including its 1D branch, radial
+fusion convolution, and head, but replaces all four branch inputs with an
+exact `(4, R_target)` float32 zero tensor. This includes `W_norm`; retaining it
+would test architecture plus an additional radial mode-envelope feature rather
+than architecture alone. Datcon loading and branch-feature construction are
+bypassed in this mode.
+
+The zero-input choice is stored in checkpoint preprocessing metadata as
+`continuum_branch_zero_inputs=True` and honored by canonical inference, so a
+control checkpoint cannot accidentally receive physical continuum inputs when
+sorting its held-out shot. Run metadata records the corresponding LOSO flag.
+
+Validation:
+
+- `python -m unittest tests/test_continuum_crossing_features.py` passed: 30
+  tests OK, including exact zero tensor shape/dtype and metadata resolution;
+- Python compilation and `git diff --check` passed;
+- a LOSO dry run emitted both branch flags and recorded the zero-input flag;
+- a cached one-epoch CPU smoke train saved
+  `/tmp/nova_cnn_raw_continuum_branch_zero_smoke.pt`; canonical inference
+  loaded it successfully and retained the zero-input preprocessing metadata.
+
+No production checkpoint was changed. The matched control output should use
+`outputs/loso_15_raw_continuum_branch_zero_M100_bs8` so it cannot overwrite
+the physical-branch run.

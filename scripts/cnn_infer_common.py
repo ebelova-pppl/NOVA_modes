@@ -137,6 +137,7 @@ def build_raw_preprocess_metadata(
     M_target: int,
     continuum_channels: bool = False,
     continuum_branch: bool = False,
+    continuum_branch_zero_inputs: bool = False,
     continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
 ) -> dict[str, Any]:
     return {
@@ -144,6 +145,7 @@ def build_raw_preprocess_metadata(
         "M_target": int(M_target),
         "continuum_channels": bool(continuum_channels),
         "continuum_branch": bool(continuum_branch),
+        "continuum_branch_zero_inputs": bool(continuum_branch_zero_inputs),
         "continuum_clip": float(continuum_clip),
     }
 
@@ -219,6 +221,14 @@ def resolve_raw_preprocess_metadata(
     continuum_branch = preprocess_block.get("continuum_branch")
     if continuum_branch is None:
         continuum_branch = checkpoint.get("continuum_branch", False)
+    continuum_branch_zero_inputs = preprocess_block.get(
+        "continuum_branch_zero_inputs"
+    )
+    if continuum_branch_zero_inputs is None:
+        continuum_branch_zero_inputs = checkpoint.get(
+            "continuum_branch_zero_inputs",
+            False,
+        )
     continuum_clip = preprocess_block.get("continuum_clip")
     if continuum_clip is None:
         continuum_clip = checkpoint.get(
@@ -227,6 +237,9 @@ def resolve_raw_preprocess_metadata(
         )
     resolved["continuum_channels"] = bool(continuum_channels)
     resolved["continuum_branch"] = bool(continuum_branch)
+    resolved["continuum_branch_zero_inputs"] = bool(
+        continuum_branch_zero_inputs
+    )
     resolved["continuum_clip"] = float(continuum_clip)
 
     if missing:
@@ -329,8 +342,14 @@ def build_continuum_branch_array(
     *,
     R_target: int,
     clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
+    zero_inputs: bool = False,
 ) -> np.ndarray:
     """Build ``W_norm``, ``du``, ``dl``, and validity-mask radial channels."""
+    if R_target < 1:
+        raise ValueError(f"R_target must be positive, got {R_target}")
+    if zero_inputs:
+        return np.zeros((4, R_target), dtype=np.float32)
+
     mode = np.asarray(mode)
     if mode.ndim != 2 or mode.shape[1] < 1:
         raise ValueError(f"mode must be a nonempty 2D array, got shape {mode.shape}")
@@ -759,6 +778,12 @@ class LoadedCNNClassifier:
                         self.preprocess.get(
                             "continuum_clip",
                             CONTINUUM_CHANNEL_CLIP_DEFAULT,
+                        )
+                    ),
+                    zero_inputs=bool(
+                        self.preprocess.get(
+                            "continuum_branch_zero_inputs",
+                            False,
                         )
                     ),
                 )

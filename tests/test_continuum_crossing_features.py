@@ -37,6 +37,8 @@ from cnn_infer_common import (  # noqa: E402
     ContinuumBranchCNN,
     build_continuum_branch_array,
     build_continuum_channel_array,
+    build_raw_preprocess_metadata,
+    resolve_raw_preprocess_metadata,
 )
 
 
@@ -344,6 +346,27 @@ class ContinuumScalarTests(unittest.TestCase):
 
         np.testing.assert_allclose(branch[0], [0.0, 0.25, 1.0, 0.25, 0.0])
         np.testing.assert_allclose(branch[1:], 0.0)
+
+    def test_cnn_continuum_branch_zero_input_control(self):
+        branch = build_continuum_branch_array(
+            "/missing/N3/egn03w.test",
+            np.array([[1.0]]),
+            1.0,
+            R_target=7,
+            zero_inputs=True,
+        )
+        metadata = build_raw_preprocess_metadata(
+            R_target=7,
+            M_target=100,
+            continuum_branch=True,
+            continuum_branch_zero_inputs=True,
+        )
+        resolved = resolve_raw_preprocess_metadata({"preprocess": metadata})
+
+        self.assertEqual(branch.shape, (4, 7))
+        self.assertEqual(branch.dtype, np.float32)
+        np.testing.assert_array_equal(branch, 0.0)
+        self.assertTrue(resolved["continuum_branch_zero_inputs"])
 
     def test_cnn_continuum_branch_model_output_shape(self):
         model = ContinuumBranchCNN()

@@ -73,6 +73,11 @@ Checkpoints save `model_type=cnn_raw_continuum_branch`; use
 `--cnn_model_kind cnn_raw_continuum_branch` or `auto` for inference. The
 retired broadcast-channel checkpoints remain loadable as
 `cnn_raw_continuum`, but `cnn_raw.py` no longer trains that architecture.
+For an architecture-only ablation, pass `--continuum_branch` together with
+`--continuum_branch_zero_inputs`. This keeps the same 1D branch, radial fusion,
+and classifier head but supplies an exact zero tensor for all four branch
+inputs during both training and checkpoint inference. In LOSO, the matching
+driver option is `--cnn_continuum_branch_zero_inputs`.
 `cnn_raw.py` uses one shared OneCycleLR plus gradient-clipping recipe for both
 split training and the optional production full-data refit. The raw CNN
 default `--lr=0.02` is the OneCycle peak LR, chosen from a small sweep because
@@ -172,6 +177,23 @@ python "$NOVA_REPO/scripts/run_loso_10.py" \
   --cnn_batch_size 8 \
   --cnn_m_target 100 \
   --cnn_continuum_branch
+```
+
+To isolate the effect of the new architecture from the physical branch
+features, use a separate output directory and add the zero-input control:
+
+```bash
+python "$NOVA_REPO/scripts/run_loso_10.py" \
+  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --data_dir "$NOVA_DATA" \
+  --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_branch_zero_M100_bs8" \
+  --work_root "$SCRATCH/nova_sc/loso_15_raw_continuum_branch_zero_M100_bs8" \
+  --cnn_batch_size 8 \
+  --cnn_m_target 100 \
+  --cnn_continuum_branch \
+  --cnn_continuum_branch_zero_inputs \
+  --cnn_cache_data \
+  --cnn_refit_full_before_save
 ```
 
 Bash users should source `$(conda info --base)/etc/profile.d/conda.sh` before

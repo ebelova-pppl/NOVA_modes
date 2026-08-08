@@ -260,6 +260,9 @@ def write_run_config(args: argparse.Namespace, fold_shots: Sequence[str]) -> Non
         "cnn_normalize": args.cnn_normalize,
         "cnn_pos_weight": args.cnn_pos_weight,
         "cnn_continuum_branch": args.cnn_continuum_branch,
+        "cnn_continuum_branch_zero_inputs": (
+            args.cnn_continuum_branch_zero_inputs
+        ),
         "cnn_continuum_clip": args.cnn_continuum_clip,
         "cnn_refit_full_before_save": args.cnn_refit_full_before_save,
         "model_eval_threshold": args.model_eval_threshold,
@@ -379,6 +382,8 @@ def run_cnn_fold(args: argparse.Namespace, shot: str, env: dict[str, str]) -> No
     if args.cnn_continuum_branch:
         cmd.append("--continuum_branch")
         cmd.extend(["--continuum_clip", str(args.cnn_continuum_clip)])
+    if args.cnn_continuum_branch_zero_inputs:
+        cmd.append("--continuum_branch_zero_inputs")
     if args.cnn_pos_weight:
         cmd.extend(["--pos_weight", args.cnn_pos_weight])
     if args.cnn_cache_data:
@@ -633,6 +638,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
         ),
     )
     ap.add_argument(
+        "--cnn_continuum_branch_zero_inputs",
+        action="store_true",
+        help=(
+            "Architecture-only ablation: use the continuum branch/fusion model "
+            "with W, du, dl, and mask inputs set identically to zero."
+        ),
+    )
+    ap.add_argument(
         "--cnn_continuum_clip",
         type=float,
         default=5.0,
@@ -656,6 +669,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_arg_parser().parse_args()
+    if args.cnn_continuum_branch_zero_inputs and not args.cnn_continuum_branch:
+        raise SystemExit(
+            "--cnn_continuum_branch_zero_inputs requires --cnn_continuum_branch"
+        )
     args.repo_root = args.repo_root.expanduser().resolve()
     args.train_csv = args.train_csv.expanduser().resolve()
     n_train_shots = count_training_shots(args.train_csv)
@@ -688,6 +705,10 @@ def main() -> None:
     print(f"n_shots:   {n_train_shots}")
     print(f"M_target:  {args.cnn_m_target}")
     print(f"continuum branch: {args.cnn_continuum_branch}")
+    print(
+        "zero continuum branch inputs: "
+        f"{args.cnn_continuum_branch_zero_inputs}"
+    )
 
     fold_shots: list[str]
     if "split" in args.steps:
