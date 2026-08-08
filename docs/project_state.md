@@ -2528,8 +2528,7 @@ the human or canonical training labels were opened. The sealed review contains
 
 After the human labels were revised, all 275 audited paths matched between the
 sealed review, `tests/labels_audit/labels_human_review.csv`, and
-`training_labels/tae_like_train.csv` (the human list has four additional
-non-audit rows). Final comparisons are:
+`training_labels/tae_like_train.csv`. Final comparisons are:
 
 - Codex-terra versus human: 247/275 agreement (89.82%), Cohen's kappa
   0.7447. Disagreements: BAD->GOOD 5, GOOD->BAD 17, SKIP->BAD 5, and
@@ -2561,13 +2560,18 @@ Sealed Codex counts were 64 GOOD, 208 BAD, and 3 SKIP decisions. After
 opening the human review and active training list, the comparison was:
 
 - Codex versus human review: 261/275 agreement (94.91%), Cohen's kappa
-  0.8614. Disagreements: BAD->GOOD 6, GOOD->BAD 5, SKIP->BAD 3. The human
-  list also contains four `nstxu_204202` rows outside the audited manifest.
+  0.8614. Disagreements: BAD->GOOD 6, GOOD->BAD 5, SKIP->BAD 3.
 - Codex versus `training_labels/tae_like_train.csv`: 260/275 agreement
   (94.55%), Cohen's kappa 0.8589. Disagreements: BAD->GOOD 11,
   GOOD->BAD 1, SKIP->BAD 2, SKIP->GOOD 1.
+- Human review versus the current `training_labels/tae_like_train.csv`:
+  all 275 shared `nstxu_204202` paths are present in both files, with 10
+  label changes. All 10 are current training GOOD -> human BAD. Four
+  review-only EAE rows were removed from the human review before this count.
 - The retained disagreement/audit discussion table is
   `tests/labels_audit/nstxu_204202/nstxu_204202_codex_union_disagreements.csv`.
+  The retained human-versus-training delta table is
+  `tests/labels_audit/nstxu_204202/nstxu_204202_human_vs_training_label_changes.csv`.
   Scratch manifests, raw measurement tables, intermediate comparison CSVs,
   and diagnostic plot directories were removed to keep `tests/labels_audit/`
   compact.
@@ -2596,6 +2600,7 @@ Discussion of the disagreements produced several updates to the
   continuum extremum without crossing through the connected mode body.
 
 The sealed list remains a blind-review artifact and was not retroactively
-edited after discussion. Any future change to `training_labels/tae_like_train.csv`
-should be made through an explicit adjudicated label update, not by modifying
-the sealed Codex file.
+edited after discussion. The active `training_labels/tae_like_train.csv` was
+not changed. The `nstxu_204202` human-review corrections should be applied
+later by creating a new versioned training list while preserving the current
+training list.

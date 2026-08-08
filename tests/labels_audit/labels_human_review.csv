@@ -46,7 +46,6 @@
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.2111E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.2191E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.2635E+02,good
-/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.2978E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.4189E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.5390E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.5498E+02,bad
@@ -59,7 +58,6 @@
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N4/egn04w.8263E+01,good
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.1086E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.1124E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.1252E+03,skip
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.1266E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.1358E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.1651E+02,good
@@ -89,7 +87,6 @@
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.7891E+01,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N5/egn05w.9219E+01,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.1001E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.1028E+03,skip
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.1049E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.1097E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.1175E+02,bad
@@ -121,7 +118,6 @@
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.9833E+01,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N6/egn06w.9938E+01,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N7/egn07w.1060E+02,good
-/global/cfs/cdirs/m314/nova2/data/nstxu_204202/N7/egn07w.1071E+03,skip
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N7/egn07w.1138E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N7/egn07w.1162E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxu_204202/N7/egn07w.1277E+02,bad
