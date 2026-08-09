@@ -1,0 +1,36 @@
+blind_id,path,codex_label,human_label,training_label,confidence,disagreement_type,three_way_category,codex_reason
+B001,nstx_141711/N1/egn01w.7183E+02,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B003,nstx_141711/N2/egn02w.4308E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,detached near-axis spike with appreciable pointwise amplitude
+B004,nstx_141711/N2/egn02w.4512E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,detached near-axis spike with appreciable pointwise amplitude
+B007,nstx_141711/N2/egn02w.6447E+02,good,good,bad,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing"
+B021,nstx_141711/N3/egn03w.3189E+02,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,detached near-axis spike with appreciable pointwise amplitude
+B024,nstx_141711/N3/egn03w.3350E+02,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,coherent resolved envelope with no material continuum crossing
+B030,nstx_141711/N3/egn03w.6735E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B047,nstx_141711/N4/egn04w.4863E+02,bad,good,good,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B050,nstx_141711/N4/egn04w.8898E+02,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing"
+B068,nstx_141711/N5/egn05w.5596E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B074,nstx_141711/N6/egn06w.1265E+03,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B095,nstx_141711/N6/egn06w.6072E+02,bad,good,good,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B096,nstx_141711/N6/egn06w.6996E+02,bad,good,good,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B104,nstx_141711/N7/egn07w.1500E+03,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B105,nstx_141711/N7/egn07w.1594E+03,bad,bad,good,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B106,nstx_141711/N7/egn07w.1825E+03,bad,bad,good,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B114,nstx_141711/N7/egn07w.3129E+02,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B116,nstx_141711/N7/egn07w.3787E+02,good,bad,good,medium,codex_vs_human;human_vs_training,codex_matches_training_human_differs,coherent resolved envelope with no material continuum crossing
+B126,nstx_141711/N7/egn07w.9318E+02,good,bad,good,medium,codex_vs_human;human_vs_training,codex_matches_training_human_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B129,nstx_141711/N8/egn08w.1296E+03,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B131,nstx_141711/N8/egn08w.1677E+03,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B132,nstx_141711/N8/egn08w.1878E+03,bad,bad,good,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B133,nstx_141711/N8/egn08w.1953E+03,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B160,nstx_141711/N8/egn08w.8043E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B164,nstx_141711/N9/egn09w.1148E+03,good,bad,good,medium,codex_vs_human;human_vs_training,codex_matches_training_human_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B168,nstx_141711/N9/egn09w.1566E+03,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B169,nstx_141711/N9/egn09w.1765E+03,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B174,nstx_141711/N9/egn09w.2629E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,continuum crossing falls inside the connected mode body or shoulder
+B175,nstx_141711/N9/egn09w.2747E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,continuum crossing falls inside the connected mode body or shoulder
+B176,nstx_141711/N9/egn09w.2889E+02,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,continuum crossing falls inside the connected mode body or shoulder
+B178,nstx_141711/N9/egn09w.3127E+02,good,bad,good,low,codex_vs_human;human_vs_training,codex_matches_training_human_differs,coherent mode; only continuum crossing is in a negligible detached tail
+B193,nstx_141711/N9/egn09w.8950E+02,bad,good,good,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/final-grid spike dominates the envelope
+B211,nstx_141711/N10/egn10w.2706E+02,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B212,nstx_141711/N10/egn10w.2824E+02,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,continuum crossing falls inside the connected mode body or shoulder
+B215,nstx_141711/N10/egn10w.3534E+02,good,bad,good,low,codex_vs_human;human_vs_training,codex_matches_training_human_differs,coherent mode; only continuum crossing is in a negligible detached tail

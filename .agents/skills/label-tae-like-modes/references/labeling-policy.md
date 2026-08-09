@@ -66,7 +66,11 @@ family, so do not apply one morphology standard to all modes.
    radially narrower and visually spikier near `r ~ 0.9`, even while the
    total mode envelope remains wide; this is not automatically a numerical
    boundary artifact. Distinguish physical shear-narrowed harmonic structure
-   from a detached grid-scale boundary artifact.
+   from a detached grid-scale boundary artifact. Sign changes or phase
+   variation among coupled edge harmonics are common in this family and do
+   not by themselves imply a separated spike or numerical boundary problem;
+   judge separation from the connected radial energy envelope and harmonic
+   coherence, not from sign reversal alone.
 3. Continuum-extremum-localized modes: modes localized near a maximum of the
    lower continuum boundary or a minimum of the upper continuum boundary,
    often at `r <~ 0.5`. These may be quite narrow and often have two dominant
@@ -90,6 +94,10 @@ Strong BAD evidence includes:
   problem; use pointwise amplitude near the axis as the primary screen, not
   only integrated near-axis energy;
 - jagged or mutually incoherent dominant harmonics;
+- an apparently sharp signed-harmonic feature that is detached from the
+  connected energy envelope or grid-scale in radius; do not count an
+  ordinary sign change within a coherent edge-localized envelope as
+  detachment by itself;
 - a continuum crossing through the main mode envelope or another location
   carrying appreciable pointwise or integrated mode energy;
 - a true continuum crossing inside the connected mode body, including a

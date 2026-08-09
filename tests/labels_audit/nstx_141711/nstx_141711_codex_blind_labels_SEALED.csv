@@ -1,0 +1,257 @@
+blind_id,path,validity,confidence,reason,prior_seen,reviewer
+B001,nstx_141711/N1/egn01w.7183E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B002,nstx_141711/N2/egn02w.2357E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B003,nstx_141711/N2/egn02w.4308E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B004,nstx_141711/N2/egn02w.4512E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B005,nstx_141711/N2/egn02w.4662E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B006,nstx_141711/N2/egn02w.5602E+02,good,high,coherent resolved envelope with no material continuum crossing,false,codex
+B007,nstx_141711/N2/egn02w.6447E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B008,nstx_141711/N2/egn02w.6783E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B009,nstx_141711/N3/egn03w.1129E+03,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B010,nstx_141711/N3/egn03w.1292E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B011,nstx_141711/N3/egn03w.1493E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B012,nstx_141711/N3/egn03w.2060E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B013,nstx_141711/N3/egn03w.2477E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B014,nstx_141711/N3/egn03w.3049E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B015,nstx_141711/N3/egn03w.3060E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B016,nstx_141711/N3/egn03w.3072E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B017,nstx_141711/N3/egn03w.3087E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B018,nstx_141711/N3/egn03w.3106E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B019,nstx_141711/N3/egn03w.3126E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B020,nstx_141711/N3/egn03w.3150E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B021,nstx_141711/N3/egn03w.3189E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B022,nstx_141711/N3/egn03w.3229E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B023,nstx_141711/N3/egn03w.3264E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B024,nstx_141711/N3/egn03w.3350E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B025,nstx_141711/N3/egn03w.3421E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B026,nstx_141711/N3/egn03w.4150E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B027,nstx_141711/N3/egn03w.4255E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B028,nstx_141711/N3/egn03w.5246E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B029,nstx_141711/N3/egn03w.5980E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B030,nstx_141711/N3/egn03w.6735E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B031,nstx_141711/N3/egn03w.8627E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B032,nstx_141711/N4/egn04w.1003E+03,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B033,nstx_141711/N4/egn04w.1226E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B034,nstx_141711/N4/egn04w.1521E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B035,nstx_141711/N4/egn04w.2108E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B036,nstx_141711/N4/egn04w.2251E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B037,nstx_141711/N4/egn04w.2483E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B038,nstx_141711/N4/egn04w.2511E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B039,nstx_141711/N4/egn04w.2722E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B040,nstx_141711/N4/egn04w.3127E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B041,nstx_141711/N4/egn04w.3557E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B042,nstx_141711/N4/egn04w.4674E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B043,nstx_141711/N4/egn04w.4712E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B044,nstx_141711/N4/egn04w.4751E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B045,nstx_141711/N4/egn04w.4804E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B046,nstx_141711/N4/egn04w.4841E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B047,nstx_141711/N4/egn04w.4863E+02,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B048,nstx_141711/N4/egn04w.5818E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B049,nstx_141711/N4/egn04w.7956E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B050,nstx_141711/N4/egn04w.8898E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B051,nstx_141711/N5/egn05w.1019E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B052,nstx_141711/N5/egn05w.1251E+03,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B053,nstx_141711/N5/egn05w.2234E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B054,nstx_141711/N5/egn05w.2443E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B055,nstx_141711/N5/egn05w.2455E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B056,nstx_141711/N5/egn05w.2526E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B057,nstx_141711/N5/egn05w.3326E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B058,nstx_141711/N5/egn05w.3338E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B059,nstx_141711/N5/egn05w.3366E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B060,nstx_141711/N5/egn05w.3417E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B061,nstx_141711/N5/egn05w.3429E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B062,nstx_141711/N5/egn05w.3646E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B063,nstx_141711/N5/egn05w.3732E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B064,nstx_141711/N5/egn05w.3890E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B065,nstx_141711/N5/egn05w.3996E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B066,nstx_141711/N5/egn05w.4326E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B067,nstx_141711/N5/egn05w.4773E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B068,nstx_141711/N5/egn05w.5596E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B069,nstx_141711/N5/egn05w.6648E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B070,nstx_141711/N5/egn05w.8838E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B071,nstx_141711/N5/egn05w.9302E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B072,nstx_141711/N6/egn06w.1028E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B073,nstx_141711/N6/egn06w.1180E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B074,nstx_141711/N6/egn06w.1265E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B075,nstx_141711/N6/egn06w.1429E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B076,nstx_141711/N6/egn06w.1606E+03,bad,high,"unresolved grid-scale radial spike, not a resolved mode",false,codex
+B077,nstx_141711/N6/egn06w.2065E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B078,nstx_141711/N6/egn06w.2240E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B079,nstx_141711/N6/egn06w.2386E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B080,nstx_141711/N6/egn06w.2395E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B081,nstx_141711/N6/egn06w.2400E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B082,nstx_141711/N6/egn06w.2719E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B083,nstx_141711/N6/egn06w.2864E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B084,nstx_141711/N6/egn06w.3259E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B085,nstx_141711/N6/egn06w.3274E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B086,nstx_141711/N6/egn06w.3279E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B087,nstx_141711/N6/egn06w.3297E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B088,nstx_141711/N6/egn06w.3306E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B089,nstx_141711/N6/egn06w.3557E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B090,nstx_141711/N6/egn06w.4024E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B091,nstx_141711/N6/egn06w.4312E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B092,nstx_141711/N6/egn06w.4763E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B093,nstx_141711/N6/egn06w.5196E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B094,nstx_141711/N6/egn06w.5877E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B095,nstx_141711/N6/egn06w.6072E+02,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B096,nstx_141711/N6/egn06w.6996E+02,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B097,nstx_141711/N6/egn06w.7398E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B098,nstx_141711/N6/egn06w.8126E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B099,nstx_141711/N6/egn06w.9258E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B100,nstx_141711/N7/egn07w.1044E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B101,nstx_141711/N7/egn07w.1168E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B102,nstx_141711/N7/egn07w.1225E+03,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B103,nstx_141711/N7/egn07w.1348E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B104,nstx_141711/N7/egn07w.1500E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B105,nstx_141711/N7/egn07w.1594E+03,bad,medium,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B106,nstx_141711/N7/egn07w.1825E+03,bad,medium,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B107,nstx_141711/N7/egn07w.1840E+03,good,low,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B108,nstx_141711/N7/egn07w.2315E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B109,nstx_141711/N7/egn07w.2354E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B110,nstx_141711/N7/egn07w.2391E+03,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B111,nstx_141711/N7/egn07w.2446E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B112,nstx_141711/N7/egn07w.2912E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B113,nstx_141711/N7/egn07w.3047E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B114,nstx_141711/N7/egn07w.3129E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B115,nstx_141711/N7/egn07w.3351E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B116,nstx_141711/N7/egn07w.3787E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B117,nstx_141711/N7/egn07w.3879E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B118,nstx_141711/N7/egn07w.4072E+02,good,medium,coherent resolved envelope with no material continuum crossing,false,codex
+B119,nstx_141711/N7/egn07w.4304E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B120,nstx_141711/N7/egn07w.4771E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B121,nstx_141711/N7/egn07w.4871E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B122,nstx_141711/N7/egn07w.4884E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B123,nstx_141711/N7/egn07w.5159E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B124,nstx_141711/N7/egn07w.5256E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B125,nstx_141711/N7/egn07w.8224E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B126,nstx_141711/N7/egn07w.9318E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B127,nstx_141711/N8/egn08w.1026E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B128,nstx_141711/N8/egn08w.1049E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B129,nstx_141711/N8/egn08w.1296E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B130,nstx_141711/N8/egn08w.1470E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B131,nstx_141711/N8/egn08w.1677E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B132,nstx_141711/N8/egn08w.1878E+03,bad,medium,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B133,nstx_141711/N8/egn08w.1953E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B134,nstx_141711/N8/egn08w.2017E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B135,nstx_141711/N8/egn08w.2079E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B136,nstx_141711/N8/egn08w.2242E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B137,nstx_141711/N8/egn08w.2243E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B138,nstx_141711/N8/egn08w.2285E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B139,nstx_141711/N8/egn08w.2294E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B140,nstx_141711/N8/egn08w.2308E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B141,nstx_141711/N8/egn08w.2389E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B142,nstx_141711/N8/egn08w.2459E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B143,nstx_141711/N8/egn08w.2554E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B144,nstx_141711/N8/egn08w.3005E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B145,nstx_141711/N8/egn08w.3070E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B146,nstx_141711/N8/egn08w.3109E+02,good,medium,coherent narrow/extremum-localized envelope without a true body crossing,false,codex
+B147,nstx_141711/N8/egn08w.3134E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B148,nstx_141711/N8/egn08w.3255E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B149,nstx_141711/N8/egn08w.3275E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B150,nstx_141711/N8/egn08w.3307E+02,good,medium,coherent narrow/extremum-localized envelope without a true body crossing,false,codex
+B151,nstx_141711/N8/egn08w.3646E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B152,nstx_141711/N8/egn08w.4015E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B153,nstx_141711/N8/egn08w.4130E+02,good,medium,coherent narrow/extremum-localized envelope without a true body crossing,false,codex
+B154,nstx_141711/N8/egn08w.4365E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B155,nstx_141711/N8/egn08w.5014E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B156,nstx_141711/N8/egn08w.5652E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B157,nstx_141711/N8/egn08w.6162E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B158,nstx_141711/N8/egn08w.7043E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B159,nstx_141711/N8/egn08w.7895E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B160,nstx_141711/N8/egn08w.8043E+02,bad,high,outer-boundary/final-grid spike dominates the envelope,false,codex
+B161,nstx_141711/N8/egn08w.9271E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B162,nstx_141711/N9/egn09w.1010E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B163,nstx_141711/N9/egn09w.1110E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B164,nstx_141711/N9/egn09w.1148E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B165,nstx_141711/N9/egn09w.1261E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B166,nstx_141711/N9/egn09w.1394E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B167,nstx_141711/N9/egn09w.1554E+03,bad,high,"unresolved grid-scale radial spike, not a resolved mode",false,codex
+B168,nstx_141711/N9/egn09w.1566E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B169,nstx_141711/N9/egn09w.1765E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B170,nstx_141711/N9/egn09w.2105E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B171,nstx_141711/N9/egn09w.2134E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B172,nstx_141711/N9/egn09w.2459E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B173,nstx_141711/N9/egn09w.2558E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B174,nstx_141711/N9/egn09w.2629E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B175,nstx_141711/N9/egn09w.2747E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B176,nstx_141711/N9/egn09w.2889E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B177,nstx_141711/N9/egn09w.3045E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B178,nstx_141711/N9/egn09w.3127E+02,good,low,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B179,nstx_141711/N9/egn09w.3405E+02,good,low,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B180,nstx_141711/N9/egn09w.3582E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B181,nstx_141711/N9/egn09w.3593E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B182,nstx_141711/N9/egn09w.3602E+02,good,medium,coherent narrow/extremum-localized envelope without a true body crossing,false,codex
+B183,nstx_141711/N9/egn09w.3610E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B184,nstx_141711/N9/egn09w.3675E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B185,nstx_141711/N9/egn09w.4027E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B186,nstx_141711/N9/egn09w.4199E+02,good,medium,coherent narrow/extremum-localized envelope without a true body crossing,false,codex
+B187,nstx_141711/N9/egn09w.4496E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B188,nstx_141711/N9/egn09w.5019E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B189,nstx_141711/N9/egn09w.5617E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B190,nstx_141711/N9/egn09w.6252E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B191,nstx_141711/N9/egn09w.6899E+02,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B192,nstx_141711/N9/egn09w.7772E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B193,nstx_141711/N9/egn09w.8950E+02,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B194,nstx_141711/N10/egn10w.1146E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B195,nstx_141711/N10/egn10w.1341E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B196,nstx_141711/N10/egn10w.1470E+03,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B197,nstx_141711/N10/egn10w.1636E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B198,nstx_141711/N10/egn10w.1644E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B199,nstx_141711/N10/egn10w.1673E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B200,nstx_141711/N10/egn10w.1679E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B201,nstx_141711/N10/egn10w.1700E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B202,nstx_141711/N10/egn10w.1713E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B203,nstx_141711/N10/egn10w.1723E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B204,nstx_141711/N10/egn10w.2033E+02,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B205,nstx_141711/N10/egn10w.2039E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B206,nstx_141711/N10/egn10w.2160E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B207,nstx_141711/N10/egn10w.2171E+02,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B208,nstx_141711/N10/egn10w.2186E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B209,nstx_141711/N10/egn10w.2189E+03,bad,high,noncoherent harmonic structure with continuum crossings in the body,false,codex
+B210,nstx_141711/N10/egn10w.2475E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B211,nstx_141711/N10/egn10w.2706E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B212,nstx_141711/N10/egn10w.2824E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B213,nstx_141711/N10/egn10w.2988E+02,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B214,nstx_141711/N10/egn10w.3008E+02,bad,low,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B215,nstx_141711/N10/egn10w.3534E+02,good,low,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B216,nstx_141711/N10/egn10w.3771E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B217,nstx_141711/N10/egn10w.4012E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B218,nstx_141711/N10/egn10w.4285E+02,good,medium,coherent narrow/extremum-localized envelope without a true body crossing,false,codex
+B219,nstx_141711/N10/egn10w.4567E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B220,nstx_141711/N10/egn10w.4978E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B221,nstx_141711/N10/egn10w.5496E+02,good,medium,"coherent edge-localized envelope; shear-narrowed harmonics, no material crossing",false,codex
+B222,nstx_141711/N10/egn10w.6177E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B223,nstx_141711/N10/egn10w.6830E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B224,nstx_141711/N10/egn10w.7518E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B225,nstx_141711/N10/egn10w.8537E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B226,nstx_141711/N10/egn10w.9564E+02,good,medium,coherent mode; only continuum crossing is in a negligible detached tail,false,codex
+B227,nstx_141711/N1/egn01w.2311E+03,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B228,nstx_141711/N1/egn01w.2349E+03,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B229,nstx_141711/N1/egn01w.2375E+03,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B230,nstx_141711/N1/egn01w.2413E+03,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B231,nstx_141711/N1/egn01w.2858E+03,bad,low,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B232,nstx_141711/N1/egn01w.2872E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B233,nstx_141711/N10/egn10w.1822E+03,bad,medium,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B234,nstx_141711/N10/egn10w.1828E+03,bad,low,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B235,nstx_141711/N10/egn10w.2337E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B236,nstx_141711/N10/egn10w.2383E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B237,nstx_141711/N10/egn10w.2415E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B238,nstx_141711/N10/egn10w.2424E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B239,nstx_141711/N10/egn10w.2601E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B240,nstx_141711/N10/egn10w.2703E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B241,nstx_141711/N2/egn02w.1352E+03,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B242,nstx_141711/N2/egn02w.2302E+03,bad,high,detached near-axis spike with appreciable pointwise amplitude,false,codex
+B243,nstx_141711/N4/egn04w.1202E+03,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B244,nstx_141711/N4/egn04w.1510E+03,bad,medium,outer-boundary/final-grid spike dominates the envelope,false,codex
+B245,nstx_141711/N4/egn04w.2552E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B246,nstx_141711/N4/egn04w.2742E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B247,nstx_141711/N5/egn05w.1252E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B248,nstx_141711/N5/egn05w.2599E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B249,nstx_141711/N7/egn07w.2558E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B250,nstx_141711/N8/egn08w.1166E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B251,nstx_141711/N8/egn08w.1228E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B252,nstx_141711/N8/egn08w.2576E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B253,nstx_141711/N8/egn08w.2630E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B254,nstx_141711/N9/egn09w.2502E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B255,nstx_141711/N9/egn09w.2537E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
+B256,nstx_141711/N9/egn09w.2606E+03,bad,high,continuum crossing falls inside the connected mode body or shoulder,false,codex
