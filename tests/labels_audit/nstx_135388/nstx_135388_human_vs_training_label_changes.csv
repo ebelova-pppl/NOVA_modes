@@ -1,0 +1,12 @@
+path,old_training_label,new_human_label,change_type
+nstx_135388/N10/egn10w.2680E+02,bad,good,bad_to_good
+nstx_135388/N2/egn02w.6059E+02,bad,good,bad_to_good
+nstx_135388/N3/egn03w.4023E+02,bad,good,bad_to_good
+nstx_135388/N3/egn03w.4436E+02,bad,good,bad_to_good
+nstx_135388/N4/egn04w.2571E+02,bad,good,bad_to_good
+nstx_135388/N5/egn05w.2248E+02,good,bad,good_to_bad
+nstx_135388/N6/egn06w.1980E+02,bad,good,bad_to_good
+nstx_135388/N7/egn07w.2569E+02,bad,good,bad_to_good
+nstx_135388/N8/egn08w.1968E+02,bad,good,bad_to_good
+nstx_135388/N8/egn08w.2639E+02,bad,good,bad_to_good
+nstx_135388/N8/egn08w.2668E+02,bad,good,bad_to_good

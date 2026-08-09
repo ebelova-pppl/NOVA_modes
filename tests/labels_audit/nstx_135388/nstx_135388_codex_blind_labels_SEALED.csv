@@ -1,0 +1,345 @@
+blind_id,path,validity,confidence,reason,prior_seen,reviewer
+B001,nstx_135388/N1/egn01w.1468E+03,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B002,nstx_135388/N1/egn01w.1904E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.22,false,codex
+B003,nstx_135388/N1/egn01w.1934E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.29,false,codex
+B004,nstx_135388/N1/egn01w.1963E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.36,false,codex
+B005,nstx_135388/N1/egn01w.1991E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.43,false,codex
+B006,nstx_135388/N1/egn01w.2018E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.50,false,codex
+B007,nstx_135388/N1/egn01w.2043E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.53,false,codex
+B008,nstx_135388/N1/egn01w.2067E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.81,false,codex
+B009,nstx_135388/N1/egn01w.2092E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.76,false,codex
+B010,nstx_135388/N1/egn01w.2115E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.80,false,codex
+B011,nstx_135388/N1/egn01w.2137E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.83,false,codex
+B012,nstx_135388/N1/egn01w.2159E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.86,false,codex
+B013,nstx_135388/N1/egn01w.2180E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.89,false,codex
+B014,nstx_135388/N1/egn01w.2200E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.91,false,codex
+B015,nstx_135388/N1/egn01w.2220E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.93,false,codex
+B016,nstx_135388/N1/egn01w.2240E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.96,false,codex
+B017,nstx_135388/N1/egn01w.2278E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.90,false,codex
+B018,nstx_135388/N1/egn01w.2296E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.89,false,codex
+B019,nstx_135388/N1/egn01w.2330E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.97,false,codex
+B020,nstx_135388/N1/egn01w.2347E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.98,false,codex
+B021,nstx_135388/N1/egn01w.2364E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.98,false,codex
+B022,nstx_135388/N1/egn01w.2395E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.99,false,codex
+B023,nstx_135388/N1/egn01w.2424E+02,bad,high,continuum crossing through connected mode body; crossing W/max=1.00,false,codex
+B024,nstx_135388/N1/egn01w.2439E+02,bad,high,continuum crossing through connected mode body; crossing W/max=1.00,false,codex
+B025,nstx_135388/N1/egn01w.2504E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.95,false,codex
+B026,nstx_135388/N1/egn01w.2514E+02,bad,high,continuum crossing through connected mode body; crossing W/max=1.00,false,codex
+B027,nstx_135388/N1/egn01w.2525E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.95,false,codex
+B028,nstx_135388/N1/egn01w.2721E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.28,false,codex
+B029,nstx_135388/N1/egn01w.2857E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.27,false,codex
+B030,nstx_135388/N1/egn01w.2865E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.27,false,codex
+B031,nstx_135388/N1/egn01w.2876E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.39,false,codex
+B032,nstx_135388/N1/egn01w.2885E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.26,false,codex
+B033,nstx_135388/N1/egn01w.2905E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.28,false,codex
+B034,nstx_135388/N1/egn01w.6037E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.53,false,codex
+B035,nstx_135388/N1/egn01w.6120E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.57,false,codex
+B036,nstx_135388/N1/egn01w.6205E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.65,false,codex
+B037,nstx_135388/N2/egn02w.1187E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.71,false,codex
+B038,nstx_135388/N2/egn02w.1211E+03,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.19,false,codex
+B039,nstx_135388/N2/egn02w.1213E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.86,false,codex
+B040,nstx_135388/N2/egn02w.1753E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.42,false,codex
+B041,nstx_135388/N2/egn02w.1770E+02,bad,low,inner crossing and detached spike-like shoulder not cleanly separable from body,false,codex
+B042,nstx_135388/N2/egn02w.2436E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B043,nstx_135388/N2/egn02w.2444E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B044,nstx_135388/N2/egn02w.2457E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B045,nstx_135388/N2/egn02w.2470E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B046,nstx_135388/N2/egn02w.2483E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B047,nstx_135388/N2/egn02w.2496E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B048,nstx_135388/N2/egn02w.2504E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B049,nstx_135388/N2/egn02w.2514E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B050,nstx_135388/N2/egn02w.2528E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B051,nstx_135388/N2/egn02w.2543E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.78,false,codex
+B052,nstx_135388/N2/egn02w.2560E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.55,false,codex
+B053,nstx_135388/N2/egn02w.2576E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.44,false,codex
+B054,nstx_135388/N2/egn02w.2592E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.48,false,codex
+B055,nstx_135388/N2/egn02w.2608E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.49,false,codex
+B056,nstx_135388/N2/egn02w.2662E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=64.07%,false,codex
+B057,nstx_135388/N2/egn02w.2667E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B058,nstx_135388/N2/egn02w.2675E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.77,false,codex
+B059,nstx_135388/N2/egn02w.2758E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B060,nstx_135388/N2/egn02w.2992E+02,good,medium,coherent resolved edge-localized mode with no true continuum crossing,false,codex
+B061,nstx_135388/N2/egn02w.3169E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B062,nstx_135388/N2/egn02w.3455E+02,bad,medium,detached near-axis bump separate from edge-localized main envelope,false,codex
+B063,nstx_135388/N2/egn02w.3524E+02,good,medium,coherent resolved edge-localized mode with no true continuum crossing,false,codex
+B064,nstx_135388/N2/egn02w.4018E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.49,false,codex
+B065,nstx_135388/N2/egn02w.4216E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.33,false,codex
+B066,nstx_135388/N2/egn02w.4231E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.25,false,codex
+B067,nstx_135388/N2/egn02w.6059E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B068,nstx_135388/N3/egn03w.1151E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.86,false,codex
+B069,nstx_135388/N3/egn03w.1222E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.32,false,codex
+B070,nstx_135388/N3/egn03w.2021E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.41,false,codex
+B071,nstx_135388/N3/egn03w.2121E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B072,nstx_135388/N3/egn03w.2126E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B073,nstx_135388/N3/egn03w.2160E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B074,nstx_135388/N3/egn03w.2179E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B075,nstx_135388/N3/egn03w.2188E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B076,nstx_135388/N3/egn03w.2326E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B077,nstx_135388/N3/egn03w.2558E+02,good,low,edge-localized mode kept after visual review; crossing judged outside main body,false,codex
+B078,nstx_135388/N3/egn03w.2677E+02,bad,medium,"very narrow spike-like structure; w01=0.015, w05=0.005",false,codex
+B079,nstx_135388/N3/egn03w.2764E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B080,nstx_135388/N3/egn03w.2917E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B081,nstx_135388/N3/egn03w.2999E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B082,nstx_135388/N3/egn03w.3194E+02,good,medium,coherent resolved edge-localized mode with no true continuum crossing,false,codex
+B083,nstx_135388/N3/egn03w.3321E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B084,nstx_135388/N3/egn03w.3446E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.53,false,codex
+B085,nstx_135388/N3/egn03w.4023E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B086,nstx_135388/N3/egn03w.4410E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.29,false,codex
+B087,nstx_135388/N3/egn03w.4436E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B088,nstx_135388/N3/egn03w.4934E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B089,nstx_135388/N3/egn03w.5494E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B090,nstx_135388/N3/egn03w.7148E+02,good,low,edge-localized mode with small visually detached tail crossing; W/max=0.05,false,codex
+B091,nstx_135388/N4/egn04w.1135E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.37,false,codex
+B092,nstx_135388/N4/egn04w.1161E+03,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B093,nstx_135388/N4/egn04w.1223E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.52,false,codex
+B094,nstx_135388/N4/egn04w.1782E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.10,false,codex
+B095,nstx_135388/N4/egn04w.1787E+02,bad,medium,"very narrow spike-like structure; w01=0.010, w05=0.000",false,codex
+B096,nstx_135388/N4/egn04w.1894E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B097,nstx_135388/N4/egn04w.1909E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B098,nstx_135388/N4/egn04w.1910E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B099,nstx_135388/N4/egn04w.2013E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.07,false,codex
+B100,nstx_135388/N4/egn04w.2181E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B101,nstx_135388/N4/egn04w.2230E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B102,nstx_135388/N4/egn04w.2289E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04,false,codex
+B103,nstx_135388/N4/egn04w.2571E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.08,false,codex
+B104,nstx_135388/N4/egn04w.2738E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.44,false,codex
+B105,nstx_135388/N4/egn04w.2739E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.48,false,codex
+B106,nstx_135388/N4/egn04w.2791E+02,good,medium,coherent resolved edge-localized mode with no true continuum crossing,false,codex
+B107,nstx_135388/N4/egn04w.2792E+02,good,medium,coherent resolved edge-localized mode with no true continuum crossing,false,codex
+B108,nstx_135388/N4/egn04w.2835E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B109,nstx_135388/N4/egn04w.2986E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B110,nstx_135388/N4/egn04w.3241E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B111,nstx_135388/N4/egn04w.3287E+02,good,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail,false,codex
+B112,nstx_135388/N4/egn04w.3862E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B113,nstx_135388/N4/egn04w.4639E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B114,nstx_135388/N4/egn04w.4640E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B115,nstx_135388/N4/egn04w.5195E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B116,nstx_135388/N4/egn04w.5200E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B117,nstx_135388/N4/egn04w.5270E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=14.37%,false,codex
+B118,nstx_135388/N4/egn04w.6100E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B119,nstx_135388/N4/egn04w.6101E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B120,nstx_135388/N4/egn04w.7336E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B121,nstx_135388/N4/egn04w.7832E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B122,nstx_135388/N5/egn05w.1073E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.85,false,codex
+B123,nstx_135388/N5/egn05w.1083E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.83,false,codex
+B124,nstx_135388/N5/egn05w.1186E+03,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.24,false,codex
+B125,nstx_135388/N5/egn05w.1781E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=4.48%,false,codex
+B126,nstx_135388/N5/egn05w.1917E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=1.74%,false,codex
+B127,nstx_135388/N5/egn05w.2098E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03,false,codex
+B128,nstx_135388/N5/egn05w.2248E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03,false,codex
+B129,nstx_135388/N5/egn05w.2418E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B130,nstx_135388/N5/egn05w.2653E+02,bad,medium,resolved poorly: very narrow low-r spike-like body,false,codex
+B131,nstx_135388/N5/egn05w.2725E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03,false,codex
+B132,nstx_135388/N5/egn05w.2892E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B133,nstx_135388/N5/egn05w.2950E+02,good,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail,false,codex
+B134,nstx_135388/N5/egn05w.3057E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B135,nstx_135388/N5/egn05w.3249E+02,good,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail,false,codex
+B136,nstx_135388/N5/egn05w.3319E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B137,nstx_135388/N5/egn05w.3560E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B138,nstx_135388/N5/egn05w.3735E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B139,nstx_135388/N5/egn05w.4285E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B140,nstx_135388/N5/egn05w.5005E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B141,nstx_135388/N5/egn05w.5648E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B142,nstx_135388/N5/egn05w.6202E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B143,nstx_135388/N5/egn05w.7266E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B144,nstx_135388/N6/egn06w.1914E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04,false,codex
+B145,nstx_135388/N6/egn06w.1917E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B146,nstx_135388/N6/egn06w.1980E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.09,false,codex
+B147,nstx_135388/N6/egn06w.2105E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B148,nstx_135388/N6/egn06w.2279E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B149,nstx_135388/N6/egn06w.2450E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B150,nstx_135388/N6/egn06w.2682E+02,bad,medium,unresolved or incoherent spike-like mode structure,false,codex
+B151,nstx_135388/N6/egn06w.2786E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B152,nstx_135388/N6/egn06w.2889E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B153,nstx_135388/N6/egn06w.3008E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B154,nstx_135388/N6/egn06w.3147E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B155,nstx_135388/N6/egn06w.3302E+02,good,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail,false,codex
+B156,nstx_135388/N6/egn06w.3468E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B157,nstx_135388/N6/egn06w.3792E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B158,nstx_135388/N6/egn06w.4121E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B159,nstx_135388/N6/egn06w.4630E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B160,nstx_135388/N6/egn06w.5263E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B161,nstx_135388/N6/egn06w.6479E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B162,nstx_135388/N6/egn06w.7164E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B163,nstx_135388/N6/egn06w.8307E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.15,false,codex
+B164,nstx_135388/N6/egn06w.9565E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.46,false,codex
+B165,nstx_135388/N7/egn07w.1043E+03,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.26,false,codex
+B166,nstx_135388/N7/egn07w.1071E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.63,false,codex
+B167,nstx_135388/N7/egn07w.1153E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.43,false,codex
+B168,nstx_135388/N7/egn07w.1181E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.81,false,codex
+B169,nstx_135388/N7/egn07w.1218E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.94,false,codex
+B170,nstx_135388/N7/egn07w.1739E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.21,false,codex
+B171,nstx_135388/N7/egn07w.1774E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B172,nstx_135388/N7/egn07w.1794E+02,good,low,mixed/localized mode kept after visual review; crossing judged outside main body,false,codex
+B173,nstx_135388/N7/egn07w.1863E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04,false,codex
+B174,nstx_135388/N7/egn07w.1960E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03,false,codex
+B175,nstx_135388/N7/egn07w.2113E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B176,nstx_135388/N7/egn07w.2223E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B177,nstx_135388/N7/egn07w.2346E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.40,false,codex
+B178,nstx_135388/N7/egn07w.2388E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.23,false,codex
+B179,nstx_135388/N7/egn07w.2394E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.02,false,codex
+B180,nstx_135388/N7/egn07w.2428E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B181,nstx_135388/N7/egn07w.2569E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03,false,codex
+B182,nstx_135388/N7/egn07w.2645E+02,bad,medium,narrow low-r body with resonance too close to appreciable amplitude,false,codex
+B183,nstx_135388/N7/egn07w.2660E+02,bad,medium,very narrow low-r spike-like structure,false,codex
+B184,nstx_135388/N7/egn07w.2680E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B185,nstx_135388/N7/egn07w.2755E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B186,nstx_135388/N7/egn07w.2759E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B187,nstx_135388/N7/egn07w.2890E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B188,nstx_135388/N7/egn07w.2971E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B189,nstx_135388/N7/egn07w.2994E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B190,nstx_135388/N7/egn07w.3304E+02,good,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail,false,codex
+B191,nstx_135388/N7/egn07w.3518E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B192,nstx_135388/N7/egn07w.3838E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B193,nstx_135388/N7/egn07w.4124E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.41,false,codex
+B194,nstx_135388/N7/egn07w.4463E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B195,nstx_135388/N7/egn07w.4950E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B196,nstx_135388/N7/egn07w.5504E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B197,nstx_135388/N7/egn07w.6105E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B198,nstx_135388/N7/egn07w.6689E+02,good,low,edge-localized mode with small visually detached tail crossing; W/max=0.04,false,codex
+B199,nstx_135388/N7/egn07w.6691E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.29,false,codex
+B200,nstx_135388/N7/egn07w.7225E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B201,nstx_135388/N7/egn07w.8037E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B202,nstx_135388/N7/egn07w.8499E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.38,false,codex
+B203,nstx_135388/N8/egn08w.1188E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.99,false,codex
+B204,nstx_135388/N8/egn08w.1210E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.55,false,codex
+B205,nstx_135388/N8/egn08w.1782E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.19,false,codex
+B206,nstx_135388/N8/egn08w.1881E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.35,false,codex
+B207,nstx_135388/N8/egn08w.1968E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04,false,codex
+B208,nstx_135388/N8/egn08w.1986E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.31,false,codex
+B209,nstx_135388/N8/egn08w.1993E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.10,false,codex
+B210,nstx_135388/N8/egn08w.1998E+02,good,low,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B211,nstx_135388/N8/egn08w.2057E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B212,nstx_135388/N8/egn08w.2197E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B213,nstx_135388/N8/egn08w.2326E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B214,nstx_135388/N8/egn08w.2587E+02,bad,medium,"very narrow spike-like structure; w01=0.010, w05=0.005",false,codex
+B215,nstx_135388/N8/egn08w.2639E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B216,nstx_135388/N8/egn08w.2654E+02,bad,medium,"very narrow spike-like structure; w01=0.020, w05=0.000",false,codex
+B217,nstx_135388/N8/egn08w.2668E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B218,nstx_135388/N8/egn08w.2674E+02,good,low,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B219,nstx_135388/N8/egn08w.2714E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B220,nstx_135388/N8/egn08w.2796E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B221,nstx_135388/N8/egn08w.2861E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B222,nstx_135388/N8/egn08w.3062E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B223,nstx_135388/N8/egn08w.3112E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B224,nstx_135388/N8/egn08w.3207E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B225,nstx_135388/N8/egn08w.3344E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B226,nstx_135388/N8/egn08w.3508E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B227,nstx_135388/N8/egn08w.3823E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B228,nstx_135388/N8/egn08w.4081E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.12,false,codex
+B229,nstx_135388/N8/egn08w.4424E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B230,nstx_135388/N8/egn08w.4787E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B231,nstx_135388/N8/egn08w.5182E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B232,nstx_135388/N8/egn08w.5708E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B233,nstx_135388/N8/egn08w.6258E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B234,nstx_135388/N8/egn08w.6825E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B235,nstx_135388/N8/egn08w.7331E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B236,nstx_135388/N8/egn08w.7957E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B237,nstx_135388/N8/egn08w.8814E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B238,nstx_135388/N8/egn08w.9418E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.31,false,codex
+B239,nstx_135388/N8/egn08w.9850E+02,good,low,edge-localized mode with small visually detached tail crossing; W/max=0.09,false,codex
+B240,nstx_135388/N9/egn09w.1047E+03,good,low,edge-localized mode with small visually detached tail crossing; W/max=0.09,false,codex
+B241,nstx_135388/N9/egn09w.1107E+03,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B242,nstx_135388/N9/egn09w.1125E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.42,false,codex
+B243,nstx_135388/N9/egn09w.1129E+03,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.29,false,codex
+B244,nstx_135388/N9/egn09w.1408E+03,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B245,nstx_135388/N9/egn09w.1792E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B246,nstx_135388/N9/egn09w.1832E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.19,false,codex
+B247,nstx_135388/N9/egn09w.1874E+02,bad,medium,near grid-scale narrow spike despite negligible crossing amplitude,false,codex
+B248,nstx_135388/N9/egn09w.1899E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B249,nstx_135388/N9/egn09w.1938E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B250,nstx_135388/N9/egn09w.1953E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B251,nstx_135388/N9/egn09w.1959E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B252,nstx_135388/N9/egn09w.1979E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B253,nstx_135388/N9/egn09w.1996E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B254,nstx_135388/N9/egn09w.2020E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B255,nstx_135388/N9/egn09w.2044E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B256,nstx_135388/N9/egn09w.2049E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B257,nstx_135388/N9/egn09w.2070E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B258,nstx_135388/N9/egn09w.2126E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B259,nstx_135388/N9/egn09w.2150E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B260,nstx_135388/N9/egn09w.2155E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B261,nstx_135388/N9/egn09w.2162E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B262,nstx_135388/N9/egn09w.2175E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B263,nstx_135388/N9/egn09w.2182E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B264,nstx_135388/N9/egn09w.2357E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.29,false,codex
+B265,nstx_135388/N9/egn09w.2407E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B266,nstx_135388/N9/egn09w.2507E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.24,false,codex
+B267,nstx_135388/N9/egn09w.2520E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B268,nstx_135388/N9/egn09w.2590E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B269,nstx_135388/N9/egn09w.2633E+02,bad,medium,"very narrow spike-like structure; w01=0.130, w05=0.005",false,codex
+B270,nstx_135388/N9/egn09w.2658E+02,bad,medium,"very narrow spike-like structure; w01=0.080, w05=0.000",false,codex
+B271,nstx_135388/N9/egn09w.2699E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B272,nstx_135388/N9/egn09w.2702E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B273,nstx_135388/N9/egn09w.2707E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B274,nstx_135388/N9/egn09w.2761E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B275,nstx_135388/N9/egn09w.2796E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B276,nstx_135388/N9/egn09w.2887E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B277,nstx_135388/N9/egn09w.2926E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B278,nstx_135388/N9/egn09w.3044E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B279,nstx_135388/N9/egn09w.3097E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B280,nstx_135388/N9/egn09w.3312E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B281,nstx_135388/N9/egn09w.3351E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B282,nstx_135388/N9/egn09w.3451E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B283,nstx_135388/N9/egn09w.3605E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B284,nstx_135388/N9/egn09w.4060E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.20,false,codex
+B285,nstx_135388/N9/egn09w.4641E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B286,nstx_135388/N9/egn09w.5020E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=0.38,false,codex
+B287,nstx_135388/N9/egn09w.5394E+02,bad,medium,detached near-axis spike above threshold; axis W/max=0.19,false,codex
+B288,nstx_135388/N9/egn09w.5860E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B289,nstx_135388/N9/egn09w.6387E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B290,nstx_135388/N9/egn09w.6908E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B291,nstx_135388/N9/egn09w.7416E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B292,nstx_135388/N9/egn09w.7961E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B293,nstx_135388/N9/egn09w.9497E+02,bad,high,continuum crossing through connected mode body; crossing W/max=0.57,false,codex
+B294,nstx_135388/N10/egn10w.1102E+03,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.20,false,codex
+B295,nstx_135388/N10/egn10w.1104E+03,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B296,nstx_135388/N10/egn10w.1113E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.81,false,codex
+B297,nstx_135388/N10/egn10w.1150E+03,bad,high,continuum crossing through connected mode body; crossing W/max=0.71,false,codex
+B298,nstx_135388/N10/egn10w.1764E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.15,false,codex
+B299,nstx_135388/N10/egn10w.1812E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=7.32%,false,codex
+B300,nstx_135388/N10/egn10w.1833E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=3.79%,false,codex
+B301,nstx_135388/N10/egn10w.1906E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=8.36%,false,codex
+B302,nstx_135388/N10/egn10w.2001E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=3.58%,false,codex
+B303,nstx_135388/N10/egn10w.2033E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=4.38%,false,codex
+B304,nstx_135388/N10/egn10w.2055E+02,bad,medium,"very narrow spike-like structure; w01=0.010, w05=0.000",false,codex
+B305,nstx_135388/N10/egn10w.2074E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B306,nstx_135388/N10/egn10w.2086E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B307,nstx_135388/N10/egn10w.2094E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B308,nstx_135388/N10/egn10w.2132E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B309,nstx_135388/N10/egn10w.2167E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B310,nstx_135388/N10/egn10w.2171E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B311,nstx_135388/N10/egn10w.2424E+02,good,low,mixed/localized mode with small visually detached tail crossing; W/max=0.06,false,codex
+B312,nstx_135388/N10/egn10w.2567E+02,bad,medium,"very narrow spike-like structure; w01=0.110, w05=0.000",false,codex
+B313,nstx_135388/N10/egn10w.2601E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B314,nstx_135388/N10/egn10w.2649E+02,bad,medium,crossing/low-r structure not cleanly detached from mode body; local E=27.33%,false,codex
+B315,nstx_135388/N10/egn10w.2660E+02,bad,medium,"very narrow spike-like structure; w01=0.245, w05=0.000",false,codex
+B316,nstx_135388/N10/egn10w.2680E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B317,nstx_135388/N10/egn10w.2703E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B318,nstx_135388/N10/egn10w.2723E+02,bad,medium,very narrow near-axis spike-like no-crossing structure,false,codex
+B319,nstx_135388/N10/egn10w.2742E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B320,nstx_135388/N10/egn10w.2748E+02,bad,medium,near-axis narrow spike-like no-crossing structure,false,codex
+B321,nstx_135388/N10/egn10w.2832E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B322,nstx_135388/N10/egn10w.2864E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B323,nstx_135388/N10/egn10w.3008E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B324,nstx_135388/N10/egn10w.3102E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B325,nstx_135388/N10/egn10w.3169E+02,good,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,false,codex
+B326,nstx_135388/N10/egn10w.3245E+02,good,medium,coherent resolved mixed/localized mode with no true continuum crossing,false,codex
+B327,nstx_135388/N10/egn10w.3375E+02,good,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail,false,codex
+B328,nstx_135388/N10/egn10w.3492E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B329,nstx_135388/N10/egn10w.3674E+02,good,medium,coherent mixed/localized mode; crossings only in negligible detached tail,false,codex
+B330,nstx_135388/N10/egn10w.3680E+02,bad,high,detached near-axis/axis-concentrated spike; axis W/max=1.00,false,codex
+B331,nstx_135388/N10/egn10w.3932E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B332,nstx_135388/N10/egn10w.4242E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B333,nstx_135388/N10/egn10w.4546E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B334,nstx_135388/N10/egn10w.4807E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B335,nstx_135388/N10/egn10w.5222E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B336,nstx_135388/N10/egn10w.5525E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B337,nstx_135388/N10/egn10w.5988E+02,good,low,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B338,nstx_135388/N10/egn10w.6074E+02,bad,medium,very narrow low-r spike-like body despite small crossing amplitude,false,codex
+B339,nstx_135388/N10/egn10w.6456E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B340,nstx_135388/N10/egn10w.6967E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B341,nstx_135388/N10/egn10w.7468E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B342,nstx_135388/N10/egn10w.7954E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B343,nstx_135388/N10/egn10w.8536E+02,good,medium,coherent edge-localized mode; crossings only in negligible detached tail,false,codex
+B344,nstx_135388/N10/egn10w.9310E+02,bad,medium,continuum crossing on appreciable body/shoulder; crossing W/max=0.21,false,codex

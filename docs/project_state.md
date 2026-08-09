@@ -214,22 +214,25 @@ From cont_features.py:
 - Treat the current J38 audit as complete: retain only coherent extremum modes
   without a material secondary continuum crossing, and revisit the remaining
   junk-like extrema candidates only if the labeling policy changes.
-- Treat the Codex blind audits of training shots `nstxu_204202` and
-  `nstx_120113` as complete. Retained artifacts live under
-  `tests/labels_audit/<shot>/` and are limited to the sealed Codex list plus
-  SHA sidecar, Codex/human/training union disagreements, and human-vs-training
-  label changes. The sealed Codex lists are provenance-preserving and should
-  not be edited in place.
+- Treat the Codex blind audits of training shots `nstxu_204202`,
+  `nstx_120113`, `nstx_141711`, and `nstx_135388` as complete. Retained
+  artifacts live under `tests/labels_audit/<shot>/` and are limited to the
+  sealed Codex list plus SHA sidecar, Codex/human/training union
+  disagreements, and human-vs-training label changes. `nstx_141711` also
+  keeps its union adjudication table; `nstx_135388` also keeps the
+  post-adjudication policy-v2 labels, change list, and training-comparison
+  tables. The sealed Codex lists are provenance-preserving and should not be
+  edited in place.
 - `nstx_120113` audit status: the clean target manifest has 174 TAE-like modes.
   Pre-adjudication Codex-vs-human agreement was 169/174 = 97.13% with Cohen
-  kappa 0.9270. Human-vs-training agreement was 172/174 = 98.85% with kappa
-  0.9704 before the planned human correction of `B045` from `bad` to `good`.
-  Review discussion resolved the remaining cases as `B045=good`, `B087=good`,
-  `B105=skip` for adjudication/training exclusion, `B106=good`, and
-  `B131/B149=bad` with low confidence because their low-r tails are distorted
-  by continuum crossing despite small integrated crossing energy. No replacement
-  training CSV has been merged yet; keep `training_labels/tae_like_train.csv`
-  unchanged until an explicit adjudicated version is approved.
+  kappa 0.9270. Review discussion resolved the remaining cases as
+  `B045=good`, `B087=good`, `B105=skip` for adjudication/training exclusion,
+  `B106=good`, and `B131/B149=bad` with low confidence because their low-r
+  tails are distorted by continuum crossing despite small integrated crossing
+  energy. The retained human-vs-training delta table has two rows after the
+  human corrections. No replacement training CSV has been merged yet; keep
+  `training_labels/tae_like_train.csv` unchanged until an explicit
+  adjudicated version is approved.
 - Keep the three-feature inner-extremum RF schema experimental. Replacing
   continuum prominence with local mode-energy fraction improved shuffled folds
   and removed the overall LOSO regression, but did not reduce G-shot LOSO FN.
@@ -2620,3 +2623,88 @@ edited after discussion. The active `training_labels/tae_like_train.csv` was
 not changed. The `nstxu_204202` human-review corrections should be applied
 later by creating a new versioned training list while preserving the current
 training list.
+
+### 2026-08-09: NSTX training-shot audit cleanup and `nstx_135388` policy-v2 closure
+
+The blind audit sequence was extended to `nstx_120113`, `nstx_141711`, and
+`nstx_135388` using the same label-free workflow as the second `nstxu_204202`
+audit: start from the clean `tests/labels_audit/tae_like_audit.csv` path
+manifest, inspect raw signed mode structure and continuum diagnostics, do not
+use RF/CNN/ensemble/model outputs, and seal the Codex review before opening
+human or training labels.
+
+Retained artifacts were pruned to the compact audit record under
+`tests/labels_audit/<shot>/`. Large diagnostic PNG directories, scratch
+manifests, raw-measurement tables, and intermediate comparison CSVs were
+removed. The retained file classes are sealed blind Codex labels plus SHA-256
+sidecars, union disagreement/adjudication tables, human-vs-training change
+tables, and for `nstx_135388` the policy-v2 results described below.
+
+Shot status:
+
+- `nstx_120113`: 174 sealed rows, with 45 GOOD, 127 BAD, and 2 SKIP decisions.
+  Sealed SHA-256:
+  `c89034c31b69686f92e82194032748961a4cc42e0d74ed0c4e75caef33cbf426`.
+  The retained human-vs-training delta table has two rows:
+  `N10/egn10w.2945E+02` human BAD versus training GOOD, and
+  `N6/egn06w.1418E+02` human SKIP versus training GOOD. No training CSV was
+  changed.
+- `nstx_141711`: 256 sealed rows, with 80 GOOD and 176 BAD decisions. Sealed
+  SHA-256:
+  `5a302ae896b926ad1b4a33e711656d92344d2b2f08204366e8021e785288b8a2`.
+  The retained human-vs-training change table has 17 rows: 16 old-training
+  GOOD -> new-human BAD and 1 old-training BAD -> new-human GOOD. The retained
+  union adjudication table has 35 review rows, with final adjudication calling
+  21 BAD, 12 GOOD, 1 SKIP, and leaving 1 row without a final label in the
+  table. No training CSV was changed.
+- `nstx_135388`: 344 sealed blind rows, with 174 GOOD and 170 BAD decisions.
+  Sealed SHA-256:
+  `17788d736e68fb74c176706379b9948161fc2cee6ebb08dd5a410eba80084ef7`.
+  The pre-adjudication Codex-vs-human agreement was 297/344 = 86.34% with
+  Cohen's kappa 0.7275, leaving 47 disagreements for discussion.
+
+The `nstx_135388` discussion exposed several policy gaps, and
+`.agents/skills/label-tae-like-modes/references/labeling-policy.md` was
+updated accordingly:
+
+- Red-flag checks for continuum crossing and radial-boundary artifacts are now
+  applied before assigning a plausible morphology family.
+- True continuum crossings with pointwise `W(r_cross) / max(W) >= ~0.1` are
+  BAD unless they are clearly in smooth detached tails with very small local
+  integrated energy; crossings near `~0.2-0.3` or larger are strong BAD
+  evidence even away from the global peak.
+- Near-axis one/few-grid-point spikes, short low-r grid-scale oscillatory
+  packets, and single-harmonic axis artifacts are BAD when they carry
+  appreciable pointwise amplitude, even if integrated near-axis energy is
+  small.
+- Outer-boundary artifacts must be checked in individual signed harmonics as
+  well as in summed `W(r)`, because a single-harmonic endpoint spike can be
+  hidden in the summed envelope.
+- Grid-scale oscillations at the mode peak or inside the connected mode body
+  are BAD even when confined to one appreciable harmonic. Ordinary type-2 edge
+  sign changes and shear-narrowed harmonics remain acceptable when the total
+  envelope is resolved and coherent.
+- Finite-radius type-3 continuum-extremum modes remain GOOD candidates when
+  they are localized near a lower-continuum maximum or upper-continuum
+  minimum, nearly touch but do not cross the continuum, and pass the boundary
+  and grid-scale red-flag checks.
+
+After the policy update, a non-blind post-adjudication
+`nstx_135388` policy-v2 pass was written to
+`tests/labels_audit/nstx_135388/nstx_135388_codex_policy_v2_labels.csv`.
+This file is explicitly not an independent validation pass: it carries
+`review_type=not_blind_post_adjudication_policy_v2` and `prior_seen=true`.
+Its SHA-256 is
+`5fc964be25adf8636be697544abdad91416264d44c2a05212084f29193f482b3`.
+Policy v2 has 131 GOOD and 213 BAD labels. It changed 47 sealed-blind Codex
+decisions: 45 GOOD -> BAD under the new red-flag rules, and 2 BAD -> GOOD
+for resolved continuum-extremum cases including `B318`.
+
+The policy-v2 labels match the current human review exactly for all 344
+`nstx_135388` modes, but this is an adjudication closure result, not a clean
+blind-agreement statistic. Relative to the current
+`training_labels/tae_like_train.csv`, policy v2/human differs on 11 rows:
+10 old-training BAD -> new GOOD and 1 old-training GOOD -> new BAD. The
+canonical training list was not changed; these corrections should be applied
+later by creating a new versioned training list while preserving the current
+one.

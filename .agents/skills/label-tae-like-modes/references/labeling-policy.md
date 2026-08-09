@@ -11,10 +11,15 @@ For every mode inspect:
 - all relevant signed poloidal harmonics `xi_m(r)`;
 - the radial energy envelope `W(r) = sum_m |xi_m(r)|^2`;
 - radial width, smoothness, coherence, and peak location;
+- grid-scale oscillations or multiple closely spaced peaks at the mode peak
+  or within the connected mode body, including artifacts visible in only one
+  signed harmonic;
 - which morphology family best describes the mode, while allowing mixed
   cases that combine multiple families;
 - near-axis behavior and radial-boundary artifacts, including both
   pointwise normalized amplitude and integrated energy near `r=0`;
+- outer-boundary behavior near `r=1`, including endpoint spikes in the
+  total envelope and in any individual signed harmonic;
 - the absolute-frequency lower and upper TAE continuum boundaries;
 - true sign-change crossings of the mode frequency with either boundary;
 - pointwise and integrated `W(r)` near each crossing;
@@ -26,6 +31,48 @@ For every mode inspect:
 - whether the mode intersects continuum elsewhere at appreciable amplitude.
 
 Do not decide from a single scalar or one plotted harmonic.
+
+## Red-flag precedence
+
+Before assigning a morphology family, first apply disqualifying gates for
+continuum crossings and radial-boundary artifacts. A plausible family label
+such as edge-localized, continuum-extremum-localized, or mixed can explain
+the overall shape, but it must not rescue a mode with appreciable continuum
+interaction or grid-scale numerical structure.
+
+If a true continuum crossing carries pointwise `W(r_cross) / max(W) >= ~0.1`,
+label the mode BAD unless the crossing is unmistakably in a smooth,
+visually detached tail with very small local integrated energy. If the
+crossing pointwise energy is large, roughly `>= ~0.2-0.3`, treat it as
+strong BAD evidence even when it is away from the global energy peak. A
+crossing on a connected shoulder, a connected secondary lobe, or a valley
+between connected lobes is part of the mode body for this purpose.
+
+Near-axis artifacts include both isolated one/few-grid-point spikes and
+short grid-scale oscillatory packets in the signed harmonics near `r=0`.
+If such a packet is visually separated from the smooth envelope, or has
+pointwise `W / max(W)` near `0.08-0.1` or larger, label BAD unless the mode
+is genuinely smooth and core-localized all the way to the axis.
+
+Outer-boundary artifacts near `r=1` are also disqualifying. Inspect both the
+summed envelope `W(r)` and the individual signed harmonics. A large endpoint
+spike or one/few-grid-point oscillatory packet in any single harmonic is BAD
+evidence even when the summed `W(r)` is modest because other harmonics
+dominate elsewhere. Accept edge-localized modes only when high-r structure is
+smoothly connected, radially resolved, and coherent across neighboring
+harmonics rather than localized at the endpoint.
+
+Grid-scale oscillations at the mode peak or inside the connected mode body
+are disqualifying even away from both radial boundaries. This includes
+several closely spaced grid-point peaks, sawtooth-like oscillations, or a
+large one/few-grid-point spike in a single dominant harmonic. A smooth
+resolved envelope with ordinary nodes or phase changes can still be physical;
+the red flag is unresolved radial structure carrying appreciable amplitude
+inside the mode body.
+
+When any red-flag gate is borderline but not clearly clean, prefer `bad`
+with low confidence over `good` with low confidence. Use `good` only after
+the mode passes these red-flag checks.
 
 ## GOOD evidence
 
@@ -81,18 +128,31 @@ family, so do not apply one morphology standard to all modes.
    lobes and continuum interactions before deciding.
 
 Extend this list when new repeatable morphology families appear. For all
-families, BAD evidence such as detached axis spikes, unresolved grid-scale
-features, or continuum crossings inside the connected mode body still
-overrides otherwise plausible morphology.
+families, BAD evidence such as detached axis spikes, short grid-scale
+near-axis packets, unresolved grid-scale features, or continuum crossings
+inside the connected mode body still overrides otherwise plausible
+morphology.
 
 ## BAD evidence
 
 Strong BAD evidence includes:
 
 - one- or few-grid-point spikes or an implausibly thin radial structure;
-- a significant spike or concentration at `r=0` consistent with a boundary
-  problem; use pointwise amplitude near the axis as the primary screen, not
-  only integrated near-axis energy;
+- a significant spike or concentration at `r=0` or `r=1` consistent with a
+  boundary problem; use pointwise amplitude and individual-harmonic structure
+  as primary screens, not only integrated boundary energy or summed `W(r)`;
+- a short grid-scale oscillatory packet near `r=0` in the signed harmonics,
+  especially when separated from the smooth envelope or accompanied by a
+  narrow energy bump;
+- a single one/few-grid-point peak at `r=0` in any appreciable harmonic,
+  even if the rest of the mode looks smooth or the summed/integrated
+  near-axis energy is small;
+- a one/few-grid-point endpoint spike or grid-scale oscillatory packet near
+  `r=1` in any individual signed harmonic, even if the summed envelope
+  `W(r)` is not large at the boundary;
+- grid-scale oscillations at the main peak or within the connected mode body,
+  especially several closely spaced peaks, a sawtooth-like radial pattern, or
+  a large one/few-grid-point spike in a single harmonic;
 - jagged or mutually incoherent dominant harmonics;
 - an apparently sharp signed-harmonic feature that is detached from the
   connected energy envelope or grid-scale in radius; do not count an
@@ -100,6 +160,11 @@ Strong BAD evidence includes:
   detachment by itself;
 - a continuum crossing through the main mode envelope or another location
   carrying appreciable pointwise or integrated mode energy;
+- a true continuum crossing with pointwise `W(r_cross) / max(W) >= ~0.1`
+  unless it is unmistakably in a smooth detached tail with very small local
+  integrated energy;
+- a true continuum crossing with large pointwise energy, roughly
+  `W(r_cross) / max(W) >= ~0.2-0.3`, even away from the global peak;
 - a true continuum crossing inside the connected mode body, including a
   shoulder, valley between connected lobes, or secondary lobe with
   appreciable amplitude, because it should produce significant continuum
@@ -118,22 +183,72 @@ between numerical grid points.
 
 For near-axis artifacts, inspect the maximum pointwise normalized energy
 `W(r) / max(W)` in the first few radial grid points, for example
-`r <= 0.03`, as well as the signed harmonics there. Integrated energy in this
-region is only supporting evidence, because a one- or few-grid-point spike
+`r <= 0.03`, as well as the signed harmonics there. Also inspect the next
+few grid points beyond that window when the plot shows a short oscillatory
+packet at low radius. Integrated energy in this region is only supporting
+evidence, because a one- or few-grid-point spike or short grid-scale packet
 can have small integrated energy while still being a clear boundary problem.
 
 Treat a detached near-axis spike as BAD when its pointwise normalized
 amplitude is appreciable, for example `max(W / max(W)) >= 0.1` near `r=0`,
 especially when it is one or a few grid points wide and separated from the
-main mode envelope. A very large detached axis spike, for example
-`max(W / max(W)) >= 0.3`, is strong BAD evidence even if its integrated
-energy fraction is small.
+main mode envelope. A single one/few-grid-point peak at the axis is also BAD
+when it appears in any appreciable individual harmonic, even if the summed
+`W(r)` or integrated near-axis energy is modest. A very large detached axis
+spike, for example `max(W / max(W)) >= 0.3`, is strong BAD evidence even if
+its integrated energy fraction is small.
+
+Treat a near-axis grid-scale oscillatory packet as BAD when it is visually
+separated from the smooth envelope or accompanied by a narrow energy bump
+with pointwise `W / max(W)` near `0.08-0.1` or larger. Do not rescue this
+pattern because the integrated near-axis energy is small. The relevant
+distinction is smooth continuation of a core-localized mode versus a
+boundary-like packet or spike.
 
 Use integrated near-axis energy as a secondary check. Large integrated
 near-axis energy strengthens the BAD decision, but small integrated energy
 does not rescue a visually detached axis spike. Do not reject a genuinely
 smooth core-localized mode merely for having amplitude near the axis; the
 disqualifying pattern is a narrow, separated, boundary-like feature.
+
+## Outer-boundary artifacts
+
+For high-r boundary artifacts, inspect both the summed radial envelope
+`W(r) / max(W)` and the largest individual signed-harmonic amplitude near
+`r=1`, for example
+`max_m |xi_m(r)| / max_{m,r} |xi_m(r)|` in the last few grid points. The
+summed envelope can hide a boundary problem when only one harmonic has a
+large endpoint spike while other harmonics dominate the physical body.
+
+Treat a one/few-grid-point endpoint spike or short grid-scale oscillatory
+packet near `r=1` as BAD when it appears in any individual harmonic and is
+not part of a smooth resolved edge-localized envelope. This remains BAD even
+if `W(r) / max(W)` is modest at the boundary. A high-r packet with pointwise
+`W / max(W) >= ~0.1` is suspicious, and `>= ~0.2-0.3` is strong BAD evidence,
+but an individual-harmonic endpoint spike can be disqualifying below those
+summed-energy thresholds.
+
+Do not confuse this with ordinary type-2 edge structure: in a physical
+edge-localized mode, separate harmonics can be radially narrow because of
+large magnetic shear, but the total envelope remains broad/resolved and the
+high-r structure is smoothly connected across neighboring harmonics rather
+than a single endpoint blow-up.
+
+## Grid-scale structure inside the mode body
+
+Inspect the radial smoothness of every appreciable signed harmonic at the
+mode peak and throughout the connected mode body. A mode is BAD when the
+peak or body contains unresolved grid-scale oscillations, multiple closely
+spaced grid-point peaks, or a large one/few-grid-point spike in any dominant
+or otherwise appreciable harmonic. This remains BAD even if the artifact is
+confined to a single poloidal harmonic; a single corrupted harmonic can make
+the mode unsuitable for training.
+
+Do not reject ordinary physical nodes, sign changes, or shear-narrowed
+harmonic structure when the envelope is smooth and resolved. The
+disqualifying pattern is radial structure at the grid scale carrying
+appreciable amplitude inside the connected mode body, especially when it
+creates several neighboring sharp peaks rather than one smooth lobe.
 
 ## Touching versus crossing
 
@@ -152,12 +267,17 @@ is close, also inspect the fraction of integrated `W(r)` near the crossing
 and the mode energy beyond an outer crossing.
 
 A crossing does not have to pass through the global maximum of `W(r)` to be
-disqualifying. If the crossing lies on a connected shoulder of the main
-envelope, in a valley between connected lobes, or in a connected secondary
-lobe with appreciable amplitude, treat it as a physically significant
-continuum interaction and label the mode BAD. Reserve GOOD for crossings
-only in detached or negligible tails where both pointwise and local
-integrated energy are very small.
+disqualifying. If the crossing carries pointwise
+`W(r_cross) / max(W) >= ~0.1`, label BAD unless it is unmistakably in a
+smooth detached tail with very small local integrated energy. If the crossing
+lies on a connected shoulder of the main envelope, in a valley between
+connected lobes, or in a connected secondary lobe with appreciable
+amplitude, treat it as a physically significant continuum interaction and
+label the mode BAD. Crossings with large pointwise energy, roughly
+`W(r_cross) / max(W) >= ~0.2-0.3`, are strong BAD evidence even when the
+global peak is elsewhere. Reserve GOOD for crossings only in detached or
+negligible tails where both pointwise and local integrated energy are very
+small.
 
 For tail crossings, do not decide from integrated energy alone. A tail can
 carry little total energy but still be physically disqualifying when its
@@ -168,6 +288,8 @@ small pointwise normalized amplitude, and a smooth tail that is visually
 detached from the main mode body. If the low-r or high-r tail is connected
 to the envelope and appears resonantly distorted at the crossing, label BAD
 with low confidence when the amplitude is modest but not clearly negligible.
+In borderline cases, prefer `bad, low` over `good, low` unless the crossing
+is clearly detached and negligible by all three checks.
 
 ## Continuum extrema
 

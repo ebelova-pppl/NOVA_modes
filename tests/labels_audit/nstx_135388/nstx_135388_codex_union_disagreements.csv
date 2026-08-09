@@ -1,0 +1,58 @@
+blind_id,path,codex_label,human_label,training_label,codex_human_agree,codex_training_agree,human_training_agree,category,codex_confidence,codex_reason
+B059,nstx_135388/N2/egn02w.2758E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B067,nstx_135388/N2/egn02w.6059E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,low,coherent edge-localized mode; crossings only in negligible detached tail
+B073,nstx_135388/N3/egn03w.2160E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B074,nstx_135388/N3/egn03w.2179E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B077,nstx_135388/N3/egn03w.2558E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,edge-localized mode kept after visual review; crossing judged outside main body
+B079,nstx_135388/N3/egn03w.2764E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B080,nstx_135388/N3/egn03w.2917E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B082,nstx_135388/N3/egn03w.3194E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved edge-localized mode with no true continuum crossing
+B083,nstx_135388/N3/egn03w.3321E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B085,nstx_135388/N3/egn03w.4023E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,medium,coherent edge-localized mode; crossings only in negligible detached tail
+B087,nstx_135388/N3/egn03w.4436E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,medium,coherent edge-localized mode; crossings only in negligible detached tail
+B090,nstx_135388/N3/egn03w.7148E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,edge-localized mode with small visually detached tail crossing; W/max=0.05
+B094,nstx_135388/N4/egn04w.1782E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.10
+B096,nstx_135388/N4/egn04w.1894E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B097,nstx_135388/N4/egn04w.1909E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B098,nstx_135388/N4/egn04w.1910E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B099,nstx_135388/N4/egn04w.2013E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.07
+B102,nstx_135388/N4/egn04w.2289E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04
+B103,nstx_135388/N4/egn04w.2571E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,low,mixed/localized mode with small visually detached tail crossing; W/max=0.08
+B120,nstx_135388/N4/egn04w.7336E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent edge-localized mode; crossings only in negligible detached tail
+B121,nstx_135388/N4/egn04w.7832E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent edge-localized mode; crossings only in negligible detached tail
+B127,nstx_135388/N5/egn05w.2098E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03
+B128,nstx_135388/N5/egn05w.2248E+02,good,bad,good,false,true,false,codex_matches_training_human_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03
+B129,nstx_135388/N5/egn05w.2418E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B135,nstx_135388/N5/egn05w.3249E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent core/extremum-localized mode; crossings only in negligible detached tail
+B138,nstx_135388/N5/egn05w.3735E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent edge-localized mode; crossings only in negligible detached tail
+B144,nstx_135388/N6/egn06w.1914E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04
+B145,nstx_135388/N6/egn06w.1917E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent mixed/localized mode; crossings only in negligible detached tail
+B146,nstx_135388/N6/egn06w.1980E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,low,mixed/localized mode with small visually detached tail crossing; W/max=0.09
+B150,nstx_135388/N6/egn06w.2682E+02,bad,good,good,false,false,true,human_matches_training_codex_differs,medium,unresolved or incoherent spike-like mode structure
+B171,nstx_135388/N7/egn07w.1774E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent mixed/localized mode; crossings only in negligible detached tail
+B172,nstx_135388/N7/egn07w.1794E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode kept after visual review; crossing judged outside main body
+B174,nstx_135388/N7/egn07w.1960E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03
+B175,nstx_135388/N7/egn07w.2113E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent mixed/localized mode; crossings only in negligible detached tail
+B179,nstx_135388/N7/egn07w.2394E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.02
+B181,nstx_135388/N7/egn07w.2569E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03
+B184,nstx_135388/N7/egn07w.2680E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B187,nstx_135388/N7/egn07w.2890E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B194,nstx_135388/N7/egn07w.4463E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent edge-localized mode; crossings only in negligible detached tail
+B198,nstx_135388/N7/egn07w.6689E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,edge-localized mode with small visually detached tail crossing; W/max=0.04
+B201,nstx_135388/N7/egn07w.8037E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent edge-localized mode; crossings only in negligible detached tail
+B207,nstx_135388/N8/egn08w.1968E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04
+B209,nstx_135388/N8/egn08w.1993E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,mixed/localized mode with small visually detached tail crossing; W/max=0.10
+B210,nstx_135388/N8/egn08w.1998E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent mixed/localized mode; crossings only in negligible detached tail
+B215,nstx_135388/N8/egn08w.2639E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,medium,coherent mixed/localized mode; crossings only in negligible detached tail
+B217,nstx_135388/N8/egn08w.2668E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B218,nstx_135388/N8/egn08w.2674E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent resolved core/extremum-localized mode with no true continuum crossing
+B239,nstx_135388/N8/egn08w.9850E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,edge-localized mode with small visually detached tail crossing; W/max=0.09
+B240,nstx_135388/N9/egn09w.1047E+03,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,edge-localized mode with small visually detached tail crossing; W/max=0.09
+B245,nstx_135388/N9/egn09w.1792E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent mixed/localized mode; crossings only in negligible detached tail
+B271,nstx_135388/N9/egn09w.2699E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B272,nstx_135388/N9/egn09w.2702E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B273,nstx_135388/N9/egn09w.2707E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent resolved mixed/localized mode with no true continuum crossing
+B288,nstx_135388/N9/egn09w.5860E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,coherent edge-localized mode; crossings only in negligible detached tail
+B290,nstx_135388/N9/egn09w.6908E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,coherent edge-localized mode; crossings only in negligible detached tail
+B316,nstx_135388/N10/egn10w.2680E+02,good,good,bad,true,false,false,new_reviews_agree_vs_training,medium,coherent resolved core/extremum-localized mode with no true continuum crossing
+B318,nstx_135388/N10/egn10w.2723E+02,bad,good,good,false,false,true,human_matches_training_codex_differs,medium,very narrow near-axis spike-like no-crossing structure

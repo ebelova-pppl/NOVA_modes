@@ -1,0 +1,12 @@
+blind_id,path,policy_v2_label,training_label,agreement,confidence,reason,review_type
+B067,nstx_135388/N2/egn02w.6059E+02,good,bad,false,low,coherent edge-localized mode; crossings only in negligible detached tail,not_blind_post_adjudication_policy_v2
+B085,nstx_135388/N3/egn03w.4023E+02,good,bad,false,medium,coherent edge-localized mode; crossings only in negligible detached tail,not_blind_post_adjudication_policy_v2
+B087,nstx_135388/N3/egn03w.4436E+02,good,bad,false,medium,coherent edge-localized mode; crossings only in negligible detached tail,not_blind_post_adjudication_policy_v2
+B103,nstx_135388/N4/egn04w.2571E+02,good,bad,false,low,mixed/localized mode with small visually detached tail crossing; W/max=0.08,not_blind_post_adjudication_policy_v2
+B128,nstx_135388/N5/egn05w.2248E+02,bad,good,false,low,connected tail/body interaction and high-r packet; not clearly detached/negligible,not_blind_post_adjudication_policy_v2
+B146,nstx_135388/N6/egn06w.1980E+02,good,bad,false,low,mixed/localized mode with small visually detached tail crossing; W/max=0.09,not_blind_post_adjudication_policy_v2
+B181,nstx_135388/N7/egn07w.2569E+02,good,bad,false,low,mixed/localized mode with small visually detached tail crossing; W/max=0.03,not_blind_post_adjudication_policy_v2
+B207,nstx_135388/N8/egn08w.1968E+02,good,bad,false,low,mixed/localized mode with small visually detached tail crossing; W/max=0.04,not_blind_post_adjudication_policy_v2
+B215,nstx_135388/N8/egn08w.2639E+02,good,bad,false,medium,coherent mixed/localized mode; crossings only in negligible detached tail,not_blind_post_adjudication_policy_v2
+B217,nstx_135388/N8/egn08w.2668E+02,good,bad,false,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,not_blind_post_adjudication_policy_v2
+B316,nstx_135388/N10/egn10w.2680E+02,good,bad,false,medium,coherent resolved core/extremum-localized mode with no true continuum crossing,not_blind_post_adjudication_policy_v2
