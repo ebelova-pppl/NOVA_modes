@@ -1,0 +1,6 @@
+path,old_training_label,new_human_label,change_type
+nstxuE204669M03t025/N10/egn10w.1295E+02,good,bad,good_to_bad
+nstxuE204669M03t025/N10/egn10w.7202E+01,good,bad,good_to_bad
+nstxuE204669M03t025/N4/egn04w.7170E+01,bad,good,bad_to_good
+nstxuE204669M03t025/N5/egn05w.2048E+02,good,bad,good_to_bad
+nstxuE204669M03t025/N9/egn09w.7539E+01,good,bad,good_to_bad

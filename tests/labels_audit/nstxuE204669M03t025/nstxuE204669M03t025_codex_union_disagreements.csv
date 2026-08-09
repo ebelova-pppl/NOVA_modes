@@ -1,0 +1,13 @@
+blind_id,path,codex_label,human_label,training_label,codex_human_agree,codex_training_agree,human_training_agree,category,codex_confidence,codex_reason,prior_seen
+B029,nstxuE204669M03t025/N1/egn01w.9104E+01,good,bad,bad,false,false,true,human_matches_training_codex_differs,low,borderline resolved mode; no significant body crossing,false
+B033,nstxuE204669M03t025/N10/egn10w.1295E+02,good,bad,good,false,true,false,codex_matches_training_human_differs,medium,resolved edge/type-2 structure; only negligible tail crossings,false
+B038,nstxuE204669M03t025/N10/egn10w.2352E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,resolved edge/type-2 structure; only negligible tail crossings,false
+B044,nstxuE204669M03t025/N10/egn10w.7202E+01,bad,bad,good,true,false,false,new_reviews_agree_vs_training,high,continuum crossing through significant mode energy,false
+B082,nstxuE204669M03t025/N3/egn03w.1022E+02,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,resolved edge/type-2 structure; only negligible tail crossings,false
+B088,nstxuE204669M03t025/N3/egn03w.5337E+01,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,resolved TAE-like structure without significant body crossing,false
+B095,nstxuE204669M03t025/N3/egn03w.9617E+01,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,resolved compact/type-3 structure; no significant crossing,false
+B096,nstxuE204669M03t025/N3/egn03w.9634E+01,good,bad,bad,false,false,true,human_matches_training_codex_differs,medium,resolved compact/type-3 structure; no significant crossing,false
+B106,nstxuE204669M03t025/N4/egn04w.7170E+01,good,good,bad,true,false,false,new_reviews_agree_vs_training,medium,resolved compact/type-3 structure; no significant crossing,false
+B121,nstxuE204669M03t025/N5/egn05w.2048E+02,bad,bad,good,true,false,false,new_reviews_agree_vs_training,medium,edge continuum crossing has large local mode energy,false
+B129,nstxuE204669M03t025/N5/egn05w.7213E+01,bad,good,good,false,false,true,human_matches_training_codex_differs,medium,grid-scale or detached packet within mode body,false
+B208,nstxuE204669M03t025/N9/egn09w.7539E+01,bad,bad,good,true,false,false,new_reviews_agree_vs_training,high,dominant axis/near-axis grid-scale packet,false

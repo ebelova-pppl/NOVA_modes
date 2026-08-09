@@ -1,0 +1,218 @@
+blind_id,path,validity,confidence,reason,prior_seen,reviewer
+B001,nstxuE204669M03t025/N1/egn01w.1001E+02,bad,high,dominant axis/near-axis grid-scale packet,true,codex
+B002,nstxuE204669M03t025/N1/egn01w.1044E+02,bad,high,continuum crossing through significant mode energy,true,codex
+B003,nstxuE204669M03t025/N1/egn01w.1052E+02,bad,high,continuum crossing through significant mode energy,true,codex
+B004,nstxuE204669M03t025/N1/egn01w.1061E+02,bad,medium,continuum crossing through significant mode energy,true,codex
+B005,nstxuE204669M03t025/N1/egn01w.1071E+02,bad,high,continuum crossing through significant mode energy,true,codex
+B006,nstxuE204669M03t025/N1/egn01w.1081E+02,bad,high,continuum crossing through significant mode energy,true,codex
+B007,nstxuE204669M03t025/N1/egn01w.1091E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B008,nstxuE204669M03t025/N1/egn01w.1101E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B009,nstxuE204669M03t025/N1/egn01w.1131E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B010,nstxuE204669M03t025/N1/egn01w.1141E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B011,nstxuE204669M03t025/N1/egn01w.1149E+02,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B012,nstxuE204669M03t025/N1/egn01w.1565E+02,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B013,nstxuE204669M03t025/N1/egn01w.3425E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B014,nstxuE204669M03t025/N1/egn01w.3485E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B015,nstxuE204669M03t025/N1/egn01w.4972E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B016,nstxuE204669M03t025/N1/egn01w.5033E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B017,nstxuE204669M03t025/N1/egn01w.5092E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B018,nstxuE204669M03t025/N1/egn01w.5285E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B019,nstxuE204669M03t025/N1/egn01w.5346E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B020,nstxuE204669M03t025/N1/egn01w.5407E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B021,nstxuE204669M03t025/N1/egn01w.5468E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B022,nstxuE204669M03t025/N1/egn01w.5528E+01,bad,medium,continuum crossing through significant mode energy,false,codex
+B023,nstxuE204669M03t025/N1/egn01w.5586E+01,bad,medium,continuum crossing through significant mode energy,false,codex
+B024,nstxuE204669M03t025/N1/egn01w.5643E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B025,nstxuE204669M03t025/N1/egn01w.5698E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B026,nstxuE204669M03t025/N1/egn01w.7103E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B027,nstxuE204669M03t025/N1/egn01w.7162E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B028,nstxuE204669M03t025/N1/egn01w.7318E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B029,nstxuE204669M03t025/N1/egn01w.9104E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B030,nstxuE204669M03t025/N1/egn01w.9754E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B031,nstxuE204669M03t025/N1/egn01w.9800E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B032,nstxuE204669M03t025/N1/egn01w.9851E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B033,nstxuE204669M03t025/N10/egn10w.1295E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B034,nstxuE204669M03t025/N10/egn10w.1393E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B035,nstxuE204669M03t025/N10/egn10w.1678E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B036,nstxuE204669M03t025/N10/egn10w.1831E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B037,nstxuE204669M03t025/N10/egn10w.1984E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B038,nstxuE204669M03t025/N10/egn10w.2352E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B039,nstxuE204669M03t025/N10/egn10w.3232E+02,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B040,nstxuE204669M03t025/N10/egn10w.3354E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B041,nstxuE204669M03t025/N10/egn10w.3902E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B042,nstxuE204669M03t025/N10/egn10w.6956E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B043,nstxuE204669M03t025/N10/egn10w.7060E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B044,nstxuE204669M03t025/N10/egn10w.7202E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B045,nstxuE204669M03t025/N10/egn10w.7308E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B046,nstxuE204669M03t025/N10/egn10w.7320E+01,bad,high,grid-scale oscillations at the mode peak/body,false,codex
+B047,nstxuE204669M03t025/N10/egn10w.7514E+01,bad,high,grid-scale oscillations at the mode peak/body,false,codex
+B048,nstxuE204669M03t025/N10/egn10w.7710E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B049,nstxuE204669M03t025/N10/egn10w.7878E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B050,nstxuE204669M03t025/N10/egn10w.7922E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B051,nstxuE204669M03t025/N10/egn10w.7964E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B052,nstxuE204669M03t025/N10/egn10w.8131E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B053,nstxuE204669M03t025/N10/egn10w.8427E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B054,nstxuE204669M03t025/N10/egn10w.8503E+01,bad,high,large separated axis/boundary packet contaminates mode,false,codex
+B055,nstxuE204669M03t025/N10/egn10w.8821E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B056,nstxuE204669M03t025/N10/egn10w.9275E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B057,nstxuE204669M03t025/N10/egn10w.9552E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B058,nstxuE204669M03t025/N2/egn02w.2918E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B059,nstxuE204669M03t025/N2/egn02w.3307E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B060,nstxuE204669M03t025/N2/egn02w.3365E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B061,nstxuE204669M03t025/N2/egn02w.3391E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B062,nstxuE204669M03t025/N2/egn02w.4446E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B063,nstxuE204669M03t025/N2/egn02w.4506E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B064,nstxuE204669M03t025/N2/egn02w.4566E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B065,nstxuE204669M03t025/N2/egn02w.4627E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B066,nstxuE204669M03t025/N2/egn02w.4688E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B067,nstxuE204669M03t025/N2/egn02w.4749E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B068,nstxuE204669M03t025/N2/egn02w.4810E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B069,nstxuE204669M03t025/N2/egn02w.4871E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B070,nstxuE204669M03t025/N2/egn02w.4933E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B071,nstxuE204669M03t025/N2/egn02w.7509E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B072,nstxuE204669M03t025/N2/egn02w.7610E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B073,nstxuE204669M03t025/N2/egn02w.7702E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B074,nstxuE204669M03t025/N2/egn02w.7803E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B075,nstxuE204669M03t025/N2/egn02w.7847E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B076,nstxuE204669M03t025/N2/egn02w.7927E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B077,nstxuE204669M03t025/N2/egn02w.8168E+01,bad,high,large separated axis/boundary packet contaminates mode,false,codex
+B078,nstxuE204669M03t025/N2/egn02w.8249E+01,bad,high,large separated axis/boundary packet contaminates mode,false,codex
+B079,nstxuE204669M03t025/N2/egn02w.9006E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B080,nstxuE204669M03t025/N2/egn02w.9225E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B081,nstxuE204669M03t025/N2/egn02w.9291E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B082,nstxuE204669M03t025/N3/egn03w.1022E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B083,nstxuE204669M03t025/N3/egn03w.2984E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B084,nstxuE204669M03t025/N3/egn03w.3046E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B085,nstxuE204669M03t025/N3/egn03w.3084E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B086,nstxuE204669M03t025/N3/egn03w.3347E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B087,nstxuE204669M03t025/N3/egn03w.4502E+01,bad,medium,grid-scale or detached packet within mode body,false,codex
+B088,nstxuE204669M03t025/N3/egn03w.5337E+01,good,medium,resolved TAE-like structure without significant body crossing,false,codex
+B089,nstxuE204669M03t025/N3/egn03w.5403E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B090,nstxuE204669M03t025/N3/egn03w.7689E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B091,nstxuE204669M03t025/N3/egn03w.7750E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B092,nstxuE204669M03t025/N3/egn03w.7867E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B093,nstxuE204669M03t025/N3/egn03w.8010E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B094,nstxuE204669M03t025/N3/egn03w.8262E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B095,nstxuE204669M03t025/N3/egn03w.9617E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B096,nstxuE204669M03t025/N3/egn03w.9634E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B097,nstxuE204669M03t025/N4/egn04w.1002E+02,bad,high,grid-scale oscillations at the mode peak/body,false,codex
+B098,nstxuE204669M03t025/N4/egn04w.1007E+02,bad,high,grid-scale oscillations at the mode peak/body,false,codex
+B099,nstxuE204669M03t025/N4/egn04w.1099E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B100,nstxuE204669M03t025/N4/egn04w.1398E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B101,nstxuE204669M03t025/N4/egn04w.1691E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B102,nstxuE204669M03t025/N4/egn04w.2546E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B103,nstxuE204669M03t025/N4/egn04w.2718E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B104,nstxuE204669M03t025/N4/egn04w.2978E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B105,nstxuE204669M03t025/N4/egn04w.3063E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B106,nstxuE204669M03t025/N4/egn04w.7170E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B107,nstxuE204669M03t025/N4/egn04w.7212E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B108,nstxuE204669M03t025/N4/egn04w.7288E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B109,nstxuE204669M03t025/N4/egn04w.7420E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B110,nstxuE204669M03t025/N4/egn04w.7493E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B111,nstxuE204669M03t025/N4/egn04w.7677E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B112,nstxuE204669M03t025/N4/egn04w.7907E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B113,nstxuE204669M03t025/N4/egn04w.8339E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B114,nstxuE204669M03t025/N4/egn04w.8625E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B115,nstxuE204669M03t025/N4/egn04w.9176E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B116,nstxuE204669M03t025/N4/egn04w.9263E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B117,nstxuE204669M03t025/N5/egn05w.1215E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B118,nstxuE204669M03t025/N5/egn05w.1383E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B119,nstxuE204669M03t025/N5/egn05w.1514E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B120,nstxuE204669M03t025/N5/egn05w.1736E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B121,nstxuE204669M03t025/N5/egn05w.2048E+02,bad,medium,edge continuum crossing has large local mode energy,false,codex
+B122,nstxuE204669M03t025/N5/egn05w.2759E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B123,nstxuE204669M03t025/N5/egn05w.2835E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B124,nstxuE204669M03t025/N5/egn05w.3008E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B125,nstxuE204669M03t025/N5/egn05w.6875E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B126,nstxuE204669M03t025/N5/egn05w.6948E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B127,nstxuE204669M03t025/N5/egn05w.7038E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B128,nstxuE204669M03t025/N5/egn05w.7072E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B129,nstxuE204669M03t025/N5/egn05w.7213E+01,bad,medium,grid-scale or detached packet within mode body,false,codex
+B130,nstxuE204669M03t025/N5/egn05w.7467E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B131,nstxuE204669M03t025/N5/egn05w.7747E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B132,nstxuE204669M03t025/N5/egn05w.7888E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B133,nstxuE204669M03t025/N5/egn05w.8011E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B134,nstxuE204669M03t025/N5/egn05w.8224E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B135,nstxuE204669M03t025/N5/egn05w.8976E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B136,nstxuE204669M03t025/N5/egn05w.9124E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B137,nstxuE204669M03t025/N5/egn05w.9563E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B138,nstxuE204669M03t025/N6/egn06w.1309E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B139,nstxuE204669M03t025/N6/egn06w.1462E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B140,nstxuE204669M03t025/N6/egn06w.1784E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B141,nstxuE204669M03t025/N6/egn06w.2005E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B142,nstxuE204669M03t025/N6/egn06w.2293E+02,bad,medium,edge continuum crossing has large local mode energy,false,codex
+B143,nstxuE204669M03t025/N6/egn06w.2789E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B144,nstxuE204669M03t025/N6/egn06w.2881E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B145,nstxuE204669M03t025/N6/egn06w.3080E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B146,nstxuE204669M03t025/N6/egn06w.3112E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B147,nstxuE204669M03t025/N6/egn06w.6696E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B148,nstxuE204669M03t025/N6/egn06w.7503E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B149,nstxuE204669M03t025/N6/egn06w.7726E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B150,nstxuE204669M03t025/N6/egn06w.8202E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B151,nstxuE204669M03t025/N6/egn06w.9020E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B152,nstxuE204669M03t025/N7/egn07w.1364E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B153,nstxuE204669M03t025/N7/egn07w.1525E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B154,nstxuE204669M03t025/N7/egn07w.1672E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B155,nstxuE204669M03t025/N7/egn07w.1846E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B156,nstxuE204669M03t025/N7/egn07w.2049E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B157,nstxuE204669M03t025/N7/egn07w.2716E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B158,nstxuE204669M03t025/N7/egn07w.3222E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B159,nstxuE204669M03t025/N7/egn07w.3388E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B160,nstxuE204669M03t025/N7/egn07w.6640E+01,bad,medium,continuum crossing through significant mode energy,false,codex
+B161,nstxuE204669M03t025/N7/egn07w.7397E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B162,nstxuE204669M03t025/N7/egn07w.8030E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B163,nstxuE204669M03t025/N7/egn07w.8867E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B164,nstxuE204669M03t025/N7/egn07w.9754E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B165,nstxuE204669M03t025/N8/egn08w.1026E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B166,nstxuE204669M03t025/N8/egn08w.1241E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B167,nstxuE204669M03t025/N8/egn08w.1394E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B168,nstxuE204669M03t025/N8/egn08w.1548E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B169,nstxuE204669M03t025/N8/egn08w.1700E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B170,nstxuE204669M03t025/N8/egn08w.1857E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B171,nstxuE204669M03t025/N8/egn08w.2045E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B172,nstxuE204669M03t025/N8/egn08w.2270E+02,good,low,borderline resolved mode; no significant body crossing,false,codex
+B173,nstxuE204669M03t025/N8/egn08w.2505E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B174,nstxuE204669M03t025/N8/egn08w.3282E+02,bad,high,large separated axis/boundary packet contaminates mode,false,codex
+B175,nstxuE204669M03t025/N8/egn08w.6607E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B176,nstxuE204669M03t025/N8/egn08w.7796E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B177,nstxuE204669M03t025/N8/egn08w.7876E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B178,nstxuE204669M03t025/N8/egn08w.8079E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B179,nstxuE204669M03t025/N8/egn08w.8444E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B180,nstxuE204669M03t025/N8/egn08w.8534E+01,good,low,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B181,nstxuE204669M03t025/N8/egn08w.8959E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B182,nstxuE204669M03t025/N8/egn08w.9359E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B183,nstxuE204669M03t025/N8/egn08w.9673E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B184,nstxuE204669M03t025/N9/egn09w.1159E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B185,nstxuE204669M03t025/N9/egn09w.1260E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B186,nstxuE204669M03t025/N9/egn09w.1540E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B187,nstxuE204669M03t025/N9/egn09w.2214E+02,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B188,nstxuE204669M03t025/N9/egn09w.2446E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B189,nstxuE204669M03t025/N9/egn09w.3101E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B190,nstxuE204669M03t025/N9/egn09w.3261E+02,bad,high,continuum crossing through significant mode energy,false,codex
+B191,nstxuE204669M03t025/N9/egn09w.3299E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B192,nstxuE204669M03t025/N9/egn09w.3319E+01,bad,high,continuum crossing through significant mode energy,false,codex
+B193,nstxuE204669M03t025/N9/egn09w.3359E+02,bad,high,large separated axis/boundary packet contaminates mode,false,codex
+B194,nstxuE204669M03t025/N9/egn09w.3513E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B195,nstxuE204669M03t025/N9/egn09w.3799E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B196,nstxuE204669M03t025/N9/egn09w.4599E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B197,nstxuE204669M03t025/N9/egn09w.5601E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B198,nstxuE204669M03t025/N9/egn09w.6642E+01,bad,medium,grid-scale oscillations at the mode peak/body,false,codex
+B199,nstxuE204669M03t025/N9/egn09w.6690E+01,bad,medium,grid-scale oscillations at the mode peak/body,false,codex
+B200,nstxuE204669M03t025/N9/egn09w.6820E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B201,nstxuE204669M03t025/N9/egn09w.6853E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B202,nstxuE204669M03t025/N9/egn09w.7015E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B203,nstxuE204669M03t025/N9/egn09w.7093E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B204,nstxuE204669M03t025/N9/egn09w.7310E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B205,nstxuE204669M03t025/N9/egn09w.7326E+01,bad,high,single narrow near-axis packet dominates,false,codex
+B206,nstxuE204669M03t025/N9/egn09w.7411E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B207,nstxuE204669M03t025/N9/egn09w.7448E+01,bad,high,single narrow near-axis packet dominates,false,codex
+B208,nstxuE204669M03t025/N9/egn09w.7539E+01,bad,high,dominant axis/near-axis grid-scale packet,false,codex
+B209,nstxuE204669M03t025/N9/egn09w.7725E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B210,nstxuE204669M03t025/N9/egn09w.7944E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B211,nstxuE204669M03t025/N9/egn09w.8162E+01,good,low,borderline resolved mode; no significant body crossing,false,codex
+B212,nstxuE204669M03t025/N9/egn09w.8312E+01,bad,high,single narrow near-axis packet dominates,false,codex
+B213,nstxuE204669M03t025/N9/egn09w.8627E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B214,nstxuE204669M03t025/N9/egn09w.8919E+01,good,medium,resolved edge/type-2 structure; only negligible tail crossings,false,codex
+B215,nstxuE204669M03t025/N9/egn09w.9132E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex
+B216,nstxuE204669M03t025/N9/egn09w.9372E+01,bad,high,single narrow near-axis packet dominates,false,codex
+B217,nstxuE204669M03t025/N9/egn09w.9803E+01,good,medium,resolved compact/type-3 structure; no significant crossing,false,codex

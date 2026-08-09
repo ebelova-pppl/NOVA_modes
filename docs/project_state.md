@@ -216,7 +216,8 @@ From cont_features.py:
   junk-like extrema candidates only if the labeling policy changes.
 - Treat the Codex blind audits of training shots `nstxu_204202`,
   `nstx_120113`, `nstx_141711`, `nstx_135388`, and
-  `nstxuE202855A01t020` as complete. Retained artifacts live under
+  `nstxuE202855A01t020`, and `nstxuE204669M03t025` as complete. Retained
+  artifacts live under
   `tests/labels_audit/<shot>/` and are limited to the sealed Codex list plus
   SHA sidecar, Codex/human/training union disagreements, and
   human-vs-training label changes. `nstx_141711` also keeps its union
@@ -2745,3 +2746,39 @@ radius while the connected envelope remains resolved and physical. Several
 sealed Codex BAD calls on those morphologies were judged too conservative
 during discussion, but the sealed blind list remains unchanged as the
 provenance-preserving record.
+
+### 2026-08-09: `nstxuE204669M03t025` blind audit cleanup
+
+The label-free blind workflow was repeated for `nstxuE204669M03t025` using
+217 clean target paths. The sealed Codex blind list has 88 GOOD and 129 BAD
+decisions. Six early decisions (`B001`-`B006`) are marked `prior_seen=true`
+because target-shot human-review rows were accidentally exposed before the
+shot was defined; clean agreement statistics therefore exclude those rows.
+Sealed SHA-256:
+`479e7986713d80f54d5beca497cbbf128f93ea3d0d9f2df34914ccd8886d831f`.
+
+After the post-seal discussion and human-review corrections for
+`B141`, `B156`, `B171`, `B172`, and `B187`, the comparison statistics are:
+
+- Codex blind vs human: 209/217 agreement = 96.31%, Cohen's kappa 0.9227.
+- Codex blind vs human clean: 203/211 agreement = 96.21%.
+- Codex blind vs current training list: 206/217 agreement = 94.93%, Cohen's
+  kappa 0.8943.
+- Human clean vs current training list: 212/217 agreement = 97.70%, Cohen's
+  kappa 0.9513.
+
+The retained shot-local artifacts were pruned to:
+
+- `nstxuE204669M03t025_codex_blind_labels_SEALED.csv`
+- `nstxuE204669M03t025_codex_blind_labels_SEALED.csv.sha256`
+- `nstxuE204669M03t025_codex_union_disagreements.csv`
+- `nstxuE204669M03t025_human_vs_training_label_changes.csv`
+
+The retained union table has 12 rows: 7 cases where the human review matches
+the current training list but Codex differs, 1 case where Codex matches the
+current training list but the human review differs, and 4 cases where both new
+reviews agree against the current training list. The remaining Codex-human
+disagreements are `B029`, `B033`, `B038`, `B082`, `B088`, `B095`, `B096`, and
+`B129`. The human-vs-training change table has 5 rows: 4 old-training GOOD ->
+new-human BAD and 1 old-training BAD -> new-human GOOD. The canonical
+`training_labels/tae_like_train.csv` was not changed.
