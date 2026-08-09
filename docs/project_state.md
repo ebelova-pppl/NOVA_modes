@@ -216,14 +216,16 @@ From cont_features.py:
   junk-like extrema candidates only if the labeling policy changes.
 - Treat the Codex blind audits of training shots `nstxu_204202`,
   `nstx_120113`, `nstx_141711`, `nstx_135388`, and
-  `nstxuE202855A01t020`, and `nstxuE204669M03t025` as complete. Retained
-  artifacts live under
+  `nstxuE202855A01t020`, `nstxuE204669M03t025`, and
+  `nstxuE205052A01t022` as complete. Retained artifacts live under
   `tests/labels_audit/<shot>/` and are limited to the sealed Codex list plus
   SHA sidecar, Codex/human/training union disagreements, and
   human-vs-training label changes. `nstx_141711` also keeps its union
   adjudication table; `nstx_135388` also keeps the post-adjudication
-  policy-v2 labels, change list, and training-comparison tables. The sealed
-  Codex lists are provenance-preserving and should not be edited in place.
+  policy-v2 labels, change list, and training-comparison tables.
+  `nstxuE205052A01t022` also keeps non-sealed Codex post-review labels and the
+  B139/B143 correction table. The sealed Codex lists are
+  provenance-preserving and should not be edited in place.
 - `nstx_120113` audit status: the clean target manifest has 174 TAE-like modes.
   Pre-adjudication Codex-vs-human agreement was 169/174 = 97.13% with Cohen
   kappa 0.9270. Review discussion resolved the remaining cases as
@@ -234,6 +236,22 @@ From cont_features.py:
   human corrections. No replacement training CSV has been merged yet; keep
   `training_labels/tae_like_train.csv` unchanged until an explicit
   adjudicated version is approved.
+- `nstxuE205052A01t022` audit status: the target manifest has 293 TAE-like
+  modes. The sealed Codex review has 24 `good`, 269 `bad`, and 0 `skip`; all
+  rows are marked `prior_seen=true` because aggregate target-shot context had
+  already been exposed, so use this as an independent mode-level review but
+  not as clean-blind agreement statistics. Post-review Codex labels change
+  only `B139` and `B143` from `good` to `bad` in the non-sealed v2 file,
+  yielding 22 `good` and 271 `bad`. After human-side corrections
+  (`B042=skip`, `B156=good`), post-review Codex-vs-human agreement is
+  250/293 = 85.32%, and the retained human-vs-training delta table has 19
+  rows. Keep `training_labels/tae_like_train.csv` unchanged until a versioned
+  adjudicated training list is explicitly created and checked with LOSO.
+- For smooth-looking modes whose continuum diagnostic still crosses the mode
+  body at large amplitude with no obvious resonant structure, treat the case
+  as a continuum/equilibrium consistency question. Do not promote these to a
+  confident `good` label from appearance alone; hold them out as `skip` or
+  require follow-up continuum verification before merging.
 - Keep the three-feature inner-extremum RF schema experimental. Replacing
   continuum prominence with local mode-energy fraction improved shuffled folds
   and removed the overall LOSO regression, but did not reduce G-shot LOSO FN.

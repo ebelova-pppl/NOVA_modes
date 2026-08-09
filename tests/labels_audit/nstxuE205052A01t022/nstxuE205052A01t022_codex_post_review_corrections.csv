@@ -1,0 +1,3 @@
+blind_id,path,sealed_label,revised_label,sealed_confidence,revised_confidence,sealed_reason,revised_reason,r_peak,max_cross_W,max_cross_Efrac,axis_Wmax,axis_Hmax,peaks_Wgt008,crossings
+B139,nstxuE205052A01t022/N4/egn04w.7632E+01,good,bad,medium,high,resolved compact/extremum-localized structure; no significant crossing,grid-scale multi-peak packet near mode body; not a resolved extremum-localized mode,0.345,0.020,0.1221,0.000,0.007,9,low@0.285:W0.020:E0.122
+B143,nstxuE205052A01t022/N4/egn04w.9744E+01,good,bad,medium,high,resolved compact/extremum-localized structure; no significant crossing,low-r/near-axis grid-scale packet with appreciable individual-harmonic amplitude,0.120,0.000,0.0000,0.044,0.227,6,

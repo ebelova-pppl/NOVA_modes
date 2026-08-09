@@ -1,0 +1,294 @@
+blind_id,path,validity,confidence,reason,prior_seen,reviewer
+B001,nstxuE205052A01t022/N1/egn01w.1028E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B002,nstxuE205052A01t022/N1/egn01w.1125E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B003,nstxuE205052A01t022/N1/egn01w.1154E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B004,nstxuE205052A01t022/N1/egn01w.1164E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B005,nstxuE205052A01t022/N1/egn01w.1174E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B006,nstxuE205052A01t022/N1/egn01w.1185E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B007,nstxuE205052A01t022/N1/egn01w.1194E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B008,nstxuE205052A01t022/N1/egn01w.1196E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B009,nstxuE205052A01t022/N1/egn01w.1209E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B010,nstxuE205052A01t022/N1/egn01w.1222E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B011,nstxuE205052A01t022/N1/egn01w.1235E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B012,nstxuE205052A01t022/N1/egn01w.1249E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B013,nstxuE205052A01t022/N1/egn01w.1264E+02,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B014,nstxuE205052A01t022/N1/egn01w.1280E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B015,nstxuE205052A01t022/N1/egn01w.1296E+02,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B016,nstxuE205052A01t022/N1/egn01w.1313E+02,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B017,nstxuE205052A01t022/N1/egn01w.1330E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B018,nstxuE205052A01t022/N1/egn01w.1349E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B019,nstxuE205052A01t022/N1/egn01w.1367E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B020,nstxuE205052A01t022/N1/egn01w.1387E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B021,nstxuE205052A01t022/N1/egn01w.1407E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B022,nstxuE205052A01t022/N1/egn01w.1427E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B023,nstxuE205052A01t022/N1/egn01w.1448E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B024,nstxuE205052A01t022/N1/egn01w.1470E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B025,nstxuE205052A01t022/N1/egn01w.1492E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B026,nstxuE205052A01t022/N1/egn01w.1625E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B027,nstxuE205052A01t022/N1/egn01w.1652E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B028,nstxuE205052A01t022/N1/egn01w.1677E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B029,nstxuE205052A01t022/N1/egn01w.1703E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B030,nstxuE205052A01t022/N1/egn01w.1729E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B031,nstxuE205052A01t022/N1/egn01w.1754E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B032,nstxuE205052A01t022/N1/egn01w.1780E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B033,nstxuE205052A01t022/N1/egn01w.9546E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B034,nstxuE205052A01t022/N1/egn01w.9878E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B035,nstxuE205052A01t022/N10/egn10w.1023E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B036,nstxuE205052A01t022/N10/egn10w.1030E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B037,nstxuE205052A01t022/N10/egn10w.1081E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B038,nstxuE205052A01t022/N10/egn10w.1086E+02,good,medium,resolved compact/extremum-localized structure; no significant crossing,true,codex
+B039,nstxuE205052A01t022/N10/egn10w.1141E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B040,nstxuE205052A01t022/N10/egn10w.1176E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B041,nstxuE205052A01t022/N10/egn10w.1239E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B042,nstxuE205052A01t022/N10/egn10w.1302E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B043,nstxuE205052A01t022/N10/egn10w.1322E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B044,nstxuE205052A01t022/N10/egn10w.1454E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B045,nstxuE205052A01t022/N10/egn10w.1536E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B046,nstxuE205052A01t022/N10/egn10w.1631E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B047,nstxuE205052A01t022/N10/egn10w.1720E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B048,nstxuE205052A01t022/N10/egn10w.1801E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B049,nstxuE205052A01t022/N10/egn10w.1937E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B050,nstxuE205052A01t022/N10/egn10w.2281E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B051,nstxuE205052A01t022/N10/egn10w.5539E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B052,nstxuE205052A01t022/N10/egn10w.6248E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B053,nstxuE205052A01t022/N10/egn10w.6473E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B054,nstxuE205052A01t022/N10/egn10w.6685E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B055,nstxuE205052A01t022/N10/egn10w.6926E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B056,nstxuE205052A01t022/N10/egn10w.6997E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B057,nstxuE205052A01t022/N10/egn10w.7076E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B058,nstxuE205052A01t022/N10/egn10w.7276E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B059,nstxuE205052A01t022/N10/egn10w.7492E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B060,nstxuE205052A01t022/N10/egn10w.7536E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B061,nstxuE205052A01t022/N10/egn10w.7687E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B062,nstxuE205052A01t022/N10/egn10w.7753E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B063,nstxuE205052A01t022/N10/egn10w.7806E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B064,nstxuE205052A01t022/N10/egn10w.7920E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B065,nstxuE205052A01t022/N10/egn10w.8025E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B066,nstxuE205052A01t022/N10/egn10w.8119E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B067,nstxuE205052A01t022/N10/egn10w.8303E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B068,nstxuE205052A01t022/N10/egn10w.8394E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B069,nstxuE205052A01t022/N10/egn10w.8479E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B070,nstxuE205052A01t022/N10/egn10w.8554E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B071,nstxuE205052A01t022/N10/egn10w.8816E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B072,nstxuE205052A01t022/N10/egn10w.9110E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B073,nstxuE205052A01t022/N10/egn10w.9412E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B074,nstxuE205052A01t022/N10/egn10w.9457E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B075,nstxuE205052A01t022/N10/egn10w.9537E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B076,nstxuE205052A01t022/N10/egn10w.9621E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B077,nstxuE205052A01t022/N10/egn10w.9643E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B078,nstxuE205052A01t022/N10/egn10w.9887E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B079,nstxuE205052A01t022/N2/egn02w.1014E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B080,nstxuE205052A01t022/N2/egn02w.1033E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B081,nstxuE205052A01t022/N2/egn02w.1133E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B082,nstxuE205052A01t022/N2/egn02w.1317E+02,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B083,nstxuE205052A01t022/N2/egn02w.1326E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B084,nstxuE205052A01t022/N2/egn02w.1336E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B085,nstxuE205052A01t022/N2/egn02w.1344E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B086,nstxuE205052A01t022/N2/egn02w.1352E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B087,nstxuE205052A01t022/N2/egn02w.1964E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B088,nstxuE205052A01t022/N2/egn02w.1994E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B089,nstxuE205052A01t022/N2/egn02w.2025E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B090,nstxuE205052A01t022/N2/egn02w.2175E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B091,nstxuE205052A01t022/N2/egn02w.2309E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B092,nstxuE205052A01t022/N2/egn02w.2464E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B093,nstxuE205052A01t022/N2/egn02w.8524E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B094,nstxuE205052A01t022/N2/egn02w.8620E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B095,nstxuE205052A01t022/N2/egn02w.8671E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B096,nstxuE205052A01t022/N2/egn02w.8697E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B097,nstxuE205052A01t022/N2/egn02w.8751E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B098,nstxuE205052A01t022/N2/egn02w.8805E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B099,nstxuE205052A01t022/N2/egn02w.8884E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B100,nstxuE205052A01t022/N2/egn02w.9108E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B101,nstxuE205052A01t022/N2/egn02w.9240E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B102,nstxuE205052A01t022/N2/egn02w.9495E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B103,nstxuE205052A01t022/N2/egn02w.9679E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B104,nstxuE205052A01t022/N3/egn03w.1074E+02,good,high,resolved edge/type-2 structure; no significant crossing,true,codex
+B105,nstxuE205052A01t022/N3/egn03w.1083E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B106,nstxuE205052A01t022/N3/egn03w.1109E+02,good,high,resolved edge/type-2 structure; no significant crossing,true,codex
+B107,nstxuE205052A01t022/N3/egn03w.1204E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B108,nstxuE205052A01t022/N3/egn03w.1233E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B109,nstxuE205052A01t022/N3/egn03w.1237E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B110,nstxuE205052A01t022/N3/egn03w.1304E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B111,nstxuE205052A01t022/N3/egn03w.1315E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B112,nstxuE205052A01t022/N3/egn03w.1323E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B113,nstxuE205052A01t022/N3/egn03w.1329E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B114,nstxuE205052A01t022/N3/egn03w.1357E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B115,nstxuE205052A01t022/N3/egn03w.6129E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B116,nstxuE205052A01t022/N3/egn03w.6210E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B117,nstxuE205052A01t022/N3/egn03w.8239E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B118,nstxuE205052A01t022/N3/egn03w.8396E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B119,nstxuE205052A01t022/N3/egn03w.8435E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B120,nstxuE205052A01t022/N3/egn03w.8484E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B121,nstxuE205052A01t022/N3/egn03w.8535E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B122,nstxuE205052A01t022/N3/egn03w.8601E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B123,nstxuE205052A01t022/N3/egn03w.8668E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B124,nstxuE205052A01t022/N3/egn03w.8758E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B125,nstxuE205052A01t022/N3/egn03w.8845E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B126,nstxuE205052A01t022/N3/egn03w.8965E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B127,nstxuE205052A01t022/N3/egn03w.9085E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B128,nstxuE205052A01t022/N3/egn03w.9237E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B129,nstxuE205052A01t022/N3/egn03w.9381E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B130,nstxuE205052A01t022/N3/egn03w.9549E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B131,nstxuE205052A01t022/N3/egn03w.9808E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B132,nstxuE205052A01t022/N3/egn03w.9958E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B133,nstxuE205052A01t022/N4/egn04w.1033E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B134,nstxuE205052A01t022/N4/egn04w.1120E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B135,nstxuE205052A01t022/N4/egn04w.1125E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B136,nstxuE205052A01t022/N4/egn04w.5349E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B137,nstxuE205052A01t022/N4/egn04w.7009E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B138,nstxuE205052A01t022/N4/egn04w.7258E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B139,nstxuE205052A01t022/N4/egn04w.7632E+01,good,medium,resolved compact/extremum-localized structure; no significant crossing,true,codex
+B140,nstxuE205052A01t022/N4/egn04w.7963E+01,bad,medium,detached outer-boundary packet/end-point artifact,true,codex
+B141,nstxuE205052A01t022/N4/egn04w.8855E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B142,nstxuE205052A01t022/N4/egn04w.9702E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B143,nstxuE205052A01t022/N4/egn04w.9744E+01,good,medium,resolved compact/extremum-localized structure; no significant crossing,true,codex
+B144,nstxuE205052A01t022/N4/egn04w.9789E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B145,nstxuE205052A01t022/N4/egn04w.9849E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B146,nstxuE205052A01t022/N5/egn05w.1024E+02,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B147,nstxuE205052A01t022/N5/egn05w.1134E+02,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B148,nstxuE205052A01t022/N5/egn05w.1151E+02,bad,medium,detached outer-boundary packet/end-point artifact,true,codex
+B149,nstxuE205052A01t022/N5/egn05w.1257E+02,good,medium,resolved edge/type-2 structure; only negligible inner crossing,true,codex
+B150,nstxuE205052A01t022/N5/egn05w.1342E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B151,nstxuE205052A01t022/N5/egn05w.1348E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B152,nstxuE205052A01t022/N5/egn05w.1358E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B153,nstxuE205052A01t022/N5/egn05w.1365E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B154,nstxuE205052A01t022/N5/egn05w.1372E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B155,nstxuE205052A01t022/N5/egn05w.1380E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B156,nstxuE205052A01t022/N5/egn05w.1454E+02,good,high,resolved edge/type-2 structure; only negligible inner crossing,true,codex
+B157,nstxuE205052A01t022/N5/egn05w.1581E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B158,nstxuE205052A01t022/N5/egn05w.1745E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B159,nstxuE205052A01t022/N5/egn05w.2142E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B160,nstxuE205052A01t022/N5/egn05w.5365E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B161,nstxuE205052A01t022/N5/egn05w.5779E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B162,nstxuE205052A01t022/N5/egn05w.5828E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B163,nstxuE205052A01t022/N5/egn05w.6400E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B164,nstxuE205052A01t022/N5/egn05w.6815E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B165,nstxuE205052A01t022/N5/egn05w.7317E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B166,nstxuE205052A01t022/N5/egn05w.7494E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B167,nstxuE205052A01t022/N5/egn05w.7628E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B168,nstxuE205052A01t022/N5/egn05w.7792E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B169,nstxuE205052A01t022/N5/egn05w.8362E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B170,nstxuE205052A01t022/N5/egn05w.8685E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B171,nstxuE205052A01t022/N5/egn05w.8767E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B172,nstxuE205052A01t022/N5/egn05w.9271E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B173,nstxuE205052A01t022/N5/egn05w.9349E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B174,nstxuE205052A01t022/N5/egn05w.9397E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B175,nstxuE205052A01t022/N5/egn05w.9548E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B176,nstxuE205052A01t022/N5/egn05w.9593E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B177,nstxuE205052A01t022/N5/egn05w.9717E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B178,nstxuE205052A01t022/N6/egn06w.1027E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B179,nstxuE205052A01t022/N6/egn06w.1052E+02,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B180,nstxuE205052A01t022/N6/egn06w.1095E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B181,nstxuE205052A01t022/N6/egn06w.1163E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B182,nstxuE205052A01t022/N6/egn06w.1200E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B183,nstxuE205052A01t022/N6/egn06w.1283E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B184,nstxuE205052A01t022/N6/egn06w.1409E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B185,nstxuE205052A01t022/N6/egn06w.1517E+02,good,high,resolved edge/type-2 structure; crossings only in negligible tail,true,codex
+B186,nstxuE205052A01t022/N6/egn06w.1731E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B187,nstxuE205052A01t022/N6/egn06w.1869E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B188,nstxuE205052A01t022/N6/egn06w.2238E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B189,nstxuE205052A01t022/N6/egn06w.5977E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B190,nstxuE205052A01t022/N6/egn06w.6783E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B191,nstxuE205052A01t022/N6/egn06w.7196E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B192,nstxuE205052A01t022/N6/egn06w.7278E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B193,nstxuE205052A01t022/N6/egn06w.7330E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B194,nstxuE205052A01t022/N6/egn06w.7541E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B195,nstxuE205052A01t022/N6/egn06w.7639E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B196,nstxuE205052A01t022/N6/egn06w.8005E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B197,nstxuE205052A01t022/N6/egn06w.8619E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B198,nstxuE205052A01t022/N6/egn06w.8721E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B199,nstxuE205052A01t022/N6/egn06w.8752E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B200,nstxuE205052A01t022/N6/egn06w.8889E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B201,nstxuE205052A01t022/N6/egn06w.9086E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B202,nstxuE205052A01t022/N6/egn06w.9614E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B203,nstxuE205052A01t022/N6/egn06w.9880E+01,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B204,nstxuE205052A01t022/N7/egn07w.1005E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B205,nstxuE205052A01t022/N7/egn07w.1075E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B206,nstxuE205052A01t022/N7/egn07w.1081E+02,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B207,nstxuE205052A01t022/N7/egn07w.1146E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B208,nstxuE205052A01t022/N7/egn07w.1206E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B209,nstxuE205052A01t022/N7/egn07w.1317E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B210,nstxuE205052A01t022/N7/egn07w.1398E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B211,nstxuE205052A01t022/N7/egn07w.1630E+02,good,medium,resolved edge/type-2 structure; only small tail crossing,true,codex
+B212,nstxuE205052A01t022/N7/egn07w.1684E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B213,nstxuE205052A01t022/N7/egn07w.1836E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B214,nstxuE205052A01t022/N7/egn07w.2197E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B215,nstxuE205052A01t022/N7/egn07w.2388E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B216,nstxuE205052A01t022/N7/egn07w.6909E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B217,nstxuE205052A01t022/N7/egn07w.7023E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B218,nstxuE205052A01t022/N7/egn07w.7073E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B219,nstxuE205052A01t022/N7/egn07w.7124E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B220,nstxuE205052A01t022/N7/egn07w.7176E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B221,nstxuE205052A01t022/N7/egn07w.7437E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B222,nstxuE205052A01t022/N7/egn07w.7801E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B223,nstxuE205052A01t022/N7/egn07w.8533E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B224,nstxuE205052A01t022/N7/egn07w.9619E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B225,nstxuE205052A01t022/N8/egn08w.1007E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B226,nstxuE205052A01t022/N8/egn08w.1033E+02,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B227,nstxuE205052A01t022/N8/egn08w.1052E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B228,nstxuE205052A01t022/N8/egn08w.1108E+02,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B229,nstxuE205052A01t022/N8/egn08w.1119E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B230,nstxuE205052A01t022/N8/egn08w.1125E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B231,nstxuE205052A01t022/N8/egn08w.1161E+02,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B232,nstxuE205052A01t022/N8/egn08w.1226E+02,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B233,nstxuE205052A01t022/N8/egn08w.1388E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B234,nstxuE205052A01t022/N8/egn08w.1484E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B235,nstxuE205052A01t022/N8/egn08w.1678E+02,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B236,nstxuE205052A01t022/N8/egn08w.1771E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B237,nstxuE205052A01t022/N8/egn08w.2217E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B238,nstxuE205052A01t022/N8/egn08w.2361E+02,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B239,nstxuE205052A01t022/N8/egn08w.5634E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B240,nstxuE205052A01t022/N8/egn08w.6646E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B241,nstxuE205052A01t022/N8/egn08w.6954E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B242,nstxuE205052A01t022/N8/egn08w.7027E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B243,nstxuE205052A01t022/N8/egn08w.7107E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B244,nstxuE205052A01t022/N8/egn08w.7488E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B245,nstxuE205052A01t022/N8/egn08w.7946E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B246,nstxuE205052A01t022/N8/egn08w.8099E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B247,nstxuE205052A01t022/N8/egn08w.8231E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B248,nstxuE205052A01t022/N8/egn08w.8566E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B249,nstxuE205052A01t022/N8/egn08w.8583E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B250,nstxuE205052A01t022/N8/egn08w.8772E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B251,nstxuE205052A01t022/N8/egn08w.9053E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B252,nstxuE205052A01t022/N8/egn08w.9206E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B253,nstxuE205052A01t022/N8/egn08w.9263E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B254,nstxuE205052A01t022/N8/egn08w.9375E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B255,nstxuE205052A01t022/N8/egn08w.9498E+01,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B256,nstxuE205052A01t022/N8/egn08w.9560E+01,bad,medium,grid-scale or fragmented packet within connected mode body,true,codex
+B257,nstxuE205052A01t022/N8/egn08w.9624E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B258,nstxuE205052A01t022/N8/egn08w.9827E+01,good,medium,resolved compact/core structure; no significant crossing,true,codex
+B259,nstxuE205052A01t022/N8/egn08w.9923E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B260,nstxuE205052A01t022/N9/egn09w.1009E+02,good,medium,resolved compact/core structure; only negligible tail crossing,true,codex
+B261,nstxuE205052A01t022/N9/egn09w.1015E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B262,nstxuE205052A01t022/N9/egn09w.1061E+02,good,medium,resolved compact/core structure; only small smooth-tail crossing,true,codex
+B263,nstxuE205052A01t022/N9/egn09w.1078E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B264,nstxuE205052A01t022/N9/egn09w.1128E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B265,nstxuE205052A01t022/N9/egn09w.1140E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B266,nstxuE205052A01t022/N9/egn09w.1178E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B267,nstxuE205052A01t022/N9/egn09w.1264E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B268,nstxuE205052A01t022/N9/egn09w.1330E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B269,nstxuE205052A01t022/N9/egn09w.1494E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B270,nstxuE205052A01t022/N9/egn09w.1506E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B271,nstxuE205052A01t022/N9/egn09w.1565E+02,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B272,nstxuE205052A01t022/N9/egn09w.1637E+02,good,medium,resolved edge/type-2 structure; crossings only in negligible tail,true,codex
+B273,nstxuE205052A01t022/N9/egn09w.1755E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B274,nstxuE205052A01t022/N9/egn09w.2091E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B275,nstxuE205052A01t022/N9/egn09w.2296E+02,bad,high,continuum crossing through significant connected mode energy,true,codex
+B276,nstxuE205052A01t022/N9/egn09w.6042E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B277,nstxuE205052A01t022/N9/egn09w.6424E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B278,nstxuE205052A01t022/N9/egn09w.6961E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B279,nstxuE205052A01t022/N9/egn09w.7046E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B280,nstxuE205052A01t022/N9/egn09w.7151E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B281,nstxuE205052A01t022/N9/egn09w.7373E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B282,nstxuE205052A01t022/N9/egn09w.7563E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B283,nstxuE205052A01t022/N9/egn09w.7601E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B284,nstxuE205052A01t022/N9/egn09w.7839E+01,bad,low,borderline crossing on connected tail/shoulder plus fragmented morphology,true,codex
+B285,nstxuE205052A01t022/N9/egn09w.8038E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B286,nstxuE205052A01t022/N9/egn09w.8190E+01,bad,high,continuum crossing through significant connected mode energy,true,codex
+B287,nstxuE205052A01t022/N9/egn09w.8537E+01,bad,low,grid-scale or fragmented packet within connected mode body,true,codex
+B288,nstxuE205052A01t022/N9/egn09w.8945E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B289,nstxuE205052A01t022/N9/egn09w.9117E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B290,nstxuE205052A01t022/N9/egn09w.9483E+01,good,medium,resolved compact/core structure; only negligible tail crossing,true,codex
+B291,nstxuE205052A01t022/N9/egn09w.9642E+01,bad,high,dominant near-axis or low-r grid-scale packet,true,codex
+B292,nstxuE205052A01t022/N9/egn09w.9724E+01,good,medium,resolved mixed compact/edge structure; only negligible tail crossing,true,codex
+B293,nstxuE205052A01t022/N9/egn09w.9740E+01,good,low,resolved mixed structure; only negligible tail crossing,true,codex

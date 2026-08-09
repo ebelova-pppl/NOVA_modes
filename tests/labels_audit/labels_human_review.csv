@@ -1459,7 +1459,7 @@
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1365E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1372E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1380E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1454E+02,bad
+/global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1454E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1581E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.1745E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N5/egn05w.2142E+02,bad
@@ -1604,7 +1604,7 @@
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1141E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1176E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1239E+02,good
-/global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1302E+02,bad
+/global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1302E+02,skip
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1322E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1454E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N10/egn10w.1536E+02,good
