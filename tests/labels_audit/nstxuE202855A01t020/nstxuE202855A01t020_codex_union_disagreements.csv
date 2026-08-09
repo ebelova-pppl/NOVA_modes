@@ -1,0 +1,21 @@
+blind_id,path,codex_label,human_label,training_label,confidence,disagreement_type,three_way_category,codex_reason
+B005,nstxuE202855A01t020/N1/egn01w.8555E+00,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,resolved core/global mode; mild low-r structure but no significant crossing or axis spike
+B007,nstxuE202855A01t020/N10/egn10w.1054E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,multiple true crossings through high-r body plus unresolved spiky structure
+B008,nstxuE202855A01t020/N10/egn10w.1210E+01,bad,bad,good,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,ultra-narrow one/few-grid body spike; not a resolved extremum-localized mode
+B009,nstxuE202855A01t020/N10/egn10w.1398E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,unresolved high-r comb/body with grid-scale peaks despite no crossing
+B010,nstxuE202855A01t020/N10/egn10w.1463E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,high-r body is dominated by grid-scale packet and sharp peaks
+B011,nstxuE202855A01t020/N10/egn10w.1484E+01,bad,good,good,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,unresolved high-r/body structure with grid-scale envelope peaks
+B012,nstxuE202855A01t020/N10/egn10w.1667E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,true crossings plus spiky high-r/body structure
+B014,nstxuE202855A01t020/N10/egn10w.2181E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,ultra-narrow one/few-grid spike with continuum crossings
+B015,nstxuE202855A01t020/N10/egn10w.2289E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,true crossing through high-r body with unresolved spiky structure
+B016,nstxuE202855A01t020/N10/egn10w.2558E+01,bad,good,bad,high,codex_vs_human;human_vs_training,codex_matches_training_human_differs,very narrow unresolved body spike with continuum crossings
+B017,nstxuE202855A01t020/N10/egn10w.2605E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,true crossings through spiky high-r body
+B019,nstxuE202855A01t020/N10/egn10w.3637E+01,bad,good,good,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,outer-boundary/endpoint spike with continuum crossings
+B041,nstxuE202855A01t020/N6/egn06w.2444E+01,bad,good,bad,high,codex_vs_human;human_vs_training,codex_matches_training_human_differs,very narrow body spike with continuum crossings
+B049,nstxuE202855A01t020/N7/egn07w.1148E+01,good,good,bad,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,resolved extremum-localized type-3 mode with no crossing
+B050,nstxuE202855A01t020/N7/egn07w.1163E+01,good,bad,bad,high,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,narrow but resolved extremum-localized type-3 mode with no crossing
+B059,nstxuE202855A01t020/N8/egn08w.1247E+01,bad,bad,good,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,separated near-axis point spike has appreciable single-harmonic amplitude
+B064,nstxuE202855A01t020/N8/egn08w.1641E+01,bad,bad,good,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,separated single-harmonic spike at r=0 despite small summed axis energy
+B066,nstxuE202855A01t020/N8/egn08w.9221E+00,good,good,bad,medium,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,narrow extremum-touching type-3 mode; no crossing through the body
+B069,nstxuE202855A01t020/N9/egn09w.1253E+01,good,good,bad,high,codex_vs_training;human_vs_training,new_reviews_agree_vs_training,compact smooth extremum-localized type-3 mode with no crossings
+B079,nstxuE202855A01t020/N9/egn09w.9307E+00,good,bad,bad,medium,codex_vs_human;codex_vs_training,human_matches_training_codex_differs,edge-localized mode; inner crossings are negligible and outside the body

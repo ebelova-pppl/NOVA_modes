@@ -70,6 +70,15 @@ resolved envelope with ordinary nodes or phase changes can still be physical;
 the red flag is unresolved radial structure carrying appreciable amplitude
 inside the mode body.
 
+Reserve terms such as ultra-narrow, one/few-grid-point, or unresolved for
+structures whose active lobe is actually at the radial grid scale: roughly a
+single-point peak, only one to three radial intervals across the core/FWHM,
+vertical-looking sides, a cusp-like top, or obvious sawtooth/packet behavior.
+Do not use ultra-narrow as a synonym for a compact but smooth localized mode.
+If the envelope is smooth, coherent across the dominant harmonics, and spans
+several radial samples with a resolved rise and fall, treat it as resolved
+even when its radial width is small compared with global TAEs.
+
 When any red-flag gate is borderline but not clearly clean, prefer `bad`
 with low confidence over `good` with low confidence. Use `good` only after
 the mode passes these red-flag checks.
@@ -89,6 +98,13 @@ global TAE. A sign change of the mode structure at that extremum is not by
 itself numerical junk. Accept such an extremum-localized mode when its
 harmonics are coherent and any other continuum crossings occur only where
 mode energy is negligible.
+
+For this family, narrowness by itself is not BAD evidence. A compact
+bell-shaped envelope near a continuum extremum, with smooth sides and a
+resolved width over several radial grid samples, should not be called
+ultra-narrow. Reject it for width only when the peak is truly grid-unresolved
+or point-like, or when another red flag such as a body crossing, axis spike,
+or corrupted harmonic is present.
 
 Do not reject a mode merely because it is core localized, low-n, narrow
 relative to older non-G modes, or has a remote continuum crossing in a tiny
@@ -137,7 +153,8 @@ morphology.
 
 Strong BAD evidence includes:
 
-- one- or few-grid-point spikes or an implausibly thin radial structure;
+- unresolved one- or few-grid-point spikes, or an implausibly thin radial
+  structure whose core/FWHM is only at the radial grid scale;
 - a significant spike or concentration at `r=0` or `r=1` consistent with a
   boundary problem; use pointwise amplitude and individual-harmonic structure
   as primary screens, not only integrated boundary energy or summed `W(r)`;
@@ -302,8 +319,12 @@ For inner-extremum modes, examine jointly:
 - structure width and axis behavior.
 
 Proximity to an extremum is supporting geometry, not an automatic GOOD label.
-Ultra-narrow structures and axis spikes remain BAD even when centered on an
-extremum.
+Grid-unresolved ultra-narrow structures and axis spikes remain BAD even when
+centered on an extremum. In this context, ultra-narrow means point-like or
+one/few-grid-interval structure, not a smooth compact envelope. A localized
+extremum mode that is radially narrow but smooth, coherent, and resolved over
+several grid samples can be GOOD when crossings are absent or only in
+negligible detached tails.
 
 ## Frequency presentation
 

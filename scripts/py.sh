@@ -24,7 +24,7 @@ done
 
 # On Perlmutter:
 
-SHOT="$NOVA_DATA/nstx_135388"
+SHOT="$NOVA_DATA/nstxuE204669M03t025"
 SPLIT="$NOVA_REPO/tests/labels_audit"
 OUT="$NOVA_REPO/tests/labels_audit/labels_human_review.csv"
 

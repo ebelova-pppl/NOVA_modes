@@ -215,14 +215,14 @@ From cont_features.py:
   without a material secondary continuum crossing, and revisit the remaining
   junk-like extrema candidates only if the labeling policy changes.
 - Treat the Codex blind audits of training shots `nstxu_204202`,
-  `nstx_120113`, `nstx_141711`, and `nstx_135388` as complete. Retained
-  artifacts live under `tests/labels_audit/<shot>/` and are limited to the
-  sealed Codex list plus SHA sidecar, Codex/human/training union
-  disagreements, and human-vs-training label changes. `nstx_141711` also
-  keeps its union adjudication table; `nstx_135388` also keeps the
-  post-adjudication policy-v2 labels, change list, and training-comparison
-  tables. The sealed Codex lists are provenance-preserving and should not be
-  edited in place.
+  `nstx_120113`, `nstx_141711`, `nstx_135388`, and
+  `nstxuE202855A01t020` as complete. Retained artifacts live under
+  `tests/labels_audit/<shot>/` and are limited to the sealed Codex list plus
+  SHA sidecar, Codex/human/training union disagreements, and
+  human-vs-training label changes. `nstx_141711` also keeps its union
+  adjudication table; `nstx_135388` also keeps the post-adjudication
+  policy-v2 labels, change list, and training-comparison tables. The sealed
+  Codex lists are provenance-preserving and should not be edited in place.
 - `nstx_120113` audit status: the clean target manifest has 174 TAE-like modes.
   Pre-adjudication Codex-vs-human agreement was 169/174 = 97.13% with Cohen
   kappa 0.9270. Review discussion resolved the remaining cases as
@@ -2708,3 +2708,40 @@ blind-agreement statistic. Relative to the current
 canonical training list was not changed; these corrections should be applied
 later by creating a new versioned training list while preserving the current
 one.
+
+### 2026-08-09: `nstxuE202855A01t020` blind audit cleanup
+
+The label-free blind workflow was repeated for `nstxuE202855A01t020` using the
+79 paths in `tests/labels_audit/nstxuE202855A01t020/tae_like_audit.csv`. The
+sealed Codex blind list has 42 GOOD and 37 BAD decisions, with confidence
+counts of 55 high, 23 medium, and 1 low. Sealed SHA-256:
+`2c3e82e4e3166374d9a20a67236de46ab2bd766cc9f3a555978db34e3838f06c`.
+
+After correcting the human review for `B004` and `B005` to BAD, the clean
+comparison statistics are:
+
+- Codex blind vs human clean: 65/79 agreement = 82.28%, Cohen's kappa 0.6395.
+- Codex blind vs current training list: 61/79 agreement = 77.22%, Cohen's
+  kappa 0.5380.
+- Human clean vs current training list: 71/79 agreement = 89.87%, Cohen's
+  kappa 0.7852.
+
+The retained shot-local artifacts were pruned to:
+
+- `nstxuE202855A01t020_codex_blind_labels_SEALED.csv`
+- `nstxuE202855A01t020_codex_blind_labels_SEALED.csv.sha256`
+- `nstxuE202855A01t020_codex_union_disagreements.csv`
+- `nstxuE202855A01t020_human_vs_training_label_changes.csv`
+
+The human-vs-training change table has 8 rows: 5 old-training BAD -> new-human
+GOOD and 3 old-training GOOD -> new-human BAD. The canonical
+`training_labels/tae_like_train.csv` was not changed.
+
+The post-seal disagreement discussion tightened the policy language for this
+shot: compact but smooth type-3 continuum-extremum modes are not
+"ultra-narrow" merely because they are localized, and high-n edge-localized
+type-2 modes can show shear-narrowed, visually spiky harmonics near large
+radius while the connected envelope remains resolved and physical. Several
+sealed Codex BAD calls on those morphologies were judged too conservative
+during discussion, but the sealed blind list remains unchanged as the
+provenance-preserving record.
