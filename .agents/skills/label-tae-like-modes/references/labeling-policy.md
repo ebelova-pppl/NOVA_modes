@@ -20,6 +20,8 @@ For every mode inspect:
 - pointwise and integrated `W(r)` near each crossing;
 - whether each true crossing lies inside the connected mode body or only in
   a detached/negligible tail;
+- whether a low-amplitude tail near a crossing is smooth and detached, or
+  visibly distorted in a way consistent with continuum interaction;
 - alignment with a local upper-boundary minimum or lower-boundary maximum;
 - whether the mode intersects continuum elsewhere at appreciable amplitude.
 
@@ -148,6 +150,16 @@ lobe with appreciable amplitude, treat it as a physically significant
 continuum interaction and label the mode BAD. Reserve GOOD for crossings
 only in detached or negligible tails where both pointwise and local
 integrated energy are very small.
+
+For tail crossings, do not decide from integrated energy alone. A tail can
+carry little total energy but still be physically disqualifying when its
+pointwise amplitude is not negligible and the local signed harmonics or
+energy envelope look distorted around the crossing. Treat GOOD tail
+crossings as requiring all of the following: small local integrated energy,
+small pointwise normalized amplitude, and a smooth tail that is visually
+detached from the main mode body. If the low-r or high-r tail is connected
+to the envelope and appears resonantly distorted at the crossing, label BAD
+with low confidence when the amplitude is modest but not clearly negligible.
 
 ## Continuum extrema
 

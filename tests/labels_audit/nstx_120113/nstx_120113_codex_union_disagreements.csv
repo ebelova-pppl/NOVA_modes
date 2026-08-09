@@ -1,0 +1,7 @@
+blind_id,path,codex_label,human_label,training_label,confidence,disagreement_type,codex_reason
+B045,nstx_120113/N10/egn10w.2945E+02,good,bad,good,medium,codex_vs_human;human_vs_training,"coherent broad mode; only negligible detached tail crossing (max W=0.00361, E+-.03=0.188%)"
+B087,nstx_120113/N5/egn05w.1226E+02,bad,good,good,medium,codex_vs_human;codex_vs_training,spiky/incoherent numerical-looking structure despite no material continuum crossing
+B105,nstx_120113/N6/egn06w.1418E+02,skip,skip,good,low,codex_vs_training;human_vs_training,ambiguous high-r edge structure: possible shear-narrowed edge mode versus boundary spike; no crossing
+B106,nstx_120113/N6/egn06w.1472E+02,skip,good,good,low,codex_vs_human;codex_vs_training,ambiguous high-r edge structure: possible shear-narrowed edge mode versus boundary spike; no crossing
+B131,nstx_120113/N7/egn07w.2630E+02,good,bad,bad,medium,codex_vs_human;codex_vs_training,"coherent broad mode; only negligible detached tail crossing (max W=0.00666, E+-.03=0.32%)"
+B149,nstx_120113/N8/egn08w.2765E+02,good,bad,bad,medium,codex_vs_human;codex_vs_training,"coherent broad mode; only negligible detached tail crossing (max W=0.00439, E+-.03=0.229%)"

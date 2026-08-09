@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-08)
+### Project state (current snapshot, updated 2026-08-09)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -214,10 +214,22 @@ From cont_features.py:
 - Treat the current J38 audit as complete: retain only coherent extremum modes
   without a material secondary continuum crossing, and revisit the remaining
   junk-like extrema candidates only if the labeling policy changes.
-- Treat the Codex blind audit of training shot `nstxu_204202` as complete.
-  Retained artifacts live under `tests/labels_audit/nstxu_204202/`; the
-  sealed Codex list is provenance-preserving and should not be edited in
-  place.
+- Treat the Codex blind audits of training shots `nstxu_204202` and
+  `nstx_120113` as complete. Retained artifacts live under
+  `tests/labels_audit/<shot>/` and are limited to the sealed Codex list plus
+  SHA sidecar, Codex/human/training union disagreements, and human-vs-training
+  label changes. The sealed Codex lists are provenance-preserving and should
+  not be edited in place.
+- `nstx_120113` audit status: the clean target manifest has 174 TAE-like modes.
+  Pre-adjudication Codex-vs-human agreement was 169/174 = 97.13% with Cohen
+  kappa 0.9270. Human-vs-training agreement was 172/174 = 98.85% with kappa
+  0.9704 before the planned human correction of `B045` from `bad` to `good`.
+  Review discussion resolved the remaining cases as `B045=good`, `B087=good`,
+  `B105=skip` for adjudication/training exclusion, `B106=good`, and
+  `B131/B149=bad` with low confidence because their low-r tails are distorted
+  by continuum crossing despite small integrated crossing energy. No replacement
+  training CSV has been merged yet; keep `training_labels/tae_like_train.csv`
+  unchanged until an explicit adjudicated version is approved.
 - Keep the three-feature inner-extremum RF schema experimental. Replacing
   continuum prominence with local mode-energy fraction improved shuffled folds
   and removed the overall LOSO regression, but did not reduce G-shot LOSO FN.
@@ -248,6 +260,10 @@ From cont_features.py:
 -	Good: smooth, physical AE structure, reasonable continuum interaction
 -	Bad: spiky, numerical, boundary artifacts
 - Ambiguities: often near continuum crossings
+- Continuum crossings in low-energy tails can be accepted only when the tail is
+  both small in integrated/pointwise amplitude and smooth/detached from the
+  main envelope. A visibly distorted connected tail near the crossing is BAD or
+  low-confidence BAD even when the integrated crossing energy is small.
  
 ## Current understanding
 -	RF is robust and reliable baseline

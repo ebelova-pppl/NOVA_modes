@@ -1,0 +1,175 @@
+blind_id,path,validity,confidence,reason,prior_seen,reviewer
+B001,nstx_120113/N1/egn01w.1388E+02,bad,high,"true continuum crossing in connected mode body (max W=0.0744, E+-.03=12%)",false,codex
+B002,nstx_120113/N1/egn01w.1397E+02,bad,high,"true continuum crossing in connected mode body (max W=0.0708, E+-.03=10.2%)",false,codex
+B003,nstx_120113/N1/egn01w.1406E+02,bad,high,"true continuum crossing in connected mode body (max W=0.0684, E+-.03=8.81%)",false,codex
+B004,nstx_120113/N1/egn01w.1415E+02,bad,high,"true continuum crossing in connected mode body (max W=0.0689, E+-.03=7.96%)",false,codex
+B005,nstx_120113/N1/egn01w.1425E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.072, E+-.03=7.34%)",false,codex
+B006,nstx_120113/N1/egn01w.1435E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.0797, E+-.03=7.07%)",false,codex
+B007,nstx_120113/N1/egn01w.1445E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.075, E+-.03=7.11%)",false,codex
+B008,nstx_120113/N1/egn01w.1455E+02,bad,medium,"axis-dominated/detached near-axis spike (axis W=0.146, E_axis=3.02%)",false,codex
+B009,nstx_120113/N1/egn01w.1602E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.549, E_axis=4.32%)",false,codex
+B010,nstx_120113/N1/egn01w.1621E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.465, E_axis=4.26%)",false,codex
+B011,nstx_120113/N1/egn01w.1642E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.433, E_axis=4.81%)",false,codex
+B012,nstx_120113/N1/egn01w.1728E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.581, E_axis=4.08%)",false,codex
+B013,nstx_120113/N1/egn01w.1754E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.237, E_axis=2.03%)",false,codex
+B014,nstx_120113/N1/egn01w.1780E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.193, E_axis=1.23%)",false,codex
+B015,nstx_120113/N1/egn01w.1807E+02,bad,high,"true continuum crossing in connected mode body (max W=0.653, E+-.03=9.95%)",false,codex
+B016,nstx_120113/N1/egn01w.1833E+02,bad,high,"true continuum crossing in connected mode body (max W=0.676, E+-.03=10.5%)",false,codex
+B017,nstx_120113/N1/egn01w.1861E+02,bad,high,"true continuum crossing in connected mode body (max W=0.676, E+-.03=11%)",false,codex
+B018,nstx_120113/N1/egn01w.1888E+02,bad,high,"true continuum crossing in connected mode body (max W=0.68, E+-.03=11.4%)",false,codex
+B019,nstx_120113/N1/egn01w.1916E+02,bad,high,"true continuum crossing in connected mode body (max W=0.685, E+-.03=11.8%)",false,codex
+B020,nstx_120113/N1/egn01w.1945E+02,bad,high,"true continuum crossing in connected mode body (max W=0.691, E+-.03=12.2%)",false,codex
+B021,nstx_120113/N1/egn01w.1974E+02,bad,high,"true continuum crossing in connected mode body (max W=0.697, E+-.03=12.6%)",false,codex
+B022,nstx_120113/N1/egn01w.2065E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=1.51%)",false,codex
+B023,nstx_120113/N1/egn01w.2096E+02,bad,high,"true continuum crossing in connected mode body (max W=0.705, E+-.03=11.4%)",false,codex
+B024,nstx_120113/N1/egn01w.2125E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.413, E_axis=1.69%)",false,codex
+B025,nstx_120113/N1/egn01w.2163E+02,bad,high,"true continuum crossing in connected mode body (max W=0.753, E+-.03=12.1%)",false,codex
+B026,nstx_120113/N1/egn01w.2196E+02,bad,high,"true continuum crossing in connected mode body (max W=0.777, E+-.03=12.5%)",false,codex
+B027,nstx_120113/N1/egn01w.2231E+02,bad,high,"true continuum crossing in connected mode body (max W=0.781, E+-.03=12.8%)",false,codex
+B028,nstx_120113/N1/egn01w.2266E+02,bad,high,"true continuum crossing in connected mode body (max W=0.727, E+-.03=13.1%)",false,codex
+B029,nstx_120113/N1/egn01w.2340E+02,bad,high,"true continuum crossing in connected mode body (max W=0.702, E+-.03=14.1%)",false,codex
+B030,nstx_120113/N1/egn01w.2378E+02,bad,high,"true continuum crossing in connected mode body (max W=0.682, E+-.03=14.3%)",false,codex
+B031,nstx_120113/N1/egn01w.2417E+02,bad,high,"true continuum crossing in connected mode body (max W=0.65, E+-.03=14.6%)",false,codex
+B032,nstx_120113/N1/egn01w.2456E+02,bad,high,"true continuum crossing in connected mode body (max W=0.615, E+-.03=15%)",false,codex
+B033,nstx_120113/N1/egn01w.2497E+02,bad,high,"true continuum crossing in connected mode body (max W=0.58, E+-.03=15.4%)",false,codex
+B034,nstx_120113/N1/egn01w.2538E+02,bad,high,"true continuum crossing in connected mode body (max W=0.544, E+-.03=15.8%)",false,codex
+B035,nstx_120113/N1/egn01w.2580E+02,bad,high,"true continuum crossing in connected mode body (max W=0.509, E+-.03=16.3%)",false,codex
+B036,nstx_120113/N1/egn01w.2623E+02,bad,high,"true continuum crossing in connected mode body (max W=0.475, E+-.03=16.7%)",false,codex
+B037,nstx_120113/N1/egn01w.2666E+02,bad,high,"true continuum crossing in connected mode body (max W=0.441, E+-.03=17.3%)",false,codex
+B038,nstx_120113/N10/egn10w.1089E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B039,nstx_120113/N10/egn10w.1224E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B040,nstx_120113/N10/egn10w.1368E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B041,nstx_120113/N10/egn10w.1534E+02,good,medium,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B042,nstx_120113/N10/egn10w.2032E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=6.23e-07, E+-.03=3.22e-05%)",false,codex
+B043,nstx_120113/N10/egn10w.2299E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=5.77e-06, E+-.03=0.000295%)",false,codex
+B044,nstx_120113/N10/egn10w.2591E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=8.29e-05, E+-.03=0.00452%)",false,codex
+B045,nstx_120113/N10/egn10w.2945E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.00361, E+-.03=0.188%)",false,codex
+B046,nstx_120113/N10/egn10w.4548E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.29, E+-.03=25.9%)",false,codex
+B047,nstx_120113/N10/egn10w.4585E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.254, E+-.03=18.1%)",false,codex
+B048,nstx_120113/N10/egn10w.4695E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.46, E+-.03=15.8%)",false,codex
+B049,nstx_120113/N10/egn10w.5042E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.161, E+-.03=17.8%)",false,codex
+B050,nstx_120113/N10/egn10w.5561E+02,bad,high,"true continuum crossing in connected mode body (max W=0.539, E+-.03=17.8%)",false,codex
+B051,nstx_120113/N10/egn10w.9347E+01,good,high,coherent broad core/global mode; no true continuum crossing or axis/boundary artifact,false,codex
+B052,nstx_120113/N10/egn10w.9510E+01,good,high,coherent broad core/global mode; no true continuum crossing or axis/boundary artifact,false,codex
+B053,nstx_120113/N2/egn02w.1062E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.938, E_axis=24.2%)",false,codex
+B054,nstx_120113/N2/egn02w.1088E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=16.3%)",false,codex
+B055,nstx_120113/N2/egn02w.1148E+02,good,medium,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B056,nstx_120113/N2/egn02w.1239E+02,good,medium,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B057,nstx_120113/N2/egn02w.1609E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=83.2%)",false,codex
+B058,nstx_120113/N2/egn02w.2030E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=0.936, E_axis=8.59%)",false,codex
+B059,nstx_120113/N3/egn03w.5807E+01,bad,high,"true continuum crossing in connected mode body (max W=0.639, E+-.03=15.6%)",false,codex
+B060,nstx_120113/N3/egn03w.6981E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=33.1%)",false,codex
+B061,nstx_120113/N4/egn04w.1052E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=36.1%)",false,codex
+B062,nstx_120113/N4/egn04w.1223E+02,good,medium,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B063,nstx_120113/N4/egn04w.1498E+02,good,medium,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B064,nstx_120113/N4/egn04w.2225E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=25.7%)",false,codex
+B065,nstx_120113/N4/egn04w.2261E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=31.8%)",false,codex
+B066,nstx_120113/N4/egn04w.2334E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.00481, E+-.03=0.151%)",false,codex
+B067,nstx_120113/N4/egn04w.2625E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=57.1%)",false,codex
+B068,nstx_120113/N4/egn04w.4455E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.213, E+-.03=30.7%)",false,codex
+B069,nstx_120113/N4/egn04w.4463E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.698, E+-.03=28.3%)",false,codex
+B070,nstx_120113/N4/egn04w.5581E+02,bad,high,"true continuum crossing in connected mode body (max W=0.494, E+-.03=30%)",false,codex
+B071,nstx_120113/N4/egn04w.5664E+02,bad,high,"true continuum crossing in connected mode body (max W=0.97, E+-.03=81.5%)",false,codex
+B072,nstx_120113/N4/egn04w.6761E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=25.8%)",false,codex
+B073,nstx_120113/N4/egn04w.8865E+01,bad,medium,"axis-dominated/detached near-axis spike (axis W=0.14, E_axis=1.13%)",false,codex
+B074,nstx_120113/N4/egn04w.8937E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=0.408, E_axis=8.78%)",false,codex
+B075,nstx_120113/N4/egn04w.8982E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=0.421, E_axis=3.63%)",false,codex
+B076,nstx_120113/N4/egn04w.9018E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=55.5%)",false,codex
+B077,nstx_120113/N4/egn04w.9059E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=11.3%)",false,codex
+B078,nstx_120113/N4/egn04w.9198E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=0.337, E_axis=5.49%)",false,codex
+B079,nstx_120113/N4/egn04w.9355E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=32.2%)",false,codex
+B080,nstx_120113/N4/egn04w.9419E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=5.74%)",false,codex
+B081,nstx_120113/N4/egn04w.9542E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=0.925, E_axis=7.11%)",false,codex
+B082,nstx_120113/N4/egn04w.9876E+01,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B083,nstx_120113/N5/egn05w.1009E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.159, E+-.03=2%)",false,codex
+B084,nstx_120113/N5/egn05w.1161E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=57.2%)",false,codex
+B085,nstx_120113/N5/egn05w.1185E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=78.5%)",false,codex
+B086,nstx_120113/N5/egn05w.1205E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=76.4%)",false,codex
+B087,nstx_120113/N5/egn05w.1226E+02,bad,medium,spiky/incoherent numerical-looking structure despite no material continuum crossing,false,codex
+B088,nstx_120113/N5/egn05w.1259E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=97.6%)",false,codex
+B089,nstx_120113/N5/egn05w.1279E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=98.5%)",false,codex
+B090,nstx_120113/N5/egn05w.1530E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=4.87e-05, E+-.03=0.00172%)",false,codex
+B091,nstx_120113/N5/egn05w.1806E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.000425, E+-.03=0.011%)",false,codex
+B092,nstx_120113/N5/egn05w.2829E+02,bad,high,"true continuum crossing in connected mode body (max W=0.106, E+-.03=3.78%)",false,codex
+B093,nstx_120113/N5/egn05w.3147E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=16%)",false,codex
+B094,nstx_120113/N5/egn05w.4734E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.373, E+-.03=22.1%)",false,codex
+B095,nstx_120113/N5/egn05w.4776E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.504, E+-.03=18.4%)",false,codex
+B096,nstx_120113/N5/egn05w.4796E+02,bad,high,"true continuum crossing in connected mode body (max W=0.985, E+-.03=65.7%)",false,codex
+B097,nstx_120113/N5/egn05w.5462E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=27.9%)",false,codex
+B098,nstx_120113/N5/egn05w.5472E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=32.1%)",false,codex
+B099,nstx_120113/N5/egn05w.5637E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.00385, E+-.03=1.27%)",false,codex
+B100,nstx_120113/N5/egn05w.5774E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.122, E+-.03=24.2%)",false,codex
+B101,nstx_120113/N5/egn05w.9885E+01,bad,high,"true continuum crossing in connected mode body (max W=0.366, E+-.03=7.15%)",false,codex
+B102,nstx_120113/N6/egn06w.1055E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B103,nstx_120113/N6/egn06w.1147E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=83.6%)",false,codex
+B104,nstx_120113/N6/egn06w.1202E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B105,nstx_120113/N6/egn06w.1418E+02,skip,low,ambiguous high-r edge structure: possible shear-narrowed edge mode versus boundary spike; no crossing,false,codex
+B106,nstx_120113/N6/egn06w.1472E+02,skip,low,ambiguous high-r edge structure: possible shear-narrowed edge mode versus boundary spike; no crossing,false,codex
+B107,nstx_120113/N6/egn06w.1484E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=99.7%)",false,codex
+B108,nstx_120113/N6/egn06w.2071E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=8.68e-05, E+-.03=0.00294%)",false,codex
+B109,nstx_120113/N6/egn06w.2540E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=52.8%)",false,codex
+B110,nstx_120113/N6/egn06w.3039E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.422, E+-.03=11.4%)",false,codex
+B111,nstx_120113/N6/egn06w.5002E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.425, E+-.03=22.3%)",false,codex
+B112,nstx_120113/N6/egn06w.5046E+02,bad,high,"true continuum crossing in connected mode body (max W=0.3, E+-.03=80.5%)",false,codex
+B113,nstx_120113/N6/egn06w.5825E+02,bad,high,"true continuum crossing in connected mode body (max W=0.319, E+-.03=33.3%)",false,codex
+B114,nstx_120113/N6/egn06w.8903E+01,bad,medium,"axis-dominated/detached near-axis spike (axis W=0.168, E_axis=6.74%)",false,codex
+B115,nstx_120113/N6/egn06w.8975E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=29.3%)",false,codex
+B116,nstx_120113/N6/egn06w.9044E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=0.692, E_axis=46.4%)",false,codex
+B117,nstx_120113/N6/egn06w.9087E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=36.8%)",false,codex
+B118,nstx_120113/N6/egn06w.9281E+01,good,high,coherent broad core/global mode; no true continuum crossing or axis/boundary artifact,false,codex
+B119,nstx_120113/N6/egn06w.9423E+01,good,high,coherent broad core/global mode; no true continuum crossing or axis/boundary artifact,false,codex
+B120,nstx_120113/N6/egn06w.9881E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=95.5%)",false,codex
+B121,nstx_120113/N7/egn07w.1057E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.000291, E+-.03=0.00666%)",false,codex
+B122,nstx_120113/N7/egn07w.1117E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=76.3%)",false,codex
+B123,nstx_120113/N7/egn07w.1121E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=83.1%)",false,codex
+B124,nstx_120113/N7/egn07w.1130E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=58%)",false,codex
+B125,nstx_120113/N7/egn07w.1146E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=52.4%)",false,codex
+B126,nstx_120113/N7/egn07w.1162E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=54.5%)",false,codex
+B127,nstx_120113/N7/egn07w.1187E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B128,nstx_120113/N7/egn07w.1216E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=77%)",false,codex
+B129,nstx_120113/N7/egn07w.1639E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=1.31e-06, E+-.03=5.5e-05%)",false,codex
+B130,nstx_120113/N7/egn07w.1976E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=5.9e-05, E+-.03=0.00229%)",false,codex
+B131,nstx_120113/N7/egn07w.2630E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.00666, E+-.03=0.32%)",false,codex
+B132,nstx_120113/N7/egn07w.3192E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.0676, E+-.03=5.13%)",false,codex
+B133,nstx_120113/N7/egn07w.4543E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.169, E+-.03=21.4%)",false,codex
+B134,nstx_120113/N7/egn07w.4562E+02,bad,high,"true continuum crossing in connected mode body (max W=0.975, E+-.03=49.5%)",false,codex
+B135,nstx_120113/N7/egn07w.4985E+02,bad,high,"true continuum crossing in connected mode body (max W=0.853, E+-.03=35.7%)",false,codex
+B136,nstx_120113/N7/egn07w.5141E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=57.2%)",false,codex
+B137,nstx_120113/N7/egn07w.5154E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.444, E+-.03=24.5%)",false,codex
+B138,nstx_120113/N7/egn07w.5162E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=59.2%)",false,codex
+B139,nstx_120113/N7/egn07w.5193E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=82.4%)",false,codex
+B140,nstx_120113/N7/egn07w.5230E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.0595, E+-.03=11.9%)",false,codex
+B141,nstx_120113/N7/egn07w.6041E+01,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=27.3%)",false,codex
+B142,nstx_120113/N8/egn08w.1032E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B143,nstx_120113/N8/egn08w.1172E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B144,nstx_120113/N8/egn08w.1321E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B145,nstx_120113/N8/egn08w.1530E+02,good,medium,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B146,nstx_120113/N8/egn08w.1802E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=1.77e-05, E+-.03=0.00598%)",false,codex
+B147,nstx_120113/N8/egn08w.2101E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=8.08e-06, E+-.03=0.000354%)",false,codex
+B148,nstx_120113/N8/egn08w.2397E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.000102, E+-.03=0.00415%)",false,codex
+B149,nstx_120113/N8/egn08w.2765E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.00439, E+-.03=0.229%)",false,codex
+B150,nstx_120113/N8/egn08w.4617E+02,bad,high,"true continuum crossing in connected mode body (max W=0.611, E+-.03=33.6%)",false,codex
+B151,nstx_120113/N8/egn08w.4740E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.157, E+-.03=20%)",false,codex
+B152,nstx_120113/N8/egn08w.5127E+02,bad,high,"true continuum crossing in connected mode body (max W=0.527, E+-.03=37.6%)",false,codex
+B153,nstx_120113/N8/egn08w.5319E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.271, E+-.03=26.4%)",false,codex
+B154,nstx_120113/N8/egn08w.9014E+01,good,high,coherent broad core/global mode; no true continuum crossing or axis/boundary artifact,false,codex
+B155,nstx_120113/N8/egn08w.9477E+01,good,high,coherent broad core/global mode; no true continuum crossing or axis/boundary artifact,false,codex
+B156,nstx_120113/N9/egn09w.1011E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=1.73e-06, E+-.03=0.000217%)",false,codex
+B157,nstx_120113/N9/egn09w.1136E+02,good,high,coherent broad edge-localized mode with coupled harmonics; no true continuum crossing,false,codex
+B158,nstx_120113/N9/egn09w.1638E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=9.63e-08, E+-.03=4.6e-06%)",false,codex
+B159,nstx_120113/N9/egn09w.2203E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=3.24e-05, E+-.03=0.0015%)",false,codex
+B160,nstx_120113/N9/egn09w.2509E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.000232, E+-.03=0.0126%)",false,codex
+B161,nstx_120113/N9/egn09w.2877E+02,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.00506, E+-.03=0.182%)",false,codex
+B162,nstx_120113/N9/egn09w.4356E+02,bad,high,"true continuum crossing in connected mode body (max W=0.934, E+-.03=26.3%)",false,codex
+B163,nstx_120113/N9/egn09w.4398E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.35, E+-.03=24.2%)",false,codex
+B164,nstx_120113/N9/egn09w.4423E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.419, E+-.03=21.8%)",false,codex
+B165,nstx_120113/N9/egn09w.4806E+02,bad,high,"true continuum crossing in connected mode body (max W=0.797, E+-.03=14.9%)",false,codex
+B166,nstx_120113/N9/egn09w.4885E+02,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.222, E+-.03=18.9%)",false,codex
+B167,nstx_120113/N9/egn09w.5240E+01,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.324, E+-.03=16%)",false,codex
+B168,nstx_120113/N9/egn09w.5398E+02,bad,high,"true continuum crossing in connected mode body (max W=0.229, E+-.03=30.6%)",false,codex
+B169,nstx_120113/N9/egn09w.9464E+01,bad,high,"appreciable continuum crossing on secondary lobe/tail (max W=0.538, E+-.03=11.6%)",false,codex
+B170,nstx_120113/N9/egn09w.9909E+01,good,medium,"coherent broad mode; only negligible detached tail crossing (max W=0.00316, E+-.03=0.518%)",false,codex
+B171,nstx_120113/N1/egn01w.6266E+02,bad,high,"axis-dominated/detached near-axis spike (axis W=1, E_axis=17.2%)",false,codex
+B172,nstx_120113/N10/egn10w.6724E+02,bad,high,"true continuum crossing in connected mode body (max W=0.195, E+-.03=17%)",false,codex
+B173,nstx_120113/N4/egn04w.6375E+02,bad,medium,"appreciable continuum crossing on secondary lobe/tail (max W=0.158, E+-.03=7.72%)",false,codex
+B174,nstx_120113/N7/egn07w.6461E+02,bad,high,"true continuum crossing in connected mode body (max W=0.264, E+-.03=22.6%)",false,codex

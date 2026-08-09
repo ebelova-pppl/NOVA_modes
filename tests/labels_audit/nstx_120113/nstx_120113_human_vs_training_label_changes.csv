@@ -1,0 +1,3 @@
+path,human_label,training_label,agreement,coverage_status
+nstx_120113/N10/egn10w.2945E+02,bad,good,false,common
+nstx_120113/N6/egn06w.1418E+02,skip,good,false,common

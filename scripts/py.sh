@@ -24,9 +24,9 @@ done
 
 # On Perlmutter:
 
-SHOT="$NOVA_DATA/nstxu_204202"
-SPLIT="$NOVA_REPO/tests"
-OUT="$NOVA_REPO/tests/labels_human_review.csv"
+SHOT="$NOVA_DATA/nstx_120113"
+SPLIT="$NOVA_REPO/tests/labels_audit"
+OUT="$NOVA_REPO/tests/labels_audit/labels_human_review.csv"
 
 for n in 1 2 3 4 5 6 7 8 9 10; do
   python scripts/label_modes_fast.py "$SHOT/N$n" \
