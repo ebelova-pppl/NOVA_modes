@@ -681,6 +681,12 @@ python label_modes_fast.py nstx_120113/N5 \
   --csv_out labels_tae_like.csv
 ```
 
+Mode-list and resume matching intentionally use the full resolved path or the
+`shot/N/file` suffix, not `N/file` alone. This avoids cross-shot collisions
+when the same mode filename appears in multiple shots and one output CSV is
+used across several reviews. The legacy `N/file` fallback is available as
+`--allow-n-file-match` only for old lists that do not contain shot names.
+
 Use `--pattern` if mode files are not named `egn*`.
 
 ### Controls

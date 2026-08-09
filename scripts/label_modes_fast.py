@@ -266,6 +266,7 @@ class Config:
     sort: bool = True
     use_rf: bool = True
     rf_model: str = "nova_mode_classifier.joblib"
+    allow_n_file_match: bool = False
 
     # plotting choices
     use_abs: bool = False          # if True, plot |mode| instead of signed
@@ -294,13 +295,20 @@ def path_key(path: str, data_dir: Optional[str] = None) -> str:
     return str((Path(data_dir).expanduser() / raw_path).resolve())
 
 
-def path_match_keys(path: str, data_dir: Optional[str] = None) -> set[str]:
+def path_match_keys(
+    path: str,
+    data_dir: Optional[str] = None,
+    *,
+    include_n_file: bool = False,
+) -> set[str]:
     """
     Build exact and suffix keys for matching mode-list rows to scanned files.
 
     Split outputs may contain absolute paths from a different filesystem root
     than the current run, especially across Perlmutter/Flux. The
-    shot/N/file suffix is stable across those roots.
+    shot/N/file suffix is stable across those roots. Matching by N/file alone
+    is unsafe for multi-shot CSVs because mode filenames repeat across shots,
+    so it is only enabled by an explicit legacy option.
     """
     keys = {path_key(path, data_dir)}
     raw_path = Path(path).expanduser()
@@ -310,16 +318,21 @@ def path_match_keys(path: str, data_dir: Optional[str] = None) -> set[str]:
         parts = candidate.parts
         if len(parts) >= 3:
             keys.add(str(Path(*parts[-3:])))
-        if len(parts) >= 2:
+        if include_n_file and len(parts) >= 2:
             keys.add(str(Path(*parts[-2:])))
 
     return keys
 
 
-def read_mode_list_keys(csv_path: str, data_dir: Optional[str]) -> set[str]:
+def read_mode_list_keys(
+    csv_path: str,
+    data_dir: Optional[str],
+    *,
+    include_n_file: bool = False,
+) -> set[str]:
     keys: set[str] = set()
     for path, _label in read_mode_csv_entries(csv_path, data_root=data_dir):
-        keys.update(path_match_keys(path))
+        keys.update(path_match_keys(path, include_n_file=include_n_file))
     return keys
 
 
@@ -354,6 +367,15 @@ def main():
             "Only files in mode_dir whose resolved path or shot/N/file suffix "
             "appears in this list are shown."
         )
+    )
+    parser.add_argument(
+        "--allow-n-file-match",
+        action="store_true",
+        help=(
+            "Legacy fallback: also match mode-list and resume entries by N/file "
+            "suffix only. This can cause cross-shot collisions when a CSV covers "
+            "more than one shot, so leave it off for normal reviews."
+        ),
     )
     parser.add_argument(
         "--data_dir",
@@ -403,6 +425,7 @@ def main():
         mode_list=args.mode_list,
         use_rf=not args.no_rf,
         rf_model=args.rf_model,
+        allow_n_file_match=args.allow_n_file_match,
         use_abs=args.abs,
         max_lines=args.max_harmonics,
     )
@@ -428,11 +451,24 @@ def main():
     files_before_mode_list_filter = None
     if cfg.mode_list:
         try:
-            mode_list_keys = read_mode_list_keys(cfg.mode_list, cfg.data_dir)
+            mode_list_keys = read_mode_list_keys(
+                cfg.mode_list,
+                cfg.data_dir,
+                include_n_file=cfg.allow_n_file_match,
+            )
         except (OSError, RuntimeError, ValueError) as exc:
             parser.error(f"Could not read --mode-list {cfg.mode_list!r}: {exc}")
         files_before_mode_list_filter = len(files)
-        files = [p for p in files if path_match_keys(p, cfg.data_dir) & mode_list_keys]
+        files = [
+            p
+            for p in files
+            if path_match_keys(
+                p,
+                cfg.data_dir,
+                include_n_file=cfg.allow_n_file_match,
+            )
+            & mode_list_keys
+        ]
         print(
             f"Mode list filter: {Path(cfg.mode_list).expanduser()} "
             f"({len(mode_list_keys)} entries)"
@@ -445,8 +481,25 @@ def main():
     labels = read_labels(cfg.out_csv)
     labeled_keys = set()
     for p in labels:
-        labeled_keys.update(path_match_keys(p, cfg.data_dir))
-    files_to_do = [p for p in files if not (path_match_keys(p, cfg.data_dir) & labeled_keys)]
+        labeled_keys.update(
+            path_match_keys(
+                p,
+                cfg.data_dir,
+                include_n_file=cfg.allow_n_file_match,
+            )
+        )
+    files_to_do = [
+        p
+        for p in files
+        if not (
+            path_match_keys(
+                p,
+                cfg.data_dir,
+                include_n_file=cfg.allow_n_file_match,
+            )
+            & labeled_keys
+        )
+    ]
     labeled_in_scope = len(files) - len(files_to_do)
 
     print(f"Mode directory: {mode_dir}")
