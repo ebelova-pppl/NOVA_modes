@@ -582,6 +582,9 @@ def aggregate_outputs(args: argparse.Namespace, fold_shots: Sequence[str]) -> No
 
 def build_arg_parser() -> argparse.ArgumentParser:
     repo_root = default_repo_root()
+    default_train_csv = Path(
+        os.environ.get("NOVA_TRAIN_CSV", repo_root / "training_labels" / "tae_like_v2_nonG.csv")
+    )
 
     ap = argparse.ArgumentParser(
         description=(
@@ -591,7 +594,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         )
     )
     ap.add_argument("--repo_root", type=Path, default=repo_root)
-    ap.add_argument("--train_csv", type=Path, default=repo_root / "training_labels" / "tae_like_train.csv")
+    ap.add_argument("--train_csv", type=Path, default=default_train_csv)
     ap.add_argument(
         "--out_root",
         type=Path,

@@ -47,7 +47,7 @@ module load pytorch
 source configs/paths/nova_paths.nersc.sh
 python -u scripts/run_loso_10.py \
   --steps all \
-  --train_csv training_labels/tae_like_train.csv \
+  --train_csv "$NOVA_TRAIN_CSV" \
   --out_root outputs/loso_15_raw_continuum_branch_M100_bs8 \
   --work_root "$SCRATCH/nova_s/loso_15_raw_continuum_branch_M100_bs8" \
   --cnn_launch srun \
@@ -58,3 +58,27 @@ python -u scripts/run_loso_10.py \
   --cnn_continuum_branch \
   --cnn_cache_data \
   --cnn_refit_full_before_save
+
+
+# To train RF on Perlmutter, use the following command:
+source configs/paths/nova_paths.nersc.sh
+nova_env
+
+python "$NOVA_REPO/scripts/rf_train_classify.py" \
+  --train_csv "$NOVA_TRAIN_CSV" \
+  --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
+
+# To train cnn_raw on Perlmutter, use the following command:
+cd /global/homes/e/ebelova/src_nova
+module load pytorch
+source configs/paths/nova_paths.nersc.sh
+nova_env
+
+python $NOVA_REPO/scripts/cnn_raw.py \
+  --train_csv $NOVA_TRAIN_CSV \
+  --data_dir $NOVA_DATA \
+  --refit_full_before_save \
+  --model_out $NOVA_REPO/models/nova_cnn_raw.pt \
+  --M_target 100 \
+  --batch_size 8 \
+  --cache_data

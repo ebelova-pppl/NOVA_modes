@@ -20,6 +20,13 @@ labels and ended at loss `0.0008`.
 Historical four-shot RF, raw CNN, straightened CNN, hybrid CNN, and LOSO
 checkpoints are archived under `old_4shots_models/`.
 
+The pre-v2 canonical checkpoints were archived before retraining on
+`training_labels/tae_like_v2_nonG.csv`:
+
+- `pre_v2_nonG_20260810/nova_mode_classifier.joblib`
+- `pre_v2_nonG_20260810/nova_mode_classifier_bundle.joblib`
+- `pre_v2_nonG_20260810/nova_cnn_raw.pt`
+
 The active RF checkpoint uses schema `rf_w_star_max_22_v2`: compared with the
 previous 22-feature checkpoint, raw `omega` was removed and the
 continuum-crossing feature `W_star_max` was added.

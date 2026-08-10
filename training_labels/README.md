@@ -8,10 +8,10 @@ example `nstx_120113/N5/egn05w.1234E+02`.
 
 ## Active training list
 
-### `tae_like_train.csv`
+### `tae_like_v2_nonG.csv`
 
-Current active expanded TAE-like good/bad training list for RF and CNN
-retraining.
+Current canonical/default TAE-like good/bad training list for RF and CNN
+retraining, while awaiting review of all NSTX-U G shots.
 
 Columns:
 - `path`
@@ -23,6 +23,54 @@ Columns:
 - `error`
 
 Current checked contents:
+- 2900 labeled modes
+- labels: 594 `good`, 2306 `bad`
+- 1635 reviewed non-G rows plus 1265 unchanged `nstxuG*` rows
+- shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
+  `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
+  `nstxuG121123K51`, `nstxuG133964S31`, `nstxuG142301H47`,
+  `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`,
+  `nstxuG121123B12`, `nstxuG142301W29`
+
+The list keeps the same columns as `tae_like_train.csv`, applies the cleaned
+human-review labels from `tests/labels_audit/labels_human_review_clean.csv`
+to the seven non-G shots, excludes rows now marked `skip`, and copies all
+`nstxuG*` rows from `tae_like_train.csv` unchanged. NERSC and Flux path configs
+now point `NOVA_TRAIN_CSV` and `NOVA_TRAIN_CSV_TAE` at this file.
+
+Three old-`good` non-G rows are excluded because the human review now marks
+them `skip`:
+  - `nstx_120113/N6/egn06w.1418E+02`
+  - `nstxuE205052A01t022/N10/egn10w.1302E+02`
+  - `nstxuE205052A01t022/N9/egn09w.1506E+02`
+
+Label flips relative to `tae_like_train.csv`:
+
+| shot | good -> bad | bad -> good |
+| --- | ---: | ---: |
+| `nstxu_204202` | 10 | 0 |
+| `nstx_120113` | 0 | 0 |
+| `nstx_135388` | 1 | 10 |
+| `nstx_141711` | 16 | 1 |
+| `nstxuE202855A01t020` | 3 | 5 |
+| `nstxuE204669M03t025` | 4 | 1 |
+| `nstxuE205052A01t022` | 16 | 1 |
+
+Totals: 50 old `good` rows became `bad`, 18 old `bad` rows became `good`, and
+three old `good` rows were removed as `skip`. The copied G-shot rows have zero
+label changes.
+
+The active RF and raw-CNN checkpoints predate this v2 list; retraining on the
+current 2900-row / 15-shot list is pending.
+
+## Previous / derived root lists
+
+### `tae_like_train.csv`
+
+Previous canonical expanded 15-shot TAE-like good/bad training list. It is
+preserved unchanged as the pre-v2 baseline for comparison.
+
+Current checked contents:
 - 2903 labeled modes
 - labels: 629 `good`, 2274 `bad`
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
@@ -31,16 +79,23 @@ Current checked contents:
   `nstxuG121123J38`, `nstxuG121123Q62`, `nstxuG142301Y93`,
   `nstxuG121123B12`, `nstxuG142301W29`
 
-This is the list to use when retraining the expanded RF and CNN models.
-The active RF and raw-CNN checkpoints predate the current G-shot label
-corrections and B12/W29 merges; retraining on the current 2903-row / 15-shot
-list is pending.
+### `tae_like_train_7.csv`
+
+Derived non-G / E-production comparison list created from
+`tae_like_train.csv` by excluding all `nstxuG*` shots. This file is useful for
+7-shot LOSO checks of the non-G / E-like production regime.
+
+Current checked contents:
+- 1638 labeled modes
+- labels: 546 `good`, 1092 `bad`
+- shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
+  `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`
 
 ## Addition / component lists
 
 Component and staged review lists live under `training_labels/additions/` so
-the root of `training_labels/` only carries the active training list, this
-README, and archive directories.
+the root of `training_labels/` stays limited to the active list, previous or
+derived top-level lists, this README, and archive directories.
 
 ### `additions/tae_like_4old.csv`
 

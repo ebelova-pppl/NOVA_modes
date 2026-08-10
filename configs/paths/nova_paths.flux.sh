@@ -22,7 +22,10 @@ unset _NOVA_CONFIG_DIR
 # Version-controlled models and labeled training list.
 export NOVA_MODELS="$NOVA_REPO/models"
 
-export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
+# export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
+# export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"
+export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_v2_nonG.csv"
+export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_v2_nonG.csv"
 
 # Flux is CPU-only for this workflow. Override after sourcing only if needed.
 export NOVA_TORCH_DEVICE=cpu
@@ -58,6 +61,7 @@ nova_env() {
     echo "NOVA_MODELS    = $NOVA_MODELS"
     echo "NOVA_RUN_ROOT  = ${NOVA_RUN_ROOT:-<unset>}"
     echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"
+    echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"
     echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"
     echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"
     echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"

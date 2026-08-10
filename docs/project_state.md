@@ -5,6 +5,21 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
  
 ## Data
 - Active version-controlled training list:
+    - `training_labels/tae_like_v2_nonG.csv`
+    - 2900 labeled TAE-like modes: 594 `good`, 2306 `bad`
+    - current canonical/default training list while awaiting review of all
+      NSTX-U G shots
+    - same columns as `training_labels/tae_like_train.csv`
+    - uses cleaned human-review labels from
+      `tests/labels_audit/labels_human_review_clean.csv` for the seven
+      non-G shots
+    - excludes three non-G rows now labeled `skip` from training
+    - copies all 1265 `nstxuG*` rows from `tae_like_train.csv` unchanged
+    - `configs/paths/nova_paths.nersc.sh`,
+      `configs/paths/nova_paths.flux.sh`, and
+      `configs/paths/nova_paths.flux.csh` point `NOVA_TRAIN_CSV` /
+      `NOVA_TRAIN_CSV_TAE` at this list
+- Previous canonical 15-shot training list:
     - `training_labels/tae_like_train.csv`
     - 2903 labeled TAE-like modes: 629 `good`, 2274 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
@@ -14,6 +29,7 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
       `nstxuG142301Y93`, `nstxuG121123B12`, `nstxuG142301W29`
     - mode paths stored relative to `$NOVA_DATA` when possible
     - example entry: `nstx_120113/N5/egn05w.1234E+02,good`
+    - preserved unchanged as the pre-v2 baseline for comparison
 - Derived non-G / E-production comparison list:
     - `training_labels/tae_like_train_7.csv`
     - 1638 labeled modes: 546 `good`, 1092 `bad`
@@ -233,9 +249,10 @@ From cont_features.py:
   `B106=good`, and `B131/B149=bad` with low confidence because their low-r
   tails are distorted by continuum crossing despite small integrated crossing
   energy. The retained human-vs-training delta table has two rows after the
-  human corrections. No replacement training CSV has been merged yet; keep
-  `training_labels/tae_like_train.csv` unchanged until an explicit
-  adjudicated version is approved.
+  human corrections. These corrections are included in the current
+  `training_labels/tae_like_v2_nonG.csv` default list; the previous
+  `training_labels/tae_like_train.csv` list is preserved unchanged for
+  comparison.
 - `nstxuE205052A01t022` audit status: the target manifest has 293 TAE-like
   modes. The sealed Codex review has 24 `good`, 269 `bad`, and 0 `skip`; all
   rows are marked `prior_seen=true` because aggregate target-shot context had
@@ -245,8 +262,10 @@ From cont_features.py:
   yielding 22 `good` and 271 `bad`. After human-side corrections
   (`B042=skip`, `B156=good`), post-review Codex-vs-human agreement is
   250/293 = 85.32%, and the retained human-vs-training delta table has 19
-  rows. Keep `training_labels/tae_like_train.csv` unchanged until a versioned
-  adjudicated training list is explicitly created and checked with LOSO.
+  rows. These corrections are included in the current
+  `training_labels/tae_like_v2_nonG.csv` default list; the previous
+  `training_labels/tae_like_train.csv` list is preserved unchanged for
+  comparison.
 - For smooth-looking modes whose continuum diagnostic still crosses the mode
   body at large amplitude with no obvious resonant structure, treat the case
   as a continuum/equilibrium consistency question. Do not promote these to a
@@ -2800,3 +2819,145 @@ disagreements are `B029`, `B033`, `B038`, `B082`, `B088`, `B095`, `B096`, and
 `B129`. The human-vs-training change table has 5 rows: 4 old-training GOOD ->
 new-human BAD and 1 old-training BAD -> new-human GOOD. The canonical
 `training_labels/tae_like_train.csv` was not changed.
+
+### 2026-08-09: human-review v2 training list
+
+Created `training_labels/tae_like_v2_nonG.csv` from the cleaned human review
+file `tests/labels_audit/labels_human_review_clean.csv`, while preserving the
+previous canonical `training_labels/tae_like_train.csv` unchanged. The new
+list keeps the same schema as the canonical training CSV:
+`path,validity,family,signed_delta,fraction_below_upper2,gap_region,error`.
+
+The cleaned human-review file contains 1638 non-G rows: 511 `good`, 1124
+`bad`, and 3 `skip`. All 1638 normalized paths matched the non-G rows in
+`tae_like_train.csv`; there were no missing paths and no conflicting duplicate
+paths. The three `skip` rows were excluded from the training CSV, leaving 1635
+reviewed non-G rows. All 1265 `nstxuG*` rows were then copied from
+`tae_like_train.csv` unchanged. The resulting list has 2900 data rows:
+594 `good` and 2306 `bad`. After the LOSO check below, this list is the
+current canonical/default training list while awaiting review of all G shots.
+
+Rows excluded because the human review now marks them `skip`:
+
+- `nstx_120113/N6/egn06w.1418E+02` (old label `good`)
+- `nstxuE205052A01t022/N10/egn10w.1302E+02` (old label `good`)
+- `nstxuE205052A01t022/N9/egn09w.1506E+02` (old label `good`)
+
+Label flips relative to `training_labels/tae_like_train.csv`:
+
+| shot | good -> bad | bad -> good |
+| --- | ---: | ---: |
+| `nstxu_204202` | 10 | 0 |
+| `nstx_120113` | 0 | 0 |
+| `nstx_135388` | 1 | 10 |
+| `nstx_141711` | 16 | 1 |
+| `nstxuE202855A01t020` | 3 | 5 |
+| `nstxuE204669M03t025` | 4 | 1 |
+| `nstxuE205052A01t022` | 16 | 1 |
+
+Totals: 50 old `good` rows became `bad`, 18 old `bad` rows became `good`, and
+three old `good` rows were removed as `skip`. The copied G-shot rows have zero
+label changes.
+
+### 2026-08-09: 15-shot LOSO on v2 non-G labels
+
+User ran the no-continuum 15-shot LOSO check on the v2 list:
+`outputs/loso_15_v2_nonG_M100_bs8/`, with work files under
+`/pscratch/sd/e/ebelova/nova_s/loso_15_v2_nonG_M100_bs8`. The configuration
+matches the previous no-continuum 15-shot baseline
+`outputs/loso_15_B12_W29_M100_bs8/`: seed 42, raw-CNN `M_target=100`,
+`R_target=201`, 80 epochs, batch size 8, learning rate 0.02, robust
+normalization, no positive-class weighting, no continuum branch, and full-CNN
+refits before sorting. The only intended input change is the training label
+CSV: `training_labels/tae_like_v2_nonG.csv` instead of
+`training_labels/tae_like_train.csv`.
+
+Run health:
+
+- all 15 folds completed RF, CNN, sorting, and aggregation;
+- 2900 held-out labels were matched, as expected after excluding three non-G
+  `skip` rows;
+- split counts contain no `n_other` rows;
+- log scan found no traceback/error/collapse/near-all prediction warnings.
+
+Aggregate v2 LOSO metrics:
+
+- CNN: CM `[[2219, 87], [94, 500]]`, accuracy `0.9376`, GOOD
+  precision/recall/F1 `0.8518 / 0.8418 / 0.8467`.
+- Combined policy: CM `[[2263, 43], [98, 496]]`, accuracy `0.9514`, GOOD
+  precision/recall/F1 `0.9202 / 0.8350 / 0.8756`.
+- RF: CM `[[2268, 38], [126, 468]]`, accuracy `0.9434`, GOOD
+  precision/recall/F1 `0.9249 / 0.7879 / 0.8509`.
+
+Direct comparison to the previous no-continuum 15-shot baseline evaluated
+against the old labels:
+
+| model | old F1 | v2 F1 | old FP/FN | v2 FP/FN |
+| --- | ---: | ---: | ---: | ---: |
+| CNN | 0.8386 | 0.8467 | 112 / 94 | 87 / 94 |
+| Combined policy | 0.8627 | 0.8756 | 46 / 117 | 43 / 98 |
+| RF | 0.8418 | 0.8509 | 41 / 142 | 38 / 126 |
+
+Because the truth labels changed for the seven non-G shots, the cleaner
+comparison also rescored the old saved predictions against the v2 label list
+for the 2900 retained rows. In that view, the label cleanup itself accounts
+for most of the combined-policy improvement:
+
+| model | old predictions on old labels F1 | old predictions on v2 labels F1 | v2 retrain on v2 labels F1 |
+| --- | ---: | ---: | ---: |
+| CNN | 0.8386 | 0.8352 | 0.8467 |
+| Combined policy | 0.8627 | 0.8758 | 0.8756 |
+| RF | 0.8418 | 0.8564 | 0.8509 |
+
+Interpretation:
+
+- The combined policy is essentially unchanged after retraining once both
+  old and new runs are judged against the v2 labels: F1 `0.8758 -> 0.8756`.
+  The retrained policy is more conservative, reducing FP `53 -> 43` but
+  increasing FN `90 -> 98`.
+- CNN benefits most from retraining on v2 labels: judged against v2 truth, F1
+  improves `0.8352 -> 0.8467`, mostly by reducing false positives
+  `127 -> 87` at the cost of more false negatives `77 -> 94`.
+- RF becomes slightly more conservative against v2 truth: F1
+  `0.8564 -> 0.8509`, with FP `47 -> 38` but FN `114 -> 126`.
+- Non-G combined-policy performance is effectively flat under v2 truth:
+  F1 `0.9113 -> 0.9108`. The apparent improvement relative to the old
+  baseline (`0.8951 -> 0.9108`) is mostly due to the corrected labels.
+- G-shot labels were copied unchanged. G-shot performance is stable:
+  combined-policy F1 `0.6351 -> 0.6395`, CNN F1 `0.6243 -> 0.6237`, RF F1
+  `0.5857 -> 0.5985`. This means the non-G relabeling did not materially
+  disrupt the G-shot regime.
+
+Per-shot combined-policy comparison, old baseline labels to v2 run labels:
+
+| shot | old F1 | v2 F1 | old FP/FN | v2 FP/FN |
+| --- | ---: | ---: | ---: | ---: |
+| `nstx_120113` | 0.9677 | 0.9670 | 2 / 1 | 2 / 1 |
+| `nstx_135388` | 0.9225 | 0.9237 | 17 / 3 | 10 / 10 |
+| `nstx_141711` | 0.8521 | 0.9067 | 1 / 24 | 1 / 13 |
+| `nstxuE202855A01t020` | 0.9348 | 0.8913 | 1 / 5 | 1 / 9 |
+| `nstxuE204669M03t025` | 0.8609 | 0.8571 | 1 / 20 | 2 / 19 |
+| `nstxuE205052A01t022` | 0.8382 | 0.9322 | 5 / 17 | 6 / 2 |
+| `nstxu_204202` | 0.9143 | 0.9048 | 1 / 11 | 4 / 8 |
+
+Main practical conclusion: the v2 labels make the aggregate metrics
+look cleaner and do not hurt G-shot transfer, but the combined policy already
+absorbed most of the label correction without needing materially different
+models. The v2 list is promoted as the current canonical/default training list
+for now, while awaiting review of all G shots. Before replacing production
+checkpoints, inspect whether the new CNN/RF conservatism is desirable for the
+downstream NOVA-C workflow, especially on `nstxuE202855A01t020`,
+`nstxuE204669M03t025`, and `nstxu_204202`.
+
+After this LOSO check, the NERSC and Flux path configs were updated so both
+`NOVA_TRAIN_CSV` and `NOVA_TRAIN_CSV_TAE` point to
+`training_labels/tae_like_v2_nonG.csv`:
+
+- `configs/paths/nova_paths.nersc.sh`
+- `configs/paths/nova_paths.flux.sh`
+- `configs/paths/nova_paths.flux.csh`
+
+The code fallbacks for fresh runs were also updated so accidental unsourced
+runs use the v2 list: `scripts/cnn_raw.py` now falls back to
+`training_labels/tae_like_v2_nonG.csv`, and `scripts/run_loso_10.py` defaults
+to `$NOVA_TRAIN_CSV` or the v2 list when the environment variable is absent.

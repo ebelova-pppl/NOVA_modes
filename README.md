@@ -52,13 +52,12 @@ Data format summary
     - continuum data (datcon#) one per shot / per ntor: low2(r), high2(r) (Alfvén continuum bounds - currently for TAE gap only)
 - Training label CSVs in `training_labels/` store mode paths relative to
   `$NOVA_DATA` when possible, for example
-  `nstx_120113/N5/egn05w.1234E+02,good`. The current active good/bad training
-  list is the expanded `training_labels/tae_like_train.csv`, now combining the
-  original four-shot list, the reviewed six-shot NSTX-U list, the refreshed
-  `nstx_135388` labels, the new `nstxuG121123J38` labels, and the reviewed
-  `nstxuG121123Q62` / `nstxuG142301Y93` labels, plus the reviewed
-  `nstxuG121123B12` and `nstxuG142301W29` labels. Older four-shot TAE-only and
-  mixed TAE/EAE lists are archived under
+  `nstx_120113/N5/egn05w.1234E+02,good`. The current canonical/default
+  good/bad training list is `training_labels/tae_like_v2_nonG.csv`: reviewed
+  non-G labels from `tests/labels_audit/labels_human_review_clean.csv`, with
+  all `nstxuG*` rows copied unchanged from the previous
+  `training_labels/tae_like_train.csv` list while awaiting review of all G
+  shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
   `training_labels/old_4shots_tae_only_labels/` and
   `training_labels/old_4shots_mixed_labels/`.
 - Internal conventions:
@@ -80,8 +79,8 @@ Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. Both checkpoints were trained on the 2610-row /
   13-shot list before the current G-shot label corrections and B12/W29 merges;
-  retraining on the current 2903-row, 629-GOOD / 2274-BAD list is pending. The
-  raw-CNN checkpoint is a full-list refit with `M_target=100`.
+  retraining on the current 2900-row, 594-GOOD / 2306-BAD v2 list is pending.
+  The raw-CNN checkpoint is a full-list refit with `M_target=100`.
 - Latest pre-B12 RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
 - An opt-in 25-feature RF experiment adds inner continuum-extremum radial
@@ -221,7 +220,8 @@ developing or retraining models, not for routine sorting.
 - Generate NOVA modes for a shot
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
-- Train classifier (RF or CNN) on the expanded `training_labels/tae_like_train.csv`.
+- Train classifier (RF or CNN) on the current default
+  `training_labels/tae_like_v2_nonG.csv`.
   For CNN
   checkpoints intended for production sorting, use
   `--refit_full_before_save` so the saved model is trained on the full labeled

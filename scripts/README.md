@@ -21,14 +21,12 @@ All CNN training scripts default to the labeled list from `$NOVA_TRAIN_CSV`.
 For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
-The current active good/bad training list is the expanded
-`training_labels/tae_like_train.csv`, which combines the original four-shot
-TAE-like set, the reviewed six-shot NSTX-U TAE-like set, refreshed
-`nstx_135388` labels, the new `nstxuG121123J38` labels, and the reviewed
-`nstxuG121123Q62` / `nstxuG142301Y93` labels, plus the reviewed
-`nstxuG121123B12` and `nstxuG142301W29` labels. It currently has
-2903 rows across 15 shots. Older four-shot TAE-only and mixed TAE/EAE lists are
-archived under
+The current canonical/default good/bad training list is
+`training_labels/tae_like_v2_nonG.csv`: reviewed non-G labels from
+`tests/labels_audit/labels_human_review_clean.csv`, with all `nstxuG*` rows
+copied unchanged from the previous `training_labels/tae_like_train.csv` list
+while awaiting review of all G shots. It currently has 2900 rows across 15
+shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
 
@@ -36,19 +34,19 @@ archived under
 module load pytorch
 
 python cnn_raw.py \
-  --train_csv training_labels/tae_like_train.csv \
+  --train_csv training_labels/tae_like_v2_nonG.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_raw.pt
 
 python cnn_straightened.py \
-  --train_csv training_labels/tae_like_train.csv \
+  --train_csv training_labels/tae_like_v2_nonG.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_straightened.pt
 
 python cnn_hybrid.py \
-  --train_csv training_labels/tae_like_train.csv \
+  --train_csv training_labels/tae_like_v2_nonG.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_hybrid.pt
@@ -150,10 +148,11 @@ runs the raw CNN through the same Slurm launch path. The helpers default to
 On PPPL Flux with the default `tcsh` shell, source
 `configs/paths/nova_paths.flux.csh`. The Flux config keeps the environment
 minimal: it resolves `NOVA_REPO` from the current Git checkout, sets
-`NOVA_MODELS=$NOVA_REPO/models`, sets `NOVA_TRAIN_CSV`, defaults
-`NOVA_TORCH_DEVICE=cpu`, and provides CPU helpers. It does not set a default
-`NOVA_DATA`; pass absolute mode/shot paths or set `NOVA_DATA` yourself for
-training and inspection workflows that use relative CSV paths.
+`NOVA_MODELS=$NOVA_REPO/models`, sets `NOVA_TRAIN_CSV` and
+`NOVA_TRAIN_CSV_TAE`, defaults `NOVA_TORCH_DEVICE=cpu`, and provides CPU
+helpers. It does not set a default `NOVA_DATA`; pass absolute mode/shot paths
+or set `NOVA_DATA` yourself for training and inspection workflows that use
+relative CSV paths.
 
 ```tcsh
 module load anaconda3
@@ -170,7 +169,7 @@ Experimental continuum-branch LOSO can be run through the same LOSO driver:
 
 ```bash
 python "$NOVA_REPO/scripts/run_loso_10.py" \
-  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --train_csv "$NOVA_TRAIN_CSV" \
   --data_dir "$NOVA_DATA" \
   --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_branch_M100_bs8" \
   --work_root "$SCRATCH/nova_s/loso_15_raw_continuum_branch_M100_bs8" \
@@ -184,7 +183,7 @@ features, use a separate output directory and add the zero-input control:
 
 ```bash
 python "$NOVA_REPO/scripts/run_loso_10.py" \
-  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --train_csv "$NOVA_TRAIN_CSV" \
   --data_dir "$NOVA_DATA" \
   --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_branch_zero_M100_bs8" \
   --work_root "$SCRATCH/nova_sc/loso_15_raw_continuum_branch_zero_M100_bs8" \
@@ -290,7 +289,7 @@ evaluation. Those checkpoints are archived under `models/old_4shots_models/`:
 python cnn_classify.py --model models/nova_cnn_raw.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
-python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like_train.csv --out preds.csv
+python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like_v2_nonG.csv --out preds.csv
 ```
 or using env and running from $SCRATCH or other dir
 ```bash
@@ -320,7 +319,7 @@ To train the mode classifier, use the relevant labeled list. For example, to
 train on the TAE-like side of the mixed data:
 
 ```bash
-python rf_train_classify.py --train_csv training_labels/tae_like_train.csv \
+python rf_train_classify.py --train_csv training_labels/tae_like_v2_nonG.csv \
        --model_out nova_mode_classifier.joblib
 ```
 Or, using env variables and running from $SCRATCH:
@@ -331,12 +330,11 @@ python $NOVA_REPO/scripts/rf_train_classify.py --train_csv $NOVA_TRAIN_CSV \
 
 `nova_mode_classifier.joblib` is a binary file that stores the trained ML model, i.e. a saved scikit-learn model (`StandardScaler + RandomForest`).
 
-After merging the reviewed six-shot NSTX-U labels, retrain RF on the expanded
-TAE-like list:
+To retrain RF on the current canonical TAE-like list:
 
 ```bash
 python "$NOVA_REPO/scripts/rf_train_classify.py" \
-  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --train_csv "$NOVA_REPO/training_labels/tae_like_v2_nonG.csv" \
   --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
@@ -433,7 +431,7 @@ rule.
 Example shuffled-fold check:
 
 ```bash
-python scripts/rf_oof_check.py training_labels/tae_like_train.csv \
+python scripts/rf_oof_check.py training_labels/tae_like_v2_nonG.csv \
   --model_in models/nova_mode_classifier.joblib \
   --r-star-energy-tie \
   --out_oof rf_rstar_energy_oof.csv \
@@ -468,7 +466,7 @@ Example training command:
 
 ```bash
 python "$NOVA_REPO/scripts/rf_train_classify.py" \
-  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  --train_csv "$NOVA_TRAIN_CSV" \
   --crossing-features \
   --model_out "$NOVA_REPO/models/nova_mode_classifier_crossing.joblib"
 ```
@@ -481,7 +479,7 @@ Run an apples-to-apples OOF experiment with the same feature option:
 
 ```bash
 python "$NOVA_REPO/scripts/rf_oof_check.py" \
-  "$NOVA_REPO/training_labels/tae_like_train.csv" \
+  "$NOVA_TRAIN_CSV" \
   --model_in "$NOVA_REPO/models/nova_mode_classifier.joblib" \
   --crossing-features \
   --out_oof rf_crossing_oof.csv \
@@ -520,7 +518,7 @@ detected inner extremum uses the deterministic fallback `(1, 1, 0)`.
 Example same-fold ablation:
 
 ```bash
-python scripts/rf_oof_check.py training_labels/tae_like_train.csv \
+python scripts/rf_oof_check.py training_labels/tae_like_v2_nonG.csv \
   --model_in models/nova_mode_classifier.joblib \
   --extremum-features \
   --out_oof rf_extremum_oof.csv \
@@ -677,7 +675,7 @@ or shot/N/file suffix appears in the CSV:
 ```bash
 python label_modes_fast.py nstx_120113/N5 \
   --data_dir "$NOVA_DATA" \
-  --mode-list training_labels/tae_like_train.csv \
+  --mode-list training_labels/tae_like_v2_nonG.csv \
   --csv_out labels_tae_like.csv
 ```
 
@@ -929,7 +927,8 @@ straightened, or hybrid CNN checkpoints that contain `model_type` metadata.
 Pass `--cnn_model_kind cnn_raw`, `cnn_straightened`, or `cnn_hybrid` only for
 older or ambiguous checkpoints.
 
-For training-set checks, pass `--label_csv training_labels/tae_like_train.csv`.
+For training-set checks, pass `--label_csv training_labels/tae_like_v2_nonG.csv`
+or use `$NOVA_TRAIN_CSV` after sourcing the path config.
 Sorter output paths are matched to label paths by shot-relative suffix, so
 absolute mode paths in the shot output can be compared with relative paths in
 the training-label CSV. `--model_eval_threshold` controls the RF-only and
@@ -974,7 +973,7 @@ python sort_shot_mixed.py \
   --rf_model /path/to/nova_mode_classifier.joblib \
   --cnn_model /path/to/nova_cnn_straightened.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
-  --label_csv training_labels/tae_like_train.csv \
+  --label_csv training_labels/tae_like_v2_nonG.csv \
   --make_plots
 ```
 or when running from $NOVA_RUN_ROOT/runs/ directory (for checking on old labeled/training shots):
@@ -984,7 +983,7 @@ python $NOVA_REPO/scripts/sort_shot_mixed.py \
   --rf_model $NOVA_REPO/models/nova_mode_classifier.joblib \
   --cnn_model $NOVA_REPO/models/nova_cnn_raw.pt \
   --out_dir $NOVA_RUN_ROOT/sort_out_nstx_135388 \
-  --label_csv $NOVA_REPO/training_labels/tae_like_train.csv \
+  --label_csv $NOVA_TRAIN_CSV \
   --make_plots
 ```
 
@@ -998,11 +997,11 @@ lost.
 ## `run_loso_10.py`
 
 Driver for leave-one-shot-out checks over all shots in the selected training
-CSV. The filename is historical; with the current `tae_like_train.csv` it
+CSV. The filename is historical; with the current `tae_like_v2_nonG.csv` it
 creates 15 folds. It:
 
 - creates one `train.csv` and `test.csv` split per held-out shot from
-  `training_labels/tae_like_train.csv`,
+  the selected `--train_csv` list,
 - retrains RF once per fold,
 - retrains raw CNN once per fold,
 - runs `sort_shot_mixed.py` on the held-out shot with `--label_csv`, and
@@ -1142,7 +1141,7 @@ awk -F, '{print $2}' train_master.csv | sort | uniq -c
 
 This script:
 
-- reads a labeled training CSV such as `training_labels/tae_like_train.csv` (`path,validity` or `path,label`, with or without a header row)
+- reads a labeled training CSV such as `training_labels/tae_like_v2_nonG.csv` (`path,validity` or `path,label`, with or without a header row)
 - loads each mode + extra scalars (`omega`, `gamma_d`, `ntor`)
 - builds `X` using `compute_features_for_mode(mode, extra_info=...)`
 - runs OOF using `StratifiedKFold`
@@ -1158,7 +1157,7 @@ It also prints a confusion matrix based on OOF predictions at threshold `0.5`.
 ### Usage
 
 ```bash
-python rf_oof_check.py training_labels/tae_like_train.csv \
+python rf_oof_check.py training_labels/tae_like_v2_nonG.csv \
   --model_in nova_mode_classifier.joblib \
   --out_oof oof_table.csv \
   --out_suspects oof_suspects.csv \
@@ -1181,7 +1180,7 @@ python rf_oof_check.py -h
 
 ```bash
 python find_rf_disagreements.py \
-  training_labels/tae_like_train.csv \
+  training_labels/tae_like_v2_nonG.csv \
   nova_mode_classifier.joblib \
   rf_vs_manual_disagreements.csv
 ```
