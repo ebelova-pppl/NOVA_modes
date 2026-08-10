@@ -345,9 +345,9 @@ Most recent RF OOF check, run on the 13-shot list before merging B12:
 - GOOD precision/recall/F1=`0.933 / 0.850 / 0.889`
 - output: `outputs/rf_oof_13shots/`
 
-The active expanded-set RF checkpoint is
-`models/nova_mode_classifier.joblib`; it also predates the B12 and W29 merges
-and must be retrained to include the new shots. Previous four-shot RF checkpoints are archived under `models/old_4shots_models/`.
+The active RF checkpoint is `models/nova_mode_classifier.joblib`, retrained
+on `training_labels/tae_like_v2_nonG.csv`. Previous four-shot RF checkpoints
+are archived under `models/old_4shots_models/`.
 
 The component six-shot list is `training_labels/additions/tae_like_6new.csv`, with
 relative `$NOVA_DATA` paths and the same full schema as `tae_like_train.csv`.
@@ -837,10 +837,9 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
   optional diagnostic plots.
 
 Current operational note: this is the main large-shot sorting path for the
-active models. The top-level RF and raw-CNN checkpoints were trained on the
-13-shot TAE-like list before the current G-shot label corrections and B12/W29
-merges; retraining on the current 15-shot list is pending. The current
-production use is NSTX-U E-like shot sorting for NOVA-C candidate selection.
+active models. The top-level RF and raw-CNN checkpoints have been retrained
+on `training_labels/tae_like_v2_nonG.csv`. The current production use is
+NSTX-U E-like shot sorting for NOVA-C candidate selection.
 **NSTX-U G-case shots are treated as a separate regime** for now because
 their narrow, strongly varying TAE gap gives sparse GOOD-mode labels and
 weaker LOSO performance.

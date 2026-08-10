@@ -1,21 +1,34 @@
 # Model Checkpoints
 
-Top-level model files are the active expanded 10-shot TAE-like checkpoints:
+Top-level model files are the active v2 TAE-like checkpoints:
 
 - `nova_mode_classifier.joblib` — Random Forest trained on
-  `training_labels/tae_like_train.csv`.
-- `nova_cnn_raw.pt` — raw CNN trained on `training_labels/tae_like_train.csv`.
+  `training_labels/tae_like_v2_nonG.csv`.
+- `nova_cnn_raw.pt` — raw CNN trained on
+  `training_labels/tae_like_v2_nonG.csv`.
+- `nova_mode_classifier_bundle.joblib` — RF training arrays and schema
+  metadata for the active checkpoint.
 
-Current expanded-set checks:
+Current active-checkpoint metadata:
 
-- RF OOF: CM `[[1447, 29], [64, 585]]`, accuracy `0.956`, GOOD
-  precision/recall/F1 `0.953 / 0.901 / 0.926`.
-- Raw CNN held-out: CM `[[290, 5], [8, 121]]`, accuracy `0.969`, GOOD
-  precision/recall/F1 `0.960 / 0.938 / 0.949`.
+- RF: trained on 2900 rows: 594 `good`, 2306 `bad`; production
+  `rf_w_star_max_22_v2` schema with 22 features.
+- Raw CNN: full-list refit on 2900 rows after a held-out split check; best
+  split accuracy `0.9534` at epoch 13; `M_target=100`, `R_target=201`,
+  robust normalization, OneCycleLR peak LR `0.02`, gradient clipping `1.0`.
+- Raw CNN final prediction-health metadata reports no collapse: 594 predicted
+  GOOD among 2900 samples, matching the 594 true GOOD labels.
+
+Current active SHA-256 checksums:
+
+```text
+2a96699bba6bb92d44c9f5b09373e35c3011c8d5bdeab297519e7cd69f5e6023  nova_mode_classifier.joblib
+0cacd4f1b31347050c1192c109058c3a89c84e3f186ea0899e2a89f95a068629  nova_mode_classifier_bundle.joblib
+29643ff060aa77e4d7624063803f199918c5a81a2a7e997f732b2481a6c0af49  nova_cnn_raw.pt
+```
 
 The active raw-CNN checkpoint uses OneCycleLR plus gradient clipping for both
-split training and its 80-epoch full-data refit. The final refit used all 2,125
-labels and ended at loss `0.0008`.
+split training and its 80-epoch full-data refit.
 
 Historical four-shot RF, raw CNN, straightened CNN, hybrid CNN, and LOSO
 checkpoints are archived under `old_4shots_models/`.

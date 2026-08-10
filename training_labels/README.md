@@ -60,8 +60,8 @@ Totals: 50 old `good` rows became `bad`, 18 old `bad` rows became `good`, and
 three old `good` rows were removed as `skip`. The copied G-shot rows have zero
 label changes.
 
-The active RF and raw-CNN checkpoints predate this v2 list; retraining on the
-current 2900-row / 15-shot list is pending.
+The active RF and raw-CNN checkpoints have been retrained on this current
+2900-row / 15-shot list.
 
 ## Previous / derived root lists
 

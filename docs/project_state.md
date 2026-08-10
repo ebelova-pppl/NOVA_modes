@@ -91,10 +91,10 @@ Notes:
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Checkpoint status: trained before the current G-shot label corrections
-      and B12/W29 merges; retraining on the current 2903-row / 15-shot active
-      list is pending
+    -	Checkpoint status: retrained on the current 2900-row / 15-shot
+      `training_labels/tae_like_v2_nonG.csv` list
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
+    -	Active training counts: 594 GOOD, 2306 BAD
     -	Latest pre-B12 13-shot OOF accuracy: 0.951
     -	Latest pre-B12 13-shot OOF CM: `[[1967, 37], [91, 515]]`
     -	Latest pre-B12 GOOD precision/recall/F1: 0.933 / 0.850 / 0.889
@@ -102,10 +102,11 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: full-CSV refit predating the current G-shot label
-      corrections and B12/W29 merges; retraining on the current active list is
-      pending
+    -	Checkpoint status: full-CSV refit on the current 2900-row / 15-shot
+      `training_labels/tae_like_v2_nonG.csv` list
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
+    -	Latest v2 split check before full refit: best accuracy 0.9534 at
+      epoch 13; final 80-epoch full refit reports no prediction collapse
     -	Latest pre-B12 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
     -	Previous 13-shot M54 held-out split check: CM `[[394, 6], [18, 103]]`,
@@ -2961,3 +2962,27 @@ The code fallbacks for fresh runs were also updated so accidental unsourced
 runs use the v2 list: `scripts/cnn_raw.py` now falls back to
 `training_labels/tae_like_v2_nonG.csv`, and `scripts/run_loso_10.py` defaults
 to `$NOVA_TRAIN_CSV` or the v2 list when the environment variable is absent.
+
+The active RF and raw-CNN checkpoints were then retrained on
+`training_labels/tae_like_v2_nonG.csv` and replaced at the top level under
+`models/`. The previous top-level checkpoints remain archived under
+`models/pre_v2_nonG_20260810/`.
+
+Active v2 model metadata:
+
+- RF: `models/nova_mode_classifier.joblib` plus
+  `models/nova_mode_classifier_bundle.joblib`; 2900 training rows, 594 GOOD /
+  2306 BAD, production `rf_w_star_max_22_v2` schema with 22 features.
+- Raw CNN: `models/nova_cnn_raw.pt`; split check best accuracy `0.9534` at
+  epoch 13, then full-list refit on all 2900 rows for 80 epochs with
+  `M_target=100`, `R_target=201`, robust normalization, OneCycleLR peak LR
+  `0.02`, gradient clipping `1.0`, no continuum branch, and no prediction
+  collapse in final prediction-health metadata.
+
+Active model SHA-256 checksums:
+
+```text
+2a96699bba6bb92d44c9f5b09373e35c3011c8d5bdeab297519e7cd69f5e6023  models/nova_mode_classifier.joblib
+0cacd4f1b31347050c1192c109058c3a89c84e3f186ea0899e2a89f95a068629  models/nova_mode_classifier_bundle.joblib
+29643ff060aa77e4d7624063803f199918c5a81a2a7e997f732b2481a6c0af49  models/nova_cnn_raw.pt
+```
