@@ -3140,3 +3140,40 @@ time, validate the resulting BAD set visually, and then implement the next
 ordered rejection gate and eventual positive GOOD templates. The complete
 repository test suite passes 57 tests, and both repository skills pass their
 structural validation.
+
+### 2026-08-16: first labeled subset run of the axis-spike gate
+
+Created a local `data/nstxu_204202/` test subset from modes present in
+`training_labels/tae_like_v2_nonG.csv`: 141 mode files across `N1` through
+`N10`, their ten matching `datcon#` files, and a verified 141-row
+`mode_labels.csv`. `N1` and `N2` contain all available eligible modes (14 and 7,
+respectively); each other `N#` contains the first 15 eligible filenames in
+stable filename order. The subset has 44 labeled GOOD and 97 labeled BAD modes.
+
+Ran `scripts/sort_shot_rules.py` with `axis_amplitude_min=0.1` and
+`axis_width_max_grid=10`, writing deterministic outputs to
+`outputs/nstxu_204202_axis_a010_w10/`. All 141 modes were valid TAE-side inputs
+(138 TAE-like and 3 mixed). The gate returned `BAD_AXIS_SPIKE` for 66 modes and
+left 75 as `REVIEW`. Relative to the copied labels, the BAD set contains 62
+labeled BAD and 4 labeled GOOD modes; the REVIEW set contains 35 labeled BAD
+and 40 labeled GOOD modes. The four labeled-GOOD rejections are:
+
+- `N7/egn07w.1060E+02`;
+- `N8/egn08w.2651E+02`;
+- `N9/egn09w.1804E+02`;
+- `N10/egn10w.1026E+02`.
+
+Next step: inspect these four modes first to determine whether they expose
+label errors, axis-feature-definition issues, or a threshold that needs
+refinement before adopting the gate configuration.
+
+Repeated the subset run with `axis_amplitude_min=0.2` and
+`axis_width_max_grid=10`, writing to
+`outputs/nstxu_204202_axis_a020_w10/`. The higher amplitude floor returns 61
+`BAD_AXIS_SPIKE` and 80 `REVIEW` decisions. The BAD set contains 60 labeled BAD
+and one labeled GOOD mode; the REVIEW set contains 37 labeled BAD and 43
+labeled GOOD modes. Compared with the `0.1` run, three labeled-GOOD low-amplitude
+wiggles and two labeled-BAD modes move from BAD to REVIEW. The only remaining
+labeled-GOOD rejection is `N10/egn10w.1026E+02`, with `axis_peak=0.284065`,
+`axis_peak_r=0.015`, and `axis_halfmax_width_grid=1.06871`. Inspect that mode to
+decide whether its training label or the gate policy should change.
