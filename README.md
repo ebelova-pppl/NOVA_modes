@@ -234,6 +234,11 @@ valid TAE-side modes are `REVIEW`, not `GOOD`, with primary reason
 `RULESET_NOT_IMPLEMENTED`. Invalid inputs remain `INVALID`, and valid EAE-like
 modes are routed without a fabricated rule decision.
 
+Each valid TAE-side result includes a named, deterministic 31-feature
+`rule_features` object: the active RF 22-feature calculations, six additional
+continuum-crossing measurements, and three continuum-extremum measurements.
+This reuses the feature calculations without running an RF model.
+
 Optional manual adjudication writes fingerprinted overrides separately:
 
 ```bash

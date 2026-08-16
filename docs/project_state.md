@@ -3042,3 +3042,31 @@ REVIEW behavior, manual precedence and validation, stale/ambiguous overrides,
 RF ranking and retain-all fallbacks, output headers/counts, JSON nulls, skill
 structure/validation, and byte-identical reruns. No real-shot smoke test was
 run because no target shot path was supplied for this task.
+
+### 2026-08-15: populate deterministic rule features with the shared RF31 calculations
+
+The placeholder rule engine now calculates and records a named 31-measurement
+`rule_features` object for every valid TAE-like or mixed mode. The feature set
+is the production RF 22 plus all six boundary-crossing extensions and all
+three inner-extremum extensions. The rule-facing schema is
+`tae-rule-features-rf31-v1` and records the source calculation schema as
+`rf_all_crossings_extremum_energy_31_v2`. The family-routing measurements
+`signed_delta` and `fraction_below_upper2` remain top-level audit columns and
+are not duplicated as rule evidence.
+
+`src/mode_features.py` now exposes the same calculations as a named mapping and
+accepts already-loaded continuum arrays. The existing ordered RF vector calls
+the same implementation and retains its previous defaults. Preprocessing
+retains validated mode and continuum arrays only for the TAE side, and
+`scripts/tae_rule_engine.py` consumes those arrays without filesystem or model
+access. Feature extraction does not load an RF checkpoint or change the
+placeholder `REVIEW` decision. Extraction failures become `INVALID` with
+`RULE_FEATURE_EXTRACTION_FAILED`, with unavailable JSON measurements written
+as `null`. Unlike the RF vector, the auditable rule payload does not present
+the no-extremum fallback tuple `(1, 1, 0)` as measured geometry: it records
+`extremum_match_found=false` and sets the three extremum measurements to null.
+
+Focused tests verify the exact 31 names, numeric parity with the shared RF31
+vector, exclusion of routing scalars, top-level radial-feature consistency,
+explicit no-extremum output, null failure output, and deterministic workflow
+regeneration. The full suite passes 52 tests.

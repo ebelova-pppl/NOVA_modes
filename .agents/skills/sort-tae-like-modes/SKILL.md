@@ -22,6 +22,14 @@ lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
 TAE/EAE/mixed split. The current placeholder rules return `REVIEW` for valid
 TAE-side modes; never reinterpret this as `GOOD`.
 
+For every valid TAE-side mode, `rule_features` records the shared 31-feature
+schema: the production RF 22, all six boundary-crossing extensions, and all
+three inner-extremum extensions. These are named deterministic measurements;
+no RF checkpoint or prediction is used to produce them. Keep `signed_delta`
+and `fraction_below_upper2` as routing audit columns rather than rule features.
+When no inner extremum is matched, require `extremum_match_found=false` and
+JSON `null` for the three undefined extremum measurements.
+
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or
 CNN to make deterministic or manual classifications.

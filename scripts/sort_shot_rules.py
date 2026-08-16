@@ -891,8 +891,15 @@ def run_shot(
 
     rule_by_key: dict[str, dict[str, Any]] = {}
     for row in preprocess.tae_rows:
-        result = evaluate_mode(row)
-        rule_by_key[str(row["mode_key"])] = result.as_output_row(row)
+        key = str(row["mode_key"])
+        feature_data = preprocess.rule_feature_data.get(key)
+        result = evaluate_mode(
+            row,
+            mode=None if feature_data is None else feature_data.mode,
+            low2=None if feature_data is None else feature_data.low2,
+            high2=None if feature_data is None else feature_data.high2,
+        )
+        rule_by_key[key] = result.as_output_row(row)
 
     preliminary_rows: list[dict[str, Any]] = []
     for source_row in preprocess.rows:

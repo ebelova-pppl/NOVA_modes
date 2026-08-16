@@ -1023,6 +1023,29 @@ reason `RULESET_NOT_IMPLEMENTED`. Multiple rule reasons and structured
 features are stored as deterministic JSON; missing feature values use JSON
 `null`.
 
+Before making that placeholder decision, the engine records the canonical 31
+measurements by name in `rule_features`. Its rule-facing schema is
+`tae-rule-features-rf31-v1`, with
+`source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
+shared `src/mode_features.py` implementation supplies:
+
+- the production 22 features, including `rad_loc`, `rad_width`, the mode-shape
+  statistics, `gamma_d`, `ntor`, and the production continuum scalars;
+- the six extended crossing features: `n_cross`, `r_star_max`, `W_star_sum`,
+  `r_star_high_shear`, `W_star_high_shear`, and
+  `W_star_high_shear_sum`;
+- the three inner-extremum features: `ext_dr`, `ext_df_gap`, and
+  `ext_energy_frac`.
+
+This calculates the same quantities used by RF feature experiments but does
+not load an RF checkpoint or use an RF prediction. `signed_delta` and
+`fraction_below_upper2` remain top-level family-routing audit columns and are
+not duplicated in `rule_features`. A rule-feature extraction failure produces
+`INVALID` with reason `RULE_FEATURE_EXTRACTION_FAILED`; unavailable values use
+JSON `null`. If no inner extremum is detected, `extremum_match_found` is false
+and `ext_dr`, `ext_df_gap`, and `ext_energy_frac` are null rather than the
+RF-only fallback tuple `(1, 1, 0)`.
+
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:
 

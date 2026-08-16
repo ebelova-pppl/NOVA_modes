@@ -113,6 +113,8 @@ def compute_features_for_mode(
     include_extremum_features=False,
     r_star_energy_tie=False,
     r_shear0=0.2,
+    continuum_arrays=None,
+    strict_continuum=False,
 ):
     """
     mode: 2D numpy array of shape (n_m, n_r).
@@ -222,10 +224,12 @@ def compute_features_for_mode(
     mode_path = extra_info.get("path") if extra_info else None
     omega = float(extra_info.get("omega")) if extra_info and "omega" in extra_info else None
 
-    if mode_path is not None and omega is not None:
+    if (mode_path is not None or continuum_arrays is not None) and omega is not None:
         try:
-            #low2, high2, i1, i2 = load_datcon_for_mode(mode_path, n_r=n_r)  # load datcon
-            low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)  # load datcon
+            if continuum_arrays is None:
+                low2, high2, *_ = load_datcon_for_mode(mode_path, n_r=n_r)
+            else:
+                low2, high2 = continuum_arrays
             cont = continuum_scalars(
                 mode,
                 omega,
@@ -268,6 +272,8 @@ def compute_features_for_mode(
                 )
             features = np.append(features, continuum_values)
         except FileNotFoundError:
+            if strict_continuum:
+                raise
             warn_once_per_dir(
                 mode_path,
                 f"   \n"
@@ -285,13 +291,16 @@ def compute_features_for_mode(
             if include_extremum_features:
                 features = np.append(features, experimental_extremum_fallback)
         except Exception as e:
-            warn_once_per_dir(
-                mode_path,
-                f"[NOVA-RF] Continuum feature computation failed in directory:\n"
-                f"  {os.path.dirname(os.path.abspath(mode_path))}\n"
-                f"Continuum-related features will be DISABLED for modes in this directory.\n"
-                f"Reason: {type(e).__name__}: {e}"
-            )
+            if strict_continuum:
+                raise
+            if mode_path is not None:
+                warn_once_per_dir(
+                    mode_path,
+                    f"[NOVA-RF] Continuum feature computation failed in directory:\n"
+                    f"  {os.path.dirname(os.path.abspath(mode_path))}\n"
+                    f"Continuum-related features will be DISABLED for modes in this directory.\n"
+                    f"Reason: {type(e).__name__}: {e}"
+                )
             features = np.append(features, cont_fallback)
             features = np.append(features, promoted_crossing_fallback)
             if include_crossing_features:
@@ -308,3 +317,66 @@ def compute_features_for_mode(
 
 
     return features
+
+
+def compute_named_features_for_mode(
+    mode,
+    extra_info=None,
+    include_crossing_features=False,
+    include_extremum_features=False,
+    r_star_energy_tie=False,
+    r_shear0=0.2,
+    continuum_arrays=None,
+    strict_continuum=False,
+    null_missing_extremum=False,
+    return_feature_status=False,
+):
+    """Return the canonical RF calculations keyed by their schema names.
+
+    This is the shared interface for consumers that need auditable named
+    measurements instead of the ordered vector expected by sklearn. Optional
+    status output lets rule-facing callers represent an absent extremum with
+    null measurements without changing the legacy RF vector fallback.
+    """
+    names = get_feature_names(
+        include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+    )
+    values = compute_features_for_mode(
+        mode,
+        extra_info=extra_info,
+        include_crossing_features=include_crossing_features,
+        include_extremum_features=include_extremum_features,
+        r_star_energy_tie=r_star_energy_tie,
+        r_shear0=r_shear0,
+        continuum_arrays=continuum_arrays,
+        strict_continuum=strict_continuum,
+    )
+    if len(values) != len(names):
+        raise ValueError(
+            f"feature vector has {len(values)} values but schema has {len(names)} names"
+        )
+    named = {name: float(value) for name, value in zip(names, values)}
+    status = {}
+    if include_extremum_features and (
+        null_missing_extremum or return_feature_status
+    ):
+        if continuum_arrays is None or extra_info is None or "omega" not in extra_info:
+            raise ValueError(
+                "continuum arrays and omega are required for extremum match status"
+            )
+        low2, high2 = continuum_arrays
+        _extremum, matched = continuum_extremum_features(
+            mode,
+            float(extra_info["omega"]),
+            low2,
+            high2,
+            return_match_status=True,
+        )
+        status["extremum_match_found"] = bool(matched)
+        if null_missing_extremum and not matched:
+            for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES:
+                named[name] = None
+    if return_feature_status:
+        return named, status
+    return named

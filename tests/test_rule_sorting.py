@@ -22,6 +22,7 @@ from make_tae_like_list import (  # noqa: E402
     classify_gap_region,
     preprocess_shot,
 )
+from mode_features import compute_features_for_mode  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
 from sort_shot_mixed import classify_gap_region as mixed_classify_gap_region  # noqa: E402
 from sort_shot_rules import (  # noqa: E402
@@ -32,7 +33,15 @@ from sort_shot_rules import (  # noqa: E402
     load_manual_overrides,
     run_shot,
 )
-from tae_rule_engine import RULESET_NOT_IMPLEMENTED, evaluate_mode  # noqa: E402
+from tae_rule_engine import (  # noqa: E402
+    RULESET_NOT_IMPLEMENTED,
+    RULE_FEATURE_EXTRACTION_FAILED,
+    RULE_FEATURE_METADATA_NAMES,
+    RULE_FEATURE_NAMES,
+    RULE_FEATURE_SCHEMA_VERSION,
+    RULE_FEATURE_SOURCE_SCHEMA_VERSION,
+    evaluate_mode,
+)
 from tae_rule_io import (  # noqa: E402
     MANUAL_OVERRIDE_FIELDS,
     RULE_OUTPUT_FIELDS,
@@ -185,28 +194,107 @@ class PreprocessingTests(unittest.TestCase):
 
 class RuleAndOverrideTests(unittest.TestCase):
     def setUp(self):
+        radial_grid = np.linspace(0.0, 1.0, 201)
+        envelope = np.exp(-((radial_grid - 0.2) / 0.03) ** 2)
+        self.mode = np.stack(
+            [(index + 1) * envelope for index in range(4)]
+        )
+        lower = np.full_like(radial_grid, 0.5)
+        upper = 0.9 + 4.0 * (radial_grid - 0.2) ** 2
+        self.low2 = lower**2
+        self.high2 = upper**2
         self.base = {
             "path": "/data/shot/N1/egn01w.one",
             "mode_key": "shot/N1/egn01w.one",
             "shot": "shot",
             "ntor": 1,
             "omega": 1.0,
+            "gamma_d": 0.01,
             "input_fingerprint": "a" * 64,
             "gap_region": "tae_like",
             "processing_status": "READY_FOR_RULES",
         }
 
+    def evaluate(self, row=None):
+        return evaluate_mode(
+            self.base if row is None else row,
+            mode=self.mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+
     def test_placeholder_returns_review_with_valid_json(self):
-        result = evaluate_mode(self.base)
+        result = self.evaluate()
         row = result.as_output_row(self.base)
         self.assertEqual(row["rule_decision"], "REVIEW")
         self.assertEqual(row["rule_primary_reason"], RULESET_NOT_IMPLEMENTED)
         self.assertEqual(json.loads(row["rule_triggered_rules"]), [RULESET_NOT_IMPLEMENTED])
-        self.assertIsNone(json.loads(row["rule_features"])["future_feature_placeholder"])
+        features = json.loads(row["rule_features"])
+        self.assertEqual(
+            features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
+        )
+        self.assertEqual(
+            set(features) - set(RULE_FEATURE_METADATA_NAMES),
+            set(RULE_FEATURE_NAMES),
+        )
+        self.assertEqual(len(RULE_FEATURE_NAMES), 31)
+        self.assertEqual(
+            features["source_feature_schema_version"],
+            RULE_FEATURE_SOURCE_SCHEMA_VERSION,
+        )
+        self.assertTrue(features["extremum_match_found"])
+        self.assertNotIn("signed_delta", features)
+        self.assertNotIn("fraction_below_upper2", features)
         self.assertEqual(stable_json({"missing": float("nan")}), '{"missing":null}')
 
+    def test_named_rule_features_match_the_shared_rf31_vector(self):
+        row = self.evaluate().as_output_row(self.base)
+        features = json.loads(row["rule_features"])
+        vector = compute_features_for_mode(
+            self.mode,
+            extra_info={
+                "path": self.base["path"],
+                "omega": self.base["omega"],
+                "gamma_d": self.base["gamma_d"],
+                "ntor": self.base["ntor"],
+            },
+            include_crossing_features=True,
+            include_extremum_features=True,
+            continuum_arrays=(self.low2, self.high2),
+            strict_continuum=True,
+        )
+        np.testing.assert_allclose(
+            [features[name] for name in RULE_FEATURE_NAMES], vector
+        )
+        self.assertGreater(features["n_cross"], 0)
+        self.assertLess(features["ext_dr"], 0.01)
+
+    def test_no_extremum_uses_explicit_status_and_null_measurements(self):
+        flat_low2 = np.full(self.mode.shape[1], 0.5**2)
+        flat_high2 = np.full(self.mode.shape[1], 1.5**2)
+        result = evaluate_mode(
+            self.base,
+            mode=self.mode,
+            low2=flat_low2,
+            high2=flat_high2,
+        )
+        row = result.as_output_row(self.base)
+        features = json.loads(row["rule_features"])
+        self.assertEqual(row["rule_decision"], "REVIEW")
+        self.assertFalse(features["extremum_match_found"])
+        for name in ("ext_dr", "ext_df_gap", "ext_energy_frac"):
+            self.assertIsNone(features[name])
+
+    def test_missing_feature_arrays_return_invalid_with_null_features(self):
+        result = evaluate_mode(self.base)
+        row = result.as_output_row(self.base)
+        features = json.loads(row["rule_features"])
+        self.assertEqual(row["rule_decision"], "INVALID")
+        self.assertEqual(row["rule_primary_reason"], RULE_FEATURE_EXTRACTION_FAILED)
+        self.assertTrue(all(features[name] is None for name in RULE_FEATURE_NAMES))
+
     def test_override_changes_final_but_preserves_rule_decision(self):
-        row = evaluate_mode(self.base).as_output_row(self.base)
+        row = self.evaluate().as_output_row(self.base)
         override = override_row({key: str(value) for key, value in row.items()})
         final, audit = apply_manual_overrides([row], [override])
         self.assertEqual(final[0]["rule_decision"], "REVIEW")
@@ -221,7 +309,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         for index, (rule_decision, manual_decision) in enumerate(
             (("GOOD", "BAD"), ("BAD", "REVIEW"), ("REVIEW", "GOOD")), start=1
         ):
-            row = evaluate_mode(self.base).as_output_row(self.base)
+            row = self.evaluate().as_output_row(self.base)
             row.update(
                 {
                     "path": f"/data/shot/N1/egn01w.{index}",
@@ -240,7 +328,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(audit.applied, 3)
 
     def test_stale_and_ambiguous_overrides_are_not_applied(self):
-        row = evaluate_mode(self.base).as_output_row(self.base)
+        row = self.evaluate().as_output_row(self.base)
         stale = override_row({key: str(value) for key, value in row.items()})
         stale["input_fingerprint"] = "b" * 64
         final, audit = apply_manual_overrides([row], [stale])
@@ -255,7 +343,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(audit.ambiguous, 2)
 
     def test_summary_counts_only_primary_reason(self):
-        row = evaluate_mode(self.base).as_output_row(self.base)
+        row = self.evaluate().as_output_row(self.base)
         row["rule_triggered_rules"] = stable_json(
             [RULESET_NOT_IMPLEMENTED, "SECONDARY_AUDIT_CODE"]
         )
@@ -279,7 +367,7 @@ class RuleAndOverrideTests(unittest.TestCase):
     def test_empty_manual_reason_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "manual_overrides.csv"
-            result_row = evaluate_mode(self.base).as_output_row(self.base)
+            result_row = self.evaluate().as_output_row(self.base)
             row = override_row({key: str(value) for key, value in result_row.items()})
             row["manual_reason"] = ""
             write_dict_csv(path, MANUAL_OVERRIDE_FIELDS, [row])
@@ -415,7 +503,25 @@ class WorkflowOutputTests(unittest.TestCase):
                 {RULESET_NOT_IMPLEMENTED: 1},
             )
             _fields, result_rows = read_dict_csv(out_dir / "rule_results.csv")
-            self.assertEqual(json.loads(result_rows[0]["rule_triggered_rules"]), [RULESET_NOT_IMPLEMENTED])
+            self.assertEqual(
+                json.loads(result_rows[0]["rule_triggered_rules"]),
+                [RULESET_NOT_IMPLEMENTED],
+            )
+            rule_features = json.loads(result_rows[0]["rule_features"])
+            self.assertEqual(
+                rule_features["feature_schema_version"],
+                RULE_FEATURE_SCHEMA_VERSION,
+            )
+            self.assertEqual(
+                set(rule_features) - set(RULE_FEATURE_METADATA_NAMES),
+                set(RULE_FEATURE_NAMES),
+            )
+            self.assertAlmostEqual(
+                rule_features["rad_loc"], float(result_rows[0]["rad_loc"])
+            )
+            self.assertAlmostEqual(
+                rule_features["rad_width"], float(result_rows[0]["rad_width"])
+            )
 
             before = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
             run_shot(shot, out_dir)

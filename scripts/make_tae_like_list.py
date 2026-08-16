@@ -45,12 +45,31 @@ DEFAULT_SIGNED_DELTA_EAE_THRESHOLD = -0.1
 
 
 @dataclass(frozen=True)
+class RuleFeatureData:
+    """Validated arrays retained in memory for pure rule-feature extraction."""
+
+    mode: np.ndarray
+    low2: np.ndarray
+    high2: np.ndarray
+
+
+@dataclass(frozen=True)
+class GapData:
+    """Continuum arrays and family-routing scalars loaded in one pass."""
+
+    low2: np.ndarray
+    high2: np.ndarray
+    scalars: dict[str, float]
+
+
+@dataclass(frozen=True)
 class PreprocessResult:
     """In-memory result returned by :func:`preprocess_shot`."""
 
     shot_dir: Path
     shot: str
     rows: tuple[dict[str, Any], ...]
+    rule_feature_data: dict[str, RuleFeatureData]
 
     @property
     def tae_rows(self) -> list[dict[str, Any]]:
@@ -227,11 +246,11 @@ def _inspect_mode_file(
     )
 
 
-def _load_gap_scalars(
+def _load_gap_data(
     path: Path, *, mode: np.ndarray, omega: float
-) -> tuple[dict[str, float] | None, str, str]:
+) -> tuple[GapData | None, str, str]:
     try:
-        _low2, upper2, *_ = load_datcon_for_mode(str(path), n_r=mode.shape[1])
+        low2, upper2, *_ = load_datcon_for_mode(str(path), n_r=mode.shape[1])
     except Exception as exc:
         return None, "INVALID_CONTINUUM", f"{type(exc).__name__}: {exc}"
     if not np.any(np.isfinite(upper2)):
@@ -240,7 +259,7 @@ def _load_gap_scalars(
         scalars = upper2_scalars(mode, omega, upper2)
     except Exception as exc:
         return None, "INVALID_UPPER2_SCALARS", f"{type(exc).__name__}: {exc}"
-    return scalars, "", ""
+    return GapData(low2=low2, high2=upper2, scalars=scalars), "", ""
 
 
 def preprocess_shot(
@@ -272,6 +291,7 @@ def preprocess_shot(
         source, n_min=n_min, n_max=n_max, pattern=pattern
     )
     rows: list[dict[str, Any]] = []
+    rule_feature_data: dict[str, RuleFeatureData] = {}
     for n, _n_dir, files in populated:
         for path in files:
             row = _base_row(path, source.name, n)
@@ -316,12 +336,13 @@ def preprocess_shot(
                 continue
             row.update({"rad_loc": centroid, "rad_width": width})
 
-            scalars, reason, message = _load_gap_scalars(
+            gap_data, reason, message = _load_gap_data(
                 path, mode=bundle["mode"], omega=bundle["omega"]
             )
-            if scalars is None:
+            if gap_data is None:
                 rows.append(_mark_invalid(row, reason, message))
                 continue
+            scalars = gap_data.scalars
             gap_region = classify_gap_region(
                 scalars["signed_delta"],
                 scalars["fraction_below_upper2"],
@@ -342,12 +363,19 @@ def preprocess_shot(
                     ),
                 }
             )
+            if gap_region != "eae_like":
+                rule_feature_data[str(row["mode_key"])] = RuleFeatureData(
+                    mode=bundle["mode"],
+                    low2=gap_data.low2,
+                    high2=gap_data.high2,
+                )
             rows.append(row)
 
     result = PreprocessResult(
         shot_dir=source,
         shot=source.name,
         rows=tuple(sorted(rows, key=rule_row_sort_key)),
+        rule_feature_data=rule_feature_data,
     )
     if out_dir is not None:
         write_preprocess_outputs(result, Path(out_dir).expanduser())

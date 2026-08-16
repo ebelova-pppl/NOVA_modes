@@ -600,6 +600,7 @@ def continuum_extremum_features(
     dr_scale=EXTREMUM_DR_SCALE,
     df_scale=EXTREMUM_DF_SCALE,
     energy_half_width=EXTREMUM_ENERGY_HALF_WIDTH,
+    return_match_status=False,
 ):
     """Measure joint mode alignment with an inner continuum-gap extremum.
 
@@ -614,8 +615,15 @@ def continuum_extremum_features(
     values place the mode frequency on the local gap side of the extremum,
     zero is tangency, and negative values place it on the continuum side.
     ``ext_energy_frac`` is the fraction of integrated W(r) within a fixed
-    radial half-width of the matched extremum.
+    radial half-width of the matched extremum. With ``return_match_status``,
+    return ``(features, matched)`` so rule-facing consumers can distinguish a
+    real match from the RF fallback tuple.
     """
+    def result(features, matched):
+        if return_match_status:
+            return features, matched
+        return features
+
     mode, omega, low2, high2, r = _validate_crossing_inputs(
         mode, omega, low2_full, high2_full, r
     )
@@ -640,7 +648,7 @@ def continuum_extremum_features(
 
     radial_energy = np.sum(np.abs(mode) ** 2, axis=0)
     if float(np.max(radial_energy)) <= 0.0:
-        return dict(EXTREMUM_FEATURE_DEFAULTS)
+        return result(dict(EXTREMUM_FEATURE_DEFAULTS), False)
     r_peak = float(r[int(np.argmax(radial_energy))])
     low = np.sqrt(np.where(low2 >= 0.0, low2, np.nan))
     high = np.sqrt(np.where(high2 >= 0.0, high2, np.nan))
@@ -656,7 +664,7 @@ def continuum_extremum_features(
         )
     )
     if not candidates:
-        return dict(EXTREMUM_FEATURE_DEFAULTS)
+        return result(dict(EXTREMUM_FEATURE_DEFAULTS), False)
 
     for candidate in candidates:
         candidate["dr"] = abs(r_peak - candidate["r_ext"])
@@ -674,16 +682,19 @@ def continuum_extremum_features(
             item["kind"],
         ),
     )
-    return {
-        "ext_dr": float(matched["dr"]),
-        "ext_df_gap": float(matched["df_gap"]),
-        "ext_energy_frac": _energy_fraction_in_window(
-            radial_energy,
-            r,
-            matched["r_ext"],
-            energy_half_width,
-        ),
-    }
+    return result(
+        {
+            "ext_dr": float(matched["dr"]),
+            "ext_df_gap": float(matched["df_gap"]),
+            "ext_energy_frac": _energy_fraction_in_window(
+                radial_energy,
+                r,
+                matched["r_ext"],
+                energy_half_width,
+            ),
+        },
+        True,
+    )
 
 
 def continuum_scalars(
