@@ -1,4 +1,0 @@
-interface:
-  display_name: "Label TAE-Like Modes"
-  short_description: "Blind model-free NOVA TAE mode review"
-  default_prompt: "Use $label-tae-like-modes to independently review this shot's TAE-like modes without models or prior labels."

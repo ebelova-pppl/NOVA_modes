@@ -1,13 +1,13 @@
 ---
-name: label-tae-like-modes
-description: "Independently hand-label NOVA TAE-like eigenmodes from raw signed mode structure and Alfvén-continuum diagnostics. Use for blind shot review, a model-independent second opinion, labeling good/bad/skip modes, or post-seal comparison with a human reviewer. Enforce strict independence: never use RF, CNN, ensemble, classifier outputs, or any previous human or automated labels for the target shot before sealing the review."
+name: visual-tae-rule-development
+description: "Develop and adjudicate visual NOVA TAE morphology rules through raw signed-mode and Alfvén-continuum inspection, including blind labeling experiments, sealed independent reviews, reviewer comparison, and post-seal discussion. Use for model-independent visual rule development, blind good/bad/skip shot review, reviewer agreement analysis, or explicit non-blind adjudication. For blind work, never use RF, CNN, ensemble, classifier outputs, or prior labels for the target shot before sealing."
 ---
 
-# Blind TAE-Like Mode Labeling
+# Visual TAE Rule Development
 
-Produce an independent physics-based review of one target shot. Treat
-objectivity as the primary requirement; agreement with an existing classifier
-or labeler is not an objective.
+Develop qualitative visual rules or produce an independent physics-based review
+of one target shot. Treat objectivity as the primary requirement during blind
+work; agreement with an existing classifier or labeler is not an objective.
 
 ## Enforce independence
 
@@ -48,7 +48,7 @@ a fixed numerical classifier.
 Start from a genuinely label-free TAE-like split manifest. Run:
 
 ```bash
-python .agents/skills/label-tae-like-modes/scripts/prepare_blind_manifest.py \
+python .agents/skills/visual-tae-rule-development/scripts/prepare_blind_manifest.py \
   SHOT_tae_eae_split/tae_like.csv blind_manifest.csv \
   --data-root "$NOVA_DATA" \
   --decisions-template blind_decisions.csv
@@ -63,7 +63,7 @@ columns. Do not weaken that check to reuse a labeled target-shot list.
 Generate label-free static diagnostic pages when batch review is useful:
 
 ```bash
-python .agents/skills/label-tae-like-modes/scripts/render_blind_diagnostics.py \
+python .agents/skills/visual-tae-rule-development/scripts/render_blind_diagnostics.py \
   blind_manifest.csv blind_diagnostics \
   --data-root "$NOVA_DATA"
 ```
@@ -122,7 +122,7 @@ number of GOOD modes toward an expected shot yield.
 Seal only after every manifest row has an independent decision and reason:
 
 ```bash
-python .agents/skills/label-tae-like-modes/scripts/seal_review.py \
+python .agents/skills/visual-tae-rule-development/scripts/seal_review.py \
   --manifest blind_manifest.csv \
   --decisions blind_decisions.csv \
   --out codex_blind_labels_SEALED.csv \
@@ -138,7 +138,7 @@ not edit either sealed file afterward.
 Only now locate or request the independent human list. Compare with:
 
 ```bash
-python .agents/skills/label-tae-like-modes/scripts/compare_reviews.py \
+python .agents/skills/visual-tae-rule-development/scripts/compare_reviews.py \
   --sealed codex_blind_labels_SEALED.csv \
   --reference human_labels.csv \
   --out blind_comparison.csv
@@ -152,3 +152,11 @@ Do not merge labels into a working shot list or canonical training list until
 the user explicitly approves the adjudicated decisions. Before any merge,
 validate exact manifest coverage, unique paths, allowed labels, family-label
 consistency, and exclusion of `skip` from model training.
+
+## Develop and adjudicate rules after sealing
+
+After a blind review is sealed and compared, use disagreements to refine the
+qualitative policy in `references/labeling-policy.md`. Keep the sealed review
+immutable. Clearly mark any later reclassification as non-blind post-seal
+adjudication, preserve its provenance separately, and never report it as a new
+independent validation result.

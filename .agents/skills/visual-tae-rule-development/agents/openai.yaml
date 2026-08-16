@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual TAE Rule Development"
+  short_description: "Blind NOVA review and visual rule development"
+  default_prompt: "Use $visual-tae-rule-development to run a blind visual NOVA TAE review or develop and adjudicate morphology rules."

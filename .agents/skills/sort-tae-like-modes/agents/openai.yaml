@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sort TAE-Like Modes"
+  short_description: "Deterministic NOVA TAE mode sorting"
+  default_prompt: "Use $sort-tae-like-modes to preprocess and deterministically sort one NOVA shot with auditable outputs."

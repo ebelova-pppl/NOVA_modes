@@ -993,6 +993,104 @@ lost.
 
 ---
 
+## Deterministic rule sorting: `make_tae_like_list.py`, `tae_rule_engine.py`, and `sort_shot_rules.py`
+
+This noninteractive one-shot workflow preserves the canonical
+`sort_shot_mixed.py` preflight, mode validation, TAE/EAE/mixed routing, and
+close-frequency structural-similarity conventions while replacing RF/CNN
+classification with versioned deterministic rules.
+
+Run the complete workflow with:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rule_sort_output
+```
+
+`scripts/make_tae_like_list.py` also exposes an importable
+`preprocess_shot()` interface and a standalone preprocessing CLI. Before any
+mode is processed, it aborts the whole shot if a populated requested `N#`
+directory lacks its `datcon#`. Other corrupt, nonfinite, or unusable inputs are
+recorded individually as `INVALID`. Valid mixed modes stay in the TAE-side
+list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
+decision.
+
+`scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
+`tae-rules-placeholder-v1` scaffold defines no physics thresholds or positive
+GOOD template, so every valid TAE-side mode returns `REVIEW` with primary
+reason `RULESET_NOT_IMPLEMENTED`. Multiple rule reasons and structured
+features are stored as deterministic JSON; missing feature values use JSON
+`null`.
+
+Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
+still applies:
+
+- `tae_like_all.csv`, `eae_like.csv`, and `rejected_modes.csv`;
+- `bad_tae_like.csv`, `good_tae_unchecked.csv`, and `good_tae_final.csv`;
+- `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`;
+- `frequency_cluster_report.txt` and `frequency_clusters.csv`.
+
+Deterministic/manual semantics use these new names:
+
+- `all_modes_rules.csv` replaces the ML-specific `all_modes_scored.csv`;
+- `rule_results.csv` preserves preliminary TAE-side rule results;
+- `final_classifications.csv` preserves both rule and final decisions;
+- `review_tae_like.csv` is a mutually exclusive REVIEW list rather than the
+  overlapping ML-QC `flagged_tae_like.csv`;
+- `manual_overrides.csv` records reusable adjudication provenance and is
+  header-only when unused.
+
+Every CSV is written with headers even when empty. Rows are ordered by shot,
+`ntor`, frequency, and mode filename. Summary reason counts use exactly one
+primary reason per mode; `rule_triggered_rules` is retained only as per-mode
+audit detail.
+
+### Manual adjudication
+
+Use the backward-compatible labeler mode to inspect preliminary REVIEW rows:
+
+```bash
+python scripts/label_modes_fast.py /path/to/shot \
+  --mode-list /path/to/rule_sort_output/final_classifications.csv \
+  --csv_out /path/to/manual_overrides.csv \
+  --adjudication review \
+  --reviewer REVIEWER_ID \
+  --no-rf
+```
+
+Use `--adjudication all` to permit overrides of preliminary GOOD, BAD, and
+REVIEW decisions. Adjudication requires signed harmonics, `--no-rf`, and a
+nonempty manual reason for each `g`/`b`/`r` decision. It calculates a SHA-256
+fingerprint from the current mode and corresponding `datcon#` contents.
+
+Rerun the sorter to apply the override file reproducibly:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rule_sort_output \
+  --manual_overrides /path/to/manual_overrides.csv
+```
+
+The sorter rejects empty reasons and applies only unique overrides whose stored
+fingerprint matches current inputs. Stale, ambiguous, ineligible, and unmatched
+override counts are reported. The summary stores the SHA-256 of the exact
+override file used.
+
+### Final-GOOD duplicate ranking
+
+Pass `--rf_model /path/to/model.joblib` only when final GOOD modes exist and an
+RF-ranked representative is desired. RF `p_good` becomes
+`duplicate_rank_score` with source `rf_p_good`; it cannot change rule, manual,
+or final decisions. Only final GOOD modes are scored. A missing/unloadable
+checkpoint retains every member of each affected close-frequency cluster with
+`SKIPPED_NO_RF_CHECKPOINT`. A scoring failure for one member retains that whole
+cluster with `SKIPPED_RF_SCORING_FAILED`. CNN models are never loaded or run by
+this workflow.
+
+---
+
 ## `run_loso_10.py`
 
 Driver for leave-one-shot-out checks over all shots in the selected training

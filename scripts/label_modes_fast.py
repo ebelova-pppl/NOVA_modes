@@ -5,8 +5,9 @@ import csv
 import argparse
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +22,16 @@ from cont_features import (
     continuum_crossing_features,
     continuum_scalars,
     load_datcon_for_mode,
+)
+from sort_shot_rules import load_manual_overrides
+from tae_rule_io import (
+    MANUAL_OVERRIDE_FIELDS,
+    datcon_path_for_mode,
+    input_fingerprint,
+    portable_mode_key,
+    read_dict_csv,
+    rule_row_sort_key,
+    write_dict_csv,
 )
 
 
@@ -336,6 +347,322 @@ def read_mode_list_keys(
     return keys
 
 
+def adjudication_candidate_rows(
+    csv_path: str,
+    *,
+    mode_dir: Path,
+    data_dir: Optional[str],
+    scope: str,
+) -> list[dict[str, Any]]:
+    """Read structured sorter rows and select reproducibly ordered candidates."""
+    fields, rows = read_dict_csv(csv_path)
+    required = {
+        "path",
+        "mode_key",
+        "input_fingerprint",
+        "ntor",
+        "omega",
+        "rule_decision",
+    }
+    missing = required - set(fields)
+    if missing:
+        raise ValueError(
+            "adjudication mode list is missing required columns: "
+            + ", ".join(sorted(missing))
+        )
+
+    selected: list[dict[str, Any]] = []
+    seen_keys: set[str] = set()
+    for row in rows:
+        rule_decision = row["rule_decision"].strip().upper()
+        if rule_decision not in {"GOOD", "BAD", "REVIEW"}:
+            continue
+        if scope == "review" and rule_decision != "REVIEW":
+            continue
+
+        raw_path = Path(row["path"]).expanduser()
+        if raw_path.is_absolute():
+            resolved = raw_path.resolve()
+        elif data_dir:
+            resolved = (Path(data_dir).expanduser() / raw_path).resolve()
+        else:
+            raise ValueError(
+                f"relative adjudication path requires --data_dir or $NOVA_DATA: {raw_path}"
+            )
+        try:
+            resolved.relative_to(mode_dir)
+        except ValueError:
+            continue
+        expected_key = portable_mode_key(resolved)
+        if row["mode_key"].strip() != expected_key:
+            raise ValueError(
+                f"mode_key {row['mode_key']!r} does not match resolved path {expected_key!r}"
+            )
+        if expected_key in seen_keys:
+            raise ValueError(f"duplicate adjudication mode_key: {expected_key}")
+        seen_keys.add(expected_key)
+        candidate = dict(row)
+        candidate["path"] = str(resolved)
+        selected.append(candidate)
+    return sorted(selected, key=rule_row_sort_key)
+
+
+def _utc_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace(
+        "+00:00", "Z"
+    )
+
+
+def _write_override_map(
+    output: Path, overrides: dict[str, dict[str, str]]
+) -> None:
+    def override_sort_key(row: dict[str, str]) -> tuple[Any, ...]:
+        mode_key = row.get("mode_key", "")
+        shot = mode_key.split("/", 1)[0]
+        try:
+            ntor = int(row.get("ntor", ""))
+        except ValueError:
+            ntor = float("inf")
+        try:
+            frequency = float(row.get("frequency", ""))
+        except ValueError:
+            frequency = float("inf")
+        return (shot, ntor, frequency, Path(row.get("path", "")).name, mode_key)
+
+    rows = sorted(
+        overrides.values(),
+        key=override_sort_key,
+    )
+    write_dict_csv(output, MANUAL_OVERRIDE_FIELDS, rows)
+
+
+def run_adjudication(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
+    """Interactively create reusable manual overrides without RF guidance."""
+    if not args.no_rf:
+        parser.error("--adjudication requires --no-rf")
+    if not args.mode_list:
+        parser.error("--adjudication requires --mode-list from sort_shot_rules.py")
+    reviewer = (args.reviewer or "").strip()
+    if not reviewer:
+        parser.error("--adjudication requires a nonempty --reviewer")
+    if args.abs:
+        parser.error("--adjudication uses signed harmonics; do not pass --abs")
+
+    try:
+        mode_dir = resolve_mode_dir(args.mode_dir, args.data_dir)
+    except ValueError as exc:
+        parser.error(str(exc))
+    if not mode_dir.is_dir():
+        parser.error(f"mode directory not found: {mode_dir}")
+
+    output = Path(args.csv_out).expanduser()
+    if args.csv_out == "mode_labels.csv":
+        output = Path("manual_overrides.csv")
+    existing_rows: list[dict[str, str]] = []
+    if output.exists():
+        try:
+            existing_rows = load_manual_overrides(output)
+        except (OSError, ValueError) as exc:
+            parser.error(f"Could not resume manual overrides {output}: {exc}")
+    overrides: dict[str, dict[str, str]] = {}
+    for row in existing_rows:
+        mode_key = row.get("mode_key", "").strip()
+        if not mode_key:
+            continue
+        if mode_key in overrides:
+            parser.error(
+                f"manual override file contains duplicate mode_key {mode_key!r}; "
+                "resolve the ambiguity before resuming adjudication"
+            )
+        overrides[mode_key] = dict(row)
+
+    try:
+        candidates = adjudication_candidate_rows(
+            args.mode_list,
+            mode_dir=mode_dir,
+            data_dir=args.data_dir,
+            scope=args.adjudication,
+        )
+    except (OSError, ValueError) as exc:
+        parser.error(f"Could not read adjudication mode list {args.mode_list!r}: {exc}")
+
+    pending: list[dict[str, Any]] = []
+    for row in candidates:
+        existing = overrides.get(row["mode_key"])
+        if (
+            existing
+            and existing.get("manual_decision", "").strip()
+            and existing.get("input_fingerprint") == row.get("input_fingerprint")
+        ):
+            continue
+        pending.append(row)
+
+    print("Manual adjudication mode: RF guidance is disabled.")
+    print(f"Scope:             {args.adjudication}")
+    print(f"Mode directory:    {mode_dir}")
+    print(f"Classification CSV: {Path(args.mode_list).expanduser()}")
+    print(f"Override CSV:      {output}")
+    print(f"Reviewer:          {reviewer}")
+    print(
+        f"Eligible {len(candidates)}; already reviewed with matching inputs "
+        f"{len(candidates) - len(pending)}; remaining {len(pending)}"
+    )
+    print("Keys: g=GOOD, b=BAD, r=REVIEW, u=undo, q=quit")
+
+    if not output.exists():
+        _write_override_map(output, overrides)
+    if not pending:
+        print("Nothing to adjudicate.")
+        return
+
+    fig, (ax1, ax_continuum, ax_spectrum) = plt.subplots(
+        3,
+        1,
+        figsize=(9, 9),
+        height_ratios=[3, 1, 1],
+        constrained_layout=True,
+    )
+    history: list[tuple[int, str, dict[str, str] | None]] = []
+    index = 0
+    while index < len(pending):
+        row = pending[index]
+        path = str(row["path"])
+        mode_key = str(row["mode_key"])
+        try:
+            current_fingerprint = input_fingerprint(
+                path, datcon_path_for_mode(path, int(row["ntor"]))
+            )
+        except Exception as exc:
+            print(
+                f"ERROR fingerprinting {mode_key}: {type(exc).__name__}: {exc}. "
+                "Rerun sort_shot_rules.py after repairing the input."
+            )
+            index += 1
+            continue
+        if current_fingerprint != row["input_fingerprint"]:
+            print(
+                f"STALE sorter row for {mode_key}: current mode/datcon fingerprint "
+                "differs. Rerun sort_shot_rules.py before adjudicating this mode."
+            )
+            index += 1
+            continue
+
+        try:
+            mode, omega, gamma_d, ntor = load_mode_from_nova(path)
+        except Exception as exc:
+            print(
+                f"ERROR reading {mode_key}: {type(exc).__name__}: {exc}. "
+                "No override was written."
+            )
+            index += 1
+            continue
+
+        nhar, nr = mode.shape
+        r = np.linspace(0.0, 1.0, nr)
+        r_star, r_star_max = get_continuum_markers_for_mode(path, mode, omega)
+        plot_all_harmonics_1d(
+            ax1,
+            mode,
+            r,
+            use_abs=False,
+            max_lines=args.max_harmonics,
+            r_star=r_star,
+            r_star_max=r_star_max,
+        )
+        ax1.set_title(
+            f"{mode_key}  n={ntor}  omega={omega:.4g}  gamma_d={gamma_d:.3g}\n"
+            f"preliminary={row['rule_decision']}  [g/b/r, u=undo, q=quit]"
+        )
+        try:
+            low2, high2, *_ = load_datcon_for_mode(path, n_r=nr)
+            plot_continuum_panel(
+                ax_continuum,
+                r,
+                omega,
+                low2,
+                high2,
+                title="Alfvén continuum",
+                r_star=r_star,
+                r_star_max=r_star_max,
+            )
+        except Exception as exc:
+            ax_continuum.clear()
+            ax_continuum.text(
+                0.5,
+                0.5,
+                f"continuum unavailable: {type(exc).__name__}: {exc}",
+                ha="center",
+                va="center",
+                transform=ax_continuum.transAxes,
+            )
+            ax_continuum.set_axis_off()
+        plot_m_spectrum(ax_spectrum, mode)
+        plt.show(block=False)
+        fig.canvas.draw()
+        plt.pause(0.01)
+
+        key = input(
+            "\nDecision (g=GOOD, b=BAD, r=REVIEW, u=undo, q=quit): "
+        ).strip().lower()[:1]
+        if key == "q":
+            print("Quitting. Manual overrides are saved.")
+            break
+        if key == "u":
+            if not history:
+                print("Nothing to undo.")
+                continue
+            previous_index, previous_key, previous_record = history.pop()
+            if previous_record is None:
+                overrides.pop(previous_key, None)
+            else:
+                overrides[previous_key] = previous_record
+            _write_override_map(output, overrides)
+            index = previous_index
+            print(f"Undid manual decision for {previous_key}")
+            continue
+        if key not in {"g", "b", "r"}:
+            print("Unrecognized key. Use g/b/r/u/q.")
+            continue
+
+        manual_reason = input("Manual reason (required): ").strip()
+        if not manual_reason:
+            print("manual_reason must be nonempty; decision was not saved.")
+            continue
+        decision = {"g": "GOOD", "b": "BAD", "r": "REVIEW"}[key]
+        previous = dict(overrides[mode_key]) if mode_key in overrides else None
+        timestamp = (
+            previous.get("adjudication_timestamp", "")
+            if previous
+            and previous.get("input_fingerprint") == current_fingerprint
+            and previous.get("adjudication_timestamp", "")
+            else _utc_timestamp()
+        )
+        overrides[mode_key] = {
+            "mode_key": mode_key,
+            "path": path,
+            "input_fingerprint": current_fingerprint,
+            "ntor": str(ntor),
+            "frequency": f"{float(omega):.17g}",
+            "original_rule_decision": row["rule_decision"],
+            "manual_decision": decision,
+            "manual_reason": manual_reason,
+            "reviewer": reviewer,
+            "adjudication_timestamp": timestamp,
+        }
+        history.append((index, mode_key, previous))
+        _write_override_map(output, overrides)
+        print(f"Adjudicated: {mode_key} -> {decision}")
+        index += 1
+
+    plt.close(fig)
+    plt.ioff()
+    print(f"Wrote structured manual overrides: {output}")
+    print(
+        "Rerun scripts/sort_shot_rules.py with --manual_overrides to rebuild "
+        "final lists, duplicate outputs, and summaries."
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Fast interactive labeling of NOVA modes"
@@ -367,6 +694,22 @@ def main():
             "Only files in mode_dir whose resolved path or shot/N/file suffix "
             "appears in this list are shown."
         )
+    )
+    parser.add_argument(
+        "--adjudication",
+        nargs="?",
+        const="review",
+        choices=("review", "all"),
+        help=(
+            "Write structured manual overrides from sort_shot_rules.py output. "
+            "Without a value, inspect preliminary REVIEW rows; use 'all' to "
+            "permit GOOD, BAD, and REVIEW overrides. Requires --mode-list, "
+            "--reviewer, and --no-rf."
+        ),
+    )
+    parser.add_argument(
+        "--reviewer",
+        help="Reviewer identifier required by --adjudication",
     )
     parser.add_argument(
         "--allow-n-file-match",
@@ -417,6 +760,9 @@ def main():
     args = parser.parse_args()
     if args.max_harmonics is not None and args.max_harmonics <= 0:
         parser.error("--max-harmonics must be a positive integer")
+    if args.adjudication:
+        run_adjudication(args, parser)
+        return
 
     cfg = Config(
         data_dir=args.data_dir,

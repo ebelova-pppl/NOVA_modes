@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-09)
+### Project state (current snapshot, updated 2026-08-15)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -2986,3 +2986,59 @@ Active model SHA-256 checksums:
 0cacd4f1b31347050c1192c109058c3a89c84e3f186ea0899e2a89f95a068629  models/nova_mode_classifier_bundle.joblib
 29643ff060aa77e4d7624063803f199918c5a81a2a7e997f732b2481a6c0af49  models/nova_cnn_raw.pt
 ```
+
+### 2026-08-15: deterministic TAE rule-sorting scaffold and skill split
+
+Renamed the active repository skill from
+`.agents/skills/label-tae-like-modes/` to
+`.agents/skills/visual-tae-rule-development/`. Historical entries above keep
+the old name because it was correct when those reviews were performed. The
+renamed skill preserves the blind manifest, rendering, sealing, comparison,
+and qualitative labeling policy while describing its current role in visual
+rule development and explicitly marked post-seal adjudication.
+
+Created `.agents/skills/sort-tae-like-modes/` for the separate deterministic
+production-style workflow. The implementation adds:
+
+- `scripts/make_tae_like_list.py`: shot-level preflight and reusable
+  `preprocess_shot()`, preserving the canonical TAE/EAE/mixed split and
+  compatible `tae_like_all.csv`, `eae_like.csv`, and `rejected_modes.csv`
+  outputs;
+- `scripts/tae_rule_engine.py`: a pure, versioned per-mode result interface;
+- `scripts/sort_shot_rules.py`: noninteractive orchestration, reusable manual
+  overrides, final-GOOD-only duplicate processing, and deterministic outputs;
+- `scripts/tae_rule_io.py`: shared schemas, stable JSON/CSV writing, portable
+  keys, and SHA-256 fingerprints over each mode plus its `datcon#` contents;
+- backward-compatible `scripts/label_modes_fast.py --adjudication` support for
+  structured GOOD/BAD/REVIEW overrides with mandatory `--no-rf`, reviewer,
+  and nonempty manual reason.
+
+The new preprocessor matches `sort_shot_mixed.py` behavior by aborting the
+entire shot before mode processing when any populated requested `N#` lacks its
+required `datcon#`. Other unusable inputs become per-mode `INVALID` rows. Valid
+mixed modes remain on the TAE side, and valid EAE-like modes are routed without
+a fabricated rule decision.
+
+The current rule set is deliberately `tae-rules-placeholder-v1`: every valid
+TAE-side mode is `REVIEW` with primary reason `RULESET_NOT_IMPLEMENTED`.
+Quantitative BAD rules and positive GOOD templates remain future work. The
+workflow does not use RF or CNN for classification. An optional RF checkpoint
+is consulted only after final decisions to rank representatives within
+final-GOOD close-frequency clusters. Missing/unloadable RF retains every
+affected member with `SKIPPED_NO_RF_CHECKPOINT`; any per-cluster scoring failure
+retains that whole cluster with `SKIPPED_RF_SCORING_FAILED`. CNN is never loaded
+or run.
+
+Manual overrides apply only when their stored input fingerprint matches the
+current mode and continuum files. Stale, ambiguous, ineligible, and unmatched
+overrides are not silently applied. The final summary records the SHA-256 of
+the exact override file. Output rows and JSON use stable ordering, summary
+reason counts use one primary reason per mode, and deterministic regeneration
+does not add timestamps.
+
+Synthetic validation in `tests/test_rule_sorting.py` covers missing-datcon
+preflight, malformed modes, split parity, fingerprint changes, placeholder
+REVIEW behavior, manual precedence and validation, stale/ambiguous overrides,
+RF ranking and retain-all fallbacks, output headers/counts, JSON nulls, skill
+structure/validation, and byte-identical reruns. No real-shot smoke test was
+run because no target shot path was supplied for this task.

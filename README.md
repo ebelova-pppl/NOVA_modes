@@ -25,6 +25,9 @@ Shared scripts / features:
 - `src/mode_transform.py`
 - `src/nova_mode_loader.py`
 - `scripts/cnn_infer_common.py`
+- `scripts/make_tae_like_list.py`
+- `scripts/tae_rule_engine.py`
+- `scripts/sort_shot_rules.py`
 
 Plotting:
 - `viz/view_modes_csv.py`
@@ -213,6 +216,46 @@ Most useful outputs:
 If the goal is only to classify new shots, do not run `rf_train_classify.py`,
 `cnn_raw.py`, `cnn_straightened.py`, or `cnn_hybrid.py`. Those scripts are for
 developing or retraining models, not for routine sorting.
+
+## Deterministic TAE rule-sorting scaffold
+
+For auditable rule development without RF/CNN classification, process one shot
+with:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rule_sort_output
+```
+
+This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
+routing conventions. The initial rule set is intentionally a placeholder:
+valid TAE-side modes are `REVIEW`, not `GOOD`, with primary reason
+`RULESET_NOT_IMPLEMENTED`. Invalid inputs remain `INVALID`, and valid EAE-like
+modes are routed without a fabricated rule decision.
+
+Optional manual adjudication writes fingerprinted overrides separately:
+
+```bash
+python scripts/label_modes_fast.py /path/to/shot \
+  --mode-list /path/to/rule_sort_output/final_classifications.csv \
+  --csv_out /path/to/manual_overrides.csv \
+  --adjudication review \
+  --reviewer REVIEWER_ID \
+  --no-rf
+
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rule_sort_output \
+  --manual_overrides /path/to/manual_overrides.csv
+```
+
+An override is applied only while its SHA-256 input fingerprint matches the
+current mode and corresponding `datcon#` contents. An optional `--rf_model`
+is used only to rank representatives inside final-GOOD close-frequency
+clusters. If it is absent, unloadable, or fails on one cluster member, every
+affected cluster member is retained and the fallback is reported. This path
+never loads or runs a CNN model.
 
 ## Typical workflow (hand labeling, (re-)training, checks etc)
 
