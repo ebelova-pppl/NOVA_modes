@@ -1,5 +1,0 @@
-Close-frequency cluster report for final-GOOD NOVA modes
-Parameters: rel_freq_tol=0.02 sim_tol=0.9 r_tol=0.1 width_tol=0.05
-Overall status: SKIPPED_NO_GOOD_MODES
-==============================================================================
-No multi-mode close-frequency clusters were present.
