@@ -3070,3 +3070,73 @@ Focused tests verify the exact 31 names, numeric parity with the shared RF31
 vector, exclusion of routing scalars, top-level radial-feature consistency,
 explicit no-extremum output, null failure output, and deterministic workflow
 regeneration. The full suite passes 52 tests.
+
+### 2026-08-15: group rule features and add crossing-record audit detail
+
+Replaced the flat rule-feature payload with
+`tae-rule-features-grouped-v2`. The grouped object preserves the exact source
+schema `rf_all_crossings_extremum_energy_31_v2` while separating:
+
+- the production 22 in `rf_standard_features`;
+- the six derived crossing summaries in `crossing_features`;
+- every underlying lower/upper crossing in `crossing_records`;
+- match status and the three type-3-relevant measurements in
+  `extremum_features`;
+- empty `resolution_features`, `numerical_structure_features`, and
+  `boundary_features` objects reserved for future parameters.
+
+Crossing records contain `boundary`, `r_cross`, `W_peak`, and
+`shear_weighted`, with deterministic low/high boundary and radial ordering.
+The tests check that record counts and sums agree with the six crossing
+summaries and that flattening the three populated feature groups reproduces
+the shared RF31 vector when all values are defined. With no crossing, the raw
+list is empty and undefined representative radii are null. No-extremum and
+feature-extraction failure semantics remain explicit. Manual input
+fingerprints are unaffected because they depend only on the mode and
+`datcon#` contents.
+
+### 2026-08-15: add the first ordered BAD gate for narrow axis spikes
+
+Implemented the first deterministic rejection gate in
+`scripts/tae_rule_engine.py` and versioned the partial ruleset as
+`tae-rules-axis-artifact-v1`. Every valid TAE-like or mixed mode now records an
+`axis_artifact` object under `boundary_features`. The rule-facing feature schema
+is `tae-rule-features-grouped-v3`; the shared RF31 source schema remains
+`rf_all_crossings_extremum_energy_31_v2`.
+
+The extractor searches all stored harmonics in normalized `r < 0.03` and
+records the largest absolute normalized amplitude, its zero-based stored
+harmonic index and radius, whether it is a genuine local maximum, its connected
+half-maximum width in normalized radius and radial-grid intervals, the outer
+edge of that component, and whether it includes `r=0`. Physical poloidal `m` is
+not inferred from the array index because the run-dependent starting offset is
+not yet established. Local-maximum detection and half-maximum edges use the
+selected harmonic's entire radial profile, preventing broad components or
+rising flanks outside the axis window from being misreported as narrow.
+
+The configurable values are `r_ax`, `axis_amplitude_min`, and
+`axis_width_max_grid`, exposed by `sort_shot_rules.py` as `--axis_r_ax`,
+`--axis_amplitude_min`, and `--axis_width_max_grid`. Both thresholds default to
+null, so features are calculated but the gate remains disabled until labeled
+modes are used for calibration. Once both are set, a true local maximum meeting
+the amplitude and maximum-width criteria returns `BAD` with primary reason
+`BAD_AXIS_SPIKE` and stops later decision gates. All sufficiently narrow local
+maxima centered inside `r < 0.03` are treated as boundary artifacts without a
+continuum-extremum/type-3 exception. Modes not rejected by this partial ruleset
+remain `REVIEW` with `NO_GOOD_TEMPLATE`, not `GOOD`.
+
+Shot and per-`n` summaries record the gate enable flag and exact values. Focused
+tests cover enabled and disabled behavior, full-grid width measurement,
+boundary-touching components, rising flanks, stable structured output, and the
+configured end-to-end shot path. The sorter skill, visual-rule skill, labeling
+policy, root README, script inventory, diagnostic axis label, and loader
+docstring now document the normalized-coordinate and stored-harmonic-index
+conventions.
+
+Current blocker/next step: `axis_amplitude_min` and `axis_width_max_grid` still
+need calibration from labeled modes, so production runs remain feature-only for
+this gate by default. After calibration, add those values explicitly at run
+time, validate the resulting BAD set visually, and then implement the next
+ordered rejection gate and eventual positive GOOD templates. The complete
+repository test suite passes 57 tests, and both repository skills pass their
+structural validation.

@@ -50,9 +50,12 @@ between connected lobes is part of the mode body for this purpose.
 
 Near-axis artifacts include both isolated one/few-grid-point spikes and
 short grid-scale oscillatory packets in the signed harmonics near `r=0`.
-If such a packet is visually separated from the smooth envelope, or has
-pointwise `W / max(W)` near `0.08-0.1` or larger, label BAD unless the mode
-is genuinely smooth and core-localized all the way to the axis.
+Any narrow local maximum centered inside `r < 0.03` is a boundary artifact and
+is BAD; an otherwise plausible continuum-extremum or core-localized family does
+not rescue it. A broad smooth component that extends beyond this window, or a
+rising flank whose center lies outside it, is not a narrow axis maximum. If a
+short oscillatory packet is visually separated from the smooth envelope, or
+has pointwise `W / max(W)` near `0.08-0.1` or larger, also label it BAD.
 
 Outer-boundary artifacts near `r=1` are also disqualifying. Inspect both the
 summed envelope `W(r)` and the individual signed harmonics. A large endpoint
@@ -198,35 +201,46 @@ between numerical grid points.
 
 ## Axis artifacts
 
-For near-axis artifacts, inspect the maximum pointwise normalized energy
-`W(r) / max(W)` in the first few radial grid points, for example
-`r <= 0.03`, as well as the signed harmonics there. Also inspect the next
-few grid points beyond that window when the plot shows a short oscillatory
-packet at low radius. Integrated energy in this region is only supporting
-evidence, because a one- or few-grid-point spike or short grid-scale packet
-can have small integrated energy while still being a clear boundary problem.
+The NOVA files use normalized radius and normalized mode amplitude. For the
+first deterministic boundary gate, set `r_ax=0.03` and calculate, for each
+stored harmonic index `h`,
 
-Treat a detached near-axis spike as BAD when its pointwise normalized
-amplitude is appreciable, for example `max(W / max(W)) >= 0.1` near `r=0`,
-especially when it is one or a few grid points wide and separated from the
-main mode envelope. A single one/few-grid-point peak at the axis is also BAD
-when it appears in any appreciable individual harmonic, even if the summed
-`W(r)` or integrated near-axis energy is modest. A very large detached axis
-spike, for example `max(W / max(W)) >= 0.3`, is strong BAD evidence even if
-its integrated energy fraction is small.
+```text
+A(h) = max_{r < r_ax} |mode(h, r)|
+axis_peak = max_h A(h)
+```
 
-Treat a near-axis grid-scale oscillatory packet as BAD when it is visually
-separated from the smooth envelope or accompanied by a narrow energy bump
-with pointwise `W / max(W)` near `0.08-0.1` or larger. Do not rescue this
-pattern because the integrated near-axis energy is small. The relevant
-distinction is smooth continuation of a core-localized mode versus a
-boundary-like packet or spike.
+Record `axis_peak_harmonic_index` as the zero-based stored array index, not an
+inferred physical poloidal `m`. Also record `axis_peak_r`, whether the candidate
+is a local maximum on that harmonic's complete radial profile, the connected
+half-maximum width in normalized radius and radial-grid intervals, its outer
+edge, and whether that component includes `r=0`.
 
-Use integrated near-axis energy as a secondary check. Large integrated
-near-axis energy strengthens the BAD decision, but small integrated energy
-does not rescue a visually detached axis spike. Do not reject a genuinely
-smooth core-localized mode merely for having amplitude near the axis; the
-disqualifying pattern is a narrow, separated, boundary-like feature.
+Search for both half-maximum edges over the entire radial grid. Never stop at
+`r_ax`: doing so would make a broad physical structure extending past the
+search window look artificially narrow. Likewise, compare samples beyond the
+window when deciding whether the candidate is a true peak or only the rising
+flank of a mode centered farther out.
+
+The ordered gate is:
+
+```text
+IF axis_peak_is_local_max
+AND axis_peak >= axis_amplitude_min
+AND axis_halfmax_width_grid <= axis_width_max_grid
+THEN BAD_AXIS_SPIKE
+AND stop evaluating later decision gates
+```
+
+Keep `axis_amplitude_min` and `axis_width_max_grid` configurable and disabled
+as JSON/YAML null until calibrated from labeled modes. Features are still
+calculated while the gate is disabled. Once configured, every sufficiently
+narrow local maximum centered inside `r < 0.03` is a boundary artifact; do not
+make a family-specific exception for continuum-extremum-localized modes.
+
+Continue to inspect summed `W(r)` and signed-harmonic packets as supporting
+evidence. Integrated near-axis energy can strengthen a BAD decision, but small
+integrated energy does not rescue a narrow individual-harmonic spike.
 
 ## Outer-boundary artifacts
 

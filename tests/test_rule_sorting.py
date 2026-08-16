@@ -22,7 +22,12 @@ from make_tae_like_list import (  # noqa: E402
     classify_gap_region,
     preprocess_shot,
 )
-from mode_features import compute_features_for_mode  # noqa: E402
+from mode_features import (  # noqa: E402
+    EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES,
+    EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES,
+    RF_FEATURE_NAMES,
+    compute_features_for_mode,
+)
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
 from sort_shot_mixed import classify_gap_region as mixed_classify_gap_region  # noqa: E402
 from sort_shot_rules import (  # noqa: E402
@@ -34,13 +39,17 @@ from sort_shot_rules import (  # noqa: E402
     run_shot,
 )
 from tae_rule_engine import (  # noqa: E402
-    RULESET_NOT_IMPLEMENTED,
+    BAD_AXIS_SPIKE,
+    NO_GOOD_TEMPLATE,
     RULE_FEATURE_EXTRACTION_FAILED,
+    RULE_FEATURE_GROUP_NAMES,
     RULE_FEATURE_METADATA_NAMES,
     RULE_FEATURE_NAMES,
     RULE_FEATURE_SCHEMA_VERSION,
     RULE_FEATURE_SOURCE_SCHEMA_VERSION,
+    AxisArtifactConfig,
     evaluate_mode,
+    extract_axis_artifact_features,
 )
 from tae_rule_io import (  # noqa: E402
     MANUAL_OVERRIDE_FIELDS,
@@ -74,6 +83,19 @@ REQUIRED_OUTPUTS = {
 }
 
 
+def flatten_grouped_rule_features(features: dict) -> dict:
+    """Return only the 31 shared measurements from the grouped audit object."""
+    flattened = dict(features["rf_standard_features"])
+    flattened.update(features["crossing_features"])
+    flattened.update(
+        {
+            name: features["extremum_features"][name]
+            for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES
+        }
+    )
+    return flattened
+
+
 def write_mode(
     path: Path,
     *,
@@ -87,6 +109,7 @@ def write_mode(
         r = np.linspace(0.0, 1.0, nr)
         envelope = np.exp(-((r - 0.4) / 0.18) ** 2)
         mode = np.stack([(index + 1) * envelope for index in range(nhar)])
+        mode /= np.max(np.abs(mode))
     payload = np.zeros((3, nhar, nr), dtype=float)
     payload[0] = mode
     values = np.concatenate(
@@ -199,6 +222,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.mode = np.stack(
             [(index + 1) * envelope for index in range(4)]
         )
+        self.mode /= np.max(np.abs(self.mode))
         lower = np.full_like(radial_grid, 0.5)
         upper = 0.9 + 4.0 * (radial_grid - 0.2) ** 2
         self.low2 = lower**2
@@ -215,36 +239,55 @@ class RuleAndOverrideTests(unittest.TestCase):
             "processing_status": "READY_FOR_RULES",
         }
 
-    def evaluate(self, row=None):
+    def evaluate(self, row=None, axis_config=None):
         return evaluate_mode(
             self.base if row is None else row,
             mode=self.mode,
             low2=self.low2,
             high2=self.high2,
+            axis_artifact_config=axis_config,
         )
 
-    def test_placeholder_returns_review_with_valid_json(self):
+    def test_unmatched_partial_ruleset_returns_review_with_valid_json(self):
         result = self.evaluate()
         row = result.as_output_row(self.base)
         self.assertEqual(row["rule_decision"], "REVIEW")
-        self.assertEqual(row["rule_primary_reason"], RULESET_NOT_IMPLEMENTED)
-        self.assertEqual(json.loads(row["rule_triggered_rules"]), [RULESET_NOT_IMPLEMENTED])
+        self.assertEqual(row["rule_primary_reason"], NO_GOOD_TEMPLATE)
+        self.assertEqual(json.loads(row["rule_triggered_rules"]), [NO_GOOD_TEMPLATE])
         features = json.loads(row["rule_features"])
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
-            set(RULE_FEATURE_NAMES),
+            set(RULE_FEATURE_GROUP_NAMES),
         )
         self.assertEqual(len(RULE_FEATURE_NAMES), 31)
         self.assertEqual(
             features["source_feature_schema_version"],
             RULE_FEATURE_SOURCE_SCHEMA_VERSION,
         )
-        self.assertTrue(features["extremum_match_found"])
-        self.assertNotIn("signed_delta", features)
-        self.assertNotIn("fraction_below_upper2", features)
+        self.assertEqual(
+            set(features["rf_standard_features"]), set(RF_FEATURE_NAMES)
+        )
+        self.assertEqual(
+            set(features["crossing_features"]),
+            set(EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES),
+        )
+        self.assertEqual(
+            set(features["extremum_features"]),
+            {"match_found", *EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES},
+        )
+        self.assertTrue(features["extremum_features"]["match_found"])
+        self.assertEqual(features["resolution_features"], {})
+        self.assertEqual(features["numerical_structure_features"], {})
+        axis_features = features["boundary_features"]["axis_artifact"]
+        self.assertEqual(axis_features["r_ax"], 0.03)
+        self.assertEqual(axis_features["axis_peak_harmonic_index"], 3)
+        self.assertFalse(axis_features["axis_peak_is_local_max"])
+        self.assertGreater(axis_features["axis_halfmax_outer_edge_r"], 0.03)
+        self.assertNotIn("signed_delta", row["rule_features"])
+        self.assertNotIn("fraction_below_upper2", row["rule_features"])
         self.assertEqual(stable_json({"missing": float("nan")}), '{"missing":null}')
 
     def test_named_rule_features_match_the_shared_rf31_vector(self):
@@ -263,11 +306,45 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_arrays=(self.low2, self.high2),
             strict_continuum=True,
         )
+        flattened = flatten_grouped_rule_features(features)
         np.testing.assert_allclose(
-            [features[name] for name in RULE_FEATURE_NAMES], vector
+            [flattened[name] for name in RULE_FEATURE_NAMES], vector
         )
-        self.assertGreater(features["n_cross"], 0)
-        self.assertLess(features["ext_dr"], 0.01)
+        crossing_features = features["crossing_features"]
+        crossing_records = features["crossing_records"]
+        self.assertGreater(crossing_features["n_cross"], 0)
+        self.assertEqual(len(crossing_records), int(crossing_features["n_cross"]))
+        self.assertLess(features["extremum_features"]["ext_dr"], 0.01)
+        self.assertTrue(
+            all(
+                set(record)
+                == {"boundary", "r_cross", "W_peak", "shear_weighted"}
+                for record in crossing_records
+            )
+        )
+        order = [
+            (
+                0 if record["boundary"] == "low" else 1,
+                record["r_cross"],
+            )
+            for record in crossing_records
+        ]
+        self.assertEqual(order, sorted(order))
+        self.assertAlmostEqual(
+            crossing_features["W_star_sum"],
+            sum(record["W_peak"] for record in crossing_records),
+        )
+        self.assertAlmostEqual(
+            crossing_features["W_star_high_shear_sum"],
+            sum(record["shear_weighted"] for record in crossing_records),
+        )
+        strongest = max(
+            crossing_records,
+            key=lambda record: (record["W_peak"], record["r_cross"]),
+        )
+        self.assertAlmostEqual(
+            crossing_features["r_star_max"], strongest["r_cross"]
+        )
 
     def test_no_extremum_uses_explicit_status_and_null_measurements(self):
         flat_low2 = np.full(self.mode.shape[1], 0.5**2)
@@ -281,9 +358,13 @@ class RuleAndOverrideTests(unittest.TestCase):
         row = result.as_output_row(self.base)
         features = json.loads(row["rule_features"])
         self.assertEqual(row["rule_decision"], "REVIEW")
-        self.assertFalse(features["extremum_match_found"])
+        self.assertFalse(features["extremum_features"]["match_found"])
         for name in ("ext_dr", "ext_df_gap", "ext_energy_frac"):
-            self.assertIsNone(features[name])
+            self.assertIsNone(features["extremum_features"][name])
+        self.assertEqual(features["crossing_records"], [])
+        self.assertEqual(features["crossing_features"]["n_cross"], 0.0)
+        self.assertIsNone(features["crossing_features"]["r_star_max"])
+        self.assertIsNone(features["crossing_features"]["r_star_high_shear"])
 
     def test_missing_feature_arrays_return_invalid_with_null_features(self):
         result = evaluate_mode(self.base)
@@ -291,7 +372,98 @@ class RuleAndOverrideTests(unittest.TestCase):
         features = json.loads(row["rule_features"])
         self.assertEqual(row["rule_decision"], "INVALID")
         self.assertEqual(row["rule_primary_reason"], RULE_FEATURE_EXTRACTION_FAILED)
-        self.assertTrue(all(features[name] is None for name in RULE_FEATURE_NAMES))
+        flattened = flatten_grouped_rule_features(features)
+        self.assertTrue(all(flattened[name] is None for name in RULE_FEATURE_NAMES))
+        self.assertIsNone(features["extremum_features"]["match_found"])
+        self.assertEqual(features["crossing_records"], [])
+        self.assertIsNone(
+            features["boundary_features"]["axis_artifact"]["axis_peak"]
+        )
+
+    def test_narrow_axis_spike_fires_first_bad_gate(self):
+        mode = np.zeros_like(self.mode)
+        mode[2, 2] = 1.0
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            axis_artifact_config=AxisArtifactConfig(
+                axis_amplitude_min=0.8,
+                axis_width_max_grid=2.0,
+            ),
+        )
+        row = result.as_output_row(self.base)
+        axis_features = json.loads(row["rule_features"])["boundary_features"][
+            "axis_artifact"
+        ]
+        self.assertEqual(row["rule_decision"], "BAD")
+        self.assertEqual(row["rule_primary_reason"], BAD_AXIS_SPIKE)
+        self.assertEqual(json.loads(row["rule_triggered_rules"]), [BAD_AXIS_SPIKE])
+        self.assertEqual(axis_features["axis_peak_harmonic_index"], 2)
+        self.assertAlmostEqual(axis_features["axis_peak_r"], 0.01)
+        self.assertTrue(axis_features["axis_peak_is_local_max"])
+        self.assertAlmostEqual(axis_features["axis_halfmax_width_grid"], 1.0)
+        self.assertFalse(axis_features["axis_component_touches_boundary"])
+
+    def test_null_thresholds_disable_axis_gate_but_keep_measurements(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 0] = 1.0
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        row = result.as_output_row(self.base)
+        axis_features = json.loads(row["rule_features"])["boundary_features"][
+            "axis_artifact"
+        ]
+        self.assertEqual(row["rule_decision"], "REVIEW")
+        self.assertEqual(row["rule_primary_reason"], NO_GOOD_TEMPLATE)
+        self.assertTrue(axis_features["axis_peak_is_local_max"])
+        self.assertTrue(axis_features["axis_component_touches_boundary"])
+
+    def test_rising_axis_flank_is_not_a_local_max(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, :17] = np.linspace(0.1, 0.9, 17)
+        features = extract_axis_artifact_features(mode)
+        self.assertAlmostEqual(features["axis_peak_r"], 0.025)
+        self.assertFalse(features["axis_peak_is_local_max"])
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            axis_artifact_config=AxisArtifactConfig(
+                axis_amplitude_min=0.1,
+                axis_width_max_grid=100.0,
+            ),
+        )
+        self.assertEqual(result.decision, "REVIEW")
+
+    def test_halfmax_component_uses_full_radial_grid(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, :9] = [0.8, 0.9, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4]
+        features = extract_axis_artifact_features(mode)
+        self.assertTrue(features["axis_peak_is_local_max"])
+        self.assertTrue(features["axis_component_touches_boundary"])
+        self.assertAlmostEqual(features["axis_halfmax_outer_edge_r"], 0.035)
+        self.assertAlmostEqual(features["axis_halfmax_width_grid"], 7.0)
+        self.assertGreater(features["axis_halfmax_outer_edge_r"], features["r_ax"])
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            axis_artifact_config=AxisArtifactConfig(
+                axis_amplitude_min=0.8,
+                axis_width_max_grid=3.0,
+            ),
+        )
+        self.assertEqual(result.decision, "REVIEW")
 
     def test_override_changes_final_but_preserves_rule_decision(self):
         row = self.evaluate().as_output_row(self.base)
@@ -345,7 +517,7 @@ class RuleAndOverrideTests(unittest.TestCase):
     def test_summary_counts_only_primary_reason(self):
         row = self.evaluate().as_output_row(self.base)
         row["rule_triggered_rules"] = stable_json(
-            [RULESET_NOT_IMPLEMENTED, "SECONDARY_AUDIT_CODE"]
+            [NO_GOOD_TEMPLATE, "SECONDARY_AUDIT_CODE"]
         )
         summary = build_summary(
             [row],
@@ -361,7 +533,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         )
         self.assertEqual(
             json.loads(summary["primary_reason_counts_json"]),
-            {RULESET_NOT_IMPLEMENTED: 1},
+            {NO_GOOD_TEMPLATE: 1},
         )
 
     def test_empty_manual_reason_is_rejected(self):
@@ -498,14 +670,18 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertEqual(first.summary["n_preliminary_review"], 1)
             self.assertEqual(first.summary["n_final_review"], 1)
             self.assertEqual(first.summary["n_final_good"], 0)
+            self.assertFalse(first.summary["axis_artifact_gate_enabled"])
+            self.assertEqual(first.summary["axis_artifact_r_ax"], 0.03)
+            self.assertIsNone(first.summary["axis_artifact_amplitude_min"])
+            self.assertIsNone(first.summary["axis_artifact_width_max_grid"])
             self.assertEqual(
                 json.loads(first.summary["primary_reason_counts_json"]),
-                {RULESET_NOT_IMPLEMENTED: 1},
+                {NO_GOOD_TEMPLATE: 1},
             )
             _fields, result_rows = read_dict_csv(out_dir / "rule_results.csv")
             self.assertEqual(
                 json.loads(result_rows[0]["rule_triggered_rules"]),
-                [RULESET_NOT_IMPLEMENTED],
+                [NO_GOOD_TEMPLATE],
             )
             rule_features = json.loads(result_rows[0]["rule_features"])
             self.assertEqual(
@@ -514,19 +690,50 @@ class WorkflowOutputTests(unittest.TestCase):
             )
             self.assertEqual(
                 set(rule_features) - set(RULE_FEATURE_METADATA_NAMES),
-                set(RULE_FEATURE_NAMES),
+                set(RULE_FEATURE_GROUP_NAMES),
             )
             self.assertAlmostEqual(
-                rule_features["rad_loc"], float(result_rows[0]["rad_loc"])
+                rule_features["rf_standard_features"]["rad_loc"],
+                float(result_rows[0]["rad_loc"]),
             )
             self.assertAlmostEqual(
-                rule_features["rad_width"], float(result_rows[0]["rad_width"])
+                rule_features["rf_standard_features"]["rad_width"],
+                float(result_rows[0]["rad_width"]),
             )
 
             before = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
             run_shot(shot, out_dir)
             after = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
             self.assertEqual(before, after)
+
+    def test_run_shot_applies_configured_axis_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = np.zeros((4, 101), dtype=float)
+            mode[2, 1] = 1.0
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=101,
+                mode=mode,
+            )
+            write_datcon(shot / "N1" / "datcon1", nr=101)
+            result = run_shot(
+                shot,
+                root / "out",
+                axis_r_ax=0.03,
+                axis_amplitude_min=0.8,
+                axis_width_max_grid=2.0,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertEqual(result.summary["n_final_bad"], 1)
+        self.assertTrue(result.summary["axis_artifact_gate_enabled"])
+        self.assertEqual(result.summary["axis_artifact_amplitude_min"], 0.8)
+        self.assertEqual(result.summary["axis_artifact_width_max_grid"], 2.0)
+        self.assertEqual(result.final_rows[0]["rule_primary_reason"], BAD_AXIS_SPIKE)
 
     def test_valid_override_hash_and_stale_recheck(self):
         with tempfile.TemporaryDirectory() as temporary:

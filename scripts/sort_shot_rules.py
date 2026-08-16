@@ -35,7 +35,11 @@ from make_tae_like_list import (  # noqa: E402
     PreprocessResult,
     preprocess_shot,
 )
-from tae_rule_engine import RULESET_VERSION, evaluate_mode  # noqa: E402
+from tae_rule_engine import (  # noqa: E402
+    RULESET_VERSION,
+    AxisArtifactConfig,
+    evaluate_mode,
+)
 from tae_rule_io import (  # noqa: E402
     ALLOWED_FINAL_DECISIONS,
     MANUAL_OVERRIDE_FIELDS,
@@ -109,6 +113,10 @@ SHOT_SUMMARY_FIELDS = [
     "similarity_threshold",
     "radial_location_tolerance",
     "radial_width_tolerance",
+    "axis_artifact_gate_enabled",
+    "axis_artifact_r_ax",
+    "axis_artifact_amplitude_min",
+    "axis_artifact_width_max_grid",
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[field for field in SHOT_SUMMARY_FIELDS if field != "shot"]]
@@ -676,7 +684,9 @@ def build_summary(
     fraction_eae_threshold: float,
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
+    axis_artifact_config: AxisArtifactConfig | None = None,
 ) -> dict[str, Any]:
+    axis_config = axis_artifact_config or AxisArtifactConfig()
     rule_rows = [row for row in rows if row.get("rule_version") == RULESET_VERSION]
     transitions = Counter(
         f"{row['rule_decision']}->{row['final_decision']}"
@@ -728,6 +738,10 @@ def build_summary(
         "similarity_threshold": SIMILARITY_THRESHOLD,
         "radial_location_tolerance": RADIAL_LOCATION_TOLERANCE,
         "radial_width_tolerance": RADIAL_WIDTH_TOLERANCE,
+        "axis_artifact_gate_enabled": axis_config.enabled,
+        "axis_artifact_r_ax": axis_config.r_ax,
+        "axis_artifact_amplitude_min": axis_config.axis_amplitude_min,
+        "axis_artifact_width_max_grid": axis_config.axis_width_max_grid,
     }
     return summary
 
@@ -743,6 +757,7 @@ def _summary_by_n(
     fraction_eae_threshold: float,
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
+    axis_artifact_config: AxisArtifactConfig | None = None,
 ) -> list[dict[str, Any]]:
     by_n: dict[int, list[Mapping[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -787,6 +802,7 @@ def _summary_by_n(
             fraction_eae_threshold=fraction_eae_threshold,
             signed_delta_eae_threshold=signed_delta_eae_threshold,
             rel_freq_tol=rel_freq_tol,
+            axis_artifact_config=axis_artifact_config,
         )
         summaries.append({"shot": shot, "n": ntor, **summary})
     return summaries
@@ -860,10 +876,18 @@ def run_shot(
     fraction_eae_threshold: float = DEFAULT_FRACTION_EAE_THRESHOLD,
     signed_delta_eae_threshold: float = DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
     rel_freq_tol: float = 0.02,
+    axis_r_ax: float = 0.03,
+    axis_amplitude_min: float | None = None,
+    axis_width_max_grid: float | None = None,
 ) -> ShotRunResult:
     """Run the complete noninteractive deterministic workflow for one shot."""
     if rel_freq_tol <= 0.0 or not math.isfinite(rel_freq_tol):
         raise ValueError("rel_freq_tol must be a finite positive number")
+    axis_config = AxisArtifactConfig(
+        r_ax=axis_r_ax,
+        axis_amplitude_min=axis_amplitude_min,
+        axis_width_max_grid=axis_width_max_grid,
+    )
     output_dir = Path(out_dir).expanduser()
     existing_override_output = output_dir / "manual_overrides.csv"
     if manual_overrides is None and existing_override_output.exists():
@@ -898,6 +922,7 @@ def run_shot(
             mode=None if feature_data is None else feature_data.mode,
             low2=None if feature_data is None else feature_data.low2,
             high2=None if feature_data is None else feature_data.high2,
+            axis_artifact_config=axis_config,
         )
         rule_by_key[key] = result.as_output_row(row)
 
@@ -933,6 +958,7 @@ def run_shot(
         fraction_eae_threshold=fraction_eae_threshold,
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
+        axis_artifact_config=axis_config,
     )
     summary_by_n = _summary_by_n(
         final_rows,
@@ -944,6 +970,7 @@ def run_shot(
         fraction_eae_threshold=fraction_eae_threshold,
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
+        axis_artifact_config=axis_config,
     )
     write_outputs(
         out_dir=output_dir,
@@ -996,6 +1023,31 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
     )
+    parser.add_argument(
+        "--axis_r_ax",
+        type=float,
+        default=0.03,
+        help="Normalized radial window r < r_ax used to find the axis peak",
+    )
+    parser.add_argument(
+        "--axis_amplitude_min",
+        type=float,
+        default=None,
+        help=(
+            "Minimum normalized harmonic amplitude for BAD_AXIS_SPIKE; the gate "
+            "is disabled unless this and --axis_width_max_grid are both set"
+        ),
+    )
+    parser.add_argument(
+        "--axis_width_max_grid",
+        type=float,
+        default=None,
+        help=(
+            "Maximum full-grid half-maximum width in radial intervals for "
+            "BAD_AXIS_SPIKE; the gate is disabled unless this and "
+            "--axis_amplitude_min are both set"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -1013,6 +1065,9 @@ def main() -> None:
         fraction_eae_threshold=args.fraction_eae_threshold,
         signed_delta_eae_threshold=args.signed_delta_eae_threshold,
         rel_freq_tol=args.rel_freq_tol,
+        axis_r_ax=args.axis_r_ax,
+        axis_amplitude_min=args.axis_amplitude_min,
+        axis_width_max_grid=args.axis_width_max_grid,
     )
     summary = result.summary
     print(f"Shot: {summary['shot']}")
@@ -1027,6 +1082,13 @@ def main() -> None:
         f"BAD={summary['n_final_bad']} REVIEW={summary['n_final_review']} "
         f"GOOD before clustering={summary['n_final_good_before_clustering']} "
         f"GOOD final={summary['n_final_good']}"
+    )
+    print(
+        "Axis artifact gate: "
+        f"enabled={summary['axis_artifact_gate_enabled']} "
+        f"r_ax={summary['axis_artifact_r_ax']} "
+        f"amplitude_min={summary['axis_artifact_amplitude_min']} "
+        f"width_max_grid={summary['axis_artifact_width_max_grid']}"
     )
     print(f"Duplicate processing: {summary['duplicate_processing_status']}")
     if args.manual_overrides:

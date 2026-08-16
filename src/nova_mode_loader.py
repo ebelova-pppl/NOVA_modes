@@ -9,7 +9,10 @@ from pathlib import Path
 
 def load_mode_from_nova(path):
     """
-    It returns a 2D numpy array: mode[m_index, r_index]
+    It returns a 2D numpy array: mode[harmonic_index, r_index]. NOVA stores
+    normalized radius and normalized mode amplitude. The physical poloidal-m
+    offset is run-dependent, so this loader does not infer it from the array
+    index.
 
     Here f1 is 1D array of size 3*nr*nhar + 4,
     it contains 3 perturbations: xi_psi, delta_p, xi_surf,
@@ -39,5 +42,4 @@ def load_mode_from_nova(path):
     mode = f11[0, :, :]  # already (nhar, nr)
 
     return mode, omega, gamma_d, ntor
-
 

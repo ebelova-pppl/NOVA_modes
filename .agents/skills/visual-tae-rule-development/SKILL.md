@@ -98,6 +98,11 @@ each radius by the local gap center `c(r)`; for cross-shot comparison, use one
 clearly stated scalar normalization for the whole panel if normalization is
 needed.
 
+The NOVA mode files already use normalized radius and normalized mode
+amplitude. Treat the first loaded array axis as the zero-based stored harmonic
+index. Do not label it as physical poloidal `m` or infer an `m` offset unless
+run metadata establishes that mapping.
+
 ## Record independent decisions
 
 Complete one row per manifest mode using this schema:

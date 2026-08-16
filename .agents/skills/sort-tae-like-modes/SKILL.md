@@ -19,16 +19,52 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. The current placeholder rules return `REVIEW` for valid
-TAE-side modes; never reinterpret this as `GOOD`.
+TAE/EAE/mixed split. The first implemented rejection gate detects narrow
+near-axis spikes. Its amplitude and width thresholds default to null, so the
+gate is disabled until calibrated; modes not rejected by an enabled gate remain
+`REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
-For every valid TAE-side mode, `rule_features` records the shared 31-feature
-schema: the production RF 22, all six boundary-crossing extensions, and all
-three inner-extremum extensions. These are named deterministic measurements;
-no RF checkpoint or prediction is used to produce them. Keep `signed_delta`
-and `fraction_below_upper2` as routing audit columns rather than rule features.
-When no inner extremum is matched, require `extremum_match_found=false` and
-JSON `null` for the three undefined extremum measurements.
+For every valid TAE-side mode, `rule_features` uses the grouped v3 schema. Keep
+the production RF 22 in `rf_standard_features`, the six crossing summaries in
+`crossing_features`, individual lower/upper crossings in `crossing_records`,
+and match status plus the three inner-extremum measurements in
+`extremum_features`. Keep the axis measurements under
+`boundary_features.axis_artifact`; reserve empty objects for
+`resolution_features` and `numerical_structure_features`. These are named
+deterministic measurements; no RF checkpoint or prediction is used to produce
+them. Keep `signed_delta` and `fraction_below_upper2` as routing audit columns
+rather than rule features. When no inner extremum is matched, require
+`match_found=false` and JSON `null` for the three undefined extremum
+measurements.
+
+NOVA mode arrays use normalized radius and normalized mode amplitude. Address
+the first array axis as the zero-based stored harmonic index; do not infer a
+physical poloidal-`m` offset unless run metadata establishes that mapping.
+
+The axis extractor searches `r < r_ax` for the largest absolute amplitude over
+all stored harmonics and records the peak, stored harmonic index, radius,
+local-maximum status, connected half-maximum width in normalized radius and
+grid intervals, outer edge, and whether the component includes `r=0`. Determine
+the local maximum and both half-maximum edges from the selected harmonic's full
+radial profile. Do not truncate the width calculation at `r_ax`.
+
+Enable the gate only after both thresholds have been calibrated:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/SHOT \
+  --out_dir /path/to/sort-output \
+  --axis_amplitude_min AMPLITUDE \
+  --axis_width_max_grid GRID_INTERVALS
+```
+
+The default `--axis_r_ax` is `0.03`. When the axis candidate is a true local
+maximum, its amplitude meets the minimum, and its full-grid half-maximum width
+does not exceed the configured maximum, return `BAD` with primary reason
+`BAD_AXIS_SPIKE` and stop later decision gates. A narrow local maximum centered
+inside `r < 0.03` is a boundary artifact regardless of an otherwise plausible
+morphology family. A broad component extending beyond the window or the rising
+flank of a mode centered outside it must not be made artificially narrow.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or
@@ -88,4 +124,6 @@ Start with:
 
 Treat `rule_triggered_rules` as per-mode audit detail, not as summary-count
 input. Confirm the manual-override SHA-256 in the summary when overrides were
-supplied. Do not add timestamps while regenerating deterministic outputs.
+supplied. The summary also records whether the axis gate was enabled and its
+exact radius, amplitude, and width settings. Do not add timestamps while
+regenerating deterministic outputs.

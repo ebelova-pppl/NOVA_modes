@@ -189,7 +189,7 @@ def render_one(
         np.arange(nhar), strength, marker="o", markersize=2.5, linewidth=0.9
     )
     ax_spectrum.set(
-        xlabel="stored harmonic index (physical m is not stored in egn)",
+        xlabel="stored harmonic index (physical m mapping not assumed)",
         ylabel=r"$\max_r |\xi_m|$",
         title="Stored poloidal-harmonic spectrum",
     )

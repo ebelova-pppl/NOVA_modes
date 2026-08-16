@@ -5,6 +5,7 @@ from cont_features import (
     CROSSING_FEATURE_DEFAULTS,
     EXTREMUM_FEATURE_DEFAULTS,
     continuum_crossing_features,
+    continuum_crossing_records,
     continuum_extremum_features,
     continuum_scalars,
     load_datcon_for_mode,
@@ -328,8 +329,10 @@ def compute_named_features_for_mode(
     r_shear0=0.2,
     continuum_arrays=None,
     strict_continuum=False,
+    null_missing_crossings=False,
     null_missing_extremum=False,
     return_feature_status=False,
+    return_crossing_records=False,
 ):
     """Return the canonical RF calculations keyed by their schema names.
 
@@ -358,6 +361,31 @@ def compute_named_features_for_mode(
         )
     named = {name: float(value) for name, value in zip(names, values)}
     status = {}
+    if null_missing_crossings or return_crossing_records:
+        if continuum_arrays is None or extra_info is None or "omega" not in extra_info:
+            raise ValueError(
+                "continuum arrays and omega are required for crossing records"
+            )
+        low2, high2 = continuum_arrays
+        records = continuum_crossing_records(
+            mode,
+            float(extra_info["omega"]),
+            low2,
+            high2,
+            r_shear0=r_shear0,
+        )
+        records = sorted(
+            records,
+            key=lambda record: (
+                0 if record["boundary"] == "low" else 1,
+                record["r_cross"],
+            ),
+        )
+        if return_crossing_records:
+            status["crossing_records"] = records
+        if null_missing_crossings and not records:
+            named["r_star_max"] = None
+            named["r_star_high_shear"] = None
     if include_extremum_features and (
         null_missing_extremum or return_feature_status
     ):

@@ -229,15 +229,25 @@ python scripts/sort_shot_rules.py \
 ```
 
 This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The initial rule set is intentionally a placeholder:
-valid TAE-side modes are `REVIEW`, not `GOOD`, with primary reason
-`RULESET_NOT_IMPLEMENTED`. Invalid inputs remain `INVALID`, and valid EAE-like
-modes are routed without a fabricated rule decision.
+routing conventions. The first ordered rule rejects a calibrated narrow local
+maximum inside `r < 0.03` as `BAD_AXIS_SPIKE`. Its amplitude and width
+thresholds default to null, so the gate is disabled until calibration. Other
+valid TAE-side modes remain `REVIEW`, not `GOOD`, with primary reason
+`NO_GOOD_TEMPLATE`. Invalid inputs remain `INVALID`, and valid EAE-like modes
+are routed without a fabricated rule decision.
 
-Each valid TAE-side result includes a named, deterministic 31-feature
-`rule_features` object: the active RF 22-feature calculations, six additional
-continuum-crossing measurements, and three continuum-extremum measurements.
-This reuses the feature calculations without running an RF model.
+Each valid TAE-side result includes a grouped, deterministic `rule_features`
+object containing the active RF 22-feature calculations, six crossing
+summaries, raw crossing records, three continuum-extremum measurements, and
+near-axis peak/width measurements. Half-maximum axis widths use the complete
+radial grid, not only the `r < 0.03` search window. NOVA radius and mode
+amplitude are already normalized; harmonic identifiers are reported as
+zero-based stored indices without inferring a physical poloidal-`m` offset.
+This reuses the calculations without running an RF model.
+
+After calibrating both thresholds from labeled modes, enable the gate with
+`--axis_amplitude_min VALUE --axis_width_max_grid VALUE`. The run summary
+records whether it was enabled and the exact threshold values.
 
 Optional manual adjudication writes fingerprinted overrides separately:
 
