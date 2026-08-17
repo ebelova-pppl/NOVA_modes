@@ -26,7 +26,7 @@ a narrow globally dominant energy envelope at the outer radial boundary.
 Their calibrated defaults are `r_ax=0.03` inclusive,
 `axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
 `grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`, and
-`w_cross_threshold=0.05`, with provisional edge defaults
+`w_cross_threshold=0.03`, with provisional edge defaults
 `r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; modes not rejected by
 any gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
@@ -107,7 +107,7 @@ shared continuum code. `W_star_max` is the largest crossing value of
 
 ```text
 IF n_cross > 0
-AND W_star_max > 0.05
+AND W_star_max > 0.03
 THEN BAD_CONT_CROSS
 AND stop evaluating later decision gates
 ```

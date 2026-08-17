@@ -1059,7 +1059,7 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertEqual(first.summary["grid_scale_spike_amplitude_min"], 0.3)
             self.assertEqual(first.summary["grid_scale_spike_width_max_grid"], 1.0)
             self.assertTrue(first.summary["continuum_crossing_gate_enabled"])
-            self.assertEqual(first.summary["continuum_crossing_w_threshold"], 0.05)
+            self.assertEqual(first.summary["continuum_crossing_w_threshold"], 0.03)
             self.assertTrue(first.summary["edge_artifact_gate_enabled"])
             self.assertEqual(first.summary["edge_artifact_r_min"], 0.97)
             self.assertEqual(first.summary["edge_artifact_width_max_grid"], 10.0)

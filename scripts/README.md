@@ -1017,7 +1017,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-grid-cont-edge-v5` ruleset implements the first four ordered
+`tae-rules-axis-grid-cont-edge-v6` ruleset implements the first four ordered
 BAD gates but still has no positive GOOD template. Modes that do not fire any
 gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
 reasons and structured features are stored as deterministic JSON; missing
@@ -1121,7 +1121,7 @@ radius. Its provisional calibrated configuration is:
 
 ```yaml
 continuum_crossing:
-  w_cross_threshold: 0.05
+  w_cross_threshold: 0.03
 ```
 
 After the axis and grid-scale gates, a mode with `n_cross > 0` and

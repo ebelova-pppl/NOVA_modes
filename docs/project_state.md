@@ -3402,6 +3402,15 @@ modes, the result is 210 BAD / 65 REVIEW, with primary reasons
 `BAD_EDGE_SPIKE=1`, and `NO_GOOD_TEMPLATE=65`. The edge gate again fired only
 for `N5/egn05w.1894E+02`.
 
+Joining these 275 TAE-side results to the current
+`training_labels/tae_like_v2_nonG.csv` gives complete one-to-one label coverage:
+211 labeled BAD and 64 labeled GOOD. Treating non-BAD/REVIEW as the retained
+positive class, there are two false negatives (labeled GOOD rejected as BAD)
+and three false positives (labeled BAD retained as REVIEW). Equivalently, with
+BAD as the positive class, those names reverse. The five rows and their primary
+gate evidence are recorded in
+`outputs/nstxu_204202_full_axis_grid_cont_edge_v5/label_disagreements.csv`.
+
 Focused tests cover the inclusive edge threshold, complete-grid energy FWHM,
 disabled-gate audit behavior, continuum-gate precedence, workflow summary
 fields, and the guardrail that a narrow individual edge harmonic does not fire
@@ -3410,3 +3419,50 @@ passes 72 tests, both repository skills pass structural validation, and
 `git diff --check` is clean. A useful next cross-shot calibration is to run the
 same fixed four-gate configuration on the labeled G shots and compare per-gate
 firing rates and label disagreements without retuning on each shot.
+
+### 2026-08-16: lower the crossing threshold to 0.03 and run nstx_120113
+
+Changed the active strict continuum-crossing condition from
+`W_star_max > 0.05` to `W_star_max > 0.03`. On the complete labeled
+`nstxu_204202` TAE-side set, this additionally rejects the labeled-BAD
+`N7/egn07w.3718E+02` (`W_star_max=0.0314811`) and
+`N8/egn08w.4276E+02` (`W_star_max=0.0360285`) without rejecting an additional
+labeled-GOOD mode. The closest retained labeled-GOOD crossing mode there is
+`N6/egn06w.9143E+01` at `W_star_max=0.0279922`, so the cross-shot margin remains
+narrow and requires continued validation.
+
+The default is now:
+
+```yaml
+continuum_crossing:
+  w_cross_threshold: 0.03
+```
+
+The comparison remains strictly greater than the threshold. Because the
+default decision behavior changed, the ordered ruleset advances to
+`tae-rules-axis-grid-cont-edge-v6`; the grouped feature schema remains
+`tae-rule-features-grouped-v6`.
+
+Ran the complete 541-mode `nstx_120113` shot from `$NOVA_DATA` into
+`outputs/nstx_120113_full_axis_grid_cont_edge_w003_v6/`. Routing found 133
+TAE-like, 41 mixed, 367 EAE-like, and no invalid inputs. Among the 174 TAE-side
+modes, the rules returned 128 BAD / 46 REVIEW with primary reasons
+`BAD_AXIS_SPIKE=59`, `BAD_GRID_SCALE_SPIKE=6`, `BAD_CONT_CROSS=61`,
+`BAD_EDGE_SPIKE=2`, and `NO_GOOD_TEMPLATE=46`.
+
+This shot contains no mode reaching the continuum gate with `W_star_max` in
+the interval `(0.03, 0.05]`, so lowering the threshold changes no
+`nstx_120113` decision relative to 0.05. The active training list provides 173
+matching GOOD/BAD labels: 128 BAD and 45 GOOD. Of these, 126 BAD are rejected,
+44 GOOD remain REVIEW, one GOOD is rejected, and two BAD remain REVIEW. The
+one additional TAE-side mode is the intentionally excluded `skip` mode
+`N6/egn06w.1418E+02`; the edge gate rejects it from a global energy peak at
+`r=0.98` with FWHM `2.42857` grid intervals.
+
+The three active-label disagreements and their gate measurements are in
+`outputs/nstx_120113_full_axis_grid_cont_edge_w003_v6/label_disagreements.csv`:
+
+- labeled GOOD but rejected: `N6/egn06w.1472E+02` by
+  `BAD_GRID_SCALE_SPIKE`;
+- labeled BAD but retained: `N7/egn07w.2630E+02` and
+  `N8/egn08w.2765E+02`, both with crossing energy below 0.007.

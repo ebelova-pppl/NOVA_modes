@@ -234,7 +234,7 @@ This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
 routing conventions. Four ordered BAD gates currently reject a calibrated
 narrow local maximum at `r <= 0.03` (`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), or a true continuum crossing with
-`W_star_max > 0.05` (`BAD_CONT_CROSS`), followed by a global total-energy peak
+`W_star_max > 0.03` (`BAD_CONT_CROSS`), followed by a global total-energy peak
 at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
 (`BAD_EDGE_SPIKE`). The active axis defaults require
 normalized amplitude at least `0.2` and full width at half maximum no greater

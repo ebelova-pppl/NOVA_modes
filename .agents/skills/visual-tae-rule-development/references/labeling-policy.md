@@ -371,16 +371,18 @@ screen applied after the axis-artifact and grid-scale-spike gates:
 
 ```text
 IF n_cross > 0
-AND W_star_max > 0.05
+AND W_star_max > 0.03
 THEN BAD_CONT_CROSS
 AND stop evaluating later decision gates
 ```
 
 Here `W_star_max` is the largest true-crossing value of
 `sum_m |xi_m(r)|^2 / max_r sum_m |xi_m(r)|^2`. The comparison is strictly
-greater than the configurable threshold. The `0.05` default cleanly separated
-the labeled crossing-related survivors in the initial `nstxu_204202`
-calibration subset, but it remains a provisional cross-shot threshold. Keep the
+greater than the configurable threshold. The initial `0.05` calibration cleanly
+separated the labeled crossing-related survivors in the 141-mode
+`nstxu_204202` subset. The current `0.03` default additionally rejects two
+labeled-BAD modes in the complete shot without rejecting another labeled-GOOD
+mode, but it remains a provisional cross-shot threshold. Keep the
 full crossing records for audit and continue to inspect borderline cases when
 developing or recalibrating the rule.
 
