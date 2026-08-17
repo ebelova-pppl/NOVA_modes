@@ -40,6 +40,9 @@ from sort_shot_rules import (  # noqa: E402
 )
 from tae_rule_engine import (  # noqa: E402
     BAD_AXIS_SPIKE,
+    BAD_CONT_CROSS,
+    BAD_EDGE_SPIKE,
+    BAD_GRID_SCALE_SPIKE,
     NO_GOOD_TEMPLATE,
     RULE_FEATURE_EXTRACTION_FAILED,
     RULE_FEATURE_GROUP_NAMES,
@@ -48,8 +51,13 @@ from tae_rule_engine import (  # noqa: E402
     RULE_FEATURE_SCHEMA_VERSION,
     RULE_FEATURE_SOURCE_SCHEMA_VERSION,
     AxisArtifactConfig,
+    ContinuumCrossingConfig,
+    EdgeArtifactConfig,
+    GridScaleSpikeConfig,
     evaluate_mode,
     extract_axis_artifact_features,
+    extract_edge_artifact_features,
+    extract_grid_scale_spike_features,
 )
 from tae_rule_io import (  # noqa: E402
     MANUAL_OVERRIDE_FIELDS,
@@ -239,13 +247,23 @@ class RuleAndOverrideTests(unittest.TestCase):
             "processing_status": "READY_FOR_RULES",
         }
 
-    def evaluate(self, row=None, axis_config=None):
+    def evaluate(
+        self,
+        row=None,
+        axis_config=None,
+        grid_config=None,
+        crossing_config=None,
+        edge_config=None,
+    ):
         return evaluate_mode(
             self.base if row is None else row,
             mode=self.mode,
             low2=self.low2,
             high2=self.high2,
             axis_artifact_config=axis_config,
+            grid_scale_spike_config=grid_config,
+            continuum_crossing_config=crossing_config,
+            edge_artifact_config=edge_config,
         )
 
     def test_unmatched_partial_ruleset_returns_review_with_valid_json(self):
@@ -280,12 +298,20 @@ class RuleAndOverrideTests(unittest.TestCase):
         )
         self.assertTrue(features["extremum_features"]["match_found"])
         self.assertEqual(features["resolution_features"], {})
-        self.assertEqual(features["numerical_structure_features"], {})
+        grid_features = features["numerical_structure_features"][
+            "grid_scale_spike"
+        ]
+        self.assertFalse(grid_features["grid_scale_candidate_found"])
+        self.assertEqual(grid_features["grid_scale_candidate_width_limit_grid"], 1.0)
         axis_features = features["boundary_features"]["axis_artifact"]
         self.assertEqual(axis_features["r_ax"], 0.03)
         self.assertEqual(axis_features["axis_peak_harmonic_index"], 3)
         self.assertFalse(axis_features["axis_peak_is_local_max"])
         self.assertGreater(axis_features["axis_halfmax_outer_edge_r"], 0.03)
+        edge_features = features["boundary_features"]["edge_artifact"]
+        self.assertEqual(edge_features["r_edge_min"], 0.97)
+        self.assertFalse(edge_features["edge_energy_peak_in_window"])
+        self.assertEqual(edge_features["edge_harmonic_peak_harmonic_index"], 3)
         self.assertNotIn("signed_delta", row["rule_features"])
         self.assertNotIn("fraction_below_upper2", row["rule_features"])
         self.assertEqual(stable_json({"missing": float("nan")}), '{"missing":null}')
@@ -379,6 +405,11 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertIsNone(
             features["boundary_features"]["axis_artifact"]["axis_peak"]
         )
+        self.assertIsNone(
+            features["numerical_structure_features"]["grid_scale_spike"][
+                "grid_scale_candidate_found"
+            ]
+        )
 
     def test_narrow_axis_spike_fires_first_bad_gate(self):
         mode = np.zeros_like(self.mode)
@@ -426,6 +457,322 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(result.decision, "BAD")
         self.assertEqual(result.primary_reason, BAD_AXIS_SPIKE)
 
+    def test_grid_scale_spike_uses_signed_lobe_width(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80] = 0.7
+        mode[1, 81] = -0.7
+        features = extract_grid_scale_spike_features(mode, width_max_grid=1.0)
+
+        self.assertTrue(features["grid_scale_candidate_found"])
+        self.assertEqual(features["grid_scale_peak_harmonic_index"], 1)
+        self.assertAlmostEqual(features["grid_scale_peak_r"], 0.4)
+        self.assertEqual(features["grid_scale_peak_sign"], 1)
+        self.assertAlmostEqual(features["grid_scale_peak"], 0.7)
+        self.assertAlmostEqual(features["grid_scale_halfmax_width_grid"], 0.75)
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        row = result.as_output_row(self.base)
+        self.assertEqual(row["rule_decision"], "BAD")
+        self.assertEqual(row["rule_primary_reason"], BAD_GRID_SCALE_SPIKE)
+        self.assertEqual(
+            json.loads(row["rule_triggered_rules"]),
+            [BAD_GRID_SCALE_SPIKE],
+        )
+
+    def test_grid_scale_gate_requires_both_amplitude_and_width(self):
+        low_amplitude = np.zeros_like(self.mode)
+        low_amplitude[1, 80] = 0.29
+        low_result = evaluate_mode(
+            self.base,
+            mode=low_amplitude,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        self.assertEqual(low_result.decision, "REVIEW")
+
+        resolved = np.zeros_like(self.mode)
+        resolved[1, 78:83] = [0.2, 0.4, 0.6, 0.4, 0.2]
+        resolved_result = evaluate_mode(
+            self.base,
+            mode=resolved,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        self.assertEqual(resolved_result.decision, "REVIEW")
+        features = extract_grid_scale_spike_features(
+            resolved,
+            width_max_grid=1.0,
+        )
+        self.assertFalse(features["grid_scale_candidate_found"])
+
+    def test_null_grid_scale_amplitude_disables_gate_but_keeps_measurement(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80] = 0.7
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            grid_scale_spike_config=GridScaleSpikeConfig(
+                amplitude_min=None,
+                width_max_grid=1.0,
+            ),
+        )
+        features = result.features["numerical_structure_features"][
+            "grid_scale_spike"
+        ]
+        self.assertEqual(result.decision, "REVIEW")
+        self.assertTrue(features["grid_scale_candidate_found"])
+        self.assertAlmostEqual(features["grid_scale_peak"], 0.7)
+
+    def test_grid_scale_gate_includes_one_sided_radial_endpoint(self):
+        mode = np.zeros_like(self.mode)
+        mode[2, -1] = -0.5
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        features = result.features["numerical_structure_features"][
+            "grid_scale_spike"
+        ]
+        self.assertEqual(result.primary_reason, BAD_GRID_SCALE_SPIKE)
+        self.assertAlmostEqual(features["grid_scale_peak_r"], 1.0)
+        self.assertAlmostEqual(features["grid_scale_halfmax_width_grid"], 0.5)
+        self.assertTrue(features["grid_scale_component_touches_boundary"])
+
+    def test_axis_gate_precedes_grid_scale_gate(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 2] = 1.0
+        mode[2, 80] = 0.8
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        self.assertEqual(result.primary_reason, BAD_AXIS_SPIKE)
+        self.assertEqual(result.triggered_rules, (BAD_AXIS_SPIKE,))
+        grid_features = result.features["numerical_structure_features"][
+            "grid_scale_spike"
+        ]
+        self.assertTrue(grid_features["grid_scale_candidate_found"])
+
+    def test_cont_cross_gate_requires_crossing_and_strictly_exceeds_threshold(self):
+        mode = np.zeros_like(self.mode)
+        crossing_index = 80
+        mode[0, 100] = 1.0
+        mode[0, crossing_index] = np.sqrt(0.06)
+        upper = np.full(mode.shape[1], 1.1)
+        upper[:crossing_index] = 0.9
+        upper[crossing_index] = 1.0
+        disabled_axis = AxisArtifactConfig(
+            axis_amplitude_min=None,
+            axis_width_max_grid=None,
+        )
+        disabled_grid = GridScaleSpikeConfig(
+            amplitude_min=None,
+            width_max_grid=None,
+        )
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=0.05
+            ),
+        )
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(result.primary_reason, BAD_CONT_CROSS)
+        self.assertEqual(result.triggered_rules, (BAD_CONT_CROSS,))
+        self.assertEqual(result.features["crossing_features"]["n_cross"], 1.0)
+        self.assertGreater(
+            result.features["rf_standard_features"]["W_star_max"],
+            0.05,
+        )
+
+        disabled_result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=None
+            ),
+        )
+        self.assertEqual(disabled_result.decision, "REVIEW")
+        self.assertEqual(
+            disabled_result.features["crossing_features"]["n_cross"],
+            1.0,
+        )
+
+        measured_threshold = result.features["rf_standard_features"][
+            "W_star_max"
+        ]
+        equal_result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=measured_threshold
+            ),
+        )
+        self.assertEqual(equal_result.decision, "REVIEW")
+
+        no_cross_result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=np.full(mode.shape[1], 1.5**2),
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=0.0
+            ),
+        )
+        self.assertEqual(no_cross_result.decision, "REVIEW")
+        self.assertEqual(
+            no_cross_result.features["crossing_features"]["n_cross"],
+            0.0,
+        )
+
+    def test_grid_scale_gate_precedes_cont_cross_gate(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80] = 0.7
+        mode[1, 81] = -0.7
+        upper = np.full(mode.shape[1], 1.1)
+        upper[:80] = 0.9
+        upper[80] = 1.0
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+        )
+        self.assertGreater(
+            result.features["rf_standard_features"]["W_star_max"],
+            0.05,
+        )
+        self.assertEqual(result.primary_reason, BAD_GRID_SCALE_SPIKE)
+        self.assertEqual(result.triggered_rules, (BAD_GRID_SCALE_SPIKE,))
+
+    def test_edge_gate_uses_global_energy_envelope_and_full_grid_width(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 194:199] = [0.4, 0.8, 1.0, 0.8, 0.4]
+        features = extract_edge_artifact_features(mode)
+
+        self.assertTrue(features["edge_energy_peak_in_window"])
+        self.assertAlmostEqual(features["edge_energy_peak_r"], 0.98)
+        self.assertAlmostEqual(features["edge_energy_halfmax_width_grid"], 2.5833333333)
+        self.assertAlmostEqual(features["edge_harmonic_peak_r"], 0.98)
+        self.assertAlmostEqual(features["edge_harmonic_halfmax_width_grid"], 3.5)
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=np.full(mode.shape[1], 0.5**2),
+            high2=np.full(mode.shape[1], 1.5**2),
+        )
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
+        self.assertEqual(result.triggered_rules, (BAD_EDGE_SPIKE,))
+
+    def test_edge_gate_is_inclusive_and_can_be_disabled(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 192:197] = [0.4, 0.8, 1.0, 0.8, 0.4]
+        low2 = np.full(mode.shape[1], 0.5**2)
+        high2 = np.full(mode.shape[1], 1.5**2)
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=low2,
+            high2=high2,
+        )
+        self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
+        self.assertAlmostEqual(
+            result.features["boundary_features"]["edge_artifact"][
+                "edge_energy_peak_r"
+            ],
+            0.97,
+        )
+
+        disabled = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=low2,
+            high2=high2,
+            edge_artifact_config=EdgeArtifactConfig(
+                r_edge_min=0.97,
+                edge_width_max_grid=None,
+            ),
+        )
+        self.assertEqual(disabled.decision, "REVIEW")
+        self.assertTrue(
+            disabled.features["boundary_features"]["edge_artifact"][
+                "edge_energy_peak_in_window"
+            ]
+        )
+
+    def test_narrow_edge_harmonic_is_audit_only_when_total_peak_is_interior(self):
+        radial_grid = np.linspace(0.0, 1.0, self.mode.shape[1])
+        mode = np.zeros_like(self.mode)
+        mode[0] = np.exp(-((radial_grid - 0.5) / 0.08) ** 2)
+        mode[1, 194:199] = [0.2, 0.4, 0.5, 0.4, 0.2]
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=np.full(mode.shape[1], 0.5**2),
+            high2=np.full(mode.shape[1], 1.5**2),
+        )
+        features = result.features["boundary_features"]["edge_artifact"]
+
+        self.assertEqual(result.decision, "REVIEW")
+        self.assertFalse(features["edge_energy_peak_in_window"])
+        self.assertAlmostEqual(features["edge_energy_peak_r"], 0.5)
+        self.assertAlmostEqual(features["edge_harmonic_peak"], 0.5)
+        self.assertAlmostEqual(features["edge_harmonic_peak_r"], 0.98)
+
+    def test_cont_cross_gate_precedes_edge_gate(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 194:199] = [0.4, 0.8, 1.0, 0.8, 0.4]
+        upper = np.full(mode.shape[1], 1.1)
+        upper[:196] = 0.9
+        upper[196] = 1.0
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=np.full(mode.shape[1], 0.5**2),
+            high2=upper**2,
+        )
+
+        self.assertGreater(
+            result.features["rf_standard_features"]["W_star_max"],
+            0.05,
+        )
+        self.assertTrue(
+            result.features["boundary_features"]["edge_artifact"][
+                "edge_energy_peak_in_window"
+            ]
+        )
+        self.assertEqual(result.primary_reason, BAD_CONT_CROSS)
+        self.assertEqual(result.triggered_rules, (BAD_CONT_CROSS,))
+
     def test_null_thresholds_disable_axis_gate_but_keep_measurements(self):
         mode = np.zeros_like(self.mode)
         mode[1, 0] = 1.0
@@ -437,6 +784,10 @@ class RuleAndOverrideTests(unittest.TestCase):
             axis_artifact_config=AxisArtifactConfig(
                 axis_amplitude_min=None,
                 axis_width_max_grid=None,
+            ),
+            grid_scale_spike_config=GridScaleSpikeConfig(
+                amplitude_min=None,
+                width_max_grid=1.0,
             ),
         )
         row = result.as_output_row(self.base)
@@ -464,6 +815,9 @@ class RuleAndOverrideTests(unittest.TestCase):
                 axis_amplitude_min=0.1,
                 axis_width_max_grid=100.0,
             ),
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=None
+            ),
         )
         self.assertEqual(result.decision, "REVIEW")
 
@@ -485,6 +839,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             axis_artifact_config=AxisArtifactConfig(
                 axis_amplitude_min=0.8,
                 axis_width_max_grid=3.0,
+            ),
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=None
             ),
         )
         self.assertEqual(result.decision, "REVIEW")
@@ -698,6 +1055,14 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertEqual(first.summary["axis_artifact_r_ax"], 0.03)
             self.assertEqual(first.summary["axis_artifact_amplitude_min"], 0.2)
             self.assertEqual(first.summary["axis_artifact_width_max_grid"], 10.0)
+            self.assertTrue(first.summary["grid_scale_spike_gate_enabled"])
+            self.assertEqual(first.summary["grid_scale_spike_amplitude_min"], 0.3)
+            self.assertEqual(first.summary["grid_scale_spike_width_max_grid"], 1.0)
+            self.assertTrue(first.summary["continuum_crossing_gate_enabled"])
+            self.assertEqual(first.summary["continuum_crossing_w_threshold"], 0.05)
+            self.assertTrue(first.summary["edge_artifact_gate_enabled"])
+            self.assertEqual(first.summary["edge_artifact_r_min"], 0.97)
+            self.assertEqual(first.summary["edge_artifact_width_max_grid"], 10.0)
             self.assertEqual(
                 json.loads(first.summary["primary_reason_counts_json"]),
                 {NO_GOOD_TEMPLATE: 1},
@@ -758,6 +1123,97 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertEqual(result.summary["axis_artifact_amplitude_min"], 0.8)
         self.assertEqual(result.summary["axis_artifact_width_max_grid"], 2.0)
         self.assertEqual(result.final_rows[0]["rule_primary_reason"], BAD_AXIS_SPIKE)
+
+    def test_run_shot_applies_grid_scale_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = np.zeros((4, 101), dtype=float)
+            mode[2, 50] = -0.7
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=101,
+                mode=mode,
+            )
+            write_datcon(shot / "N1" / "datcon1", nr=101)
+            result = run_shot(
+                shot,
+                root / "out",
+                grid_scale_amplitude_min=0.6,
+                grid_scale_width_max_grid=1.0,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertTrue(result.summary["grid_scale_spike_gate_enabled"])
+        self.assertEqual(result.summary["grid_scale_spike_amplitude_min"], 0.6)
+        self.assertEqual(result.summary["grid_scale_spike_width_max_grid"], 1.0)
+        self.assertEqual(
+            result.final_rows[0]["rule_primary_reason"],
+            BAD_GRID_SCALE_SPIKE,
+        )
+
+    def test_run_shot_applies_cont_cross_gate_and_reports_threshold(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            radial_grid = np.linspace(0.0, 1.0, 101)
+            upper = 0.9 + 0.4 * radial_grid
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=101,
+            )
+            write_datcon(
+                shot / "N1" / "datcon1",
+                nr=101,
+                upper_frequency=upper,
+            )
+            result = run_shot(
+                shot,
+                root / "out",
+                w_cross_threshold=0.05,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertTrue(result.summary["continuum_crossing_gate_enabled"])
+        self.assertEqual(result.summary["continuum_crossing_w_threshold"], 0.05)
+        self.assertEqual(
+            result.final_rows[0]["rule_primary_reason"],
+            BAD_CONT_CROSS,
+        )
+
+    def test_run_shot_applies_edge_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = np.zeros((4, 101), dtype=float)
+            mode[2, 96:101] = [0.2, 0.6, 1.0, 0.6, 0.2]
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=101,
+                mode=mode,
+            )
+            write_datcon(shot / "N1" / "datcon1", nr=101)
+            result = run_shot(
+                shot,
+                root / "out",
+                edge_r_min=0.97,
+                edge_width_max_grid=4.0,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertTrue(result.summary["edge_artifact_gate_enabled"])
+        self.assertEqual(result.summary["edge_artifact_r_min"], 0.97)
+        self.assertEqual(result.summary["edge_artifact_width_max_grid"], 4.0)
+        self.assertEqual(
+            result.final_rows[0]["rule_primary_reason"],
+            BAD_EDGE_SPIKE,
+        )
 
     def test_valid_override_hash_and_stale_recheck(self):
         with tempfile.TemporaryDirectory() as temporary:

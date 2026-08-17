@@ -80,9 +80,11 @@ Model families
 
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
-  `models/nova_cnn_raw.pt`. Both checkpoints were retrained on the current
-  2900-row, 594-GOOD / 2306-BAD v2 list. The raw-CNN checkpoint is a
-  full-list refit with `M_target=100`.
+  `models/nova_cnn_raw.pt`. Both checkpoints were retrained on the preceding
+  2900-row, 594-GOOD / 2306-BAD v2 snapshot. The current list has one later
+  label correction and now contains 593 GOOD / 2307 BAD; the checkpoints have
+  not yet been refit for that correction. The raw-CNN checkpoint is a full-list
+  refit with `M_target=100`.
 - Latest pre-B12 RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
 - An opt-in 25-feature RF experiment adds inner continuum-extremum radial
@@ -229,27 +231,36 @@ python scripts/sort_shot_rules.py \
 ```
 
 This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The first ordered rule rejects a calibrated narrow local
-maximum at `r <= 0.03` as `BAD_AXIS_SPIKE`. The active defaults require
+routing conventions. Four ordered BAD gates currently reject a calibrated
+narrow local maximum at `r <= 0.03` (`BAD_AXIS_SPIKE`), a large unresolved
+signed lobe (`BAD_GRID_SCALE_SPIKE`), or a true continuum crossing with
+`W_star_max > 0.05` (`BAD_CONT_CROSS`), followed by a global total-energy peak
+at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
+(`BAD_EDGE_SPIKE`). The active axis defaults require
 normalized amplitude at least `0.2` and full width at half maximum no greater
-than `10` radial-grid intervals. Other valid TAE-side modes remain `REVIEW`,
-not `GOOD`, with primary reason `NO_GOOD_TEMPLATE`. Invalid inputs remain
-`INVALID`, and valid EAE-like modes are routed without a fabricated rule
-decision.
+than `10` radial-grid intervals; the grid-scale defaults require amplitude at
+least `0.3` and width no greater than one grid interval. Other valid TAE-side
+modes remain `REVIEW`, not `GOOD`, with primary reason `NO_GOOD_TEMPLATE`.
+Invalid inputs remain `INVALID`, and valid EAE-like modes are routed without a
+fabricated rule decision.
 
 Each valid TAE-side result includes a grouped, deterministic `rule_features`
 object containing the active RF 22-feature calculations, six crossing
 summaries, raw crossing records, three continuum-extremum measurements, and
-near-axis peak/width measurements. Half-maximum axis widths use the complete
-radial grid, not only the `r <= 0.03` search window. NOVA radius and mode
+axis/edge boundary measurements. Half-maximum boundary widths use the complete
+radial grid, not only their search windows. The edge decision uses the global
+normalized total-energy envelope; the strongest individual edge harmonic is
+recorded for audit but does not fire the gate alone. NOVA radius and mode
 amplitude are already normalized; harmonic identifiers are reported as
 zero-based stored indices without inferring a physical poloidal-`m` offset.
 This reuses the calculations without running an RF model.
 
-Override the calibrated defaults with `--axis_amplitude_min VALUE` and
-`--axis_width_max_grid VALUE`, or use `--disable_axis_artifact` for a
-feature-only run. The run summary records whether the gate was enabled and the
-exact threshold values.
+Override the calibrated defaults with `--axis_amplitude_min VALUE`,
+`--axis_width_max_grid VALUE`, `--grid_scale_amplitude_min VALUE`,
+`--grid_scale_width_max_grid VALUE`, `--w_cross_threshold VALUE`,
+`--edge_r_min VALUE`, and `--edge_width_max_grid VALUE`. The
+matching disable switches retain measurements while disabling each decision
+gate. The run summary records every gate's enable state and exact thresholds.
 
 Optional manual adjudication writes fingerprinted overrides separately:
 

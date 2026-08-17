@@ -19,21 +19,30 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. The first implemented rejection gate detects narrow
-near-axis spikes. Its calibrated defaults are `r_ax=0.03` inclusive,
-`axis_amplitude_min=0.2`, and `axis_width_max_grid=10`; modes not rejected by
-the gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
+TAE/EAE/mixed split. The first four ordered rejection gates detect narrow
+near-axis spikes, unresolved signed-harmonic spikes anywhere in radius, and
+continuum crossings carrying appreciable normalized radial energy, followed by
+a narrow globally dominant energy envelope at the outer radial boundary.
+Their calibrated defaults are `r_ax=0.03` inclusive,
+`axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
+`grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`, and
+`w_cross_threshold=0.05`, with provisional edge defaults
+`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; modes not rejected by
+any gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v3 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v6 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features`, individual lower/upper crossings in `crossing_records`,
 and match status plus the three inner-extremum measurements in
 `extremum_features`. Keep the axis measurements under
-`boundary_features.axis_artifact`; reserve empty objects for
-`resolution_features` and `numerical_structure_features`. These are named
-deterministic measurements; no RF checkpoint or prediction is used to produce
-them. Keep `signed_delta` and `fraction_below_upper2` as routing audit columns
-rather than rule features. When no inner extremum is matched, require
+`boundary_features.axis_artifact`, the outer energy-envelope and edge-harmonic
+audit measurements under `boundary_features.edge_artifact`, and the unresolved
+signed-lobe measurements under `numerical_structure_features.grid_scale_spike`;
+reserve an empty object for `resolution_features`. These are named deterministic
+measurements; no RF checkpoint or prediction is used to produce them. Keep
+`signed_delta` and
+`fraction_below_upper2` as routing audit columns rather than rule features.
+When no inner extremum is matched, require
 `match_found=false` and JSON `null` for the three undefined extremum
 measurements.
 
@@ -66,6 +75,68 @@ at `r <= 0.03` is a boundary artifact regardless of an otherwise plausible
 morphology family. A broad component extending beyond the window or the rising
 flank of a mode centered outside it must not be made artificially narrow. Use
 `--disable_axis_artifact` only when a feature-only run is explicitly needed.
+
+The second gate searches every stored harmonic over the complete radial grid.
+For each positive local maximum or negative local minimum, measure the connected
+signed lobe above half of its own absolute peak. Never measure this component on
+`abs(mode)`, because adjacent `+A/-A` samples would be joined into a falsely
+broad component. Among lobes no wider than the configured limit, record the
+strongest candidate, its signed amplitude, sign, zero-based stored harmonic
+index, radius, interpolated inner and outer half-maximum edges, width in
+normalized radius and grid intervals, and whether the component touches either
+radial boundary.
+
+The calibrated second gate is:
+
+```text
+IF grid_scale_peak >= 0.3
+AND grid_scale_halfmax_width_grid <= 1
+THEN BAD_GRID_SCALE_SPIKE
+AND stop evaluating later decision gates
+```
+
+It runs only after `BAD_AXIS_SPIKE`. Override its thresholds with
+`--grid_scale_amplitude_min` and `--grid_scale_width_max_grid`; use
+`--disable_grid_scale_spike` for a feature-only run. The shot and per-`n`
+summaries record enable state and exact settings.
+
+The third gate uses the existing deterministic true-crossing measurements. A
+crossing is a lower/upper continuum boundary intersection recorded by the
+shared continuum code. `W_star_max` is the largest crossing value of
+`sum_h |mode_h(r)|^2`, normalized by its radial maximum. The calibrated gate is:
+
+```text
+IF n_cross > 0
+AND W_star_max > 0.05
+THEN BAD_CONT_CROSS
+AND stop evaluating later decision gates
+```
+
+The comparison is intentionally strict (`>`). This gate runs only after
+`BAD_GRID_SCALE_SPIKE`. Override the threshold with `--w_cross_threshold`; use
+`--disable_cont_cross` to retain the same crossing features while disabling the
+decision.
+
+The fourth gate measures the global radial-energy envelope
+`W(r)=sum_h |mode_h(r)|^2`, normalized to a peak of one. Search both
+half-maximum edges on the full grid. Keep a separate mirrored audit of the
+strongest individual harmonic in the inclusive `r >= r_edge_min` window, but
+do not use that harmonic alone for this decision: physical edge modes can have
+narrow shear-localized harmonics while their total envelope remains resolved.
+The provisional calibrated gate is:
+
+```text
+IF edge_energy_peak_r >= 0.97
+AND edge_energy_halfmax_width_grid <= 10
+THEN BAD_EDGE_SPIKE
+AND stop evaluating later decision gates
+```
+
+This gate runs only after `BAD_CONT_CROSS`. Override its settings with
+`--edge_r_min` and `--edge_width_max_grid`; use `--disable_edge_artifact` to
+retain both envelope and harmonic audit measurements without applying the
+decision. The edge threshold is inclusive. Shot and per-`n` summaries record
+the enable state and exact threshold for all four gates.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or
@@ -125,6 +196,6 @@ Start with:
 
 Treat `rule_triggered_rules` as per-mode audit detail, not as summary-count
 input. Confirm the manual-override SHA-256 in the summary when overrides were
-supplied. The summary also records whether the axis gate was enabled and its
-exact radius, amplitude, and width settings. Do not add timestamps while
-regenerating deterministic outputs.
+supplied. The summary also records whether each implemented gate was enabled
+and its exact thresholds. Do not add timestamps while regenerating
+deterministic outputs.

@@ -266,6 +266,35 @@ large magnetic shear, but the total envelope remains broad/resolved and the
 high-r structure is smoothly connected across neighboring harmonics rather
 than a single endpoint blow-up.
 
+The fourth deterministic BAD gate is intentionally narrower than this full
+visual policy. It screens the low-hanging case in which the global total-energy
+maximum itself is at the edge and its connected energy envelope is unresolved.
+Calculate `W(r)=sum_m |xi_m(r)|^2`, normalize it by its global radial maximum,
+and find the connected half-maximum component on the complete radial grid. The
+current provisional non-blind calibration is:
+
+```text
+IF edge_energy_peak_r >= 0.97
+AND edge_energy_halfmax_width_grid <= 10
+THEN BAD_EDGE_SPIKE
+AND stop evaluating later decision gates
+```
+
+The radius comparison is inclusive, and this gate runs after
+`BAD_CONT_CROSS`. Keep `r_edge_min` and `edge_width_max_grid` configurable.
+Record the global-energy peak radius, interpolated inner and outer half-maximum
+edges, width in normalized radius and grid intervals, and whether the component
+touches `r=1`. Also record the strongest individual-harmonic peak within the
+edge window, its stored harmonic index, radius, local-maximum status, full-grid
+half-maximum edges and widths, and boundary-touch status for audit.
+
+Do not fire this gate from the individual-harmonic audit alone. The initial
+`nstxu_204202` calibration showed that a literal mirrored axis rule rejects
+physical edge-localized modes whose narrow harmonics are consistent with shear.
+Those cases remain subject to visual review or a future structure-aware edge
+rule; this deterministic gate rejects only a narrow, globally dominant total
+envelope.
+
 ## Grid-scale structure inside the mode body
 
 Inspect the radial smoothness of every appreciable signed harmonic at the
@@ -281,6 +310,32 @@ harmonic structure when the envelope is smooth and resolved. The
 disqualifying pattern is radial structure at the grid scale carrying
 appreciable amplitude inside the connected mode body, especially when it
 creates several neighboring sharp peaks rather than one smooth lobe.
+
+The second deterministic BAD gate screens the clearest unresolved spikes
+before a later alternating-packet rule is developed. Search every stored
+harmonic over the complete normalized radial grid. Treat positive local maxima
+and negative local minima as separate signed lobes, and linearly interpolate
+the connected half-maximum edges on the sign-adjusted harmonic profile. Do not
+measure the component on `abs(mode)`, which can join adjacent `+A/-A` samples
+and make an unresolved oscillation appear broad.
+
+With normalized NOVA amplitudes, the current non-blind calibrated gate is:
+
+```text
+IF any signed local extremum has abs(amplitude) >= 0.3
+AND signed_halfmax_width_grid <= 1
+THEN BAD_GRID_SCALE_SPIKE
+AND stop evaluating later decision gates
+```
+
+Apply it after `BAD_AXIS_SPIKE`, include one-sided extrema at `r=0` and `r=1`,
+and keep both thresholds configurable. For audit output, record the strongest
+candidate meeting the configured width limit, its signed amplitude and sign,
+zero-based stored harmonic index, radius, interpolated inner and outer edges,
+width in normalized radius and radial-grid intervals, and whether the
+half-maximum component touches a radial boundary. A mode that does not fire
+this strict one-grid gate can still be BAD under a later alternating-sign rule
+or another numerical-structure rule.
 
 ## Touching versus crossing
 
@@ -310,6 +365,24 @@ label the mode BAD. Crossings with large pointwise energy, roughly
 global peak is elsewhere. Reserve GOOD for crossings only in detached or
 negligible tails where both pointwise and local integrated energy are very
 small.
+
+The current third deterministic BAD gate is a provisional non-blind calibrated
+screen applied after the axis-artifact and grid-scale-spike gates:
+
+```text
+IF n_cross > 0
+AND W_star_max > 0.05
+THEN BAD_CONT_CROSS
+AND stop evaluating later decision gates
+```
+
+Here `W_star_max` is the largest true-crossing value of
+`sum_m |xi_m(r)|^2 / max_r sum_m |xi_m(r)|^2`. The comparison is strictly
+greater than the configurable threshold. The `0.05` default cleanly separated
+the labeled crossing-related survivors in the initial `nstxu_204202`
+calibration subset, but it remains a provisional cross-shot threshold. Keep the
+full crossing records for audit and continue to inspect borderline cases when
+developing or recalibrating the rule.
 
 For tail crossings, do not decide from integrated energy alone. A tail can
 carry little total energy but still be physically disqualifying when its

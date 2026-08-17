@@ -24,7 +24,7 @@ Columns:
 
 Current checked contents:
 - 2900 labeled modes
-- labels: 594 `good`, 2306 `bad`
+- labels: 593 `good`, 2307 `bad`
 - 1635 reviewed non-G rows plus 1265 unchanged `nstxuG*` rows
 - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
   `nstxuE202855A01t020`, `nstxuE204669M03t025`, `nstxuE205052A01t022`,
@@ -48,7 +48,7 @@ Label flips relative to `tae_like_train.csv`:
 
 | shot | good -> bad | bad -> good |
 | --- | ---: | ---: |
-| `nstxu_204202` | 10 | 0 |
+| `nstxu_204202` | 11 | 0 |
 | `nstx_120113` | 0 | 0 |
 | `nstx_135388` | 1 | 10 |
 | `nstx_141711` | 16 | 1 |
@@ -56,12 +56,14 @@ Label flips relative to `tae_like_train.csv`:
 | `nstxuE204669M03t025` | 4 | 1 |
 | `nstxuE205052A01t022` | 16 | 1 |
 
-Totals: 50 old `good` rows became `bad`, 18 old `bad` rows became `good`, and
+Totals: 51 old `good` rows became `bad`, 18 old `bad` rows became `good`, and
 three old `good` rows were removed as `skip`. The copied G-shot rows have zero
 label changes.
 
-The active RF and raw-CNN checkpoints have been retrained on this current
-2900-row / 15-shot list.
+The active RF and raw-CNN checkpoints were retrained on the preceding
+594-GOOD / 2306-BAD snapshot. The post-refit correction of
+`nstxu_204202/N9/egn09w.3222E+02` from `good` to `bad` is present in this CSV
+but is not yet reflected in those checkpoints.
 
 ## Previous / derived root lists
 

@@ -1,12 +1,12 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-15)
+### Project state (current snapshot, updated 2026-08-16)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
 - Active version-controlled training list:
     - `training_labels/tae_like_v2_nonG.csv`
-    - 2900 labeled TAE-like modes: 594 `good`, 2306 `bad`
+    - 2900 labeled TAE-like modes: 593 `good`, 2307 `bad`
     - current canonical/default training list while awaiting review of all
       NSTX-U G shots
     - same columns as `training_labels/tae_like_train.csv`
@@ -91,10 +91,11 @@ Notes:
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Checkpoint status: retrained on the current 2900-row / 15-shot
-      `training_labels/tae_like_v2_nonG.csv` list
+    -	Checkpoint status: retrained on the preceding 2900-row / 15-shot
+      `training_labels/tae_like_v2_nonG.csv` snapshot; the later N9/3222 label
+      correction is not yet reflected in the checkpoint
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
-    -	Active training counts: 594 GOOD, 2306 BAD
+    -	Checkpoint training counts: 594 GOOD, 2306 BAD
     -	Latest pre-B12 13-shot OOF accuracy: 0.951
     -	Latest pre-B12 13-shot OOF CM: `[[1967, 37], [91, 515]]`
     -	Latest pre-B12 GOOD precision/recall/F1: 0.933 / 0.850 / 0.889
@@ -102,8 +103,9 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: full-CSV refit on the current 2900-row / 15-shot
-      `training_labels/tae_like_v2_nonG.csv` list
+    -	Checkpoint status: full-CSV refit on the preceding 2900-row / 15-shot
+      `training_labels/tae_like_v2_nonG.csv` snapshot; the later N9/3222 label
+      correction is not yet reflected in the checkpoint
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest v2 split check before full refit: best accuracy 0.9534 at
       epoch 13; final 80-epoch full refit reports no prediction collapse
@@ -3210,3 +3212,201 @@ index without deleting their local files. Their parameters and scientifically
 relevant counts remain recorded above; keep the local outputs during rule
 development and regenerate a final audit run after the ordered ruleset is
 complete.
+
+### 2026-08-16: add the second ordered BAD gate for unresolved grid-scale spikes
+
+Implemented `BAD_GRID_SCALE_SPIKE` after explicit non-blind calibration on the
+141-mode `data/nstxu_204202/` subset. The gate searches every stored harmonic
+over the complete normalized radial grid for positive local maxima and negative
+local minima. Each candidate width is the linearly interpolated connected FWHM
+of the sign-adjusted lobe; it is deliberately not calculated from `abs(mode)`,
+because adjacent `+A/-A` samples would otherwise merge into a falsely broad
+component. One-sided extrema at either radial boundary are included.
+
+The active configurable defaults are:
+
+```yaml
+grid_scale_spike:
+  amplitude_min: 0.3
+  width_max_grid: 1
+```
+
+Among candidates meeting the width limit, the audit feature records the
+largest absolute peak, its signed amplitude and sign, zero-based stored
+harmonic index, radius, interpolated half-maximum edges, width in normalized
+radius and grid intervals, and boundary-touch status. A peak meeting the
+amplitude threshold returns `BAD_GRID_SCALE_SPIKE` and stops later gates. The
+axis gate retains precedence. The rule feature now lives under
+`numerical_structure_features.grid_scale_spike`; the rule-feature schema is
+`tae-rule-features-grouped-v5` and the partial ruleset is
+`tae-rules-axis-grid-spike-v3`.
+
+The one-grid cutoff catches all four calibration examples discussed during
+development: `N8/egn08w.4253E+02`, `N5/egn05w.3044E+02`,
+`N4/egn04w.1333E+02`, and `N8/egn08w.1566E+02`. On the unchanged copied label
+CSV, the gate alone matches 52 labeled BAD and two labeled GOOD modes. After
+the existing axis gate, it adds seven labeled BAD and two labeled GOOD modes.
+A two-grid cutoff was rejected because it would match 36 labeled GOOD modes
+overall and 35 after the axis gate. Visual non-blind inspection found one of
+the one-grid GOOD-labeled cases, `N9/egn09w.3222E+02`, to be a genuine bad
+grid-scale spike; the copied and canonical training-label files were not
+changed as part of this gate implementation.
+
+The CLI exposes `--grid_scale_amplitude_min`,
+`--grid_scale_width_max_grid`, and `--disable_grid_scale_spike`. Shot and
+per-`n` summaries record the enable flag and exact thresholds. Focused tests
+cover signed rather than absolute width, both amplitude and width conditions,
+endpoint handling, gate precedence, summary reporting, and deterministic
+workflow output. A later alternating-sign packet gate remains available for
+wider or lower-amplitude numerical oscillations that this strict one-grid gate
+does not reject.
+
+A default no-override smoke run in
+`outputs/nstxu_204202_axis_grid_defaults_v3/` processed all 141 modes without
+invalid inputs and returned 71 BAD / 70 REVIEW, with primary reasons
+`BAD_AXIS_SPIKE=62`, `BAD_GRID_SCALE_SPIKE=9`, and `NO_GOOD_TEMPLATE=70`.
+Relative to the unchanged copied labels, BAD contains 68 labeled BAD and three
+labeled GOOD modes; one of those three is the newly adjudicated bad
+`N9/egn09w.3222E+02`. Its recorded grid candidate is the negative lobe at
+`r=0.975` in stored harmonic index 52, with absolute amplitude `0.578006` and
+FWHM `0.892769` grid intervals. The complete repository suite passes 64 tests.
+
+### 2026-08-16: correct the N9/3222 training label and refresh REVIEW modes
+
+After explicit non-blind visual adjudication, changed
+`nstxu_204202/N9/egn09w.3222E+02` from `good` to `bad`. The decisive evidence
+is the signed-harmonic grid-scale spike already recorded by the second gate:
+absolute amplitude `0.578006`, FWHM `0.892769` radial-grid intervals, centered
+at `r=0.975` in zero-based stored harmonic index 52.
+
+Updated the active canonical `training_labels/tae_like_v2_nonG.csv`, its
+cleaned human-review source `tests/labels_audit/labels_human_review_clean.csv`,
+the per-shot human-vs-training change table, and the local 141-mode calibration
+copy. The active list remains 2900 rows and now contains 593 GOOD / 2307 BAD.
+The previous canonical/derived training lists, archived snapshots, raw review
+files, and sealed Codex review remain unchanged for historical provenance. The
+active RF and raw-CNN checkpoints were trained before this correction on the
+594-GOOD / 2306-BAD snapshot and have not been refit.
+
+Generated `data/nstxu_204202/review_mode_labels.csv` from the current
+`tae-rules-axis-grid-spike-v3` REVIEW output. It contains 70 unique portable
+mode paths with their current labels: 41 GOOD and 29 BAD. The complete sorter
+audit remains in
+`outputs/nstxu_204202_axis_grid_defaults_v3/review_tae_like.csv`.
+
+### 2026-08-16: add the third ordered BAD gate for continuum crossings
+
+Implemented `BAD_CONT_CROSS` after explicit non-blind calibration on the 70
+modes that survived the axis-artifact and grid-scale-spike gates. The gate
+reuses the shared deterministic continuum calculations; it does not load an RF
+checkpoint or use an RF prediction. `n_cross` counts true lower/upper boundary
+crossings, while `W_star_max` is the largest crossing value of
+`sum_h |mode_h(r)|^2`, normalized by its maximum over radius.
+
+The active provisional configuration is:
+
+```yaml
+continuum_crossing:
+  w_cross_threshold: 0.05
+```
+
+The third ordered gate is applied only after `BAD_AXIS_SPIKE` and
+`BAD_GRID_SCALE_SPIKE`:
+
+```text
+IF n_cross > 0
+AND W_star_max > w_cross_threshold
+THEN BAD_CONT_CROSS
+AND stop evaluating later decision gates
+```
+
+The comparison is strictly greater than the threshold. In the 70-mode
+calibration set, 28 of the 29 labeled BAD modes had a crossing and their
+minimum `W_star_max` was `0.0573674`; the maximum among the 41 labeled GOOD
+modes was `0.00573841`. Thus the `0.05` default rejected all 28 crossing BAD
+modes and no labeled GOOD modes. The remaining labeled BAD mode,
+`N5/egn05w.1894E+02`, has `n_cross=0` and correctly remains outside this gate.
+
+The CLI exposes `--w_cross_threshold` and `--disable_cont_cross`. Shot and
+per-`n` summaries record the gate enable flag and threshold. The grouped rule
+features already contained all required crossing measurements, so the feature
+schema remains `tae-rule-features-grouped-v5`; the ordered ruleset is now
+`tae-rules-axis-grid-cont-cross-v4`.
+
+A default no-override smoke run in
+`outputs/nstxu_204202_axis_grid_cont_defaults_v4/` processed all 141 modes with
+no invalid inputs and returned 99 BAD / 42 REVIEW. Primary reasons are
+`BAD_AXIS_SPIKE=62`, `BAD_GRID_SCALE_SPIKE=9`, `BAD_CONT_CROSS=28`, and
+`NO_GOOD_TEMPLATE=42`. Relative to the current copied labels, BAD contains 97
+labeled BAD and two labeled GOOD modes; REVIEW contains 41 labeled GOOD modes
+and only `N5/egn05w.1894E+02` as labeled BAD. Refreshed
+`data/nstxu_204202/review_mode_labels.csv` to these 42 current REVIEW modes.
+
+Focused coverage verifies crossing presence, strict threshold behavior, gate
+precedence, configured shot-level execution, and summary fields. The complete
+repository suite passes 67 tests, and both repository skills pass structural
+validation.
+
+### 2026-08-16: add the fourth ordered BAD gate for narrow edge-energy spikes
+
+Implemented `BAD_EDGE_SPIKE` as the fourth short-circuit rejection gate, after
+`BAD_CONT_CROSS`. The decision uses the global radial-energy envelope
+`W(r)=sum_h |mode_h(r)|^2`, normalized by its maximum over radius. It does not
+use a literal mirrored axis rule on any individual harmonic: calibration on the
+42 survivors from the first three gates showed that such a rule would reject
+several labeled-GOOD physical edge modes whose narrow harmonics are consistent
+with magnetic shear. The strongest individual edge harmonic and its full-grid
+half-maximum geometry are still recorded separately for audit.
+
+The active provisional configuration is:
+
+```yaml
+edge_artifact:
+  r_edge_min: 0.97
+  edge_width_max_grid: 10
+```
+
+The radius comparison is inclusive, and both half-maximum edges are searched
+on the complete radial grid:
+
+```text
+IF edge_energy_peak_r >= r_edge_min
+AND edge_energy_halfmax_width_grid <= edge_width_max_grid
+THEN BAD_EDGE_SPIKE
+AND stop evaluating later decision gates
+```
+
+The CLI exposes `--edge_r_min`, `--edge_width_max_grid`, and
+`--disable_edge_artifact`. Shot and per-`n` summaries record enable state and
+exact settings. Adding `boundary_features.edge_artifact` advances the grouped
+schema to `tae-rule-features-grouped-v6`; the ordered ruleset is now
+`tae-rules-axis-grid-cont-edge-v5`.
+
+The default 141-mode calibration run is in
+`outputs/nstxu_204202_axis_grid_cont_edge_defaults_v5/`. It processed all modes
+without invalid inputs and returned 100 BAD / 41 REVIEW, with primary reasons
+`BAD_AXIS_SPIKE=62`, `BAD_GRID_SCALE_SPIKE=9`, `BAD_CONT_CROSS=28`,
+`BAD_EDGE_SPIKE=1`, and `NO_GOOD_TEMPLATE=41`. The fourth gate rejected only
+the remaining labeled BAD mode, `N5/egn05w.1894E+02`; its global energy peak is
+at `r=0.975` with FWHM `5.244843` grid intervals. Its strongest audited edge
+harmonic is stored index 34 at `r=0.98`, with FWHM `1.547562` grid intervals.
+All 41 remaining REVIEW modes are labeled GOOD. The two labeled-GOOD modes
+already rejected by earlier gates remain the only label/rule disagreements in
+this calibration subset.
+
+The complete 725-mode `nstxu_204202` shot was then processed from `$NOVA_DATA`
+into `outputs/nstxu_204202_full_axis_grid_cont_edge_v5/`. Routing found 261
+TAE-like, 14 mixed, 450 EAE-like, and no invalid inputs. Among the 275 TAE-side
+modes, the result is 210 BAD / 65 REVIEW, with primary reasons
+`BAD_AXIS_SPIKE=112`, `BAD_GRID_SCALE_SPIKE=18`, `BAD_CONT_CROSS=79`,
+`BAD_EDGE_SPIKE=1`, and `NO_GOOD_TEMPLATE=65`. The edge gate again fired only
+for `N5/egn05w.1894E+02`.
+
+Focused tests cover the inclusive edge threshold, complete-grid energy FWHM,
+disabled-gate audit behavior, continuum-gate precedence, workflow summary
+fields, and the guardrail that a narrow individual edge harmonic does not fire
+when the total energy peaks in the interior. The complete repository suite now
+passes 72 tests, both repository skills pass structural validation, and
+`git diff --check` is clean. A useful next cross-shot calibration is to run the
+same fixed four-gate configuration on the labeled G shots and compare per-gate
+firing rates and label disagreements without retuning on each shot.

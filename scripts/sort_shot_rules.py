@@ -39,8 +39,16 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_AXIS_AMPLITUDE_MIN,
     DEFAULT_AXIS_R_AX,
     DEFAULT_AXIS_WIDTH_MAX_GRID,
+    DEFAULT_EDGE_R_MIN,
+    DEFAULT_EDGE_WIDTH_MAX_GRID,
+    DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
+    DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    DEFAULT_W_CROSS_THRESHOLD,
     RULESET_VERSION,
     AxisArtifactConfig,
+    ContinuumCrossingConfig,
+    EdgeArtifactConfig,
+    GridScaleSpikeConfig,
     evaluate_mode,
 )
 from tae_rule_io import (  # noqa: E402
@@ -120,6 +128,14 @@ SHOT_SUMMARY_FIELDS = [
     "axis_artifact_r_ax",
     "axis_artifact_amplitude_min",
     "axis_artifact_width_max_grid",
+    "grid_scale_spike_gate_enabled",
+    "grid_scale_spike_amplitude_min",
+    "grid_scale_spike_width_max_grid",
+    "continuum_crossing_gate_enabled",
+    "continuum_crossing_w_threshold",
+    "edge_artifact_gate_enabled",
+    "edge_artifact_r_min",
+    "edge_artifact_width_max_grid",
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[field for field in SHOT_SUMMARY_FIELDS if field != "shot"]]
@@ -688,8 +704,14 @@ def build_summary(
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
+    grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    continuum_crossing_config: ContinuumCrossingConfig | None = None,
+    edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> dict[str, Any]:
     axis_config = axis_artifact_config or AxisArtifactConfig()
+    grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
+    crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
+    edge_config = edge_artifact_config or EdgeArtifactConfig()
     rule_rows = [row for row in rows if row.get("rule_version") == RULESET_VERSION]
     transitions = Counter(
         f"{row['rule_decision']}->{row['final_decision']}"
@@ -745,6 +767,14 @@ def build_summary(
         "axis_artifact_r_ax": axis_config.r_ax,
         "axis_artifact_amplitude_min": axis_config.axis_amplitude_min,
         "axis_artifact_width_max_grid": axis_config.axis_width_max_grid,
+        "grid_scale_spike_gate_enabled": grid_config.enabled,
+        "grid_scale_spike_amplitude_min": grid_config.amplitude_min,
+        "grid_scale_spike_width_max_grid": grid_config.width_max_grid,
+        "continuum_crossing_gate_enabled": crossing_config.enabled,
+        "continuum_crossing_w_threshold": crossing_config.w_cross_threshold,
+        "edge_artifact_gate_enabled": edge_config.enabled,
+        "edge_artifact_r_min": edge_config.r_edge_min,
+        "edge_artifact_width_max_grid": edge_config.edge_width_max_grid,
     }
     return summary
 
@@ -761,6 +791,9 @@ def _summary_by_n(
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
+    grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    continuum_crossing_config: ContinuumCrossingConfig | None = None,
+    edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> list[dict[str, Any]]:
     by_n: dict[int, list[Mapping[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -806,6 +839,9 @@ def _summary_by_n(
             signed_delta_eae_threshold=signed_delta_eae_threshold,
             rel_freq_tol=rel_freq_tol,
             axis_artifact_config=axis_artifact_config,
+            grid_scale_spike_config=grid_scale_spike_config,
+            continuum_crossing_config=continuum_crossing_config,
+            edge_artifact_config=edge_artifact_config,
         )
         summaries.append({"shot": shot, "n": ntor, **summary})
     return summaries
@@ -882,6 +918,11 @@ def run_shot(
     axis_r_ax: float = DEFAULT_AXIS_R_AX,
     axis_amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
     axis_width_max_grid: float | None = DEFAULT_AXIS_WIDTH_MAX_GRID,
+    grid_scale_amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
+    grid_scale_width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    w_cross_threshold: float | None = DEFAULT_W_CROSS_THRESHOLD,
+    edge_r_min: float = DEFAULT_EDGE_R_MIN,
+    edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
 ) -> ShotRunResult:
     """Run the complete noninteractive deterministic workflow for one shot."""
     if rel_freq_tol <= 0.0 or not math.isfinite(rel_freq_tol):
@@ -890,6 +931,17 @@ def run_shot(
         r_ax=axis_r_ax,
         axis_amplitude_min=axis_amplitude_min,
         axis_width_max_grid=axis_width_max_grid,
+    )
+    grid_config = GridScaleSpikeConfig(
+        amplitude_min=grid_scale_amplitude_min,
+        width_max_grid=grid_scale_width_max_grid,
+    )
+    crossing_config = ContinuumCrossingConfig(
+        w_cross_threshold=w_cross_threshold,
+    )
+    edge_config = EdgeArtifactConfig(
+        r_edge_min=edge_r_min,
+        edge_width_max_grid=edge_width_max_grid,
     )
     output_dir = Path(out_dir).expanduser()
     existing_override_output = output_dir / "manual_overrides.csv"
@@ -926,6 +978,9 @@ def run_shot(
             low2=None if feature_data is None else feature_data.low2,
             high2=None if feature_data is None else feature_data.high2,
             axis_artifact_config=axis_config,
+            grid_scale_spike_config=grid_config,
+            continuum_crossing_config=crossing_config,
+            edge_artifact_config=edge_config,
         )
         rule_by_key[key] = result.as_output_row(row)
 
@@ -962,6 +1017,9 @@ def run_shot(
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
+        grid_scale_spike_config=grid_config,
+        continuum_crossing_config=crossing_config,
+        edge_artifact_config=edge_config,
     )
     summary_by_n = _summary_by_n(
         final_rows,
@@ -974,6 +1032,9 @@ def run_shot(
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
+        grid_scale_spike_config=grid_config,
+        continuum_crossing_config=crossing_config,
+        edge_artifact_config=edge_config,
     )
     write_outputs(
         out_dir=output_dir,
@@ -1055,6 +1116,76 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Calculate axis features but disable the BAD_AXIS_SPIKE decision gate",
     )
+    parser.add_argument(
+        "--grid_scale_amplitude_min",
+        type=float,
+        default=DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
+        help=(
+            "Minimum absolute normalized signed-lobe amplitude for "
+            f"BAD_GRID_SCALE_SPIKE (default: {DEFAULT_GRID_SCALE_AMPLITUDE_MIN})"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_width_max_grid",
+        type=float,
+        default=DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+        help=(
+            "Maximum signed-lobe half-maximum width in radial intervals for "
+            f"BAD_GRID_SCALE_SPIKE (default: {DEFAULT_GRID_SCALE_WIDTH_MAX_GRID:g})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_grid_scale_spike",
+        action="store_true",
+        help=(
+            "Calculate grid-scale features at the configured width but disable "
+            "the BAD_GRID_SCALE_SPIKE decision gate"
+        ),
+    )
+    parser.add_argument(
+        "--w_cross_threshold",
+        type=float,
+        default=DEFAULT_W_CROSS_THRESHOLD,
+        help=(
+            "Reject a mode as BAD_CONT_CROSS when n_cross > 0 and "
+            "W_star_max is strictly greater than this peak-normalized radial "
+            f"energy (default: {DEFAULT_W_CROSS_THRESHOLD})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_cont_cross",
+        action="store_true",
+        help=(
+            "Retain continuum-crossing measurements but disable the "
+            "BAD_CONT_CROSS decision gate"
+        ),
+    )
+    parser.add_argument(
+        "--edge_r_min",
+        type=float,
+        default=DEFAULT_EDGE_R_MIN,
+        help=(
+            "Inclusive normalized radius at which a global energy peak is "
+            f"edge-localized for BAD_EDGE_SPIKE (default: {DEFAULT_EDGE_R_MIN})"
+        ),
+    )
+    parser.add_argument(
+        "--edge_width_max_grid",
+        type=float,
+        default=DEFAULT_EDGE_WIDTH_MAX_GRID,
+        help=(
+            "Maximum full-grid total-energy half-maximum width in radial "
+            f"intervals for BAD_EDGE_SPIKE (default: {DEFAULT_EDGE_WIDTH_MAX_GRID:g})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_edge_artifact",
+        action="store_true",
+        help=(
+            "Calculate edge-envelope and harmonic audit features but disable "
+            "the BAD_EDGE_SPIKE decision gate"
+        ),
+    )
     return parser.parse_args()
 
 
@@ -1079,6 +1210,19 @@ def main() -> None:
         axis_width_max_grid=(
             None if args.disable_axis_artifact else args.axis_width_max_grid
         ),
+        grid_scale_amplitude_min=(
+            None
+            if args.disable_grid_scale_spike
+            else args.grid_scale_amplitude_min
+        ),
+        grid_scale_width_max_grid=args.grid_scale_width_max_grid,
+        w_cross_threshold=(
+            None if args.disable_cont_cross else args.w_cross_threshold
+        ),
+        edge_r_min=args.edge_r_min,
+        edge_width_max_grid=(
+            None if args.disable_edge_artifact else args.edge_width_max_grid
+        ),
     )
     summary = result.summary
     print(f"Shot: {summary['shot']}")
@@ -1100,6 +1244,23 @@ def main() -> None:
         f"r_ax={summary['axis_artifact_r_ax']} "
         f"amplitude_min={summary['axis_artifact_amplitude_min']} "
         f"width_max_grid={summary['axis_artifact_width_max_grid']}"
+    )
+    print(
+        "Grid-scale spike gate: "
+        f"enabled={summary['grid_scale_spike_gate_enabled']} "
+        f"amplitude_min={summary['grid_scale_spike_amplitude_min']} "
+        f"width_max_grid={summary['grid_scale_spike_width_max_grid']}"
+    )
+    print(
+        "Continuum-crossing gate: "
+        f"enabled={summary['continuum_crossing_gate_enabled']} "
+        f"w_cross_threshold={summary['continuum_crossing_w_threshold']}"
+    )
+    print(
+        "Edge artifact gate: "
+        f"enabled={summary['edge_artifact_gate_enabled']} "
+        f"r_edge_min={summary['edge_artifact_r_min']} "
+        f"width_max_grid={summary['edge_artifact_width_max_grid']}"
     )
     print(f"Duplicate processing: {summary['duplicate_processing_status']}")
     if args.manual_overrides:

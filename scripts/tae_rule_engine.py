@@ -31,15 +31,23 @@ from tae_rule_io import empty_rule_row, stable_json
 DEFAULT_AXIS_R_AX = 0.03
 DEFAULT_AXIS_AMPLITUDE_MIN = 0.2
 DEFAULT_AXIS_WIDTH_MAX_GRID = 10.0
+DEFAULT_GRID_SCALE_AMPLITUDE_MIN = 0.3
+DEFAULT_GRID_SCALE_WIDTH_MAX_GRID = 1.0
+DEFAULT_W_CROSS_THRESHOLD = 0.05
+DEFAULT_EDGE_R_MIN = 0.97
+DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
 
-RULESET_VERSION = "tae-rules-axis-artifact-v2"
+RULESET_VERSION = "tae-rules-axis-grid-cont-edge-v5"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
+BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
+BAD_CONT_CROSS = "BAD_CONT_CROSS"
+BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
 NO_GOOD_TEMPLATE = "NO_GOOD_TEMPLATE"
 RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v4"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v6"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -94,6 +102,81 @@ class AxisArtifactConfig:
         )
 
 
+@dataclass(frozen=True)
+class GridScaleSpikeConfig:
+    """Thresholds for the unresolved signed-harmonic spike gate."""
+
+    amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN
+    width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID
+
+    def __post_init__(self) -> None:
+        if self.amplitude_min is not None and (
+            not math.isfinite(self.amplitude_min)
+            or not 0.0 <= self.amplitude_min <= 1.0
+        ):
+            raise ValueError(
+                "grid_scale amplitude_min must be null or finite and in [0, 1]"
+            )
+        if self.width_max_grid is not None and (
+            not math.isfinite(self.width_max_grid)
+            or self.width_max_grid < 0.0
+        ):
+            raise ValueError(
+                "grid_scale width_max_grid must be null or a finite "
+                "nonnegative number"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether both thresholds required by the gate are configured."""
+        return self.amplitude_min is not None and self.width_max_grid is not None
+
+
+@dataclass(frozen=True)
+class ContinuumCrossingConfig:
+    """Threshold for the significant continuum-crossing rejection gate."""
+
+    w_cross_threshold: float | None = DEFAULT_W_CROSS_THRESHOLD
+
+    def __post_init__(self) -> None:
+        if self.w_cross_threshold is not None and (
+            not math.isfinite(self.w_cross_threshold)
+            or not 0.0 <= self.w_cross_threshold <= 1.0
+        ):
+            raise ValueError(
+                "w_cross_threshold must be null or finite and in [0, 1]"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether the crossing-energy threshold is configured."""
+        return self.w_cross_threshold is not None
+
+
+@dataclass(frozen=True)
+class EdgeArtifactConfig:
+    """Thresholds for the narrow global-energy edge-spike rejection gate."""
+
+    r_edge_min: float = DEFAULT_EDGE_R_MIN
+    edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.r_edge_min) or not 0.0 <= self.r_edge_min < 1.0:
+            raise ValueError("edge r_edge_min must be finite and in [0, 1)")
+        if self.edge_width_max_grid is not None and (
+            not math.isfinite(self.edge_width_max_grid)
+            or self.edge_width_max_grid < 0.0
+        ):
+            raise ValueError(
+                "edge_width_max_grid must be null or a finite nonnegative number"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether the edge-energy width threshold is configured."""
+        return self.edge_width_max_grid is not None
+
+
 def empty_axis_artifact_features(
     r_ax: float = DEFAULT_AXIS_R_AX,
 ) -> dict[str, Any]:
@@ -111,17 +194,73 @@ def empty_axis_artifact_features(
     }
 
 
+def empty_grid_scale_spike_features(
+    width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    *,
+    candidate_found: bool | None = None,
+) -> dict[str, Any]:
+    """Return the stable grid-scale-spike shape with null measurements."""
+    return {
+        "grid_scale_candidate_found": candidate_found,
+        "grid_scale_candidate_width_limit_grid": width_max_grid,
+        "grid_scale_peak": None,
+        "grid_scale_peak_signed_amplitude": None,
+        "grid_scale_peak_sign": None,
+        "grid_scale_peak_harmonic_index": None,
+        "grid_scale_peak_r": None,
+        "grid_scale_halfmax_width_r": None,
+        "grid_scale_halfmax_width_grid": None,
+        "grid_scale_halfmax_inner_edge_r": None,
+        "grid_scale_halfmax_outer_edge_r": None,
+        "grid_scale_component_touches_boundary": None,
+    }
+
+
+def empty_edge_artifact_features(
+    r_edge_min: float = DEFAULT_EDGE_R_MIN,
+) -> dict[str, Any]:
+    """Return the stable edge-artifact feature shape with null measurements."""
+    return {
+        "r_edge_min": r_edge_min,
+        "edge_energy_peak": None,
+        "edge_energy_peak_r": None,
+        "edge_energy_peak_in_window": None,
+        "edge_energy_halfmax_width_r": None,
+        "edge_energy_halfmax_width_grid": None,
+        "edge_energy_halfmax_inner_edge_r": None,
+        "edge_energy_halfmax_outer_edge_r": None,
+        "edge_energy_component_touches_boundary": None,
+        "edge_harmonic_peak": None,
+        "edge_harmonic_peak_harmonic_index": None,
+        "edge_harmonic_peak_r": None,
+        "edge_harmonic_peak_is_local_max": None,
+        "edge_harmonic_halfmax_width_r": None,
+        "edge_harmonic_halfmax_width_grid": None,
+        "edge_harmonic_halfmax_inner_edge_r": None,
+        "edge_harmonic_halfmax_outer_edge_r": None,
+        "edge_harmonic_component_touches_boundary": None,
+    }
+
+
 def empty_rule_features(
     axis_artifact_config: AxisArtifactConfig | None = None,
+    grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
-    config = axis_artifact_config or AxisArtifactConfig()
+    axis_config = axis_artifact_config or AxisArtifactConfig()
+    grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
+    edge_config = edge_artifact_config or EdgeArtifactConfig()
     return {
         "feature_schema_version": RULE_FEATURE_SCHEMA_VERSION,
         "source_feature_schema_version": RULE_FEATURE_SOURCE_SCHEMA_VERSION,
         "rf_standard_features": {name: None for name in RF_FEATURE_NAMES},
         "resolution_features": {},
-        "numerical_structure_features": {},
+        "numerical_structure_features": {
+            "grid_scale_spike": empty_grid_scale_spike_features(
+                grid_config.width_max_grid
+            ),
+        },
         "crossing_features": {
             name: None for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
         },
@@ -131,7 +270,10 @@ def empty_rule_features(
             **{name: None for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES},
         },
         "boundary_features": {
-            "axis_artifact": empty_axis_artifact_features(config.r_ax),
+            "axis_artifact": empty_axis_artifact_features(axis_config.r_ax),
+            "edge_artifact": empty_edge_artifact_features(
+                edge_config.r_edge_min
+            ),
         },
     }
 
@@ -140,6 +282,8 @@ def grouped_rule_features(
     named_features: Mapping[str, Any],
     feature_status: Mapping[str, Any],
     axis_artifact_features: Mapping[str, Any],
+    grid_scale_spike_features: Mapping[str, Any],
+    edge_artifact_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -149,7 +293,9 @@ def grouped_rule_features(
             name: named_features[name] for name in RF_FEATURE_NAMES
         },
         "resolution_features": {},
-        "numerical_structure_features": {},
+        "numerical_structure_features": {
+            "grid_scale_spike": dict(grid_scale_spike_features),
+        },
         "crossing_features": {
             name: named_features[name]
             for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
@@ -164,6 +310,7 @@ def grouped_rule_features(
         },
         "boundary_features": {
             "axis_artifact": dict(axis_artifact_features),
+            "edge_artifact": dict(edge_artifact_features),
         },
     }
 
@@ -181,6 +328,183 @@ def _interpolate_threshold_crossing(
         return r_above
     fraction = (threshold - value_below) / delta
     return r_below + fraction * (r_above - r_below)
+
+
+def _signed_local_extrema(profile: np.ndarray) -> list[tuple[int, int, int]]:
+    """Return ``(index, plateau_left, plateau_right)`` for signed extrema.
+
+    Positive maxima and negative minima are both returned. A boundary sample
+    or plateau is accepted using its available one-sided neighbor; the
+    leftmost plateau index is the deterministic representative.
+    """
+    n_radial = profile.size
+    tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0, float(np.max(np.abs(profile)))
+    )
+    extrema: list[tuple[int, int, int]] = []
+    plateau_left = 0
+    while plateau_left < n_radial:
+        value = float(profile[plateau_left])
+        plateau_right = plateau_left
+        while (
+            plateau_right + 1 < n_radial
+            and abs(float(profile[plateau_right + 1]) - value) <= tolerance
+        ):
+            plateau_right += 1
+
+        if abs(value) > tolerance:
+            sign = 1.0 if value > 0.0 else -1.0
+            peak = sign * value
+            left_is_lower = (
+                plateau_left == 0
+                or sign * float(profile[plateau_left - 1]) < peak - tolerance
+            )
+            right_is_lower = (
+                plateau_right == n_radial - 1
+                or sign * float(profile[plateau_right + 1]) < peak - tolerance
+            )
+            has_outer_neighbor = plateau_left > 0 or plateau_right < n_radial - 1
+            if left_is_lower and right_is_lower and has_outer_neighbor:
+                extrema.append((plateau_left, plateau_left, plateau_right))
+        plateau_left = plateau_right + 1
+    return extrema
+
+
+def _signed_halfmax_component(
+    profile: np.ndarray,
+    *,
+    peak_index: int,
+    radial_grid: np.ndarray,
+) -> tuple[float, float, float, float, bool]:
+    """Measure one signed lobe without joining an adjacent opposite-sign lobe."""
+    signed_amplitude = float(profile[peak_index])
+    sign = 1.0 if signed_amplitude > 0.0 else -1.0
+    signed_profile = sign * profile
+    half_maximum = 0.5 * abs(signed_amplitude)
+
+    component_left = peak_index
+    while (
+        component_left > 0
+        and float(signed_profile[component_left - 1]) >= half_maximum
+    ):
+        component_left -= 1
+    component_right = peak_index
+    while (
+        component_right < profile.size - 1
+        and float(signed_profile[component_right + 1]) >= half_maximum
+    ):
+        component_right += 1
+
+    if component_left == 0:
+        inner_edge = 0.0
+    else:
+        inner_edge = _interpolate_threshold_crossing(
+            float(radial_grid[component_left - 1]),
+            float(signed_profile[component_left - 1]),
+            float(radial_grid[component_left]),
+            float(signed_profile[component_left]),
+            half_maximum,
+        )
+    if component_right == profile.size - 1:
+        outer_edge = 1.0
+    else:
+        outer_edge = _interpolate_threshold_crossing(
+            float(radial_grid[component_right]),
+            float(signed_profile[component_right]),
+            float(radial_grid[component_right + 1]),
+            float(signed_profile[component_right + 1]),
+            half_maximum,
+        )
+
+    width_r = max(0.0, outer_edge - inner_edge)
+    radial_interval = 1.0 / (profile.size - 1)
+    return (
+        float(inner_edge),
+        float(outer_edge),
+        float(width_r),
+        float(width_r / radial_interval),
+        bool(component_left == 0 or component_right == profile.size - 1),
+    )
+
+
+def extract_grid_scale_spike_features(
+    mode: np.ndarray,
+    *,
+    width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+) -> dict[str, Any]:
+    """Find the strongest signed local lobe within a grid-width limit.
+
+    Each positive maximum or negative minimum is measured on its signed
+    harmonic profile over the complete radial grid. This deliberately avoids
+    ``abs(mode)``, which can join unresolved adjacent ``+A/-A`` lobes.
+    """
+    if width_max_grid is not None and (
+        not math.isfinite(width_max_grid) or width_max_grid < 0.0
+    ):
+        raise ValueError(
+            "grid-scale width_max_grid must be null or a finite nonnegative number"
+        )
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+    if width_max_grid is None:
+        return empty_grid_scale_spike_features(
+            width_max_grid,
+            candidate_found=False,
+        )
+
+    radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
+    candidates: list[dict[str, Any]] = []
+    width_tolerance = 64.0 * np.finfo(float).eps * max(1.0, width_max_grid)
+    for harmonic_index, profile in enumerate(mode_array):
+        for peak_index, _plateau_left, _plateau_right in _signed_local_extrema(
+            profile
+        ):
+            inner_edge, outer_edge, width_r, width_grid, touches_boundary = (
+                _signed_halfmax_component(
+                    profile,
+                    peak_index=peak_index,
+                    radial_grid=radial_grid,
+                )
+            )
+            if width_grid > width_max_grid + width_tolerance:
+                continue
+            signed_amplitude = float(profile[peak_index])
+            candidates.append(
+                {
+                    "grid_scale_candidate_found": True,
+                    "grid_scale_candidate_width_limit_grid": float(width_max_grid),
+                    "grid_scale_peak": abs(signed_amplitude),
+                    "grid_scale_peak_signed_amplitude": signed_amplitude,
+                    "grid_scale_peak_sign": 1 if signed_amplitude > 0.0 else -1,
+                    "grid_scale_peak_harmonic_index": int(harmonic_index),
+                    "grid_scale_peak_r": float(radial_grid[peak_index]),
+                    "grid_scale_halfmax_width_r": width_r,
+                    "grid_scale_halfmax_width_grid": width_grid,
+                    "grid_scale_halfmax_inner_edge_r": inner_edge,
+                    "grid_scale_halfmax_outer_edge_r": outer_edge,
+                    "grid_scale_component_touches_boundary": touches_boundary,
+                }
+            )
+
+    if not candidates:
+        return empty_grid_scale_spike_features(
+            float(width_max_grid),
+            candidate_found=False,
+        )
+    return min(
+        candidates,
+        key=lambda candidate: (
+            -candidate["grid_scale_peak"],
+            candidate["grid_scale_halfmax_width_grid"],
+            candidate["grid_scale_peak_harmonic_index"],
+            candidate["grid_scale_peak_r"],
+        ),
+    )
 
 
 def extract_axis_artifact_features(
@@ -291,6 +615,114 @@ def extract_axis_artifact_features(
     }
 
 
+def extract_edge_artifact_features(
+    mode: np.ndarray,
+    *,
+    r_edge_min: float = DEFAULT_EDGE_R_MIN,
+) -> dict[str, Any]:
+    """Measure a narrow edge-localized total-energy envelope and its harmonic.
+
+    The decision evidence uses the global peak of normalized radial energy
+    ``sum_m |mode_m(r)|^2``. The strongest individual harmonic in the inclusive
+    edge window is retained separately for audit because physical edge modes
+    can contain narrow harmonics while their total envelope remains resolved.
+    All half-maximum edges are searched over the complete radial grid.
+    """
+    if not math.isfinite(r_edge_min) or not 0.0 <= r_edge_min < 1.0:
+        raise ValueError("edge r_edge_min must be finite and in [0, 1)")
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+
+    n_radial = mode_array.shape[1]
+    radial_grid = np.linspace(0.0, 1.0, n_radial)
+    radial_tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0, abs(r_edge_min)
+    )
+    radial_energy = np.sum(np.square(np.abs(mode_array)), axis=0)
+    energy_peak_index = int(np.argmax(radial_energy))
+    energy_peak_raw = float(radial_energy[energy_peak_index])
+    energy_peak_r = float(radial_grid[energy_peak_index])
+
+    result = empty_edge_artifact_features(float(r_edge_min))
+    result.update(
+        {
+            "edge_energy_peak": 1.0 if energy_peak_raw > 0.0 else 0.0,
+            "edge_energy_peak_r": energy_peak_r,
+            "edge_energy_peak_in_window": bool(
+                energy_peak_raw > 0.0
+                and energy_peak_r >= r_edge_min - radial_tolerance
+            ),
+        }
+    )
+    if energy_peak_raw > 0.0:
+        normalized_energy = radial_energy / energy_peak_raw
+        inner_edge, outer_edge, width_r, width_grid, _touches_boundary = (
+            _signed_halfmax_component(
+                normalized_energy,
+                peak_index=energy_peak_index,
+                radial_grid=radial_grid,
+            )
+        )
+        result.update(
+            {
+                "edge_energy_halfmax_width_r": width_r,
+                "edge_energy_halfmax_width_grid": width_grid,
+                "edge_energy_halfmax_inner_edge_r": inner_edge,
+                "edge_energy_halfmax_outer_edge_r": outer_edge,
+                "edge_energy_component_touches_boundary": bool(
+                    outer_edge >= 1.0 - radial_tolerance
+                ),
+            }
+        )
+
+    # Reversing the radial axis lets the established inclusive axis-window
+    # measurement audit the strongest individual harmonic near r=1.
+    mirrored = extract_axis_artifact_features(
+        mode_array[:, ::-1],
+        r_ax=1.0 - r_edge_min,
+    )
+    harmonic_index = int(mirrored["axis_peak_harmonic_index"])
+    harmonic_peak_r = 1.0 - float(mirrored["axis_peak_r"])
+    harmonic_peak_index = int(round(harmonic_peak_r * (n_radial - 1)))
+    harmonic_peak = float(mirrored["axis_peak"])
+    result.update(
+        {
+            "edge_harmonic_peak": harmonic_peak,
+            "edge_harmonic_peak_harmonic_index": harmonic_index,
+            "edge_harmonic_peak_r": harmonic_peak_r,
+            "edge_harmonic_peak_is_local_max": bool(
+                mirrored["axis_peak_is_local_max"]
+            ),
+        }
+    )
+    if harmonic_peak > 0.0:
+        harmonic_profile = np.abs(mode_array[harmonic_index])
+        inner_edge, outer_edge, width_r, width_grid, _touches_boundary = (
+            _signed_halfmax_component(
+                harmonic_profile,
+                peak_index=harmonic_peak_index,
+                radial_grid=radial_grid,
+            )
+        )
+        result.update(
+            {
+                "edge_harmonic_halfmax_width_r": width_r,
+                "edge_harmonic_halfmax_width_grid": width_grid,
+                "edge_harmonic_halfmax_inner_edge_r": inner_edge,
+                "edge_harmonic_halfmax_outer_edge_r": outer_edge,
+                "edge_harmonic_component_touches_boundary": bool(
+                    outer_edge >= 1.0 - radial_tolerance
+                ),
+            }
+        )
+    return result
+
+
 @dataclass(frozen=True)
 class RuleResult:
     """Stable, auditable result returned for one preprocessed TAE-side mode."""
@@ -345,9 +777,15 @@ def evaluate_mode(
     low2: np.ndarray | None = None,
     high2: np.ndarray | None = None,
     axis_artifact_config: AxisArtifactConfig | None = None,
+    grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    continuum_crossing_config: ContinuumCrossingConfig | None = None,
+    edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
+    grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
+    crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
+    edge_config = edge_artifact_config or EdgeArtifactConfig()
     path = str(preprocessed_row.get("path", ""))
     mode_key = str(preprocessed_row.get("mode_key", ""))
     shot = str(preprocessed_row.get("shot", ""))
@@ -376,7 +814,7 @@ def evaluate_mode(
             decision="INVALID",
             primary_reason=reason,
             triggered_rules=(reason,),
-            features=empty_rule_features(axis_config),
+            features=empty_rule_features(axis_config, grid_config, edge_config),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
         )
@@ -385,6 +823,14 @@ def evaluate_mode(
         if mode is None or low2 is None or high2 is None:
             raise ValueError("mode, low2, and high2 arrays are required")
         axis_features = extract_axis_artifact_features(mode, r_ax=axis_config.r_ax)
+        grid_scale_features = extract_grid_scale_spike_features(
+            mode,
+            width_max_grid=grid_config.width_max_grid,
+        )
+        edge_features = extract_edge_artifact_features(
+            mode,
+            r_edge_min=edge_config.r_edge_min,
+        )
         named_features, feature_status = compute_named_features_for_mode(
             mode,
             extra_info={
@@ -421,6 +867,8 @@ def evaluate_mode(
             named_features,
             feature_status,
             axis_features,
+            grid_scale_features,
+            edge_features,
         )
     except Exception as exc:
         return RuleResult(
@@ -434,7 +882,7 @@ def evaluate_mode(
             decision="INVALID",
             primary_reason=RULE_FEATURE_EXTRACTION_FAILED,
             triggered_rules=(RULE_FEATURE_EXTRACTION_FAILED,),
-            features=empty_rule_features(axis_config),
+            features=empty_rule_features(axis_config, grid_config, edge_config),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
         )
@@ -459,6 +907,71 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_AXIS_SPIKE,
             triggered_rules=(BAD_AXIS_SPIKE,),
+            features=features,
+        )
+
+    if (
+        grid_config.enabled
+        and grid_scale_features["grid_scale_candidate_found"]
+        and grid_scale_features["grid_scale_peak"] >= grid_config.amplitude_min
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_GRID_SCALE_SPIKE,
+            triggered_rules=(BAD_GRID_SCALE_SPIKE,),
+            features=features,
+        )
+
+    n_cross = named_features["n_cross"]
+    w_star_max = named_features["W_star_max"]
+    w_cross_threshold = crossing_config.w_cross_threshold
+    if (
+        w_cross_threshold is not None
+        and n_cross is not None
+        and n_cross > 0.0
+        and w_star_max is not None
+        and w_star_max > w_cross_threshold
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_CONT_CROSS,
+            triggered_rules=(BAD_CONT_CROSS,),
+            features=features,
+        )
+
+    edge_width_max_grid = edge_config.edge_width_max_grid
+    if (
+        edge_width_max_grid is not None
+        and edge_features["edge_energy_peak_in_window"]
+        and edge_features["edge_energy_halfmax_width_grid"] is not None
+        and edge_features["edge_energy_halfmax_width_grid"]
+        <= edge_width_max_grid
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_EDGE_SPIKE,
+            triggered_rules=(BAD_EDGE_SPIKE,),
             features=features,
         )
 

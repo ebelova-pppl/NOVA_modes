@@ -1017,15 +1017,15 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-artifact-v2` ruleset implements the first ordered BAD gate but
-still has no positive GOOD template. Modes that do not fire the gate return
-`REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule reasons and
-structured features are stored as deterministic JSON; missing feature values
-use JSON `null`.
+`tae-rules-axis-grid-cont-edge-v5` ruleset implements the first four ordered
+BAD gates but still has no positive GOOD template. Modes that do not fire any
+gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
+reasons and structured features are stored as deterministic JSON; missing
+feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v4`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v6`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1043,8 +1043,17 @@ groups are:
   `axis_peak_harmonic_index`, `axis_peak_r`, `axis_peak_is_local_max`, the
   connected half-maximum width in normalized radius and grid intervals, its
   outer edge, and whether the component includes `r=0`;
-- reserved empty `resolution_features` and `numerical_structure_features`
-  objects for later rule development.
+- `boundary_features.edge_artifact`: the global normalized total-energy peak
+  radius, inclusive edge-window status, connected full-grid half-maximum edges
+  and widths, and outer-boundary touch status, plus the strongest individual
+  edge harmonic's peak, zero-based stored harmonic index, local-maximum status,
+  full-grid half-maximum edges and widths, and boundary-touch status for audit;
+- `numerical_structure_features.grid_scale_spike`: whether a width-limited
+  signed-lobe candidate was found, the configured candidate width limit, its
+  absolute and signed peak amplitude, sign, zero-based stored harmonic index,
+  radius, interpolated half-maximum edges and widths, and whether the component
+  touches either radial boundary;
+- a reserved empty `resolution_features` object for later rule development.
 
 This calculates the same quantities used by RF feature experiments but does
 not load an RF checkpoint or use an RF prediction. `signed_delta` and
@@ -1082,6 +1091,67 @@ full-grid width returns `BAD` with `BAD_AXIS_SPIKE` and stops later decision
 gates. Any sufficiently narrow local maximum centered at `r <= 0.03` is treated
 as a boundary artifact without a morphology-family exception. The shot and
 per-`n` summaries record the enable flag and exact configuration.
+
+The second gate searches every stored harmonic across the complete radial grid
+for positive local maxima and negative local minima. It measures each connected
+half-maximum lobe on the signed profile, not on `abs(mode)`, so adjacent
+opposite-sign samples cannot be merged into a falsely broad component. Among
+lobes no wider than the configured limit, it records the strongest candidate.
+One-sided local extrema at either radial endpoint are included.
+
+Grid-scale-spike configuration corresponds to:
+
+```yaml
+grid_scale_spike:
+  amplitude_min: 0.3
+  width_max_grid: 1
+```
+
+The CLI names are `--grid_scale_amplitude_min` and
+`--grid_scale_width_max_grid`. When the strongest width-limited candidate meets
+the amplitude threshold, the second ordered gate returns `BAD` with
+`BAD_GRID_SCALE_SPIKE` and stops later decision gates. Use
+`--disable_grid_scale_spike` to retain the configured-width measurements while
+disabling this decision.
+
+The third gate uses the existing true lower/upper continuum crossings and
+their pointwise radial energy. `W_star_max` is the maximum over crossing records
+of `sum_h |mode_h(r_cross)|^2`, normalized by the maximum of that energy over
+radius. Its provisional calibrated configuration is:
+
+```yaml
+continuum_crossing:
+  w_cross_threshold: 0.05
+```
+
+After the axis and grid-scale gates, a mode with `n_cross > 0` and
+`W_star_max > w_cross_threshold` returns `BAD` with `BAD_CONT_CROSS` and stops
+later gates. The comparison is strictly greater than the threshold. Override
+it with `--w_cross_threshold`, or use `--disable_cont_cross` to retain the
+crossing measurements without applying the decision. The shot and per-`n`
+summaries record the crossing-gate enable flag and calibrated threshold.
+
+The fourth gate uses the global radial-energy envelope
+`W(r)=sum_h |mode_h(r)|^2`, normalized by its global maximum. Its provisional
+calibrated configuration is:
+
+```yaml
+edge_artifact:
+  r_edge_min: 0.97
+  edge_width_max_grid: 10
+```
+
+After the continuum-crossing gate, a mode whose global energy peak is at
+`r >= r_edge_min` and whose connected energy FWHM is no greater than
+`edge_width_max_grid` returns `BAD` with `BAD_EDGE_SPIKE`. Both half-maximum
+edges are found on the complete radial grid. The strongest individual harmonic
+within the same inclusive edge window is recorded for audit, but does not fire
+this gate alone because physical edge-localized modes can contain narrow
+shear-localized harmonics within a broader total envelope. Override the
+settings with `--edge_r_min` and `--edge_width_max_grid`, or use
+`--disable_edge_artifact` to retain the measurements without applying the
+decision. Shot and per-`n` summaries record enable state and thresholds for all
+four gates.
 
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:
