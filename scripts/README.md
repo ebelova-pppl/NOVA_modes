@@ -1017,7 +1017,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-grid-cont-edge-v6` ruleset implements the first four ordered
+`tae-rules-axis-grid-cont-window-edge-v7` ruleset implements the first five ordered
 BAD gates but still has no positive GOOD template. Modes that do not fire any
 gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
 reasons and structured features are stored as deterministic JSON; missing
@@ -1025,7 +1025,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v6`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v7`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1034,7 +1034,11 @@ groups are:
   production continuum scalars;
 - `crossing_features`: `n_cross`, `r_star_max`, `W_star_sum`,
   `r_star_high_shear`, `W_star_high_shear`, and
-  `W_star_high_shear_sum`;
+  `W_star_high_shear_sum`, plus independently selected amplitude and normalized
+  energy winners from the configured neighborhood of all true crossings. The
+  latter record the window widths, winning values, sample radii, associated
+  crossing boundary/radius, harmonic index for amplitude, and sample distance
+  from the crossing in grid intervals;
 - `crossing_records`: every lower/upper crossing with `boundary`, `r_cross`,
   `W_peak`, and `shear_weighted`, ordered by boundary and radius;
 - `extremum_features`: `match_found`, `ext_dr`, `ext_df_gap`, and
@@ -1131,7 +1135,30 @@ it with `--w_cross_threshold`, or use `--disable_cont_cross` to retain the
 crossing measurements without applying the decision. The shot and per-`n`
 summaries record the crossing-gate enable flag and calibrated threshold.
 
-The fourth gate uses the global radial-energy envelope
+The fourth gate samples the normalized mode arrays near every interpolated true
+crossing. Its calibrated configuration is:
+
+```yaml
+continuum_crossing_window:
+  half_width_grid: 2
+  amplitude_min: 0.25
+  w_min: 0.05
+```
+
+For each crossing, include radial samples satisfying
+`abs(r_i - r_cross) <= half_width_grid * delta_r`. Across all such samples and
+crossings, independently retain the largest individual-harmonic absolute
+amplitude `cross_window_A_max` and largest peak-normalized total radial energy
+`cross_window_W_max`, with the winning sample and crossing metadata for each.
+After `BAD_CONT_CROSS`, a mode with `n_cross > 0` returns `BAD` with
+`BAD_CONT_CROSS_WINDOW` when either
+`cross_window_A_max >= amplitude_min` or `cross_window_W_max >= w_min`. These
+comparisons are inclusive. Override the settings with
+`--cross_window_half_width_grid`, `--cross_window_amplitude_min`, and
+`--cross_window_w_min`; use `--disable_cont_cross_window` to retain the
+measurements while disabling this decision.
+
+The fifth gate uses the global radial-energy envelope
 `W(r)=sum_h |mode_h(r)|^2`, normalized by its global maximum. Its provisional
 calibrated configuration is:
 
@@ -1141,7 +1168,7 @@ edge_artifact:
   edge_width_max_grid: 10
 ```
 
-After the continuum-crossing gate, a mode whose global energy peak is at
+After both continuum-crossing gates, a mode whose global energy peak is at
 `r >= r_edge_min` and whose connected energy FWHM is no greater than
 `edge_width_max_grid` returns `BAD` with `BAD_EDGE_SPIKE`. Both half-maximum
 edges are found on the complete radial grid. The strongest individual harmonic
@@ -1151,7 +1178,7 @@ shear-localized harmonics within a broader total envelope. Override the
 settings with `--edge_r_min` and `--edge_width_max_grid`, or use
 `--disable_edge_artifact` to retain the measurements without applying the
 decision. Shot and per-`n` summaries record enable state and thresholds for all
-four gates.
+five gates.
 
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:

@@ -34,20 +34,24 @@ DEFAULT_AXIS_WIDTH_MAX_GRID = 10.0
 DEFAULT_GRID_SCALE_AMPLITUDE_MIN = 0.3
 DEFAULT_GRID_SCALE_WIDTH_MAX_GRID = 1.0
 DEFAULT_W_CROSS_THRESHOLD = 0.03
+DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID = 2
+DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN = 0.25
+DEFAULT_CROSS_WINDOW_W_MIN = 0.05
 DEFAULT_EDGE_R_MIN = 0.97
 DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
 
-RULESET_VERSION = "tae-rules-axis-grid-cont-edge-v6"
+RULESET_VERSION = "tae-rules-axis-grid-cont-window-edge-v7"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
 BAD_CONT_CROSS = "BAD_CONT_CROSS"
+BAD_CONT_CROSS_WINDOW = "BAD_CONT_CROSS_WINDOW"
 BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
 NO_GOOD_TEMPLATE = "NO_GOOD_TEMPLATE"
 RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v6"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v7"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -154,6 +158,38 @@ class ContinuumCrossingConfig:
 
 
 @dataclass(frozen=True)
+class ContinuumCrossingWindowConfig:
+    """Thresholds for crossing-neighborhood amplitude and energy."""
+
+    half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID
+    amplitude_min: float | None = DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN
+    w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN
+
+    def __post_init__(self) -> None:
+        if isinstance(self.half_width_grid, bool) or not isinstance(
+            self.half_width_grid, int
+        ):
+            raise ValueError("cross_window half_width_grid must be an integer")
+        if self.half_width_grid < 0:
+            raise ValueError("cross_window half_width_grid must be nonnegative")
+        for name, value in (
+            ("amplitude_min", self.amplitude_min),
+            ("w_min", self.w_min),
+        ):
+            if value is not None and (
+                not math.isfinite(value) or not 0.0 <= value <= 1.0
+            ):
+                raise ValueError(
+                    f"cross_window {name} must be null or finite and in [0, 1]"
+                )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether either crossing-neighborhood threshold is configured."""
+        return self.amplitude_min is not None or self.w_min is not None
+
+
+@dataclass(frozen=True)
 class EdgeArtifactConfig:
     """Thresholds for the narrow global-energy edge-spike rejection gate."""
 
@@ -242,15 +278,43 @@ def empty_edge_artifact_features(
     }
 
 
+def empty_continuum_crossing_window_features(
+    half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
+    *,
+    candidate_found: bool | None = None,
+) -> dict[str, Any]:
+    """Return the stable crossing-neighborhood shape with null measurements."""
+    return {
+        "cross_window_candidate_found": candidate_found,
+        "cross_window_half_width_grid": half_width_grid,
+        "cross_window_half_width_r": None,
+        "cross_window_A_max": None,
+        "cross_window_A_harmonic_index": None,
+        "cross_window_A_sample_r": None,
+        "cross_window_A_crossing_boundary": None,
+        "cross_window_A_crossing_r": None,
+        "cross_window_A_distance_grid": None,
+        "cross_window_W_max": None,
+        "cross_window_W_sample_r": None,
+        "cross_window_W_crossing_boundary": None,
+        "cross_window_W_crossing_r": None,
+        "cross_window_W_distance_grid": None,
+    }
+
+
 def empty_rule_features(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     edge_config = edge_artifact_config or EdgeArtifactConfig()
+    cross_window_config = (
+        continuum_crossing_window_config or ContinuumCrossingWindowConfig()
+    )
     return {
         "feature_schema_version": RULE_FEATURE_SCHEMA_VERSION,
         "source_feature_schema_version": RULE_FEATURE_SOURCE_SCHEMA_VERSION,
@@ -262,7 +326,10 @@ def empty_rule_features(
             ),
         },
         "crossing_features": {
-            name: None for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+            **{name: None for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES},
+            **empty_continuum_crossing_window_features(
+                cross_window_config.half_width_grid
+            ),
         },
         "crossing_records": [],
         "extremum_features": {
@@ -284,6 +351,7 @@ def grouped_rule_features(
     axis_artifact_features: Mapping[str, Any],
     grid_scale_spike_features: Mapping[str, Any],
     edge_artifact_features: Mapping[str, Any],
+    continuum_crossing_window_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -297,8 +365,11 @@ def grouped_rule_features(
             "grid_scale_spike": dict(grid_scale_spike_features),
         },
         "crossing_features": {
-            name: named_features[name]
-            for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+            **{
+                name: named_features[name]
+                for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
+            },
+            **dict(continuum_crossing_window_features),
         },
         "crossing_records": list(feature_status["crossing_records"]),
         "extremum_features": {
@@ -615,6 +686,114 @@ def extract_axis_artifact_features(
     }
 
 
+def extract_continuum_crossing_window_features(
+    mode: np.ndarray,
+    crossing_records: list[Mapping[str, Any]],
+    *,
+    half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
+) -> dict[str, Any]:
+    """Measure harmonic amplitude and normalized energy near true crossings.
+
+    The inclusive radial window around each interpolated crossing is
+    ``abs(r_i - r_cross) <= half_width_grid * delta_r``. Winners are selected
+    independently for individual-harmonic absolute amplitude and total radial
+    energy so both kinds of evidence remain auditable.
+    """
+    if isinstance(half_width_grid, bool) or not isinstance(half_width_grid, int):
+        raise ValueError("cross_window half_width_grid must be an integer")
+    if half_width_grid < 0:
+        raise ValueError("cross_window half_width_grid must be nonnegative")
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+
+    radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
+    delta_r = float(radial_grid[1] - radial_grid[0])
+    half_width_r = float(half_width_grid * delta_r)
+    result = empty_continuum_crossing_window_features(
+        half_width_grid,
+        candidate_found=False,
+    )
+    result["cross_window_half_width_r"] = half_width_r
+    if not crossing_records:
+        return result
+
+    ordered_records: list[tuple[str, float]] = []
+    for record in crossing_records:
+        if set(record) != {"boundary", "r_cross", "W_peak", "shear_weighted"}:
+            raise ValueError("crossing record does not match the audit schema")
+        boundary = str(record["boundary"])
+        r_cross = float(record["r_cross"])
+        if boundary not in {"low", "high"} or not math.isfinite(r_cross):
+            raise ValueError("crossing record contains invalid window coordinates")
+        ordered_records.append((boundary, r_cross))
+    ordered_records.sort(key=lambda item: (0 if item[0] == "low" else 1, item[1]))
+
+    radial_energy = np.sum(mode_array**2, axis=0)
+    energy_max = float(np.max(radial_energy))
+    if energy_max > 0.0:
+        normalized_energy = radial_energy / energy_max
+    else:
+        normalized_energy = np.zeros_like(radial_energy)
+    absolute_mode = np.abs(mode_array)
+    radial_tolerance = 64.0 * np.finfo(float).eps * max(1.0, half_width_r)
+
+    amplitude_winner: tuple[float, int, int, str, float] | None = None
+    energy_winner: tuple[float, int, str, float] | None = None
+    for boundary, r_cross in ordered_records:
+        sample_indices = np.flatnonzero(
+            np.abs(radial_grid - r_cross) <= half_width_r + radial_tolerance
+        )
+        for sample_index_raw in sample_indices:
+            sample_index = int(sample_index_raw)
+            harmonic_index = int(np.argmax(absolute_mode[:, sample_index]))
+            amplitude = float(absolute_mode[harmonic_index, sample_index])
+            if amplitude_winner is None or amplitude > amplitude_winner[0]:
+                amplitude_winner = (
+                    amplitude,
+                    harmonic_index,
+                    sample_index,
+                    boundary,
+                    r_cross,
+                )
+            energy = float(normalized_energy[sample_index])
+            if energy_winner is None or energy > energy_winner[0]:
+                energy_winner = (energy, sample_index, boundary, r_cross)
+
+    if amplitude_winner is None or energy_winner is None:
+        raise ValueError("crossing window contains no radial grid samples")
+
+    amplitude, harmonic_index, sample_index, boundary, r_cross = amplitude_winner
+    sample_r = float(radial_grid[sample_index])
+    result.update(
+        {
+            "cross_window_candidate_found": True,
+            "cross_window_A_max": amplitude,
+            "cross_window_A_harmonic_index": harmonic_index,
+            "cross_window_A_sample_r": sample_r,
+            "cross_window_A_crossing_boundary": boundary,
+            "cross_window_A_crossing_r": r_cross,
+            "cross_window_A_distance_grid": abs(sample_r - r_cross) / delta_r,
+        }
+    )
+    energy, sample_index, boundary, r_cross = energy_winner
+    sample_r = float(radial_grid[sample_index])
+    result.update(
+        {
+            "cross_window_W_max": energy,
+            "cross_window_W_sample_r": sample_r,
+            "cross_window_W_crossing_boundary": boundary,
+            "cross_window_W_crossing_r": r_cross,
+            "cross_window_W_distance_grid": abs(sample_r - r_cross) / delta_r,
+        }
+    )
+    return result
+
+
 def extract_edge_artifact_features(
     mode: np.ndarray,
     *,
@@ -779,12 +958,16 @@ def evaluate_mode(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
+    continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
+    cross_window_config = (
+        continuum_crossing_window_config or ContinuumCrossingWindowConfig()
+    )
     edge_config = edge_artifact_config or EdgeArtifactConfig()
     path = str(preprocessed_row.get("path", ""))
     mode_key = str(preprocessed_row.get("mode_key", ""))
@@ -814,7 +997,12 @@ def evaluate_mode(
             decision="INVALID",
             primary_reason=reason,
             triggered_rules=(reason,),
-            features=empty_rule_features(axis_config, grid_config, edge_config),
+            features=empty_rule_features(
+                axis_config,
+                grid_config,
+                edge_config,
+                cross_window_config,
+            ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
         )
@@ -863,12 +1051,18 @@ def evaluate_mode(
                 for name in ("r_cross", "W_peak", "shear_weighted")
             ):
                 raise ValueError("crossing record contains invalid values")
+        cross_window_features = extract_continuum_crossing_window_features(
+            mode,
+            feature_status["crossing_records"],
+            half_width_grid=cross_window_config.half_width_grid,
+        )
         features = grouped_rule_features(
             named_features,
             feature_status,
             axis_features,
             grid_scale_features,
             edge_features,
+            cross_window_features,
         )
     except Exception as exc:
         return RuleResult(
@@ -882,7 +1076,12 @@ def evaluate_mode(
             decision="INVALID",
             primary_reason=RULE_FEATURE_EXTRACTION_FAILED,
             triggered_rules=(RULE_FEATURE_EXTRACTION_FAILED,),
-            features=empty_rule_features(axis_config, grid_config, edge_config),
+            features=empty_rule_features(
+                axis_config,
+                grid_config,
+                edge_config,
+                cross_window_config,
+            ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
         )
@@ -950,6 +1149,39 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_CONT_CROSS,
             triggered_rules=(BAD_CONT_CROSS,),
+            features=features,
+        )
+
+    cross_window_amplitude = cross_window_features["cross_window_A_max"]
+    cross_window_w = cross_window_features["cross_window_W_max"]
+    amplitude_hit = (
+        cross_window_config.amplitude_min is not None
+        and cross_window_amplitude is not None
+        and cross_window_amplitude >= cross_window_config.amplitude_min
+    )
+    energy_hit = (
+        cross_window_config.w_min is not None
+        and cross_window_w is not None
+        and cross_window_w >= cross_window_config.w_min
+    )
+    if (
+        cross_window_config.enabled
+        and n_cross is not None
+        and n_cross > 0.0
+        and cross_window_features["cross_window_candidate_found"]
+        and (amplitude_hit or energy_hit)
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_CONT_CROSS_WINDOW,
+            triggered_rules=(BAD_CONT_CROSS_WINDOW,),
             features=features,
         )
 

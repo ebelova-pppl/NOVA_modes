@@ -231,11 +231,14 @@ python scripts/sort_shot_rules.py \
 ```
 
 This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. Four ordered BAD gates currently reject a calibrated
+routing conventions. Five ordered BAD gates currently reject a calibrated
 narrow local maximum at `r <= 0.03` (`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), or a true continuum crossing with
-`W_star_max > 0.03` (`BAD_CONT_CROSS`), followed by a global total-energy peak
-at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
+`W_star_max > 0.03` (`BAD_CONT_CROSS`). A second crossing gate rejects when an
+inclusive ±2-grid neighborhood of any true crossing has individual-harmonic
+absolute amplitude at least `0.25` or peak-normalized radial energy at least
+`0.05` (`BAD_CONT_CROSS_WINDOW`). The final gate rejects a global total-energy
+peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
 (`BAD_EDGE_SPIKE`). The active axis defaults require
 normalized amplitude at least `0.2` and full width at half maximum no greater
 than `10` radial-grid intervals; the grid-scale defaults require amplitude at
@@ -246,21 +249,24 @@ fabricated rule decision.
 
 Each valid TAE-side result includes a grouped, deterministic `rule_features`
 object containing the active RF 22-feature calculations, six crossing
-summaries, raw crossing records, three continuum-extremum measurements, and
-axis/edge boundary measurements. Half-maximum boundary widths use the complete
-radial grid, not only their search windows. The edge decision uses the global
-normalized total-energy envelope; the strongest individual edge harmonic is
-recorded for audit but does not fire the gate alone. NOVA radius and mode
-amplitude are already normalized; harmonic identifiers are reported as
-zero-based stored indices without inferring a physical poloidal-`m` offset.
-This reuses the calculations without running an RF model.
+summaries, crossing-window amplitude and energy evidence, raw crossing records,
+three continuum-extremum measurements, and axis/edge boundary measurements.
+Half-maximum boundary widths use the complete radial grid, not only their
+search windows. The edge decision uses the global normalized total-energy
+envelope; the strongest individual edge harmonic is recorded for audit but
+does not fire the gate alone. NOVA radius and mode amplitude are already
+normalized; harmonic identifiers are reported as zero-based stored indices
+without inferring a physical poloidal-`m` offset. This reuses the calculations
+without running an RF model.
 
 Override the calibrated defaults with `--axis_amplitude_min VALUE`,
 `--axis_width_max_grid VALUE`, `--grid_scale_amplitude_min VALUE`,
 `--grid_scale_width_max_grid VALUE`, `--w_cross_threshold VALUE`,
-`--edge_r_min VALUE`, and `--edge_width_max_grid VALUE`. The
-matching disable switches retain measurements while disabling each decision
-gate. The run summary records every gate's enable state and exact thresholds.
+`--cross_window_half_width_grid VALUE`,
+`--cross_window_amplitude_min VALUE`, `--cross_window_w_min VALUE`,
+`--edge_r_min VALUE`, and `--edge_width_max_grid VALUE`. The matching disable
+switches retain measurements while disabling each decision gate. The run
+summary records every gate's enable state and exact thresholds.
 
 Optional manual adjudication writes fingerprinted overrides separately:
 

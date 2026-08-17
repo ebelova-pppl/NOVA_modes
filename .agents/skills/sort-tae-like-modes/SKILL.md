@@ -19,22 +19,26 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. The first four ordered rejection gates detect narrow
+TAE/EAE/mixed split. The first five ordered rejection gates detect narrow
 near-axis spikes, unresolved signed-harmonic spikes anywhere in radius, and
-continuum crossings carrying appreciable normalized radial energy, followed by
-a narrow globally dominant energy envelope at the outer radial boundary.
+continuum crossings carrying appreciable exact-point or nearby amplitude and
+normalized radial energy, followed by a narrow globally dominant energy
+envelope at the outer radial boundary.
 Their calibrated defaults are `r_ax=0.03` inclusive,
 `axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
 `grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`, and
-`w_cross_threshold=0.03`, with provisional edge defaults
+`w_cross_threshold=0.03`, crossing-window defaults
+`cross_window_half_width_grid=2`, `cross_window_amplitude_min=0.25`, and
+`cross_window_w_min=0.05`, with provisional edge defaults
 `r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; modes not rejected by
 any gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v6 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v7 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
-`crossing_features`, individual lower/upper crossings in `crossing_records`,
-and match status plus the three inner-extremum measurements in
-`extremum_features`. Keep the axis measurements under
+`crossing_features` together with crossing-window amplitude and energy audit
+evidence, individual lower/upper crossings in `crossing_records`, and match
+status plus the three inner-extremum measurements in `extremum_features`. Keep
+the axis measurements under
 `boundary_features.axis_artifact`, the outer energy-envelope and edge-harmonic
 audit measurements under `boundary_features.edge_artifact`, and the unresolved
 signed-lobe measurements under `numerical_structure_features.grid_scale_spike`;
@@ -117,7 +121,29 @@ The comparison is intentionally strict (`>`). This gate runs only after
 `--disable_cont_cross` to retain the same crossing features while disabling the
 decision.
 
-The fourth gate measures the global radial-energy envelope
+The fourth gate inspects an inclusive radial neighborhood around every true
+crossing:
+
+```text
+For every crossing, include samples with
+abs(r_i - r_cross) <= 2 * delta_r
+
+IF n_cross > 0
+AND (cross_window_A_max >= 0.25 OR cross_window_W_max >= 0.05)
+THEN BAD_CONT_CROSS_WINDOW
+AND stop evaluating later decision gates
+```
+
+`cross_window_A_max` is the largest absolute individual-harmonic amplitude in
+all crossing windows. `cross_window_W_max` is the largest
+`sum_h |mode_h(r_i)|^2`, normalized by its radial maximum. Record independent
+winning sample radius, crossing boundary/radius, distance in grid intervals,
+and the winning stored harmonic index for amplitude. Override the defaults
+with `--cross_window_half_width_grid`, `--cross_window_amplitude_min`, and
+`--cross_window_w_min`; use `--disable_cont_cross_window` to retain evidence
+without applying the gate. The two threshold comparisons are inclusive.
+
+The fifth gate measures the global radial-energy envelope
 `W(r)=sum_h |mode_h(r)|^2`, normalized to a peak of one. Search both
 half-maximum edges on the full grid. Keep a separate mirrored audit of the
 strongest individual harmonic in the inclusive `r >= r_edge_min` window, but
@@ -132,11 +158,11 @@ THEN BAD_EDGE_SPIKE
 AND stop evaluating later decision gates
 ```
 
-This gate runs only after `BAD_CONT_CROSS`. Override its settings with
+This gate runs only after `BAD_CONT_CROSS_WINDOW`. Override its settings with
 `--edge_r_min` and `--edge_width_max_grid`; use `--disable_edge_artifact` to
 retain both envelope and harmonic audit measurements without applying the
 decision. The edge threshold is inclusive. Shot and per-`n` summaries record
-the enable state and exact threshold for all four gates.
+the enable state and exact threshold for all five gates.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or

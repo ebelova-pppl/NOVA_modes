@@ -39,6 +39,9 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_AXIS_AMPLITUDE_MIN,
     DEFAULT_AXIS_R_AX,
     DEFAULT_AXIS_WIDTH_MAX_GRID,
+    DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
+    DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
+    DEFAULT_CROSS_WINDOW_W_MIN,
     DEFAULT_EDGE_R_MIN,
     DEFAULT_EDGE_WIDTH_MAX_GRID,
     DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
@@ -47,6 +50,7 @@ from tae_rule_engine import (  # noqa: E402
     RULESET_VERSION,
     AxisArtifactConfig,
     ContinuumCrossingConfig,
+    ContinuumCrossingWindowConfig,
     EdgeArtifactConfig,
     GridScaleSpikeConfig,
     evaluate_mode,
@@ -133,6 +137,10 @@ SHOT_SUMMARY_FIELDS = [
     "grid_scale_spike_width_max_grid",
     "continuum_crossing_gate_enabled",
     "continuum_crossing_w_threshold",
+    "continuum_crossing_window_gate_enabled",
+    "continuum_crossing_window_half_width_grid",
+    "continuum_crossing_window_amplitude_min",
+    "continuum_crossing_window_w_min",
     "edge_artifact_gate_enabled",
     "edge_artifact_r_min",
     "edge_artifact_width_max_grid",
@@ -706,11 +714,15 @@ def build_summary(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
+    continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> dict[str, Any]:
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
+    cross_window_config = (
+        continuum_crossing_window_config or ContinuumCrossingWindowConfig()
+    )
     edge_config = edge_artifact_config or EdgeArtifactConfig()
     rule_rows = [row for row in rows if row.get("rule_version") == RULESET_VERSION]
     transitions = Counter(
@@ -772,6 +784,14 @@ def build_summary(
         "grid_scale_spike_width_max_grid": grid_config.width_max_grid,
         "continuum_crossing_gate_enabled": crossing_config.enabled,
         "continuum_crossing_w_threshold": crossing_config.w_cross_threshold,
+        "continuum_crossing_window_gate_enabled": cross_window_config.enabled,
+        "continuum_crossing_window_half_width_grid": (
+            cross_window_config.half_width_grid
+        ),
+        "continuum_crossing_window_amplitude_min": (
+            cross_window_config.amplitude_min
+        ),
+        "continuum_crossing_window_w_min": cross_window_config.w_min,
         "edge_artifact_gate_enabled": edge_config.enabled,
         "edge_artifact_r_min": edge_config.r_edge_min,
         "edge_artifact_width_max_grid": edge_config.edge_width_max_grid,
@@ -793,6 +813,7 @@ def _summary_by_n(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
+    continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> list[dict[str, Any]]:
     by_n: dict[int, list[Mapping[str, Any]]] = defaultdict(list)
@@ -841,6 +862,7 @@ def _summary_by_n(
             axis_artifact_config=axis_artifact_config,
             grid_scale_spike_config=grid_scale_spike_config,
             continuum_crossing_config=continuum_crossing_config,
+            continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
         )
         summaries.append({"shot": shot, "n": ntor, **summary})
@@ -921,6 +943,9 @@ def run_shot(
     grid_scale_amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
     grid_scale_width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
     w_cross_threshold: float | None = DEFAULT_W_CROSS_THRESHOLD,
+    cross_window_half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
+    cross_window_amplitude_min: float | None = DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
+    cross_window_w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN,
     edge_r_min: float = DEFAULT_EDGE_R_MIN,
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
 ) -> ShotRunResult:
@@ -938,6 +963,11 @@ def run_shot(
     )
     crossing_config = ContinuumCrossingConfig(
         w_cross_threshold=w_cross_threshold,
+    )
+    cross_window_config = ContinuumCrossingWindowConfig(
+        half_width_grid=cross_window_half_width_grid,
+        amplitude_min=cross_window_amplitude_min,
+        w_min=cross_window_w_min,
     )
     edge_config = EdgeArtifactConfig(
         r_edge_min=edge_r_min,
@@ -980,6 +1010,7 @@ def run_shot(
             axis_artifact_config=axis_config,
             grid_scale_spike_config=grid_config,
             continuum_crossing_config=crossing_config,
+            continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
         )
         rule_by_key[key] = result.as_output_row(row)
@@ -1019,6 +1050,7 @@ def run_shot(
         axis_artifact_config=axis_config,
         grid_scale_spike_config=grid_config,
         continuum_crossing_config=crossing_config,
+        continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
     )
     summary_by_n = _summary_by_n(
@@ -1034,6 +1066,7 @@ def run_shot(
         axis_artifact_config=axis_config,
         grid_scale_spike_config=grid_config,
         continuum_crossing_config=crossing_config,
+        continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
     )
     write_outputs(
@@ -1161,6 +1194,44 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--cross_window_half_width_grid",
+        type=int,
+        default=DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
+        help=(
+            "Inclusive half-width in radial grid intervals around every true "
+            "crossing for BAD_CONT_CROSS_WINDOW "
+            f"(default: {DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID})"
+        ),
+    )
+    parser.add_argument(
+        "--cross_window_amplitude_min",
+        type=float,
+        default=DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
+        help=(
+            "Minimum individual-harmonic absolute amplitude within the crossing "
+            "window for BAD_CONT_CROSS_WINDOW "
+            f"(default: {DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN})"
+        ),
+    )
+    parser.add_argument(
+        "--cross_window_w_min",
+        type=float,
+        default=DEFAULT_CROSS_WINDOW_W_MIN,
+        help=(
+            "Minimum peak-normalized radial energy within the crossing window "
+            "for BAD_CONT_CROSS_WINDOW "
+            f"(default: {DEFAULT_CROSS_WINDOW_W_MIN})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_cont_cross_window",
+        action="store_true",
+        help=(
+            "Calculate crossing-window measurements but disable the "
+            "BAD_CONT_CROSS_WINDOW decision gate"
+        ),
+    )
+    parser.add_argument(
         "--edge_r_min",
         type=float,
         default=DEFAULT_EDGE_R_MIN,
@@ -1219,6 +1290,15 @@ def main() -> None:
         w_cross_threshold=(
             None if args.disable_cont_cross else args.w_cross_threshold
         ),
+        cross_window_half_width_grid=args.cross_window_half_width_grid,
+        cross_window_amplitude_min=(
+            None
+            if args.disable_cont_cross_window
+            else args.cross_window_amplitude_min
+        ),
+        cross_window_w_min=(
+            None if args.disable_cont_cross_window else args.cross_window_w_min
+        ),
         edge_r_min=args.edge_r_min,
         edge_width_max_grid=(
             None if args.disable_edge_artifact else args.edge_width_max_grid
@@ -1255,6 +1335,15 @@ def main() -> None:
         "Continuum-crossing gate: "
         f"enabled={summary['continuum_crossing_gate_enabled']} "
         f"w_cross_threshold={summary['continuum_crossing_w_threshold']}"
+    )
+    print(
+        "Continuum-crossing window gate: "
+        f"enabled={summary['continuum_crossing_window_gate_enabled']} "
+        "half_width_grid="
+        f"{summary['continuum_crossing_window_half_width_grid']} "
+        "amplitude_min="
+        f"{summary['continuum_crossing_window_amplitude_min']} "
+        f"w_min={summary['continuum_crossing_window_w_min']}"
     )
     print(
         "Edge artifact gate: "

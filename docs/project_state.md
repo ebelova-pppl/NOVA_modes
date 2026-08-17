@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-16)
+### Project state (current snapshot, updated 2026-08-17)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -3466,3 +3466,159 @@ The three active-label disagreements and their gate measurements are in
   `BAD_GRID_SCALE_SPIKE`;
 - labeled BAD but retained: `N7/egn07w.2630E+02` and
   `N8/egn08w.2765E+02`, both with crossing energy below 0.007.
+
+### 2026-08-16: run the fixed four-gate rules on nstxuG121123B12
+
+Ran the unchanged `tae-rules-axis-grid-cont-edge-v6` configuration, including
+the strict `W_star_max > 0.03` crossing threshold, on the complete 637-mode
+`nstxuG121123B12` shot from `$NOVA_DATA`. Outputs are in
+`outputs/nstxuG121123B12_full_axis_grid_cont_edge_w003_v6/`.
+
+Routing found 129 TAE-like, 7 mixed, 501 EAE-like, and no invalid inputs. Among
+the 136 TAE-side modes, the rules returned 112 BAD / 24 REVIEW with primary
+reasons `BAD_AXIS_SPIKE=18`, `BAD_GRID_SCALE_SPIKE=51`,
+`BAD_CONT_CROSS=43`, `BAD_EDGE_SPIKE=0`, and `NO_GOOD_TEMPLATE=24`.
+
+The active training list supplies 135 matching labels: 116 BAD and 19 GOOD.
+All 19 labeled GOOD modes remain REVIEW, while 111 of 116 labeled BAD modes are
+rejected. The five disagreements are therefore all labeled-BAD modes retained
+as REVIEW; there are no labeled-GOOD rejections. Their measurements are in
+`outputs/nstxuG121123B12_full_axis_grid_cont_edge_w003_v6/label_disagreements.csv`.
+The one additional TAE-side mode, `N7/egn07w.1888E+02`, is not in the active
+training list and is rejected by `BAD_CONT_CROSS`.
+
+Relative to the former 0.05 crossing threshold, the 0.03 default rejects three
+additional labeled-BAD modes and the one unlabeled mode, with no labeled-GOOD
+loss:
+
+- `N8/egn08w.3027E+02`, BAD, `W_star_max=0.0438244`;
+- `N9/egn09w.1294E+02`, BAD, `W_star_max=0.0435955`;
+- `N9/egn09w.2852E+02`, BAD, `W_star_max=0.0498032`;
+- `N7/egn07w.1888E+02`, unlabeled, `W_star_max=0.0369659`.
+
+These threshold-specific changes are recorded in
+`outputs/nstxuG121123B12_full_axis_grid_cont_edge_w003_v6/crossing_threshold_003_changes.csv`.
+
+### 2026-08-17: run the fixed four-gate rules on nstxuG121123J38
+
+Ran the unchanged `tae-rules-axis-grid-cont-edge-v6` configuration on the
+complete 620-mode `nstxuG121123J38` shot from `$NOVA_DATA`. Outputs are in
+`outputs/nstxuG121123J38_full_axis_grid_cont_edge_w003_v6/`.
+
+Routing found 165 TAE-like, 9 mixed, 446 EAE-like, and no invalid inputs. Among
+the 174 TAE-side modes, the rules returned 145 BAD / 29 REVIEW with primary
+reasons `BAD_AXIS_SPIKE=36`, `BAD_GRID_SCALE_SPIKE=28`,
+`BAD_CONT_CROSS=81`, `BAD_EDGE_SPIKE=0`, and `NO_GOOD_TEMPLATE=29`.
+
+The active training list has exact one-to-one coverage of these 174 modes: 167
+BAD and 7 GOOD. All 7 labeled GOOD modes remain REVIEW. The rules reject 145 of
+167 labeled BAD modes and retain 22 labeled BAD modes as REVIEW; there are no
+labeled-GOOD rejections. The 22 disagreements are recorded in
+`outputs/nstxuG121123J38_full_axis_grid_cont_edge_w003_v6/label_disagreements.csv`.
+
+Relative to the former 0.05 crossing threshold, the 0.03 default rejects nine
+additional labeled-BAD modes with no labeled-GOOD loss. Their `W_star_max`
+values span `0.0304733` to `0.0475866`; the exact rows are in
+`outputs/nstxuG121123J38_full_axis_grid_cont_edge_w003_v6/crossing_threshold_003_changes.csv`.
+
+### 2026-08-17: add the crossing-neighborhood BAD gate
+
+Implemented `BAD_CONT_CROSS_WINDOW` as the fourth ordered short-circuit gate,
+after exact-point `BAD_CONT_CROSS` and before `BAD_EDGE_SPIKE`. It addresses
+continuum resonances that fall between radial samples or have appreciable mode
+structure immediately beside the interpolated crossing even when
+`W_star_max <= 0.03`.
+
+The active configuration is:
+
+```yaml
+continuum_crossing_window:
+  half_width_grid: 2
+  amplitude_min: 0.25
+  w_min: 0.05
+```
+
+For every true lower/upper crossing, the extractor includes radial samples
+satisfying `abs(r_i - r_cross) <= half_width_grid * delta_r`. Across all such
+samples and crossings, it independently selects the largest absolute
+individual-harmonic amplitude and the largest total radial energy normalized
+by its maximum over radius. The inclusive decision is:
+
+```text
+IF n_cross > 0
+AND (cross_window_A_max >= amplitude_min OR cross_window_W_max >= w_min)
+THEN BAD_CONT_CROSS_WINDOW
+AND stop evaluating later decision gates
+```
+
+`crossing_features` now records both winners' values, sample radii, associated
+crossing boundary/radius, and distance from the crossing in grid intervals,
+plus the winning stored harmonic index for amplitude. These measurements are
+retained when the decision is disabled. The CLI exposes
+`--cross_window_half_width_grid`, `--cross_window_amplitude_min`,
+`--cross_window_w_min`, and `--disable_cont_cross_window`; shot and per-`n`
+summaries record the enable state and all settings. The ordered ruleset is now
+`tae-rules-axis-grid-cont-window-edge-v7`, and the expanded grouped audit schema
+is `tae-rule-features-grouped-v7`.
+
+Full fixed-default regressions produced:
+
+- `nstxu_204202`: 212 BAD / 63 REVIEW; the new gate fires zero times. Against
+  all 275 active labels, 210/211 BAD modes are rejected and 62/64 GOOD modes
+  remain REVIEW.
+- `nstx_120113`: 128 BAD / 46 REVIEW; the new gate fires zero times. Against
+  173 active labels, 126/128 BAD modes are rejected and 44/45 GOOD modes remain
+  REVIEW. The separate `skip` mode remains outside the active label list.
+- `nstxuG121123B12`: 112 BAD / 24 REVIEW; the new gate fires zero times.
+  Against 135 active labels, 111/116 BAD modes are rejected and all 19 GOOD
+  modes remain REVIEW. The separate `skip` mode remains outside the list.
+- `nstxuG121123J38`: 159 BAD / 15 REVIEW. The new gate rejects 14 additional
+  modes, all 14 labeled BAD, reducing labeled-BAD survivors from 22 to 8 while
+  retaining all 7 labeled GOOD modes as REVIEW.
+
+Outputs and updated disagreement audits are in the corresponding
+`outputs/*_full_axis_grid_cont_window_edge_w003_v7/` directories. J38's 14 new
+rejections and their exact amplitude/energy winners are also recorded in
+`cross_window_new_rejections.csv` there. The repository suite passes 77 tests,
+both repository skills pass structural validation, and `git diff --check` is
+clean.
+
+### 2026-08-17: run v7 on the remaining six labeled G shots
+
+Ran the unchanged `tae-rules-axis-grid-cont-window-edge-v7` defaults on K51,
+Q62, S31, H47, W29, and Y93. The six runs discovered 5,580 modes and routed
+878 TAE-like, 86 mixed, and 4,616 EAE-like modes with zero invalid inputs.
+Among 964 TAE-side modes, the rules returned 911 BAD / 53 REVIEW. Primary
+reasons were `BAD_AXIS_SPIKE=250`, `BAD_GRID_SCALE_SPIKE=327`,
+`BAD_CONT_CROSS=314`, `BAD_CONT_CROSS_WINDOW=20`, `BAD_EDGE_SPIKE=0`, and
+`NO_GOOD_TEMPLATE=53`.
+
+The active training list matches 956 modes: 899 BAD and 57 GOOD. Eight
+additional TAE-side modes are unlabeled. Of the matched modes, 879 BAD are
+rejected, 20 BAD remain REVIEW, 26 GOOD are rejected, and 31 GOOD remain
+REVIEW. Interpreting BAD as rejected and GOOD as retained gives 95.2%
+rule/label agreement, 97.8% BAD recall, and 54.4% GOOD retention. Report all
+three metrics because the label population is strongly BAD-heavy.
+
+The crossing-window gate fires on 20 labeled modes in these six shots: 17 BAD
+and three GOOD. All three GOOD disagreements are in Q62. Q62 is the main
+cross-shot caveat: all 12 currently labeled-GOOD modes are rejected, nine by
+the exact crossing gate and three by the window gate. The three window cases
+are `N9/egn09w.1848E+02`, `N10/egn10w.1850E+02`, and
+`N10/egn10w.1895E+02`; the middle case is just above the energy threshold at
+`cross_window_W_max=0.05105` with amplitude below the amplitude threshold.
+
+Combining these runs with the earlier B12 and J38 v7 results covers all eight
+labeled G shots: 6,837 discovered modes and 1,274 TAE-side modes, with 1,182
+BAD / 92 REVIEW and no invalid inputs. The active list matches 1,265 rows: the
+rules reject 1,149/1,182 BAD modes and retain 57/83 GOOD modes, for 95.3%
+agreement, 97.2% BAD recall, and 68.7% GOOD retention. The window gate rejects
+34 labeled modes across all eight shots: 31 BAD and three GOOD. Relative to
+disabling that gate, it raises agreement from 93.1% to 95.3% while lowering
+GOOD retention from 72.3% to 68.7%.
+
+Presentation-ready tables, gate/label composition, all 46 disagreements from
+the six new shots, the eight unlabeled modes, and all 34 G-shot window-gate
+rows are in `outputs/g_shots_axis_grid_cont_window_edge_w003_v7/`. Individual
+sorter outputs are in each shot's
+`outputs/SHOT_full_axis_grid_cont_window_edge_w003_v7/` directory.

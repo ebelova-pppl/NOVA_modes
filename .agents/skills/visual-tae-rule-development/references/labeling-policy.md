@@ -266,7 +266,7 @@ large magnetic shear, but the total envelope remains broad/resolved and the
 high-r structure is smoothly connected across neighboring harmonics rather
 than a single endpoint blow-up.
 
-The fourth deterministic BAD gate is intentionally narrower than this full
+The fifth deterministic BAD gate is intentionally narrower than this full
 visual policy. It screens the low-hanging case in which the global total-energy
 maximum itself is at the edge and its connected energy envelope is unresolved.
 Calculate `W(r)=sum_m |xi_m(r)|^2`, normalize it by its global radial maximum,
@@ -281,7 +281,8 @@ AND stop evaluating later decision gates
 ```
 
 The radius comparison is inclusive, and this gate runs after
-`BAD_CONT_CROSS`. Keep `r_edge_min` and `edge_width_max_grid` configurable.
+`BAD_CONT_CROSS_WINDOW`. Keep `r_edge_min` and `edge_width_max_grid`
+configurable.
 Record the global-energy peak radius, interpolated inner and outer half-maximum
 edges, width in normalized radius and grid intervals, and whether the component
 touches `r=1`. Also record the strongest individual-harmonic peak within the
@@ -385,6 +386,28 @@ labeled-BAD modes in the complete shot without rejecting another labeled-GOOD
 mode, but it remains a provisional cross-shot threshold. Keep the
 full crossing records for audit and continue to inspect borderline cases when
 developing or recalibrating the rule.
+
+The fourth deterministic BAD gate addresses resonances that fall between
+radial samples or whose connected shoulder becomes appreciable just beside the
+interpolated crossing. For every true crossing, inspect the inclusive window
+`abs(r_i - r_cross) <= 2 * delta_r`. Independently record the largest absolute
+individual-harmonic amplitude and largest peak-normalized total radial energy
+over all such samples and crossings, together with each winner's sample and
+crossing metadata. The current non-blind calibrated screen is:
+
+```text
+IF n_cross > 0
+AND (cross_window_A_max >= 0.25 OR cross_window_W_max >= 0.05)
+THEN BAD_CONT_CROSS_WINDOW
+AND stop evaluating later decision gates
+```
+
+Both comparisons are inclusive, the half-window and thresholds remain
+configurable, and this gate runs after `BAD_CONT_CROSS` but before
+`BAD_EDGE_SPIKE`. Disabling the decision must not suppress these audit
+measurements. Treat this as a conservative deterministic screen for nearby
+appreciable continuum interaction, not as a replacement for visual assessment
+of weaker distorted tails or connected mode-body crossings.
 
 For tail crossings, do not decide from integrated energy alone. A tail can
 carry little total energy but still be physically disqualifying when its

@@ -41,6 +41,7 @@ from sort_shot_rules import (  # noqa: E402
 from tae_rule_engine import (  # noqa: E402
     BAD_AXIS_SPIKE,
     BAD_CONT_CROSS,
+    BAD_CONT_CROSS_WINDOW,
     BAD_EDGE_SPIKE,
     BAD_GRID_SCALE_SPIKE,
     NO_GOOD_TEMPLATE,
@@ -52,10 +53,12 @@ from tae_rule_engine import (  # noqa: E402
     RULE_FEATURE_SOURCE_SCHEMA_VERSION,
     AxisArtifactConfig,
     ContinuumCrossingConfig,
+    ContinuumCrossingWindowConfig,
     EdgeArtifactConfig,
     GridScaleSpikeConfig,
     evaluate_mode,
     extract_axis_artifact_features,
+    extract_continuum_crossing_window_features,
     extract_edge_artifact_features,
     extract_grid_scale_spike_features,
 )
@@ -88,6 +91,23 @@ REQUIRED_OUTPUTS = {
     "shot_summary_by_n.csv",
     "frequency_cluster_report.txt",
     "frequency_clusters.csv",
+}
+
+CROSS_WINDOW_FEATURE_NAMES = {
+    "cross_window_candidate_found",
+    "cross_window_half_width_grid",
+    "cross_window_half_width_r",
+    "cross_window_A_max",
+    "cross_window_A_harmonic_index",
+    "cross_window_A_sample_r",
+    "cross_window_A_crossing_boundary",
+    "cross_window_A_crossing_r",
+    "cross_window_A_distance_grid",
+    "cross_window_W_max",
+    "cross_window_W_sample_r",
+    "cross_window_W_crossing_boundary",
+    "cross_window_W_crossing_r",
+    "cross_window_W_distance_grid",
 }
 
 
@@ -253,6 +273,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         axis_config=None,
         grid_config=None,
         crossing_config=None,
+        cross_window_config=None,
         edge_config=None,
     ):
         return evaluate_mode(
@@ -263,6 +284,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             axis_artifact_config=axis_config,
             grid_scale_spike_config=grid_config,
             continuum_crossing_config=crossing_config,
+            continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
         )
 
@@ -290,7 +312,8 @@ class RuleAndOverrideTests(unittest.TestCase):
         )
         self.assertEqual(
             set(features["crossing_features"]),
-            set(EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES),
+            set(EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES)
+            | CROSS_WINDOW_FEATURE_NAMES,
         )
         self.assertEqual(
             set(features["extremum_features"]),
@@ -580,6 +603,11 @@ class RuleAndOverrideTests(unittest.TestCase):
             amplitude_min=None,
             width_max_grid=None,
         )
+        disabled_cross_window = ContinuumCrossingWindowConfig(
+            half_width_grid=2,
+            amplitude_min=None,
+            w_min=None,
+        )
 
         result = evaluate_mode(
             self.base,
@@ -591,6 +619,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=0.05
             ),
+            continuum_crossing_window_config=disabled_cross_window,
         )
         self.assertEqual(result.decision, "BAD")
         self.assertEqual(result.primary_reason, BAD_CONT_CROSS)
@@ -611,6 +640,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=None
             ),
+            continuum_crossing_window_config=disabled_cross_window,
         )
         self.assertEqual(disabled_result.decision, "REVIEW")
         self.assertEqual(
@@ -631,6 +661,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=measured_threshold
             ),
+            continuum_crossing_window_config=disabled_cross_window,
         )
         self.assertEqual(equal_result.decision, "REVIEW")
 
@@ -644,12 +675,204 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=0.0
             ),
+            continuum_crossing_window_config=disabled_cross_window,
         )
         self.assertEqual(no_cross_result.decision, "REVIEW")
         self.assertEqual(
             no_cross_result.features["crossing_features"]["n_cross"],
             0.0,
         )
+
+    def test_cross_window_extractor_uses_inclusive_radial_grid_distance(self):
+        mode = np.zeros((2, 11), dtype=float)
+        mode[0, 8] = 1.0
+        mode[0, 4] = 0.1
+        mode[1, 5] = -0.3
+        crossing_records = [
+            {
+                "boundary": "high",
+                "r_cross": 0.35,
+                "W_peak": 0.0,
+                "shear_weighted": 0.0,
+            }
+        ]
+
+        one_grid = extract_continuum_crossing_window_features(
+            mode,
+            crossing_records,
+            half_width_grid=1,
+        )
+        two_grid = extract_continuum_crossing_window_features(
+            mode,
+            crossing_records,
+            half_width_grid=2,
+        )
+
+        self.assertTrue(two_grid["cross_window_candidate_found"])
+        self.assertAlmostEqual(one_grid["cross_window_A_max"], 0.1)
+        self.assertAlmostEqual(two_grid["cross_window_A_max"], 0.3)
+        self.assertEqual(two_grid["cross_window_A_harmonic_index"], 1)
+        self.assertAlmostEqual(two_grid["cross_window_A_sample_r"], 0.5)
+        self.assertEqual(two_grid["cross_window_A_crossing_boundary"], "high")
+        self.assertAlmostEqual(two_grid["cross_window_A_crossing_r"], 0.35)
+        self.assertAlmostEqual(two_grid["cross_window_A_distance_grid"], 1.5)
+        self.assertAlmostEqual(two_grid["cross_window_W_max"], 0.09)
+        self.assertAlmostEqual(two_grid["cross_window_W_sample_r"], 0.5)
+
+        no_crossing = extract_continuum_crossing_window_features(
+            mode,
+            [],
+            half_width_grid=2,
+        )
+        self.assertFalse(no_crossing["cross_window_candidate_found"])
+        self.assertIsNone(no_crossing["cross_window_A_max"])
+        self.assertIsNone(no_crossing["cross_window_W_max"])
+        self.assertAlmostEqual(no_crossing["cross_window_half_width_r"], 0.2)
+
+    def test_cross_window_gate_catches_signal_two_grid_steps_from_crossing(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 120] = 1.0
+        mode[1, 80] = 0.01
+        mode[1, 82] = 0.3
+        upper = np.full(mode.shape[1], 1.1)
+        upper[:80] = 0.9
+        upper[80] = 1.0
+        disabled_axis = AxisArtifactConfig(
+            axis_amplitude_min=None,
+            axis_width_max_grid=None,
+        )
+        disabled_grid = GridScaleSpikeConfig(
+            amplitude_min=None,
+            width_max_grid=None,
+        )
+
+        one_grid = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=0.03
+            ),
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                half_width_grid=1,
+                amplitude_min=0.25,
+                w_min=0.05,
+            ),
+        )
+        two_grid = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=0.03
+            ),
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                half_width_grid=2,
+                amplitude_min=0.25,
+                w_min=0.05,
+            ),
+        )
+
+        self.assertEqual(one_grid.decision, "REVIEW")
+        self.assertLess(
+            two_grid.features["rf_standard_features"]["W_star_max"],
+            0.03,
+        )
+        self.assertEqual(two_grid.primary_reason, BAD_CONT_CROSS_WINDOW)
+        self.assertEqual(
+            two_grid.triggered_rules,
+            (BAD_CONT_CROSS_WINDOW,),
+        )
+        cross_features = two_grid.features["crossing_features"]
+        self.assertAlmostEqual(cross_features["cross_window_A_max"], 0.3)
+        self.assertAlmostEqual(cross_features["cross_window_W_max"], 0.09)
+
+        disabled = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=upper**2,
+            axis_artifact_config=disabled_axis,
+            grid_scale_spike_config=disabled_grid,
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=0.03
+            ),
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                half_width_grid=2,
+                amplitude_min=None,
+                w_min=None,
+            ),
+        )
+        self.assertEqual(disabled.decision, "REVIEW")
+        self.assertAlmostEqual(
+            disabled.features["crossing_features"]["cross_window_A_max"],
+            0.3,
+        )
+
+    def test_cross_window_gate_uses_amplitude_or_energy_and_inclusive_thresholds(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 120] = 1.0
+        mode[0, 80] = 0.01
+        mode[1, 82] = 0.2
+        mode[2, 82] = 0.2
+        upper = np.full(mode.shape[1], 1.1)
+        upper[:80] = 0.9
+        upper[80] = 1.0
+        common = {
+            "mode": mode,
+            "low2": self.low2,
+            "high2": upper**2,
+            "axis_artifact_config": AxisArtifactConfig(
+                axis_amplitude_min=None,
+                axis_width_max_grid=None,
+            ),
+            "grid_scale_spike_config": GridScaleSpikeConfig(
+                amplitude_min=None,
+                width_max_grid=None,
+            ),
+            "continuum_crossing_config": ContinuumCrossingConfig(
+                w_cross_threshold=None
+            ),
+        }
+
+        energy_only = evaluate_mode(
+            self.base,
+            **common,
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                half_width_grid=2,
+                amplitude_min=0.25,
+                w_min=0.08,
+            ),
+        )
+        self.assertEqual(energy_only.primary_reason, BAD_CONT_CROSS_WINDOW)
+        self.assertLess(
+            energy_only.features["crossing_features"]["cross_window_A_max"],
+            0.25,
+        )
+        self.assertAlmostEqual(
+            energy_only.features["crossing_features"]["cross_window_W_max"],
+            0.08,
+        )
+
+        amplitude_mode = mode.copy()
+        amplitude_mode[1, 82] = 0.25
+        amplitude_mode[2, 82] = 0.0
+        amplitude_only = evaluate_mode(
+            self.base,
+            **{**common, "mode": amplitude_mode},
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                half_width_grid=2,
+                amplitude_min=0.25,
+                w_min=None,
+            ),
+        )
+        self.assertEqual(amplitude_only.primary_reason, BAD_CONT_CROSS_WINDOW)
 
     def test_grid_scale_gate_precedes_cont_cross_gate(self):
         mode = np.zeros_like(self.mode)
@@ -773,6 +996,38 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(result.primary_reason, BAD_CONT_CROSS)
         self.assertEqual(result.triggered_rules, (BAD_CONT_CROSS,))
 
+    def test_cross_window_gate_precedes_edge_gate(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 194:199] = [0.4, 0.8, 1.0, 0.8, 0.4]
+        upper = np.full(mode.shape[1], 1.1)
+        upper[:194] = 0.9
+        upper[194] = 1.0
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=np.full(mode.shape[1], 0.5**2),
+            high2=upper**2,
+            axis_artifact_config=AxisArtifactConfig(
+                axis_amplitude_min=None,
+                axis_width_max_grid=None,
+            ),
+            grid_scale_spike_config=GridScaleSpikeConfig(
+                amplitude_min=None,
+                width_max_grid=None,
+            ),
+            continuum_crossing_config=ContinuumCrossingConfig(
+                w_cross_threshold=None
+            ),
+        )
+
+        self.assertTrue(
+            result.features["boundary_features"]["edge_artifact"][
+                "edge_energy_peak_in_window"
+            ]
+        )
+        self.assertEqual(result.primary_reason, BAD_CONT_CROSS_WINDOW)
+        self.assertEqual(result.triggered_rules, (BAD_CONT_CROSS_WINDOW,))
+
     def test_null_thresholds_disable_axis_gate_but_keep_measurements(self):
         mode = np.zeros_like(self.mode)
         mode[1, 0] = 1.0
@@ -818,6 +1073,10 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=None
             ),
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                amplitude_min=None,
+                w_min=None,
+            ),
         )
         self.assertEqual(result.decision, "REVIEW")
 
@@ -842,6 +1101,10 @@ class RuleAndOverrideTests(unittest.TestCase):
             ),
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=None
+            ),
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                amplitude_min=None,
+                w_min=None,
             ),
         )
         self.assertEqual(result.decision, "REVIEW")
@@ -1060,6 +1323,21 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertEqual(first.summary["grid_scale_spike_width_max_grid"], 1.0)
             self.assertTrue(first.summary["continuum_crossing_gate_enabled"])
             self.assertEqual(first.summary["continuum_crossing_w_threshold"], 0.03)
+            self.assertTrue(
+                first.summary["continuum_crossing_window_gate_enabled"]
+            )
+            self.assertEqual(
+                first.summary["continuum_crossing_window_half_width_grid"],
+                2,
+            )
+            self.assertEqual(
+                first.summary["continuum_crossing_window_amplitude_min"],
+                0.25,
+            )
+            self.assertEqual(
+                first.summary["continuum_crossing_window_w_min"],
+                0.05,
+            )
             self.assertTrue(first.summary["edge_artifact_gate_enabled"])
             self.assertEqual(first.summary["edge_artifact_r_min"], 0.97)
             self.assertEqual(first.summary["edge_artifact_width_max_grid"], 10.0)
@@ -1183,6 +1461,61 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertEqual(
             result.final_rows[0]["rule_primary_reason"],
             BAD_CONT_CROSS,
+        )
+
+    def test_run_shot_applies_cross_window_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            radial_grid = np.linspace(0.0, 1.0, 101)
+            mode = np.zeros((4, radial_grid.size), dtype=float)
+            mode[0, 60] = 1.0
+            mode[1, 40] = 0.01
+            mode[1, 42] = 0.3
+            upper = np.full(radial_grid.size, 1.1)
+            upper[:40] = 0.9
+            upper[40] = 1.0
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=radial_grid.size,
+                mode=mode,
+            )
+            write_datcon(
+                shot / "N1" / "datcon1",
+                nr=radial_grid.size,
+                upper_frequency=upper,
+            )
+            result = run_shot(
+                shot,
+                root / "out",
+                grid_scale_amplitude_min=None,
+                w_cross_threshold=0.03,
+                cross_window_half_width_grid=2,
+                cross_window_amplitude_min=0.25,
+                cross_window_w_min=0.05,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertTrue(
+            result.summary["continuum_crossing_window_gate_enabled"]
+        )
+        self.assertEqual(
+            result.summary["continuum_crossing_window_half_width_grid"],
+            2,
+        )
+        self.assertEqual(
+            result.summary["continuum_crossing_window_amplitude_min"],
+            0.25,
+        )
+        self.assertEqual(
+            result.summary["continuum_crossing_window_w_min"],
+            0.05,
+        )
+        self.assertEqual(
+            result.final_rows[0]["rule_primary_reason"],
+            BAD_CONT_CROSS_WINDOW,
         )
 
     def test_run_shot_applies_edge_gate_and_reports_thresholds(self):
