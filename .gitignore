@@ -37,3 +37,6 @@ results/split_tests
 prompts/
 outputs/review*
 outputs/loso*
+
+# Generated deterministic rule-calibration runs
+outputs/*_axis_*/

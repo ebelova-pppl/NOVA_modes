@@ -20,9 +20,9 @@ python scripts/sort_shot_rules.py \
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
 TAE/EAE/mixed split. The first implemented rejection gate detects narrow
-near-axis spikes. Its amplitude and width thresholds default to null, so the
-gate is disabled until calibrated; modes not rejected by an enabled gate remain
-`REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
+near-axis spikes. Its calibrated defaults are `r_ax=0.03` inclusive,
+`axis_amplitude_min=0.2`, and `axis_width_max_grid=10`; modes not rejected by
+the gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
 For every valid TAE-side mode, `rule_features` uses the grouped v3 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
@@ -41,14 +41,14 @@ NOVA mode arrays use normalized radius and normalized mode amplitude. Address
 the first array axis as the zero-based stored harmonic index; do not infer a
 physical poloidal-`m` offset unless run metadata establishes that mapping.
 
-The axis extractor searches `r < r_ax` for the largest absolute amplitude over
-all stored harmonics and records the peak, stored harmonic index, radius,
+The axis extractor searches `r <= r_ax` for the largest absolute amplitude
+over all stored harmonics and records the peak, stored harmonic index, radius,
 local-maximum status, connected half-maximum width in normalized radius and
 grid intervals, outer edge, and whether the component includes `r=0`. Determine
 the local maximum and both half-maximum edges from the selected harmonic's full
 radial profile. Do not truncate the width calculation at `r_ax`.
 
-Enable the gate only after both thresholds have been calibrated:
+Override the calibrated gate when testing alternate thresholds:
 
 ```bash
 python scripts/sort_shot_rules.py \
@@ -58,13 +58,14 @@ python scripts/sort_shot_rules.py \
   --axis_width_max_grid GRID_INTERVALS
 ```
 
-The default `--axis_r_ax` is `0.03`. When the axis candidate is a true local
-maximum, its amplitude meets the minimum, and its full-grid half-maximum width
-does not exceed the configured maximum, return `BAD` with primary reason
+The default inclusive `--axis_r_ax` is `0.03`. When the axis candidate is a true
+local maximum, its amplitude meets the minimum, and its full-grid half-maximum
+width does not exceed the configured maximum, return `BAD` with primary reason
 `BAD_AXIS_SPIKE` and stop later decision gates. A narrow local maximum centered
-inside `r < 0.03` is a boundary artifact regardless of an otherwise plausible
+at `r <= 0.03` is a boundary artifact regardless of an otherwise plausible
 morphology family. A broad component extending beyond the window or the rising
-flank of a mode centered outside it must not be made artificially narrow.
+flank of a mode centered outside it must not be made artificially narrow. Use
+`--disable_axis_artifact` only when a feature-only run is explicitly needed.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or

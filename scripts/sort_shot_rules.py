@@ -36,6 +36,9 @@ from make_tae_like_list import (  # noqa: E402
     preprocess_shot,
 )
 from tae_rule_engine import (  # noqa: E402
+    DEFAULT_AXIS_AMPLITUDE_MIN,
+    DEFAULT_AXIS_R_AX,
+    DEFAULT_AXIS_WIDTH_MAX_GRID,
     RULESET_VERSION,
     AxisArtifactConfig,
     evaluate_mode,
@@ -876,9 +879,9 @@ def run_shot(
     fraction_eae_threshold: float = DEFAULT_FRACTION_EAE_THRESHOLD,
     signed_delta_eae_threshold: float = DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
     rel_freq_tol: float = 0.02,
-    axis_r_ax: float = 0.03,
-    axis_amplitude_min: float | None = None,
-    axis_width_max_grid: float | None = None,
+    axis_r_ax: float = DEFAULT_AXIS_R_AX,
+    axis_amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
+    axis_width_max_grid: float | None = DEFAULT_AXIS_WIDTH_MAX_GRID,
 ) -> ShotRunResult:
     """Run the complete noninteractive deterministic workflow for one shot."""
     if rel_freq_tol <= 0.0 or not math.isfinite(rel_freq_tol):
@@ -1026,27 +1029,31 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--axis_r_ax",
         type=float,
-        default=0.03,
-        help="Normalized radial window r < r_ax used to find the axis peak",
+        default=DEFAULT_AXIS_R_AX,
+        help="Inclusive normalized radial window r <= r_ax used to find the axis peak",
     )
     parser.add_argument(
         "--axis_amplitude_min",
         type=float,
-        default=None,
+        default=DEFAULT_AXIS_AMPLITUDE_MIN,
         help=(
-            "Minimum normalized harmonic amplitude for BAD_AXIS_SPIKE; the gate "
-            "is disabled unless this and --axis_width_max_grid are both set"
+            "Minimum normalized harmonic amplitude for BAD_AXIS_SPIKE "
+            f"(default: {DEFAULT_AXIS_AMPLITUDE_MIN})"
         ),
     )
     parser.add_argument(
         "--axis_width_max_grid",
         type=float,
-        default=None,
+        default=DEFAULT_AXIS_WIDTH_MAX_GRID,
         help=(
             "Maximum full-grid half-maximum width in radial intervals for "
-            "BAD_AXIS_SPIKE; the gate is disabled unless this and "
-            "--axis_amplitude_min are both set"
+            f"BAD_AXIS_SPIKE (default: {DEFAULT_AXIS_WIDTH_MAX_GRID:g})"
         ),
+    )
+    parser.add_argument(
+        "--disable_axis_artifact",
+        action="store_true",
+        help="Calculate axis features but disable the BAD_AXIS_SPIKE decision gate",
     )
     return parser.parse_args()
 
@@ -1066,8 +1073,12 @@ def main() -> None:
         signed_delta_eae_threshold=args.signed_delta_eae_threshold,
         rel_freq_tol=args.rel_freq_tol,
         axis_r_ax=args.axis_r_ax,
-        axis_amplitude_min=args.axis_amplitude_min,
-        axis_width_max_grid=args.axis_width_max_grid,
+        axis_amplitude_min=(
+            None if args.disable_axis_artifact else args.axis_amplitude_min
+        ),
+        axis_width_max_grid=(
+            None if args.disable_axis_artifact else args.axis_width_max_grid
+        ),
     )
     summary = result.summary
     print(f"Shot: {summary['shot']}")

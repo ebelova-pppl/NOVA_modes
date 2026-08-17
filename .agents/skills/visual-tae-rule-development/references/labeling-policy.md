@@ -50,7 +50,7 @@ between connected lobes is part of the mode body for this purpose.
 
 Near-axis artifacts include both isolated one/few-grid-point spikes and
 short grid-scale oscillatory packets in the signed harmonics near `r=0`.
-Any narrow local maximum centered inside `r < 0.03` is a boundary artifact and
+Any narrow local maximum centered at `r <= 0.03` is a boundary artifact and
 is BAD; an otherwise plausible continuum-extremum or core-localized family does
 not rescue it. A broad smooth component that extends beyond this window, or a
 rising flank whose center lies outside it, is not a narrow axis maximum. If a
@@ -206,7 +206,7 @@ first deterministic boundary gate, set `r_ax=0.03` and calculate, for each
 stored harmonic index `h`,
 
 ```text
-A(h) = max_{r < r_ax} |mode(h, r)|
+A(h) = max_{r <= r_ax} |mode(h, r)|
 axis_peak = max_h A(h)
 ```
 
@@ -232,11 +232,12 @@ THEN BAD_AXIS_SPIKE
 AND stop evaluating later decision gates
 ```
 
-Keep `axis_amplitude_min` and `axis_width_max_grid` configurable and disabled
-as JSON/YAML null until calibrated from labeled modes. Features are still
-calculated while the gate is disabled. Once configured, every sufficiently
-narrow local maximum centered inside `r < 0.03` is a boundary artifact; do not
-make a family-specific exception for continuum-extremum-localized modes.
+Keep `axis_amplitude_min` and `axis_width_max_grid` configurable. The current
+non-blind calibrated defaults are `0.2` normalized amplitude and `10` radial
+grid intervals, with an inclusive `r_ax=0.03`. Every sufficiently narrow local
+maximum centered at `r <= 0.03` is a boundary artifact; do not make a
+family-specific exception for continuum-extremum-localized modes. Feature-only
+runs may disable the decision gate while retaining all measurements.
 
 Continue to inspect summed `W(r)` and signed-harmonic packets as supporting
 evidence. Integrated near-axis energy can strengthen a BAD decision, but small

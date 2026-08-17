@@ -28,14 +28,18 @@ from mode_features import (
 from tae_rule_io import empty_rule_row, stable_json
 
 
-RULESET_VERSION = "tae-rules-axis-artifact-v1"
+DEFAULT_AXIS_R_AX = 0.03
+DEFAULT_AXIS_AMPLITUDE_MIN = 0.2
+DEFAULT_AXIS_WIDTH_MAX_GRID = 10.0
+
+RULESET_VERSION = "tae-rules-axis-artifact-v2"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 NO_GOOD_TEMPLATE = "NO_GOOD_TEMPLATE"
 RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v3"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v4"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -59,9 +63,9 @@ RULE_FEATURE_GROUP_NAMES = (
 class AxisArtifactConfig:
     """Thresholds for the near-axis narrow-spike rejection gate."""
 
-    r_ax: float = 0.03
-    axis_amplitude_min: float | None = None
-    axis_width_max_grid: float | None = None
+    r_ax: float = DEFAULT_AXIS_R_AX
+    axis_amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN
+    axis_width_max_grid: float | None = DEFAULT_AXIS_WIDTH_MAX_GRID
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.r_ax) or not 0.0 < self.r_ax <= 1.0:
@@ -90,7 +94,9 @@ class AxisArtifactConfig:
         )
 
 
-def empty_axis_artifact_features(r_ax: float = 0.03) -> dict[str, Any]:
+def empty_axis_artifact_features(
+    r_ax: float = DEFAULT_AXIS_R_AX,
+) -> dict[str, Any]:
     """Return the stable axis-artifact feature shape with null measurements."""
     return {
         "r_ax": r_ax,
@@ -180,9 +186,9 @@ def _interpolate_threshold_crossing(
 def extract_axis_artifact_features(
     mode: np.ndarray,
     *,
-    r_ax: float = 0.03,
+    r_ax: float = DEFAULT_AXIS_R_AX,
 ) -> dict[str, Any]:
-    """Measure the strongest harmonic amplitude inside the near-axis window.
+    """Measure the strongest harmonic amplitude in the inclusive axis window.
 
     The half-maximum component and local-maximum test use the complete radial
     profile of the selected stored harmonic, not only the axis search window.
@@ -199,7 +205,8 @@ def extract_axis_artifact_features(
 
     n_radial = mode_array.shape[1]
     radial_grid = np.linspace(0.0, 1.0, n_radial)
-    axis_indices = np.flatnonzero(radial_grid < r_ax)
+    radial_tolerance = 64.0 * np.finfo(float).eps * max(1.0, abs(r_ax))
+    axis_indices = np.flatnonzero(radial_grid <= r_ax + radial_tolerance)
     if axis_indices.size == 0:
         raise ValueError("axis window contains no radial grid samples")
 

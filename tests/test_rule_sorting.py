@@ -406,6 +406,26 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertAlmostEqual(axis_features["axis_halfmax_width_grid"], 1.0)
         self.assertFalse(axis_features["axis_component_touches_boundary"])
 
+    def test_axis_window_includes_peak_exactly_at_r_ax(self):
+        mode = np.zeros_like(self.mode)
+        mode[2, 5] = 0.7
+        mode[2, 6] = 1.0
+        mode[2, 7] = 0.2
+        features = extract_axis_artifact_features(mode)
+        self.assertAlmostEqual(features["axis_peak_r"], 0.03)
+        self.assertEqual(features["axis_peak"], 1.0)
+        self.assertTrue(features["axis_peak_is_local_max"])
+        self.assertLess(features["axis_halfmax_width_grid"], 10.0)
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(result.primary_reason, BAD_AXIS_SPIKE)
+
     def test_null_thresholds_disable_axis_gate_but_keep_measurements(self):
         mode = np.zeros_like(self.mode)
         mode[1, 0] = 1.0
@@ -414,6 +434,10 @@ class RuleAndOverrideTests(unittest.TestCase):
             mode=mode,
             low2=self.low2,
             high2=self.high2,
+            axis_artifact_config=AxisArtifactConfig(
+                axis_amplitude_min=None,
+                axis_width_max_grid=None,
+            ),
         )
         row = result.as_output_row(self.base)
         axis_features = json.loads(row["rule_features"])["boundary_features"][
@@ -428,7 +452,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         mode = np.zeros_like(self.mode)
         mode[0, :17] = np.linspace(0.1, 0.9, 17)
         features = extract_axis_artifact_features(mode)
-        self.assertAlmostEqual(features["axis_peak_r"], 0.025)
+        self.assertAlmostEqual(features["axis_peak_r"], 0.03)
         self.assertFalse(features["axis_peak_is_local_max"])
 
         result = evaluate_mode(
@@ -670,10 +694,10 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertEqual(first.summary["n_preliminary_review"], 1)
             self.assertEqual(first.summary["n_final_review"], 1)
             self.assertEqual(first.summary["n_final_good"], 0)
-            self.assertFalse(first.summary["axis_artifact_gate_enabled"])
+            self.assertTrue(first.summary["axis_artifact_gate_enabled"])
             self.assertEqual(first.summary["axis_artifact_r_ax"], 0.03)
-            self.assertIsNone(first.summary["axis_artifact_amplitude_min"])
-            self.assertIsNone(first.summary["axis_artifact_width_max_grid"])
+            self.assertEqual(first.summary["axis_artifact_amplitude_min"], 0.2)
+            self.assertEqual(first.summary["axis_artifact_width_max_grid"], 10.0)
             self.assertEqual(
                 json.loads(first.summary["primary_reason_counts_json"]),
                 {NO_GOOD_TEMPLATE: 1},

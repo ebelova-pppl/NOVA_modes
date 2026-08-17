@@ -3177,3 +3177,36 @@ wiggles and two labeled-BAD modes move from BAD to REVIEW. The only remaining
 labeled-GOOD rejection is `N10/egn10w.1026E+02`, with `axis_peak=0.284065`,
 `axis_peak_r=0.015`, and `axis_halfmax_width_grid=1.06871`. Inspect that mode to
 decide whether its training label or the gate policy should change.
+
+### 2026-08-16: adopt inclusive axis boundary and calibrated gate defaults
+
+Updated the first axis-artifact rule after explicit non-blind calibration on
+the 141-mode `nstxu_204202` subset. The axis search window is now inclusive,
+`r <= r_ax`, with `r_ax=0.03`. This admits a local maximum on the configured
+boundary while retaining the full-profile local-maximum test and full-grid
+FWHM calculation. The active shared defaults are now
+`axis_amplitude_min=0.2` and `axis_width_max_grid=10`; the CLI uses the same
+constants. `--disable_axis_artifact` remains available for feature-only runs.
+
+Versioned the behavior change as `tae-rules-axis-artifact-v2` and the
+rule-feature payload as `tae-rule-features-grouped-v4`. Added a regression test
+for a peak centered exactly at `r=0.03`, updated default/disabled-gate tests,
+and synchronized the sorter skill, visual labeling policy, root README, and
+script inventory.
+
+A no-override smoke run in `outputs/nstxu_204202_axis_defaults_v2/` processed
+all 141 modes without invalid inputs and returned 62 BAD / 79 REVIEW. Relative
+to the copied labels, BAD contains 61 labeled BAD and one labeled GOOD; REVIEW
+contains 36 labeled BAD and 43 labeled GOOD. The previously missed
+`N1/egn01w.1139E+02` is now `BAD_AXIS_SPIKE` with `axis_peak=1` at `r=0.03` and
+FWHM `2.09123` grid intervals. The complete repository suite passes 58 tests,
+and both repository skills validate. Next, inspect the remaining REVIEW modes
+while developing later ordered gates; the lone labeled-GOOD axis rejection
+`N10/egn10w.1026E+02` remains a calibration/adjudication case.
+
+Generated `outputs/*_axis_*/` calibration directories are now ignored by Git.
+The previously indexed `nstxu_204202` calibration runs were removed from the
+index without deleting their local files. Their parameters and scientifically
+relevant counts remain recorded above; keep the local outputs during rule
+development and regenerate a final audit run after the ordered ruleset is
+complete.

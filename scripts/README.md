@@ -1017,7 +1017,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-artifact-v1` ruleset implements the first ordered BAD gate but
+`tae-rules-axis-artifact-v2` ruleset implements the first ordered BAD gate but
 still has no positive GOOD template. Modes that do not fire the gate return
 `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule reasons and
 structured features are stored as deterministic JSON; missing feature values
@@ -1025,7 +1025,7 @@ use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v3`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v4`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1058,8 +1058,9 @@ are null rather than the RF-only fallback tuple `(1, 1, 0)`.
 
 NOVA mode radius and amplitude are already normalized. The loader and rule
 outputs use the zero-based stored harmonic index and do not infer the physical
-poloidal-`m` offset. The axis candidate is selected over all harmonics in
-`r < r_ax`, but its local-maximum test and connected half-maximum edges use the
+poloidal-`m` offset. The axis candidate is selected over all harmonics in the
+inclusive window `r <= r_ax`, but its local-maximum test and connected
+half-maximum edges use the
 selected harmonic's complete radial profile. This prevents a broad component
 or rising flank that extends beyond the axis window from being reported as a
 narrow spike.
@@ -1069,18 +1070,18 @@ Axis-gate configuration corresponds to:
 ```yaml
 axis_artifact:
   r_ax: 0.03
-  axis_amplitude_min: null
-  axis_width_max_grid: null
+  axis_amplitude_min: 0.2
+  axis_width_max_grid: 10
 ```
 
 The CLI names are `--axis_r_ax`, `--axis_amplitude_min`, and
-`--axis_width_max_grid`. Both threshold values must be non-null to enable the
-gate; features are calculated even while it is disabled. With the gate
-enabled, a true local maximum meeting the amplitude minimum and maximum
+`--axis_width_max_grid`. These calibrated values are active by default. Use
+`--disable_axis_artifact` to calculate the same features without applying the
+BAD gate. A true local maximum meeting the amplitude minimum and maximum
 full-grid width returns `BAD` with `BAD_AXIS_SPIKE` and stops later decision
-gates. Any sufficiently narrow local maximum centered inside `r < 0.03` is
-treated as a boundary artifact without a morphology-family exception. The shot
-and per-`n` summaries record the enable flag and exact configuration.
+gates. Any sufficiently narrow local maximum centered at `r <= 0.03` is treated
+as a boundary artifact without a morphology-family exception. The shot and
+per-`n` summaries record the enable flag and exact configuration.
 
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:
