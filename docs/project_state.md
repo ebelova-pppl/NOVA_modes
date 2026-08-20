@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-17)
+### Project state (current snapshot, updated 2026-08-20)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
@@ -3622,3 +3622,67 @@ the six new shots, the eight unlabeled modes, and all 34 G-shot window-gate
 rows are in `outputs/g_shots_axis_grid_cont_window_edge_w003_v7/`. Individual
 sorter outputs are in each shot's
 `outputs/SHOT_full_axis_grid_cont_window_edge_w003_v7/` directory.
+
+### 2026-08-17: complete 14-shot v7 comparison excluding Q62
+
+Ran the unchanged `tae-rules-axis-grid-cont-window-edge-v7` configuration on
+the five remaining non-G shots: `nstx_135388`, `nstx_141711`,
+`nstxuE202855A01t020`, `nstxuE204669M03t025`, and
+`nstxuE205052A01t022`. Combined these with the existing seven G-shot runs and
+the earlier `nstx_120113` and `nstxu_204202` runs, while excluding Q62 because
+its mode/continuum calculation may use the wrong q profile.
+
+The 14-shot comparison contains 11,349 discovered modes: 2,486 strict
+TAE-like, 220 mixed, 8,643 EAE-like, and zero invalid. The 2,706 TAE-side
+modes receive 2,123 BAD and 583 REVIEW decisions. The active list matches
+2,659 of them: 2,078 labeled BAD and 581 labeled GOOD; 47 current TAE-side
+modes are unlabeled or excluded from training.
+
+The rule/label matrix is 2,022 labeled-BAD modes rejected, 56 labeled-BAD
+modes retained for REVIEW, 59 labeled-GOOD modes rejected, and 522
+labeled-GOOD modes retained. This gives 95.7% agreement, 97.3% BAD recall,
+89.8% GOOD retention, and 90.3% GOOD precision among REVIEW modes. The seven
+non-G shots have 95.7% agreement, 97.7% BAD recall, and 91.2% GOOD retention;
+the seven retained G shots have 95.7%, 96.9%, and 80.3%, respectively.
+
+There are 115 disagreements in total: 59 GOOD-rejected and 56 BAD-retained.
+The exact continuum-crossing gate accounts for 30 rejected-GOOD modes, while
+the crossing-window gate accounts for one. The crossing-window gate rejects
+39 labeled modes overall: 38 BAD and one GOOD. These remain agreement checks,
+not independent accuracy estimates: most G-shot labels are not yet audited,
+and H47 retains a possible continuum-consistency issue.
+
+The presentation summary, machine-readable per-shot statistics, and complete
+disagreement list are in
+`outputs/14_shots_axis_grid_cont_window_edge_w003_v7/`.
+
+### 2026-08-20: gate-3-disabled 14-shot ablation
+
+Ran a matched 14-shot ablation excluding Q62 with the exact-point
+`BAD_CONT_CROSS` gate disabled. TAE/EAE routing and the axis, grid-scale,
+crossing-window, and edge gates were unchanged. All 14 runs completed with
+zero invalid inputs; production defaults were not changed.
+
+The baseline returns 2,123 BAD / 583 REVIEW decisions, while the ablation
+returns 2,107 BAD / 599 REVIEW. Against 2,659 matched active labels, disabling
+gate 3 recovers seven labeled-GOOD modes and newly retains nine labeled-BAD
+modes. GOOD retention rises from 89.85% to 91.05%, BAD recall falls from
+97.31% to 96.87%, rule/label agreement changes from 95.675% to 95.600%, and
+GOOD precision among REVIEW modes falls from 90.31% to 89.06%.
+
+On the seven audited non-G shots, six GOOD modes are recovered and six BAD
+modes become REVIEW. Agreement is unchanged at 95.657%, GOOD retention rises
+from 91.18% to 92.35%, and BAD recall falls from 97.69% to 97.16%. On the
+seven retained G shots, one GOOD is recovered and three BAD modes become
+REVIEW; those labels remain less reliable because most G shots are unaudited.
+
+Gate 4 absorbs 809 of the 825 baseline gate-3 rejections: 753 labeled BAD, 23
+labeled GOOD, and 33 unlabeled. Only 16 become REVIEW: nine labeled BAD and
+seven labeled GOOD. All 16 have `W_star_max` between 0.03047 and 0.04317 and
+remain below both gate-4 thresholds. Therefore, disabling gate 3 makes only a
+small GOOD-recall-oriented operating-point shift; 23 former gate-3
+labeled-GOOD modes are still rejected by gate 4.
+
+The aggregate comparison, per-shot statistics, 16 changed modes, and former
+gate-3 outcome counts are in
+`outputs/14_shots_axis_grid_cont_exact_off_window_edge_v7/`.
