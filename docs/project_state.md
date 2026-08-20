@@ -3698,3 +3698,21 @@ NOVA_DITW_ROOT=/p/nstxdigtwin/energetic_particles/nova/DiTw
 `configs/paths/nova_paths.flux.sh` exports the variable for Bash, while
 `configs/paths/nova_paths.flux.csh` sets the equivalent tcsh environment
 variable. Both `nova_env` helpers now display the configured path.
+
+### 2026-08-20: Q62 local continuum-profile refresh
+
+For local visual inspection of Q62 modes against the recalculated continuum,
+preserved the former training-data `datcon1` through `datcon10` files as
+`datcon1_old` through `datcon10_old` under
+`/p/hym/ebelova/NOVA/data_mixed/nstxuG121123Q62/N*/`. Installed the
+corresponding active `datconN` files from
+`$NOVA_DITW_ROOT/nstxuG121123Q62/N*/` and verified all ten active files by
+byte comparison and SHA-256. Mode files, `datcon_gf.txt`, labels, and model
+checkpoints were not changed.
+
+The user subsequently applied the same Q62 continuum refresh in the
+Perlmutter `$NOVA_DATA` copy: the former `datcon1` through `datcon10` files
+were retained with the `_old` suffix, and the recalculated DiTw `datconN`
+profiles were installed as the active files. This keeps the Flux and
+Perlmutter Q62 inspection datasets aligned while preserving the previous
+continuum profiles on both systems.
