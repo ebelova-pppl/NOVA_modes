@@ -28,6 +28,13 @@ Shared scripts / features:
 - `scripts/make_tae_like_list.py`
 - `scripts/tae_rule_engine.py`
 - `scripts/sort_shot_rules.py`
+- `scripts/audit_training_provenance.py`
+
+Training-data provenance:
+
+- latest Flux training-vs-DiTw audit:
+  `audits/training_provenance/2026-08-20_flux_v1/report.md`
+- versioned file hashes and exact differences are stored beside that report
 
 Plotting:
 - `viz/view_modes_csv.py`

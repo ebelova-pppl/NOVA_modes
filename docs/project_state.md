@@ -3716,3 +3716,48 @@ were retained with the `_old` suffix, and the recalculated DiTw `datconN`
 profiles were installed as the active files. This keeps the Flux and
 Perlmutter Q62 inspection datasets aligned while preserving the previous
 continuum profiles on both systems.
+
+### 2026-08-20: versioned Flux training-vs-DiTw provenance audit
+
+Added the read-only reusable auditor
+`scripts/audit_training_provenance.py`. It compares every training-relevant
+`egn*`, active `datconN`, optional `datcon_gf.txt`, and preserved
+`datconN_old` backup for all shots named by a selected training CSV. File
+identity uses SHA-256. For changed same-name mode files, the manifest also
+records parsed frequency, damping, mode-array shape, classifier-used mode
+structure equality, and maximum absolute mode difference. No input files are
+modified.
+
+Generated and retained the first versioned Flux audit at
+`audits/training_provenance/2026-08-20_flux_v1/`. The artifact set uses schema
+`nova-training-provenance-v1`, covers all 15 shots and 2900 canonical rows in
+`training_labels/tae_like_v2_nonG.csv`, contains 12,835 scoped file-pair rows
+and 998 non-identical/missing rows, and includes:
+
+- `file_manifest.csv` and its compact non-identical subset `differences.csv`;
+- `shot_summary.csv` and the human-readable `report.md`;
+- `run_metadata.json`, including the training-list and audit-script hashes;
+- `SHA256SUMS` for the complete generated artifact set.
+
+Most important findings preserved by this audit:
+
+- `nstx_141711` has 42 changed canonical same-name modes and 101 canonical
+  training modes absent from current DiTw;
+- `nstxuG121123K51` has 106 changed canonical same-name modes and 86 canonical
+  training modes absent from current DiTw;
+- `nstx_120113` and `nstxu_204202` have 120 and 135 canonical training modes,
+  respectively, absent from current DiTw;
+- active continuum mismatches remain for `nstx_120113` (10), `nstx_135388`
+  (9), `nstx_141711` (10), `nstxuG121123K51` (10), `nstxuG133964S31`
+  (10), `nstxuG142301H47` (10), and `nstxuG142301Y93` (10);
+- Q62 now has 10 active `datconN` files identical to DiTw, while its 10
+  preserved `datconN_old` files all differ from the current reference and
+  retain the pre-refresh continuum provenance.
+
+The changed canonical mode frequencies remain numerically close: median
+absolute relative changes are `5.75e-7` for `nstx_141711` and `5.13e-7` for
+K51, with maxima `1.14e-4` and `7.46e-5`. Nevertheless, all 42 and 106 changed
+canonical files, respectively, have unequal classifier-used mode structures;
+nine `nstx_141711` modes also changed array shape. Treat those shots as true
+mode-provenance mismatches rather than harmless timestamp or formatting
+changes. Labels and model checkpoints were not changed by the audit.

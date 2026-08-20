@@ -1,0 +1,22 @@
+{
+  "artifact_sha256": {
+    "differences.csv": "38b518fbc68bb94400bf49dbd110ad62b14a51985d1680b1d6548c96c0519da3",
+    "file_manifest.csv": "407da119e60ef476602c765ddd169e48521613d410a9ef73188cc9f0d14eb292",
+    "report.md": "7845c5c3ec37a9639e2f37be15bc0e7571aefd22b0b574d26eb17020a3134c61",
+    "shot_summary.csv": "a60d1b1f7ff2ebbae14a177b7dcbc7cdf3a19a441a9b7f1fd5c4c8270ec35b59"
+  },
+  "audit_id": "2026-08-20_flux_training_vs_ditw_v1",
+  "audit_script": "/p/hym/ebelova/NOVA/NOVA_modes/scripts/audit_training_provenance.py",
+  "audit_script_sha256": "118e3257fef63076fc7dc492d753182db279ba855c4da6dfc49fb04112dc14a8",
+  "canonical_row_count": 2900,
+  "difference_row_count": 998,
+  "generated_at": "2026-08-20T20:58:36+00:00",
+  "include_datcon_gf": true,
+  "manifest_row_count": 12835,
+  "reference_root": "/p/nstxdigtwin/energetic_particles/nova/DiTw",
+  "schema_version": "nova-training-provenance-v1",
+  "shot_count": 15,
+  "train_csv": "/p/hym/ebelova/NOVA/NOVA_modes/training_labels/tae_like_v2_nonG.csv",
+  "train_csv_sha256": "8587aef8876c575c27f4404d44a4a45f9e46ffa210b7efc53ec67e2de149f0ad",
+  "training_root": "/p/hym/ebelova/NOVA/data_mixed"
+}

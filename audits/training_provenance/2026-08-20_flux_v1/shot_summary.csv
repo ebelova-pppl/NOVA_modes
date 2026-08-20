@@ -1,0 +1,16 @@
+shot,canonical_rows,canonical_identical,canonical_different,canonical_missing_training,canonical_missing_reference,canonical_missing_both,mode_training_count,mode_reference_count,mode_identical,mode_different,mode_training_only,mode_reference_only,mode_missing_both,datcon_identical,datcon_different,datcon_training_only,datcon_reference_only,datcon_backup_count,datcon_backup_identical_to_reference,datcon_backup_different_from_reference,datcon_gf_identical,datcon_gf_different,datcon_gf_training_only,datcon_gf_reference_only,overall_status
+nstx_120113,173,53,0,0,120,0,541,341,341,0,200,0,0,0,10,0,0,0,0,0,1,9,0,0,mode_and_continuum_mismatch
+nstx_135388,344,344,0,0,0,0,1169,1169,1169,0,0,0,0,1,9,0,0,0,0,0,1,9,0,0,continuum_mismatch
+nstx_141711,256,113,42,0,101,0,679,535,476,59,144,0,0,0,10,0,0,0,0,0,0,10,0,0,mode_and_continuum_mismatch
+nstxuE202855A01t020,79,79,0,0,0,0,125,125,125,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,active_payload_aligned
+nstxuE204669M03t025,217,217,0,0,0,0,973,973,973,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,active_payload_aligned
+nstxuE205052A01t022,291,291,0,0,0,0,1486,1486,1486,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,active_payload_aligned
+nstxuG121123B12,135,135,0,0,0,0,637,637,637,0,0,0,0,10,0,0,0,0,0,0,0,0,0,10,active_payload_aligned
+nstxuG121123J38,174,174,0,0,0,0,620,620,620,0,0,0,0,10,0,0,0,0,0,0,10,0,0,0,active_payload_aligned
+nstxuG121123K51,208,16,106,0,86,0,837,766,633,113,91,20,0,0,10,0,0,0,0,0,0,10,0,0,mode_and_continuum_mismatch
+nstxuG121123Q62,241,241,0,0,0,0,1186,1186,1186,0,0,0,0,10,0,0,0,10,0,10,0,10,0,0,active_payload_aligned
+nstxuG133964S31,74,74,0,0,0,0,830,830,830,0,0,0,0,0,10,0,0,0,0,0,0,0,0,10,continuum_mismatch
+nstxuG142301H47,169,169,0,0,0,0,1016,1016,1016,0,0,0,0,0,10,0,0,0,0,0,0,0,0,10,continuum_mismatch
+nstxuG142301W29,158,158,0,0,0,0,1060,1060,1060,0,0,0,0,10,0,0,0,0,0,0,0,0,0,10,active_payload_aligned
+nstxuG142301Y93,106,106,0,0,0,0,651,651,651,0,0,0,0,0,10,0,0,0,0,0,0,0,0,10,continuum_mismatch
+nstxu_204202,275,140,0,0,135,0,725,533,532,0,193,1,0,10,0,0,0,0,0,0,9,0,0,0,mode_mismatch

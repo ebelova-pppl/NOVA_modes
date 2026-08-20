@@ -1248,6 +1248,57 @@ this workflow.
 
 ---
 
+## Training-shot provenance audit: `audit_training_provenance.py`
+
+Use this read-only audit before relabeling, retraining, or replacing local shot
+data when the same NOVA filenames may have been recalculated in a shared shot
+database. It compares the shots named by the selected training CSV across a
+training snapshot and a reference tree. The scoped payload is:
+
+- every `N*/egn*` mode file in the union of both trees;
+- active `N*/datconN` continuum files;
+- preserved training-side `datconN_old` backups, paired with reference
+  `datconN`; and
+- optional `datcon_gf.txt` auxiliary files.
+
+Run-directory executables, plots, and logs are deliberately excluded. Mode and
+continuum identity is determined by SHA-256, not filename, size, or timestamp.
+Changed same-name modes are also parsed to record `omega`, damping, array
+shape, classifier-used mode-structure equality, and maximum absolute mode
+difference.
+
+After setting `NOVA_DATA`, sourcing the Flux path config supplies
+`NOVA_DITW_ROOT` and `NOVA_TRAIN_CSV`:
+
+```bash
+source configs/paths/nova_paths.flux.sh
+python scripts/audit_training_provenance.py \
+  --training-root "$NOVA_DATA" \
+  --reference-root "$NOVA_DITW_ROOT" \
+  --train-csv "$NOVA_TRAIN_CSV" \
+  --out-dir audits/training_provenance/YYYY-MM-DD_flux_vN
+```
+
+Use a new dated/versioned output directory for each frozen comparison. The
+script refuses to overwrite known artifacts unless `--replace` is passed.
+Outputs are:
+
+- `file_manifest.csv` — complete scoped inventory, hashes, timestamps, labels,
+  and changed-mode diagnostics;
+- `differences.csv` — all non-identical or missing file pairs;
+- `shot_summary.csv` — per-shot canonical-mode, all-mode, and continuum counts;
+- `report.md` — concise human-readable findings;
+- `run_metadata.json` — schema, exact roots/options, training-list hash, audit
+  script hash, and artifact hashes; and
+- `SHA256SUMS` — integrity hashes for the generated artifact set.
+
+The first retained Flux audit is
+`audits/training_provenance/2026-08-20_flux_v1/`. It uses schema
+`nova-training-provenance-v1` and covers all 15 shots and 2900 rows in
+`training_labels/tae_like_v2_nonG.csv`.
+
+---
+
 ## `run_loso_10.py`
 
 Driver for leave-one-shot-out checks over all shots in the selected training
