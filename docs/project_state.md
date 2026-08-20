@@ -3686,3 +3686,15 @@ labeled-GOOD modes are still rejected by gate 4.
 The aggregate comparison, per-shot statistics, 16 changed modes, and former
 gate-3 outcome counts are in
 `outputs/14_shots_axis_grid_cont_exact_off_window_edge_v7/`.
+
+### 2026-08-20: Flux main shot-database path
+
+Added the shared Flux main-shot database root to both shell path configs:
+
+```text
+NOVA_DITW_ROOT=/p/nstxdigtwin/energetic_particles/nova/DiTw
+```
+
+`configs/paths/nova_paths.flux.sh` exports the variable for Bash, while
+`configs/paths/nova_paths.flux.csh` sets the equivalent tcsh environment
+variable. Both `nova_env` helpers now display the configured path.

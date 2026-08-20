@@ -35,6 +35,9 @@ endif
 # Version-controlled models and labeled training list.
 setenv NOVA_MODELS "${NOVA_REPO}/models"
 
+# Main NOVA shot database on Flux.
+setenv NOVA_DITW_ROOT "/p/nstxdigtwin/energetic_particles/nova/DiTw"
+
 # setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like_train.csv"
 # setenv NOVA_TRAIN_CSV_TAE "${NOVA_REPO}/training_labels/tae_like_train.csv"
 setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like_v2_nonG.csv"
@@ -79,7 +82,7 @@ alias set_paths 'source "$NOVA_REPO/configs/paths/nova_paths.flux.csh"'
 
 alias set_nova_env 'module load anaconda3; source `conda info --base`/etc/profile.d/conda.csh; setenv CONDA_PKGS_DIRS "/p/hym/conda_pkgs"; conda activate /p/hym/conda_envs/nova-perlmutter' 
 
-alias nova_env 'echo "NOVA_REPO      = $NOVA_REPO"; echo "NOVA_MODELS    = $NOVA_MODELS"; echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"; echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"; echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"; echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"; echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"; echo "MKL_NUM_THREADS = $MKL_NUM_THREADS"; echo "PYTHONPATH     = $PYTHONPATH"'
+alias nova_env 'echo "NOVA_REPO      = $NOVA_REPO"; echo "NOVA_MODELS    = $NOVA_MODELS"; echo "NOVA_DITW_ROOT = $NOVA_DITW_ROOT"; echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"; echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"; echo "NOVA_TORCH_DEVICE = $NOVA_TORCH_DEVICE"; echo "NOVA_CPUS_PER_TASK = $NOVA_CPUS_PER_TASK"; echo "OMP_NUM_THREADS = $OMP_NUM_THREADS"; echo "MKL_NUM_THREADS = $MKL_NUM_THREADS"; echo "PYTHONPATH     = $PYTHONPATH"'
 
 alias nova_cdrepo 'cd "$NOVA_REPO"'
 alias nova_run_sort 'python "$NOVA_REPO/scripts/sort_shot.py" \!*'

@@ -22,6 +22,9 @@ unset _NOVA_CONFIG_DIR
 # Version-controlled models and labeled training list.
 export NOVA_MODELS="$NOVA_REPO/models"
 
+# Main NOVA shot database on Flux.
+export NOVA_DITW_ROOT="/p/nstxdigtwin/energetic_particles/nova/DiTw"
+
 # export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
 # export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"
 export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_v2_nonG.csv"
@@ -59,6 +62,7 @@ export PYTHONUSERBASE="/p/hym/local"
 nova_env() {
     echo "NOVA_REPO      = $NOVA_REPO"
     echo "NOVA_MODELS    = $NOVA_MODELS"
+    echo "NOVA_DITW_ROOT = $NOVA_DITW_ROOT"
     echo "NOVA_RUN_ROOT  = ${NOVA_RUN_ROOT:-<unset>}"
     echo "NOVA_TRAIN_CSV = $NOVA_TRAIN_CSV"
     echo "NOVA_TRAIN_CSV_TAE = $NOVA_TRAIN_CSV_TAE"
