@@ -10,3 +10,8 @@ It shows:
     Rate-limit usage
     Active model and chat ID
 For overall account usage and remaining limits, open the Codex usage dashboard
+
+To rename chat from terminal window use:
+```text
+/rename
+```
