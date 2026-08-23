@@ -3761,3 +3761,36 @@ canonical files, respectively, have unequal classifier-used mode structures;
 nine `nstx_141711` modes also changed array shape. Treat those shots as true
 mode-provenance mismatches rather than harmless timestamp or formatting
 changes. Labels and model checkpoints were not changed by the audit.
+
+### 2026-08-23: frozen Flux training-database copy
+
+Created a complete preservation copy of the current Flux training database:
+
+```text
+/p/hym/ebelova/NOVA/data_mixed
+  -> /p/hym/ebelova/NOVA/data_mixed_2026_08_20
+```
+
+The destination was confirmed empty before copying. The archive copy retained
+file metadata and hard-link relationships. A post-copy checksum dry run with
+deletion reporting produced no differences or extra destination files. Both
+trees contain 268 directories, 18,876 regular files, zero symbolic links, and
+7,018,731,738 regular-file bytes. This dated directory is the recoverable data
+snapshot associated with the 2026-08-20 provenance audit; do not modify it
+while constructing a DiTw-aligned candidate training database.
+
+The corresponding repository state is preserved in GitHub by the annotated
+tag `training-data-audit-2026-08-20-v1`, which resolves to commit
+`ad8c4a917225117cec9779cfb9d74d9afec0cb16`.
+
+The two active training-label lists were also copied to
+`training_labels/labels_2026_08_20/`:
+
+- `tae_like_train.csv`
+- `tae_like_v2_nonG.csv`
+
+Both dated copies are byte-identical to the current files at the top level of
+`training_labels/`. The dated directory also contains the archived legacy
+`tae_like_train_7.csv`; that file is no longer present at the active top level.
+Together, the data-directory copy, Git tag, and dated label files preserve the
+pre-synchronization training state.
