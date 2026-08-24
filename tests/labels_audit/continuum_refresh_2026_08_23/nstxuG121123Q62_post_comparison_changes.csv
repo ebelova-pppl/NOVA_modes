@@ -1,0 +1,8 @@
+path,precheck_label,final_label,old_v2_label,confidence,reason,prior_seen
+nstxuG121123Q62/N10/egn10w.1690E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true
+nstxuG121123Q62/N9/egn09w.1686E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true
+nstxuG121123Q62/N9/egn09w.1753E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true
+nstxuG121123Q62/N9/egn09w.1769E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true
+nstxuG121123Q62/N9/egn09w.1805E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true
+nstxuG121123Q62/N9/egn09w.1890E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true
+nstxuG121123Q62/N9/egn09w.1901E+02,bad,good,good,low,smooth_small_r_continuum_crossing_no_resonant_spike,true

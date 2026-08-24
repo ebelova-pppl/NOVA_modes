@@ -1,0 +1,11 @@
+path,label,new_label,change,mode_payload_changed,signed_delta,fraction_below_upper2,gap_region
+nstxuG121123K51/N7/egn07w.2619E+02,good,bad,good_to_bad,true,0.8801,0.9959,below_upper2
+nstxuG121123K51/N8/egn08w.4850E+02,good,bad,good_to_bad,true,0.7394,0.9849,below_upper2
+nstxuG121123K51/N9/egn09w.2153E+02,bad,good,bad_to_good,true,0.9753,1.0000,below_upper2
+nstxuG121123K51/N9/egn09w.2306E+02,good,bad,good_to_bad,true,0.9663,1.0000,below_upper2
+nstxuG121123K51/N9/egn09w.2937E+02,good,bad,good_to_bad,true,0.8286,0.9807,below_upper2
+nstxuG121123K51/N9/egn09w.3938E+02,bad,good,bad_to_good,true,0.9784,1.0000,below_upper2
+nstxuG121123K51/N9/egn09w.4729E+02,bad,good,bad_to_good,true,0.5848,1.0000,below_upper2
+nstxuG121123K51/N10/egn10w.2227E+02,good,bad,good_to_bad,true,0.9760,0.9998,below_upper2
+nstxuG121123K51/N10/egn10w.3021E+02,good,bad,good_to_bad,true,0.8409,0.9933,below_upper2
+nstxuG121123K51/N10/egn10w.4437E+02,bad,good,bad_to_good,true,0.9756,1.0000,below_upper2

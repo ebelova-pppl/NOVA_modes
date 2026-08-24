@@ -519,9 +519,10 @@ def run_adjudication(args: argparse.Namespace, parser: argparse.ArgumentParser) 
         3,
         1,
         figsize=(9, 9),
-        height_ratios=[3, 1, 1],
+        gridspec_kw={"height_ratios": [3, 1, 1]},
         constrained_layout=True,
     )
+    ax_continuum.sharex(ax1)
     history: list[tuple[int, str, dict[str, str] | None]] = []
     index = 0
     while index < len(pending):
@@ -569,10 +570,12 @@ def run_adjudication(args: argparse.Namespace, parser: argparse.ArgumentParser) 
             r_star=r_star,
             r_star_max=r_star_max,
         )
+        ax1.set_xlim(float(r[0]), float(r[-1]))
         ax1.set_title(
             f"{mode_key}  n={ntor}  omega={omega:.4g}  gamma_d={gamma_d:.3g}\n"
             f"preliminary={row['rule_decision']}  [g/b/r, u=undo, q=quit]"
         )
+        ax_continuum.set_axis_on()
         try:
             low2, high2, *_ = load_datcon_for_mode(path, n_r=nr)
             plot_continuum_panel(
@@ -690,7 +693,7 @@ def main():
         "--mode-list",
         help=(
             "Optional CSV list of candidate modes to label, such as "
-            "training_labels/tae_like_v2_nonG.csv or training_labels/eae_like.csv. "
+            "training_labels/tae_like_train.csv or training_labels/eae_like.csv. "
             "Only files in mode_dir whose resolved path or shot/N/file suffix "
             "appears in this list are shown."
         )
@@ -887,15 +890,17 @@ def main():
     if cfg.show_m_spectrum:
         fig, (ax1, axC, ax2) = plt.subplots(
             3, 1, figsize=(9, 9),
-            height_ratios=[3, 1, 1],
+            gridspec_kw={"height_ratios": [3, 1, 1]},
             constrained_layout=True
         )
+        axC.sharex(ax1)
     else:
         fig, (ax1, axC) = plt.subplots(
             2, 1, figsize=(9, 7),
-            height_ratios=[3, 1],
+            gridspec_kw={"height_ratios": [3, 1]},
             constrained_layout=True
         )
+        axC.sharex(ax1)
         ax2 = None
 
 
@@ -948,12 +953,14 @@ def main():
             r_star=r_star,
             r_star_max=r_star_max,
         )
+        ax1.set_xlim(float(r[0]), float(r[-1]))
 
         ax1.set_title(title)
 
         # Continuum mini-panel
         n_r = mode.shape[1]
         r = np.linspace(0.0, 1.0, n_r)
+        axC.set_axis_on()
         try:
             low2, high2, *_ = load_datcon_for_mode(path, n_r=n_r)
             low2 = low2.copy()

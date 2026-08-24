@@ -34,15 +34,22 @@ def read_mode_csv(csv_path: str, base_dir: Optional[str] = None):
     default path resolution if base_dir is None.
     Returns:
       paths:  list[str]
-      labels: list[Optional[str]]  # "good"/"bad"/None
+      labels: list[Optional[str]]  # "good"/"bad"/"skip"/None
     """
     paths, labels = [], []
     for p, raw_label in read_mode_csv_entries(csv_path, data_root=base_dir):
         lab = None
         if raw_label is not None:
             s = raw_label.strip().lower()
-            if s in ("good", "bad", "g", "b"):
-                lab = "good" if s in ("good", "g") else "bad"
+            label_aliases = {
+                "good": "good",
+                "g": "good",
+                "bad": "bad",
+                "b": "bad",
+                "skip": "skip",
+                "s": "skip",
+            }
+            lab = label_aliases.get(s)
 
         paths.append(p)
         labels.append(lab)
@@ -74,6 +81,32 @@ def continuum_marker_radii(
         float(crossing["r_star_max"]) if crossing["n_cross"] > 0 else None
     )
     return r_star, r_star_max
+
+
+def draw_continuum_markers(
+    ax,
+    r_star: Optional[float],
+    r_star_max: Optional[float],
+    *,
+    show_labels: bool,
+) -> None:
+    """Draw the shared closest-approach and maximum-crossing markers."""
+    if r_star is not None and np.isfinite(r_star):
+        ax.axvline(
+            r_star,
+            color="k",
+            linestyle="--",
+            linewidth=1.0,
+            label="r*" if show_labels else None,
+        )
+    if r_star_max is not None and np.isfinite(r_star_max):
+        ax.axvline(
+            r_star_max,
+            color="tab:purple",
+            linestyle=":",
+            linewidth=1.4,
+            label="r* max crossing" if show_labels else None,
+        )
 
 
 def plot_mode_panel(ax, mode: np.ndarray, r: np.ndarray, kind: str, topk: int, use_abs: bool):
@@ -149,16 +182,7 @@ def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: flo
             r_star = None
             r_star_max = None
 
-    if r_star is not None and np.isfinite(r_star):
-        ax.axvline(r_star, color="k", linestyle="--", linewidth=1.0, label="r*")
-    if r_star_max is not None and np.isfinite(r_star_max):
-        ax.axvline(
-            r_star_max,
-            color="tab:purple",
-            linestyle=":",
-            linewidth=1.4,
-            label="r* max crossing",
-        )
+    draw_continuum_markers(ax, r_star, r_star_max, show_labels=True)
 
     ax.set_xlabel("r (normalized)")
     ax.set_ylabel("frequency")
@@ -217,7 +241,7 @@ def main():
 
     row = 0
     ax_mode = fig.add_subplot(gs[row, 0]); row += 1
-    ax_cont = fig.add_subplot(gs[row, 0]) if show_cont else None
+    ax_cont = fig.add_subplot(gs[row, 0], sharex=ax_mode) if show_cont else None
     if show_cont: row += 1
     ax_mspec = fig.add_subplot(gs[row, 0]) if show_mspec else None
 
@@ -249,11 +273,13 @@ def main():
 
         plot_mode_panel(ax_mode, mode, r, kind=("contour" if state["contour"] else "lines"),
                         topk=args.topk, use_abs=state["use_abs"])
+        ax_mode.set_xlim(float(r[0]), float(r[-1]))
 
         if ax_cont is not None:
             # Plot continuum band and omega; also try to plot r*:
             # First do the base plot
             ax_cont.clear()
+            ax_cont.set_axis_on()
             try:
                 low2, high2, *_ = load_datcon_for_mode(path, n_r=nr)
                 low2 = mask_invalid_datcon_tail(low2)
@@ -276,22 +302,12 @@ def main():
                     r_star = None
                     r_star_max = None
 
-                if r_star is not None and np.isfinite(r_star):
-                    ax_cont.axvline(
-                        r_star,
-                        color="k",
-                        linestyle="--",
-                        linewidth=1.0,
-                        label="r*",
-                    )
-                if r_star_max is not None and np.isfinite(r_star_max):
-                    ax_cont.axvline(
-                        r_star_max,
-                        color="tab:purple",
-                        linestyle=":",
-                        linewidth=1.4,
-                        label="r* max crossing",
-                    )
+                draw_continuum_markers(
+                    ax_cont, r_star, r_star_max, show_labels=True
+                )
+                draw_continuum_markers(
+                    ax_mode, r_star, r_star_max, show_labels=False
+                )
 
                 ax_cont.set_xlabel("r (normalized)")
                 ax_cont.set_ylabel("frequency")

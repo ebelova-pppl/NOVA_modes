@@ -1,0 +1,6 @@
+path,old_label,new_label,confidence,prior_seen,review_type,decision_source,review_note
+nstx_120113/N6/egn06w.1418E+02,skip,good,low,true,non_blind_continuum_refresh_adjudication,human,human visual re-review with refreshed continuum; detailed morphology note not recorded
+nstx_135388/N5/egn05w.2098E+02,bad,good,low,true,non_blind_continuum_refresh_adjudication,human,human visual re-review with refreshed continuum; detailed morphology note not recorded
+nstx_135388/N5/egn05w.2248E+02,bad,good,low,true,non_blind_continuum_refresh_adjudication,human,human visual re-review with refreshed continuum; detailed morphology note not recorded
+nstx_135388/N6/egn06w.1980E+02,good,bad,low,true,non_blind_continuum_refresh_adjudication,human,human visual re-review with refreshed continuum; detailed morphology note not recorded
+nstx_135388/N7/egn07w.2394E+02,bad,good,low,true,non_blind_continuum_refresh_adjudication,human,human visual re-review with refreshed continuum; detailed morphology note not recorded

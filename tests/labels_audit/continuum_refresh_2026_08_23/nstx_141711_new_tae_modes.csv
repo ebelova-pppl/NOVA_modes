@@ -1,0 +1,5 @@
+path,label,selection_reason,signed_delta,fraction_below_upper2,gap_region
+nstx_141711/N1/egn01w.2329E+03,bad,absent_from_old_v2_labels,0.0792,0.5053,below_upper2
+nstx_141711/N1/egn01w.2616E+03,bad,absent_from_old_v2_labels,-0.3352,0.5297,below_upper2
+nstx_141711/N1/egn01w.2778E+03,bad,absent_from_old_v2_labels,-0.3635,0.5836,below_upper2
+nstx_141711/N1/egn01w.2903E+03,bad,absent_from_old_v2_labels,-0.2748,0.7419,below_upper2

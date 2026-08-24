@@ -1,0 +1,5 @@
+path,label,new_label,change,signed_delta,fraction_below_upper2,gap_region,review_reason
+nstxuG142301H47/N10/egn10w.1342E+02,good,bad,good_to_bad,0.9974,1.0000,below_upper2,
+nstxuG142301H47/N10/egn10w.1503E+02,bad,good,bad_to_good,0.9999,1.0000,below_upper2,extremum_localized
+nstxuG142301H47/N8/egn08w.2244E+02,bad,good,bad_to_good,0.9830,1.0000,below_upper2,extremum_localized
+nstxuG142301H47/N9/egn09w.1813E+02,bad,good,bad_to_good,0.9954,0.9998,below_upper2,extremum_localized

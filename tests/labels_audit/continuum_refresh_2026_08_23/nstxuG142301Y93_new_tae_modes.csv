@@ -1,0 +1,8 @@
+path,label,selection_reason,signed_delta,fraction_below_upper2,gap_region
+nstxuG142301Y93/N1/egn01w.1894E+02,bad,continuum_driven_tae_addition,0.1166,0.4505,mixed
+nstxuG142301Y93/N1/egn01w.1937E+02,bad,continuum_driven_tae_addition,0.1498,0.4041,mixed
+nstxuG142301Y93/N1/egn01w.2146E+02,bad,continuum_driven_tae_addition,-0.0999,0.4624,mixed
+nstxuG142301Y93/N2/egn02w.2123E+02,bad,continuum_driven_tae_addition,-0.2919,0.4239,mixed
+nstxuG142301Y93/N3/egn03w.1635E+02,bad,continuum_driven_tae_addition,-0.0471,0.2256,mixed
+nstxuG142301Y93/N3/egn03w.2200E+02,bad,continuum_driven_tae_addition,-0.3037,0.4178,mixed
+nstxuG142301Y93/N3/egn03w.2513E+02,bad,continuum_driven_tae_addition,-0.1491,0.5199,below_upper2

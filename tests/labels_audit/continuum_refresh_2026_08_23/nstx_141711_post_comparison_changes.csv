@@ -1,0 +1,5 @@
+path,precheck_label,final_label,old_v2_label,reason,prior_seen
+nstx_141711/N3/egn03w.3421E+02,bad,good,good,user_retained_old_label_after_disagreement_review,true
+nstx_141711/N7/egn07w.1840E+03,bad,good,good,user_retained_old_label_after_disagreement_review,true
+nstx_141711/N8/egn08w.1049E+03,bad,good,good,user_retained_old_label_after_disagreement_review,true
+nstx_141711/N10/egn10w.9564E+02,bad,good,good,user_retained_old_label_after_disagreement_review,true

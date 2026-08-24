@@ -105,7 +105,7 @@
 /global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1055E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1147E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1202E+02,good
-/global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1418E+02,skip
+/global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1418E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1472E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.1484E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_120113/N6/egn06w.2071E+02,good
@@ -349,8 +349,8 @@
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.1186E+03,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.1781E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.1917E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2098E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2248E+02,bad
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2098E+02,good
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2248E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2418E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2653E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.2725E+02,good
@@ -368,7 +368,7 @@
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N5/egn05w.7266E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.1914E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.1917E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.1980E+02,good
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.1980E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.2105E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.2279E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N6/egn06w.2450E+02,good
@@ -401,7 +401,7 @@
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2223E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2346E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2388E+02,bad
-/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2394E+02,bad
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2394E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2428E+02,bad
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2569E+02,good
 /global/cfs/cdirs/m314/nova2/data/nstx_135388/N7/egn07w.2645E+02,bad

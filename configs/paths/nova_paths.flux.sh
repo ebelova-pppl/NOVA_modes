@@ -25,10 +25,8 @@ export NOVA_MODELS="$NOVA_REPO/models"
 # Main NOVA shot database on Flux.
 export NOVA_DITW_ROOT="/p/nstxdigtwin/energetic_particles/nova/DiTw"
 
-# export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
-# export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"
-export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_v2_nonG.csv"
-export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_v2_nonG.csv"
+export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"
+export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"
 
 # Flux is CPU-only for this workflow. Override after sourcing only if needed.
 export NOVA_TORCH_DEVICE=cpu

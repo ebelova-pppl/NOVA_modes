@@ -1,0 +1,7 @@
+path,label,new_label,change,mode_payload_changed,signed_delta,fraction_below_upper2,gap_region
+nstx_141711/N3/egn03w.3421E+02,good,bad,good_to_bad,false,0.9680,1.0000,below_upper2
+nstx_141711/N7/egn07w.1840E+03,good,bad,good_to_bad,true,0.4631,0.9932,below_upper2
+nstx_141711/N7/egn07w.9318E+02,bad,good,bad_to_good,false,0.9723,0.9964,below_upper2
+nstx_141711/N8/egn08w.1026E+03,good,bad,good_to_bad,true,0.6958,0.9935,below_upper2
+nstx_141711/N8/egn08w.1049E+03,good,bad,good_to_bad,true,0.9305,0.9982,below_upper2
+nstx_141711/N10/egn10w.9564E+02,good,bad,good_to_bad,false,0.9752,0.9954,below_upper2

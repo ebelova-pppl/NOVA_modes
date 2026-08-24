@@ -63,11 +63,11 @@ Data format summary
 - Training label CSVs in `training_labels/` store mode paths relative to
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current canonical/default
-  good/bad training list is `training_labels/tae_like_v2_nonG.csv`: reviewed
-  non-G labels from `tests/labels_audit/labels_human_review_clean.csv`, with
-  all `nstxuG*` rows copied unchanged from the previous
-  `training_labels/tae_like_train.csv` list while awaiting review of all G
-  shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
+  good/bad training list is `training_labels/tae_like_train.csv`, an exact
+  active copy of the versioned `training_labels/tae_like_v3.csv`. It contains
+  the completed rebuilt-database audit for all 15 shots: 2,639 modes, with 595
+  GOOD and 2,044 BAD labels. Older four-shot TAE-only and mixed TAE/EAE lists
+  are archived under
   `training_labels/old_4shots_tae_only_labels/` and
   `training_labels/old_4shots_mixed_labels/`.
 - Internal conventions:
@@ -304,7 +304,7 @@ never loads or runs a CNN model.
 - Label or verify training data (label_modes_fast.py)
 - Added split_tae_eae.py step to sort out tae-like vs eae-like modes 
 - Train classifier (RF or CNN) on the current default
-  `training_labels/tae_like_v2_nonG.csv`.
+  `training_labels/tae_like_train.csv`.
   For CNN
   checkpoints intended for production sorting, use
   `--refit_full_before_save` so the saved model is trained on the full labeled

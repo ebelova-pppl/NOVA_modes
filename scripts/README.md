@@ -22,11 +22,10 @@ For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
 The current canonical/default good/bad training list is
-`training_labels/tae_like_v2_nonG.csv`: reviewed non-G labels from
-`tests/labels_audit/labels_human_review_clean.csv`, with all `nstxuG*` rows
-copied unchanged from the previous `training_labels/tae_like_train.csv` list
-while awaiting review of all G shots. It currently has 2900 rows across 15
-shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
+`training_labels/tae_like_train.csv`, an exact copy of the versioned
+`training_labels/tae_like_v3.csv`. It contains the completed rebuilt-database
+audit for all 15 shots: 2,639 rows, with 595 GOOD and 2,044 BAD labels. Older
+four-shot TAE-only and mixed TAE/EAE lists are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
 
@@ -34,19 +33,19 @@ shots. Older four-shot TAE-only and mixed TAE/EAE lists are archived under
 module load pytorch
 
 python cnn_raw.py \
-  --train_csv training_labels/tae_like_v2_nonG.csv \
+  --train_csv training_labels/tae_like_train.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_raw.pt
 
 python cnn_straightened.py \
-  --train_csv training_labels/tae_like_v2_nonG.csv \
+  --train_csv training_labels/tae_like_train.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_straightened.pt
 
 python cnn_hybrid.py \
-  --train_csv training_labels/tae_like_v2_nonG.csv \
+  --train_csv training_labels/tae_like_train.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_hybrid.pt
@@ -289,7 +288,7 @@ evaluation. Those checkpoints are archived under `models/old_4shots_models/`:
 python cnn_classify.py --model models/nova_cnn_raw.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file_path/
 python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
-python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like_v2_nonG.csv --out preds.csv
+python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like_train.csv --out preds.csv
 ```
 or using env and running from $SCRATCH or other dir
 ```bash
@@ -319,7 +318,7 @@ To train the mode classifier, use the relevant labeled list. For example, to
 train on the TAE-like side of the mixed data:
 
 ```bash
-python rf_train_classify.py --train_csv training_labels/tae_like_v2_nonG.csv \
+python rf_train_classify.py --train_csv training_labels/tae_like_train.csv \
        --model_out nova_mode_classifier.joblib
 ```
 Or, using env variables and running from $SCRATCH:
@@ -334,7 +333,7 @@ To retrain RF on the current canonical TAE-like list:
 
 ```bash
 python "$NOVA_REPO/scripts/rf_train_classify.py" \
-  --train_csv "$NOVA_REPO/training_labels/tae_like_v2_nonG.csv" \
+  --train_csv "$NOVA_REPO/training_labels/tae_like_train.csv" \
   --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
@@ -638,6 +637,13 @@ file by default, and its title reports `plotted/total`. To reduce visual
 crowding, use `--max-harmonics N`; this keeps the strongest `N` harmonics
 ranked by `max_r |xi_m|`:
 
+The subplot height ratios are passed through `gridspec_kw` for compatibility
+with the older system Matplotlib available on some Flux nodes.
+The mode-structure and continuum panels share an explicit normalized-radius
+axis spanning `[0, 1]`; the harmonic-spectrum panel keeps its independent
+stored-harmonic-index axis. The black dashed closest-approach marker and
+purple dotted maximum-crossing marker are drawn through both radial panels.
+
 ```bash
 python label_modes_fast.py nstx_135388/N5 \
   --data_dir "$NOVA_DATA" \
@@ -675,7 +681,7 @@ or shot/N/file suffix appears in the CSV:
 ```bash
 python label_modes_fast.py nstx_120113/N5 \
   --data_dir "$NOVA_DATA" \
-  --mode-list training_labels/tae_like_v2_nonG.csv \
+  --mode-list training_labels/tae_like_train.csv \
   --csv_out labels_tae_like.csv
 ```
 
@@ -715,7 +721,11 @@ Script to plot mode structures from a `name.csv` list.
 
 Makes the same plots as `label_modes_fast.py` plus contour plots of `mode(r, m)`.
 Relative paths in the CSV are resolved under `--base_dir`, which defaults to
-`$NOVA_DATA`.
+`$NOVA_DATA`. When the CSV contains a `label` column, GOOD, BAD, and SKIP
+labels are displayed in the figure title. The mode and continuum panels share
+the normalized-radius x-axis. The black dashed `r*` closest-approach marker and
+purple dotted `r* max crossing` marker extend through both panels so they can
+be compared directly with mode-amplitude features.
 
 For the staged six-shot NSTX-U label list:
 
@@ -926,7 +936,7 @@ straightened, or hybrid CNN checkpoints that contain `model_type` metadata.
 Pass `--cnn_model_kind cnn_raw`, `cnn_straightened`, or `cnn_hybrid` only for
 older or ambiguous checkpoints.
 
-For training-set checks, pass `--label_csv training_labels/tae_like_v2_nonG.csv`
+For training-set checks, pass `--label_csv training_labels/tae_like_train.csv`
 or use `$NOVA_TRAIN_CSV` after sourcing the path config.
 Sorter output paths are matched to label paths by shot-relative suffix, so
 absolute mode paths in the shot output can be compared with relative paths in
@@ -972,7 +982,7 @@ python sort_shot_mixed.py \
   --rf_model /path/to/nova_mode_classifier.joblib \
   --cnn_model /path/to/nova_cnn_straightened.pt \
   --out_dir /path/to/sort_outputs/nstx_135388 \
-  --label_csv training_labels/tae_like_v2_nonG.csv \
+  --label_csv training_labels/tae_like_train.csv \
   --make_plots
 ```
 or when running from $NOVA_RUN_ROOT/runs/ directory (for checking on old labeled/training shots):
@@ -1302,7 +1312,7 @@ The first retained Flux audit is
 ## `run_loso_10.py`
 
 Driver for leave-one-shot-out checks over all shots in the selected training
-CSV. The filename is historical; with the current `tae_like_v2_nonG.csv` it
+CSV. The filename is historical; with the current `tae_like_train.csv` it
 creates 15 folds. It:
 
 - creates one `train.csv` and `test.csv` split per held-out shot from
@@ -1446,7 +1456,7 @@ awk -F, '{print $2}' train_master.csv | sort | uniq -c
 
 This script:
 
-- reads a labeled training CSV such as `training_labels/tae_like_v2_nonG.csv` (`path,validity` or `path,label`, with or without a header row)
+- reads a labeled training CSV such as `training_labels/tae_like_train.csv` (`path,validity` or `path,label`, with or without a header row)
 - loads each mode + extra scalars (`omega`, `gamma_d`, `ntor`)
 - builds `X` using `compute_features_for_mode(mode, extra_info=...)`
 - runs OOF using `StratifiedKFold`
@@ -1462,7 +1472,7 @@ It also prints a confusion matrix based on OOF predictions at threshold `0.5`.
 ### Usage
 
 ```bash
-python rf_oof_check.py training_labels/tae_like_v2_nonG.csv \
+python rf_oof_check.py training_labels/tae_like_train.csv \
   --model_in nova_mode_classifier.joblib \
   --out_oof oof_table.csv \
   --out_suspects oof_suspects.csv \
@@ -1485,7 +1495,7 @@ python rf_oof_check.py -h
 
 ```bash
 python find_rf_disagreements.py \
-  training_labels/tae_like_v2_nonG.csv \
+  training_labels/tae_like_train.csv \
   nova_mode_classifier.joblib \
   rf_vs_manual_disagreements.csv
 ```

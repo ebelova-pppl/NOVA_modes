@@ -1,26 +1,24 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-20)
+### Project state (current snapshot, updated 2026-08-23)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
  
 ## Data
 - Active version-controlled training list:
-    - `training_labels/tae_like_v2_nonG.csv`
-    - 2900 labeled TAE-like modes: 593 `good`, 2307 `bad`
-    - current canonical/default training list while awaiting review of all
-      NSTX-U G shots
-    - same columns as `training_labels/tae_like_train.csv`
-    - uses cleaned human-review labels from
-      `tests/labels_audit/labels_human_review_clean.csv` for the seven
-      non-G shots
-    - excludes three non-G rows now labeled `skip` from training
-    - copies all 1265 `nstxuG*` rows from `tae_like_train.csv` unchanged
+    - canonical active copy: `training_labels/tae_like_train.csv`
+    - versioned source: `training_labels/tae_like_v3.csv`
+    - the two files are byte-identical
+    - 2639 labeled TAE-like modes: 595 `good`, 2044 `bad`
+    - complete rebuilt-database audit covering all 15 training shots
     - `configs/paths/nova_paths.nersc.sh`,
       `configs/paths/nova_paths.flux.sh`, and
       `configs/paths/nova_paths.flux.csh` point `NOVA_TRAIN_CSV` /
       `NOVA_TRAIN_CSV_TAE` at this list
-- Previous canonical 15-shot training list:
-    - `training_labels/tae_like_train.csv`
+- Preserved pre-v3 list:
+    - `training_labels/tae_like_v2_nonG.csv`
+    - 2900 labeled TAE-like modes: 593 `good`, 2307 `bad`
+    - preserved unchanged for reproducibility
+- Pre-promotion canonical 15-shot training list (Git history):
     - 2903 labeled TAE-like modes: 629 `good`, 2274 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
@@ -29,15 +27,17 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
       `nstxuG142301Y93`, `nstxuG121123B12`, `nstxuG142301W29`
     - mode paths stored relative to `$NOVA_DATA` when possible
     - example entry: `nstx_120113/N5/egn05w.1234E+02,good`
-    - preserved unchanged as the pre-v2 baseline for comparison
+    - replaced intentionally at the `tae_like_train.csv` path during v3
+      promotion; exact prior contents remain in Git history
 - Derived non-G / E-production comparison list:
     - `training_labels/tae_like_train_7.csv`
     - 1638 labeled modes: 546 `good`, 1092 `bad`
     - shots: `nstx_120113`, `nstx_135388`, `nstx_141711`, `nstxu_204202`,
       `nstxuE202855A01t020`, `nstxuE204669M03t025`,
       `nstxuE205052A01t022`
-    - created from `tae_like_train.csv` by excluding all `nstxuG*` shots for
-      7-shot LOSO checks of the non-G / E-like production regime
+    - created from the pre-promotion `tae_like_train.csv` by excluding all
+      `nstxuG*` shots for 7-shot LOSO checks of the non-G / E-like production
+      regime
 - Archived historical lists:
     - older TAE-only lists: `training_labels/old_4shots_tae_only_labels/`
     - previous four-shot mixed TAE/EAE lists: `training_labels/old_4shots_mixed_labels/`
@@ -3794,3 +3794,712 @@ Both dated copies are byte-identical to the current files at the top level of
 `tae_like_train_7.csv`; that file is no longer present at the active top level.
 Together, the data-directory copy, Git tag, and dated label files preserve the
 pre-synchronization training state.
+
+### 2026-08-23: initialized the candidate training database
+
+Initialized `/p/hym/ebelova/NOVA/data_mixed_new` with the six training shots
+whose audit found no relevant DiTw mismatch:
+
+- `E202855` (`nstxuE202855A01t020`)
+- `E204669` (`nstxuE204669M03t025`)
+- `E205052` (`nstxuE205052A01t022`)
+- `B12` (`nstxuG121123B12`)
+- `J38` (`nstxuG121123J38`)
+- `W29` (`nstxuG142301W29`)
+
+For each shot, both the canonical shot directory and its
+`_tae_eae_split` companion were copied unchanged from
+`/p/hym/ebelova/NOVA/data_mixed`, for 12 top-level directories total. The copy
+contains 5,052 regular files in 95 directories and 1,874,319,634 regular-file
+bytes. Per-directory checksum dry runs with deletion reporting found no
+missing, extra, or differing files in `data_mixed_new`.
+
+Added six more canonical shot directories whose mode files were accepted but
+whose training-side continuum profiles were outdated:
+
+- `nstx_120113`
+- `nstx_135388`
+- `nstxuG121123Q62`
+- `nstxuG133964S31`
+- `nstxuG142301H47`
+- `nstxuG142301Y93`
+
+For this group, only the `N*/egn*` mode payload and directory structure were
+copied from `/p/hym/ebelova/NOVA/data_mixed`. No `datcon*` files, auxiliary
+continuum files, root-level labels or logs, or `_tae_eae_split` directories
+were copied. The result contains 6,251 checksum-verified mode files in 75
+directories and 2,369,936,968 bytes.
+
+Q62 is an exception to the pending-continuum state because its active
+training-side profiles had already been refreshed from DiTw. Copied
+`N1/datcon1` through `N10/datcon10` from the refreshed
+`data_mixed/nstxuG121123Q62` tree into `data_mixed_new` and verified all ten
+files byte-for-byte (156,060 bytes total). The preserved `datconN_old`
+backups and every `datcon*txt` auxiliary file remain excluded. Q62 now needs
+only regenerated TAE/EAE split outputs; at that stage, the other five shot
+trees still awaited recalculated continuum profiles.
+
+Installed the recalculated active continuum profiles for those remaining five
+shots directly from their corresponding directories under
+`/p/nstxdigtwin/energetic_particles/nova/DiTw`:
+
+- `nstx_120113`
+- `nstx_135388`
+- `nstxuG133964S31`
+- `nstxuG142301H47`
+- `nstxuG142301Y93`
+
+For every shot, copied exactly `N1/datcon1` through `N10/datcon10`, for 50
+files and 780,300 bytes total. Each destination file is byte-identical to its
+DiTw source. No `datcon*old*`, `datcon*txt*`, unnumbered `datcon`, or split
+output was copied. These five shots and Q62 now have their accepted mode files
+and updated active continua in `data_mixed_new`; all six still require
+regenerated TAE/EAE split outputs.
+
+Populated the final three canonical shot trees directly from DiTw, copying
+only each populated `N*/egn*` mode set and its matching active `N*/datconN`:
+
+- `nstx_141711`: 535 modes and 10 continuum files;
+- `nstxuG121123K51` (K51): 766 modes and 10 continuum files;
+- `nstxu_204202`: 533 modes and 9 continuum files (`N2` through `N10`; `N1`
+  has no mode payload).
+
+This final group contains 1,834 mode files plus 29 related continuum files,
+for 668,664,206 bytes total. Content-checksum and exact-inventory dry runs
+against `/p/nstxdigtwin/energetic_particles/nova/DiTw` found no missing,
+extra, or differing payload files. No auxiliary files or `_tae_eae_split`
+directories were copied. `data_mixed_new` now contains canonical shot trees
+for all 15 training shots; these final three also require regenerated TAE/EAE
+split outputs.
+
+### 2026-08-23: provisional v3 labels for the rebuilt database
+
+Created `training_labels/tae_like_v3_nonG.csv` for the six shots whose mode,
+continuum, and split data were retained unchanged in `data_mixed_new`:
+
+- `nstxuE202855A01t020`: 79 rows (50 `good`, 29 `bad`)
+- `nstxuE204669M03t025`: 217 rows (82 `good`, 135 `bad`)
+- `nstxuE205052A01t022`: 291 rows (57 `good`, 234 `bad`)
+- `nstxuG121123B12`: 135 rows (19 `good`, 116 `bad`)
+- `nstxuG121123J38`: 174 rows (7 `good`, 167 `bad`)
+- `nstxuG142301W29`: 158 rows (7 `good`, 151 `bad`)
+
+The 1,054-row list contains 222 `good` and 832 `bad` labels. Rows were copied
+verbatim from `training_labels/tae_like_v2_nonG.csv`, retaining the full
+seven-column schema and source ordering. Validation found no malformed rows,
+duplicate paths, unexpected labels, or paths missing from
+`/p/hym/ebelova/NOVA/data_mixed_new`. The `nonG` name denotes a provisional
+list while the remaining G shots await label audit; audited G shots B12, J38,
+and W29 are included. Existing path-config defaults still point to v2 and were
+not changed in this step.
+
+### 2026-08-23: regenerated TAE/EAE splits for nine refreshed shots
+
+Ran `scripts/split_tae_eae.py` with its default thresholds on the nine shot
+trees whose split products were intentionally omitted while rebuilding
+`/p/hym/ebelova/NOVA/data_mixed_new`. Each output was written to the matching
+`<shot>_tae_eae_split/` directory under that data root and contains
+`all_modes.csv`, `tae_like.csv`, `eae_like.csv`, and
+`all_modes_tae_eae_split.csv`.
+
+| shot | all modes | strict TAE-like | mixed in TAE output | TAE output total | EAE-like | errors |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `nstx_120113` | 541 | 133 | 41 | 174 | 367 | 0 |
+| `nstx_135388` | 1169 | 330 | 15 | 345 | 824 | 0 |
+| `nstxuG121123Q62` | 1186 | 219 | 30 | 249 | 937 | 0 |
+| `nstxuG133964S31` | 830 | 52 | 24 | 76 | 754 | 0 |
+| `nstxuG142301H47` | 1016 | 162 | 16 | 178 | 838 | 0 |
+| `nstxuG142301Y93` | 651 | 100 | 13 | 113 | 538 | 0 |
+| `nstx_141711` | 535 | 146 | 12 | 158 | 377 | 0 |
+| `nstxuG121123K51` | 766 | 149 | 3 | 152 | 614 | 0 |
+| `nstxu_204202` | 533 | 130 | 10 | 140 | 393 | 0 |
+| **total** | **7227** | **1421** | **164** | **1585** | **5642** | **0** |
+
+Exact-inventory validation confirmed that all 7,227 direct `N*/egn*` modes
+appear once in `all_modes.csv` and the full audit table, that the TAE and EAE
+path sets are disjoint and conserve the complete input set, and that every
+output path exists under its corresponding new shot tree. All split scalars
+are populated and no error rows were produced. Together with the six retained
+split directories, `data_mixed_new` now has one `_tae_eae_split` directory for
+each of its 15 canonical shots.
+
+The count above follows the splitter's documented nonrecursive `N*/egn*`
+input rule. `nstx_135388` also retains 858 nested `N*/Out/egn*` files copied
+from the previous database; `split_tae_eae.py` does not scan those run-output
+subdirectories, so they are not part of its 1,169-mode canonical split input.
+
+At generation time, the nine newly generated CSV sets contained absolute mode
+paths under `data_mixed_new`. The six split directories copied unchanged
+earlier retained their original absolute path roots: E202855, E204669,
+E205052, and J38 pointed to DiTw, while B12 and W29 pointed to the former
+`data_mixed` tree. Those source mode files had been verified identical, so
+this did not change the split classifications.
+
+### 2026-08-23: promoted the rebuilt database and repaired split paths
+
+The user renamed the former `/p/hym/ebelova/NOVA/data_mixed` tree to
+`/p/hym/ebelova/NOVA/data_mixed_tmp` and promoted `data_mixed_new` to the
+canonical `/p/hym/ebelova/NOVA/data_mixed` path. The separately frozen
+`data_mixed_2026_08_20` snapshot remains available and was checksum-verified
+against the former database immediately before the cutover.
+
+Rewrote only the absolute mode-path prefix in the four generated split CSVs
+for each of the nine refreshed shots, changing
+`/p/hym/ebelova/NOVA/data_mixed_new/` to
+`/p/hym/ebelova/NOVA/data_mixed/`. This updated 21,681 CSV data-row path
+entries across 36 files. Post-rewrite validation confirmed that all paths
+exist in the promoted database, the 7,227-mode input inventory is conserved,
+the 1,585 TAE-like and 5,642 EAE-like path sets remain disjoint and complete,
+and all audit rows still have valid scalars with zero errors. No split
+classification or non-path field was changed.
+
+Of the six split directories retained unchanged, B12 and W29 now resolve
+through the promoted canonical `data_mixed` path automatically. E202855,
+E204669, E205052, and J38 still retain their valid DiTw absolute paths; their
+corresponding mode payloads were previously verified identical to the copied
+canonical shot trees.
+
+### 2026-08-23: old-vs-new TAE-list membership for six continuum refreshes
+
+Compared normalized `shot/N*/egn*` membership in the old and rebuilt
+`tae_like.csv` lists for `nstx_120113`, `nstx_135388`, Q62, S31, H47, and Y93.
+The five available historical splits came from `data_mixed_tmp`. Because no
+historical `_tae_eae_split` directory existed for `nstx_120113`, generated a
+temporary baseline with the current `split_tae_eae.py` and that shot's old
+numbered continuum profiles. The temporary files were removed after the
+comparison.
+
+All six old/new all-mode inventories are identical, so the differences below
+are continuum-driven TAE/EAE membership changes rather than mode-filename
+additions or removals:
+
+| shot | old TAE | new TAE | added | removed | net |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `nstx_120113` | 174 | 174 | 0 | 0 | 0 |
+| `nstx_135388` | 344 | 345 | 1 | 0 | +1 |
+| `nstxuG121123Q62` | 241 | 249 | 8 | 0 | +8 |
+| `nstxuG133964S31` | 76 | 76 | 0 | 0 | 0 |
+| `nstxuG142301H47` | 175 | 178 | 3 | 0 | +3 |
+| `nstxuG142301Y93` | 106 | 113 | 7 | 0 | +7 |
+| **total** | **1116** | **1135** | **19** | **0** | **+19** |
+
+New TAE-list members are:
+
+- `nstx_135388`: `N4/egn04w.1922E+03` (`above_upper2 -> mixed`)
+- Q62: `N1/egn01w.1537E+02`, `N1/egn01w.1564E+02`,
+  `N1/egn01w.1593E+02`, `N1/egn01w.1655E+02`,
+  `N1/egn01w.1710E+02`, `N1/egn01w.1902E+02`,
+  `N1/egn01w.1937E+02`, and `N1/egn01w.2780E+02` (all
+  `above_upper2 -> mixed`)
+- H47: `N1/egn01w.3450E+02` (`above_upper2 -> below_upper2`),
+  `N3/egn03w.3059E+02`, and `N8/egn08w.1194E+02` (both
+  `above_upper2 -> mixed`)
+- Y93: `N1/egn01w.1894E+02`, `N1/egn01w.1937E+02`,
+  `N1/egn01w.2146E+02`, `N2/egn02w.2123E+02`,
+  `N3/egn03w.1635E+02`, and `N3/egn03w.2200E+02` (all
+  `above_upper2 -> mixed`), plus `N3/egn03w.2513E+02`
+  (`above_upper2 -> below_upper2`)
+
+No former TAE member was removed. None of the 19 newly admitted modes has a
+row in `training_labels/tae_like_v2_nonG.csv`; all 19 therefore require new
+label review before inclusion in v3. This is a path-membership result: even
+where membership is unchanged, recomputed continuum scalars may differ and
+can still affect continuum-dependent model features.
+
+### 2026-08-23: targeted non-G continuum-review shortlist
+
+Created a viewer-safe suspect list for targeted reinspection of the recently
+reviewed `nstx_120113` and `nstx_135388` labels:
+
+```text
+tests/labels_audit/continuum_refresh_2026_08_23/
+  nonG_suspect_modes.csv
+  nonG_suspect_mode_details.csv
+  README.md
+```
+
+The selection is explicitly a non-blind adjudication aid. It includes all
+retained low-confidence review cases plus, for each shot with a nonzero
+change, the top 10 current TAE modes by absolute full-precision old/new change
+in `signed_delta` and the top 10 by absolute change in
+`fraction_below_upper2`. The union contains 45 unique modes: 4 from
+`nstx_120113` and 41 from `nstx_135388`; 30 are confidence-selected, 16 are
+scalar-selected, and one satisfies both criteria.
+
+The `nstx_120113` upper-gap scalars are exactly unchanged at full precision
+for all 174 current TAE modes despite byte differences in all ten numbered
+continuum files, so only its four confidence-sensitive modes enter the list.
+For `nstx_135388`, the two top-10 scalar rankings have a 16-mode union; the
+largest change is the newly admitted `N4/egn04w.1922E+03` mode
+(`above_upper2 -> mixed`).
+
+`nonG_suspect_modes.csv` includes the current adjudicated labels so this explicit
+non-blind audit can be completed directly in `viz/view_modes_csv.py` without
+requiring a separate handwritten record. Its post-review labels comprise 23
+GOOD and 22 BAD. The initial labels for 44 modes came from the recent clean
+human-review list, while the newly admitted
+`nstx_135388/N4/egn04w.1922E+03` mode retains its BAD label from the preserved
+old all-mode list because it was outside the former TAE-like split.
+The viewer now preserves and displays SKIP labels as well as GOOD and BAD.
+Its mode-structure and continuum panels now share the normalized-radius
+x-axis, and both continuum-location markers extend into the mode panel for
+direct alignment with amplitude spikes.
+The companion details table retains prior-label and confidence provenance,
+reasons, raw scalar values, changes, ranks, and gap-region transitions. All 45
+relative paths were verified to resolve under the promoted canonical
+`/p/hym/ebelova/NOVA/data_mixed` tree.
+
+After visually reinspecting the shortlist with the aligned mode/continuum
+panels, the user made five low-confidence decisions:
+
+- `nstx_120113/N6/egn06w.1418E+02`: SKIP -> GOOD
+- `nstx_135388/N5/egn05w.2098E+02`: BAD -> GOOD
+- `nstx_135388/N5/egn05w.2248E+02`: BAD -> GOOD
+- `nstx_135388/N6/egn06w.1980E+02`: GOOD -> BAD
+- `nstx_135388/N7/egn07w.2394E+02`: BAD -> GOOD
+
+These explicitly non-blind decisions are recorded in
+`nonG_suspect_label_changes.csv` with `confidence=low` and `prior_seen=true`.
+They update the active clean human-review source and the working viewer list,
+whose new counts are 23 GOOD and 22 BAD. The sealed reviews, policy-v2 files,
+frozen 2026-08-20 labels, and active v2 training list remain unchanged. The
+five changes are applied in the subsequent v3 expansion below.
+
+### 2026-08-23: expanded v3 with refreshed `nstx_120113` and `nstx_135388`
+
+Expanded `training_labels/tae_like_v3_nonG.csv` from six to eight shots using
+the regenerated split manifests under the promoted canonical
+`/p/hym/ebelova/NOVA/data_mixed` tree. The requested `nstx_120133` name was
+interpreted as `nstx_120113` after a bounded check found no `nstx_120133`
+directory and confirmed the audited `nstx_120113` directory.
+
+Added:
+
+- `nstx_120113`: 174 rows (46 GOOD, 128 BAD)
+- `nstx_135388`: 345 rows (133 GOOD, 212 BAD)
+
+The first shot has exact one-to-one coverage of its current 174-row TAE-like
+split. The second covers all 345 current TAE-like modes: 344 adjudicated human
+labels plus the newly admitted `N4/egn04w.1922E+03` mode, whose preserved BAD
+label was retained. The five low-confidence continuum-refresh decisions are
+included. All added scalar and gap-region fields come directly from the
+regenerated split CSVs.
+
+The resulting eight-shot candidate contains 1,573 unique rows: 401 GOOD and
+1,172 BAD. As part of the required family/validity consistency check, 30 stale
+family values inherited by the original six-shot v3 block were normalized:
+23 `bad,tae` rows became `bad,none`, and 7 `good,none` rows became
+`good,tae`. No existing validity label or scientific scalar was changed.
+
+Validation confirmed exact target-shot split membership, relative portable
+paths, allowed labels, no SKIP or error rows, consistent family values, and
+all 1,573 files resolving under the canonical data root. The v2 and dated
+2026-08-20 lists remain unchanged, and path-config defaults still point to
+v2 while v3 remains provisional.
+
+### 2026-08-23: Flux Matplotlib compatibility for interactive labeling
+
+Updated all three `scripts/label_modes_fast.py` subplot layouts to pass
+`height_ratios` through `gridspec_kw`. This preserves the existing panel
+proportions while avoiding the `Figure.__init__() got an unexpected keyword
+argument 'height_ratios'` failure from the older system Matplotlib on Flux.
+The mode-structure and continuum panels in both normal labeling and manual
+adjudication now also share an explicit normalized-radius `[0, 1]` axis. Their
+plot boxes and continuum-location markers therefore align, while the lower
+harmonic-spectrum panel retains its independent stored-index axis.
+
+### 2026-08-23: added refreshed S31 labels to v3
+
+Interpreted the requested `S1` shot as the completed
+`nstxuG133964S31` review. Added all 76 current S31 TAE-like modes to
+`training_labels/tae_like_v3_nonG.csv` using the regenerated split scalars and
+the deduplicated human-review labels. Every S31 mode is BAD; there are no
+SKIPs, duplicate labels, missing manifest modes, or extra review paths.
+
+The old and current S31 TAE-like manifests contain the same 76 paths. The old
+v2 training list covered 74 of them, all BAD, so there are no label reversals.
+V3 adds BAD labels for the two previously absent modes:
+
+- `nstxuG133964S31/N5/egn05w.1581E+02`
+- `nstxuG133964S31/N10/egn10w.1678E+02`
+
+The resulting nine-shot provisional v3 list contains 1,649 unique rows: 401
+GOOD and 1,248 BAD. Validation confirmed exact S31 split coverage, portable
+relative paths, current split scalars, no errors or family mismatches, and all
+1,649 mode files resolving under the canonical data root. V2 and the dated
+2026-08-20 label snapshots remain unchanged.
+
+### 2026-08-23: compared refreshed H47 review with old labels
+
+Validated the completed `nstxuG142301H47` human review against the current
+178-row regenerated TAE-like split. The raw and clean review files are
+byte-identical and contain 12 GOOD and 166 BAD decisions, with exact split
+coverage, no duplicates, and no SKIPs.
+
+The frozen/current v2 training list has 169 H47 rows (9 GOOD, 160 BAD). Of
+those shared paths, the initial comparison found five disagreements. During
+review, `N10/egn10w.1403E+02` was corrected from the mistakenly entered BAD
+label to GOOD, matching v2. The final comparison has 165 agreements and four
+differences: three BAD-to-GOOD and one GOOD-to-BAD. Agreement is 165/169 =
+97.63%, with Cohen's kappa 0.7876. The three retained BAD-to-GOOD modes were
+adjudicated as extremum-localized types. A viewer-ready four-row comparison
+was written to
+`tests/labels_audit/continuum_refresh_2026_08_23/nstxuG142301H47_label_disagreements.csv`;
+its displayed `label` is the old v2 decision and its `new_label` column
+preserves the final review decision. The explicitly non-blind N10 correction
+is retained in `nstxuG142301H47_post_comparison_changes.csv`.
+
+Nine reviewed modes have no old v2 label. Six were present in the old
+175-mode TAE split but omitted from its 169-row training subset; three are the
+known continuum-driven additions to the refreshed 178-mode split. At comparison
+time, H47 had not yet been merged into `training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: added finalized H47 labels to v3
+
+Added all 178 finalized `nstxuG142301H47` labels to
+`training_labels/tae_like_v3_nonG.csv`, joined by normalized mode path to the
+current regenerated H47 `tae_like.csv` manifest. The added block contains 12
+GOOD and 166 BAD rows and uses current split scalars and gap-region values.
+It includes the post-comparison `N10/egn10w.1403E+02=GOOD` correction and the
+three retained BAD-to-GOOD extremum-localized adjudications.
+
+The resulting ten-shot provisional v3 list contains 1,827 unique rows: 413
+GOOD and 1,414 BAD. The preceding 1,649-row v3 prefix was preserved
+byte-for-byte. Full validation confirmed exact H47 review/split coverage,
+allowed binary labels, portable relative paths, no duplicates, SKIPs, errors,
+family mismatches, scalar mismatches, or missing mode files. The v2 and dated
+2026-08-20 snapshots remain unchanged. The resulting v3 SHA-256 is
+`f90439792258bec7e310eb366192fdf59670431d87552bf9f256c4054cd30f20`.
+
+### 2026-08-23: compared refreshed Y93 review with old labels
+
+Validated the completed `nstxuG142301Y93` human review against the current
+113-row regenerated TAE-like split. The raw and clean review files are
+byte-identical and contain one GOOD and 112 BAD labels, with exact split coverage, no
+duplicates or SKIPs, and all mode files resolving under the canonical data
+root.
+
+The frozen/current v2 list exactly covers the former 106-mode Y93 split with
+one GOOD and 105 BAD labels. The initial comparison found one disagreement at
+`N9/egn09w.1539E+02`; during post-comparison review, the user retained the old
+GOOD label. The finalized review now agrees on all 106 shared paths (100%
+agreement, Cohen's kappa 1.0). The correction is recorded in
+`nstxuG142301Y93_post_comparison_changes.csv`, and the retained disagreement
+CSV now contains only its header.
+
+The seven reviewed paths without old v2 labels are exactly the known
+continuum-driven additions to the refreshed Y93 TAE split; all seven are BAD.
+They are collected for visual inspection in the viewer-ready
+`nstxuG142301Y93_new_tae_modes.csv`, which includes their current labels and
+regenerated split scalars.
+At comparison time, Y93 had not yet been merged into
+`training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: added finalized Y93 labels to v3
+
+Added all 113 finalized `nstxuG142301Y93` labels to
+`training_labels/tae_like_v3_nonG.csv`, joined by normalized mode path to the
+current regenerated Y93 `tae_like.csv` manifest. The added block contains one
+GOOD and 112 BAD rows and uses current split scalars and gap-region values. It
+retains `N9/egn09w.1539E+02=GOOD`; the seven continuum-driven additions are all
+BAD.
+
+The resulting eleven-shot provisional v3 list contains 1,940 unique rows: 414
+GOOD and 1,526 BAD. The preceding 1,827-row v3 prefix was preserved
+byte-for-byte. Full validation confirmed exact Y93 review/split coverage,
+allowed binary labels, portable relative paths, no duplicates, SKIPs, errors,
+family mismatches, scalar mismatches, or missing mode files. The v2 and dated
+2026-08-20 snapshots remain unchanged. The resulting v3 SHA-256 is
+`32d6ea4e3de54e6b9d7c0a4715e18739417201655845498ea8ecba2814597ed9`.
+
+### 2026-08-23: compared refreshed Q62 review with old labels
+
+Validated the completed `nstxuG121123Q62` human review against the current
+249-row regenerated TAE-like split. The raw and clean review files are
+byte-identical and contain 16 GOOD and 233 BAD final labels, with exact split
+coverage, no duplicates or SKIPs, and all mode files resolving under the
+canonical data root.
+
+The frozen/current v2 list exactly covers the former 241-mode Q62 split with
+12 GOOD and 229 BAD labels. The initial comparison had 230 agreements and 11
+differences: seven GOOD-to-BAD and four BAD-to-GOOD (95.44%, Cohen's kappa
+0.4528). That initial state is preserved in
+`nstxuG121123Q62_initial_label_disagreements.csv`.
+
+The user then adjudicated all 11 modes GOOD with low confidence because they
+form one smooth morphology family with small-r continuum crossings but no
+resonant-like amplitude spikes. Seven precheck BAD labels were corrected to
+GOOD and recorded in `nstxuG121123Q62_post_comparison_changes.csv` with
+`prior_seen=true`; `N9/egn09w.2152E+02` remains GOOD. The complete adjudicated
+family is retained in the viewer-ready
+`nstxuG121123Q62_uniform_low_conf_good_modes.csv` with final labels,
+confidence, rationale, label provenance, and current split scalars.
+
+The final comparison has 237/241 agreements = 98.34%, with Cohen's kappa
+0.8485. The four remaining differences are all old-BAD-to-final-GOOD and are
+listed in `nstxuG121123Q62_label_disagreements.csv`, which displays the old v2
+label for inspection.
+
+The eight reviewed paths without old v2 labels are exactly the known
+continuum-driven N1 additions to the refreshed Q62 TAE split; all eight are
+BAD. They are collected in the viewer-ready
+`nstxuG121123Q62_new_tae_modes.csv` with current labels and regenerated split
+scalars. At comparison time, Q62 had not yet been merged into
+`training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: added finalized Q62 labels to v3
+
+Added all 249 finalized `nstxuG121123Q62` labels to
+`training_labels/tae_like_v3_nonG.csv`, joined by normalized mode path to the
+current regenerated Q62 `tae_like.csv` manifest. The added block contains 16
+GOOD and 233 BAD rows and uses current split scalars and gap-region values. It
+includes all 11 explicitly non-blind, low-confidence GOOD adjudications; the
+eight continuum-driven additions are all BAD.
+
+The resulting twelve-shot provisional v3 list contains 2,189 unique rows: 430
+GOOD and 1,759 BAD. The preceding 1,940-row v3 prefix was preserved
+byte-for-byte. Full validation confirmed exact Q62 review/split coverage,
+allowed binary labels, portable relative paths, no duplicates, SKIPs, errors,
+family mismatches, scalar mismatches, or missing mode files. The v2 and dated
+2026-08-20 snapshots remain unchanged. The resulting v3 SHA-256 is
+`0fca442ac6eaf27417ee8377bc18eb2825806708d1963955b7b098d6eb4f4b85`.
+
+### 2026-08-23: staged nstxu_204202 exact-label transfer
+
+Compared the current 140-row `nstxu_204202` TAE-like split with the 275 labels
+for this shot in `tae_like_v2_nonG.csv`. The current set is a strict subset of
+the old labeled set: all 140 current paths are shared, there are no genuinely
+new current TAE-like paths, and 135 old paths are absent from the current mode
+tree. Byte-for-byte comparison with `data_mixed_2026_08_20` confirmed that all
+140 shared mode files are unchanged.
+
+Staged the 140 exact transferred labels (62 GOOD and 78 BAD) in
+`tests/labels_audit/continuum_refresh_2026_08_23/nstxu_204202_transferred_labels.csv`.
+The component uses relative paths, current split ordering, current regenerated
+split scalars, and normalized family fields. The label-free new-mode inspection
+list is header-only because the current-minus-old set is empty.
+
+Quarantined the 135 old-only labels (two GOOD and 133 BAD) in
+`tests/labels_audit/continuum_refresh_2026_08_23/nstxu_204202_quarantined_old_labels.csv`.
+Every quarantined path is absent from the current data tree; the file preserves
+the old v2 label/scalar provenance and records reason
+`absent_from_current_mode_tree`. This staged component has not yet been merged
+into `training_labels/tae_like_v3_nonG.csv`, which remains at 2,189 rows (430
+GOOD and 1,759 BAD).
+
+### 2026-08-23: added nstxu_204202 exact transfers to v3
+
+Added all 140 validated `nstxu_204202` transfer rows to
+`training_labels/tae_like_v3_nonG.csv`: 62 GOOD and 78 BAD. The appended block
+exactly matches the current TAE-like split, uses its regenerated scalar values,
+and excludes all 135 quarantined paths that are absent from the current mode
+tree.
+
+The resulting thirteen-shot provisional v3 list contains 2,329 unique rows:
+492 GOOD and 1,837 BAD. The preceding 2,189-row v3 prefix was preserved
+byte-for-byte. Full validation confirmed portable relative paths, allowed
+binary labels, consistent family fields, no errors or duplicates, exact
+`nstxu_204202` split coverage, and all 2,329 mode files resolving under the
+canonical data root. The resulting v3 SHA-256 is
+`5f441650f47a0e8f26e95f26e658081d1968527b505f00b9a3d1420613ead683`.
+
+### 2026-08-23: prepared nstx_141711 full current-shot review
+
+Prepared a new label-free review of the recalculated `nstx_141711` modes. The
+current regenerated TAE-like split contains 158 unique modes across `N1`
+through `N10`; all mode files resolve under the canonical data root and the
+split contains no error rows.
+
+Generated
+`tests/labels_audit/continuum_refresh_2026_08_23/nstx_141711_blind_manifest.csv`
+from the current split using the visual-review manifest preparer, together
+with the blank structured `nstx_141711_blind_decisions.csv` template. The
+manifest contains no prior labels or classifier fields. The interactive human
+review will be written to the new `nstx_141711_human_labels.csv` path using
+`label_modes_fast.py`, the whole-shot `N*/egn*` pattern, the blind manifest as
+its mode list, signed harmonics, and `--no-rf`.
+
+No `nstx_141711` rows have been added to `tae_like_v3_nonG.csv`. Historical
+label comparison and any v3 merge remain deferred until the independent
+158-mode current-shot review is complete and validated.
+
+### 2026-08-23: completed nstx_141711 review and comparison
+
+Validated the completed current-shot review against the 158-row blind
+manifest. The clean review has exact coverage, 75 GOOD and 83 BAD decisions,
+no SKIPs, and no missing mode files. The 159-row raw history repeats
+`N3/egn03w.5246E+02=GOOD` once; deduplication retains the same decision. The
+clean pre-comparison file is frozen by a SHA-256 sidecar with digest
+`0264756d76e83d209390137261511af5baa63e092ebdef2aecc15b1dd13792d3`.
+
+Compared the review with old v2 labels only after completeness validation. Of
+154 exact shared paths, 148 agree and six differ (96.10% agreement, Cohen's
+kappa 0.9221): five old GOOD to current BAD and one old BAD to current GOOD.
+Three disagreement paths have changed mode payloads relative to the frozen
+2026-08-20 database and three are byte-identical. The viewer-ready differences
+are preserved in `nstx_141711_initial_label_disagreements.csv`; the complete
+initial shared-path table is in
+`nstx_141711_initial_shared_label_comparison.csv`.
+
+Four current TAE-like paths have no old v2 label; all four are N1 modes and all
+were reviewed BAD. Of 102 old-only labeled paths, 101 mode files are absent
+from the current tree and one old-BAD mode remains in the tree but is not in
+the current TAE-like split. The new and old-only sets are recorded in
+`nstx_141711_new_tae_modes.csv` and
+`nstx_141711_quarantined_old_labels.csv`, respectively.
+
+The six label differences await user adjudication. No `nstx_141711` rows have
+been added to `training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: adjudicated nstx_141711 label differences
+
+The user retained old v2 labels for four of the six initial differences and
+kept the current review decisions for two: `N7/egn07w.9318E+02=GOOD` and
+`N8/egn08w.1026E+03=BAD`. The four changes from the checksummed pre-comparison
+review are recorded separately in `nstx_141711_post_comparison_changes.csv`
+with `prior_seen=true`; `nstx_141711_disagreement_adjudication.csv` records the
+final decision for all six initially differing modes.
+
+Created `nstx_141711_human_labels_final.csv` without altering the preserved
+pre-comparison clean review. The final 158-mode list contains 79 GOOD and 79
+BAD decisions and has SHA-256
+`2a82d29d8d9d7905e563dbe47e95bc4f57fe35570731ff58f6f6b6757bffe48a`.
+Final old-label agreement is 152/154 shared paths (98.70%, Cohen's kappa
+0.9740), leaving only the two explicitly adjudicated differences in
+`nstx_141711_label_disagreements.csv`. The final complete shared-path table is
+`nstx_141711_shared_label_comparison.csv`.
+
+No `nstx_141711` rows have been added to `training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: added finalized nstx_141711 labels to v3
+
+Added the complete 158-row finalized `nstx_141711` review to
+`training_labels/tae_like_v3_nonG.csv`, using regenerated current split
+scalars and normalized family fields. The block contains 79 GOOD and 79 BAD
+labels, including the explicitly adjudicated `N7/egn07w.9318E+02=GOOD` and
+`N8/egn08w.1026E+03=BAD` decisions. All 102 old-only quarantined labels remain
+excluded.
+
+The resulting fourteen-shot provisional v3 list contains 2,487 unique rows:
+571 GOOD and 1,916 BAD. The preceding 2,329-row v3 prefix was preserved
+byte-for-byte. Full validation confirmed exact current-shot review and split
+coverage, allowed binary labels, portable relative paths, consistent family
+fields, current scalars, no errors or duplicates, and all 2,487 mode files
+resolving under the canonical data root. The v2 and frozen 2026-08-20 label
+snapshots remain unchanged. The resulting v3 SHA-256 is
+`a613b1e259321d18d4f89007e83f5a79aa8637cc4469ba00b3c327bc07d994e0`.
+
+### 2026-08-23: prepared K51 full current-shot review
+
+Prepared a new label-free review package for the recalculated
+`nstxuG121123K51` modes. The current regenerated TAE-like split contains 152
+unique modes across `N2` through `N10`; all files resolve under the canonical
+data root and the split contains no error rows.
+
+Generated
+`tests/labels_audit/continuum_refresh_2026_08_23/nstxuG121123K51_blind_manifest.csv`
+from the current split using the visual-review manifest preparer, together
+with the blank structured `nstxuG121123K51_blind_decisions.csv` template. The
+manifest contains no prior labels or classifier fields. Whole-shot validation
+confirmed that the `N*/egn*` scan sees 766 K51 mode files and the manifest
+filters it to exactly the 152 current TAE-like targets.
+
+The interactive human review will be written to the new
+`nstxuG121123K51_human_labels.csv` path using `label_modes_fast.py`, signed
+harmonics, the label-free manifest, and `--no-rf`. Historical comparison and
+any v3 merge remain deferred until the complete current-shot review is
+validated.
+
+### 2026-08-23: completed K51 review and comparison
+
+Validated `nstxuG121123K51_human_labels_clean.csv` directly against the
+152-row blind manifest, as requested, without using the duplicate-bearing raw
+labeler history. The clean review has exact coverage, 25 GOOD and 127 BAD
+decisions, no SKIPs, and no missing mode files. Its frozen SHA-256 sidecar has
+digest `ae59e1386911d2c3d2dbba42e37b932f2bcb1e8eea714fc4bcdde2ba7f13ea1b`.
+
+Compared historical labels only after completeness validation. Of 122 exact
+shared paths, 112 agree and ten differ (91.80% agreement, Cohen's kappa
+0.7408): six old GOOD to current BAD and four old BAD to current GOOD. All ten
+disagreement mode payloads changed relative to the frozen 2026-08-20 database.
+The viewer-ready differences are in
+`nstxuG121123K51_initial_label_disagreements.csv`; the complete initial
+shared-path table is in `nstxuG121123K51_initial_shared_label_comparison.csv`.
+
+Thirty current TAE-like paths have no old v2 label, comprising two GOOD and 28
+BAD decisions. All 86 old-only labeled mode files are absent from the current
+tree; their old labels comprise three GOOD and 83 BAD. The new and old-only
+sets are recorded in `nstxuG121123K51_new_tae_modes.csv` and
+`nstxuG121123K51_quarantined_old_labels.csv`, respectively.
+
+The ten label differences await user adjudication. No K51 rows have been
+added to `training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: adjudicated K51 label differences
+
+The user changed only `N9/egn09w.3938E+02` from the clean-review GOOD decision
+to BAD, matching its old v2 label, and retained the clean-review decisions for
+the other nine initially differing modes. The single change is preserved in
+`nstxuG121123K51_post_comparison_changes.csv` with `prior_seen=true`; the
+complete ten-mode decision record is
+`nstxuG121123K51_disagreement_adjudication.csv`.
+
+Created `nstxuG121123K51_human_labels_final.csv` without altering the
+checksummed pre-comparison clean list. The finalized 152-mode review contains
+24 GOOD and 128 BAD decisions and has SHA-256
+`3d75f3019c8e9bd2f2abd785f3786439a6f5defd8607de587434a83f223ac766`.
+Final old-label agreement is 113/122 shared paths (92.62%, Cohen's kappa
+0.7631), leaving nine differences in
+`nstxuG121123K51_label_disagreements.csv`. The final complete shared-path table
+is `nstxuG121123K51_shared_label_comparison.csv`.
+
+No K51 rows have been added to `training_labels/tae_like_v3_nonG.csv`.
+
+### 2026-08-23: added finalized K51 labels to v3
+
+Added the complete 152-row finalized `nstxuG121123K51` review to
+`training_labels/tae_like_v3_nonG.csv`, using regenerated current split
+scalars and normalized family fields. The block contains 24 GOOD and 128 BAD
+labels and includes the post-comparison `N9/egn09w.3938E+02=BAD` correction.
+All 86 old-only quarantined paths remain excluded.
+
+The resulting fifteen-shot provisional v3 list contains 2,639 unique rows:
+595 GOOD and 2,044 BAD. The preceding 2,487-row v3 prefix was preserved
+byte-for-byte. Full validation confirmed exact current-shot review and split
+coverage, allowed binary labels, portable relative paths, consistent family
+fields, current scalars, no errors or duplicates, and all 2,639 mode files
+resolving under the canonical data root. The v2 and frozen 2026-08-20 label
+snapshots remain unchanged. The resulting v3 SHA-256 is
+`0eb939ef226447f66121d44fc6eb13b6b9ef64746958c189588058e26846d364`.
+
+All 15 rebuilt training shots are now represented in the provisional v3
+candidate. The historical `nonG` filename remains unchanged for the moment;
+path-config defaults also still point to the preserved v2 list pending the
+next explicit promotion/retraining decision.
+
+### 2026-08-23: promoted audited v3 to the main training list
+
+Renamed the completed `training_labels/tae_like_v3_nonG.csv` candidate to
+`training_labels/tae_like_v3.csv` now that every G shot has been audited, then
+replaced `training_labels/tae_like_train.csv` with an exact copy. Both active
+files contain 2,639 unique rows across all 15 shots: 595 GOOD and 2,044 BAD,
+with SHA-256
+`7cf7b3cbf07a6af65311867bc109ac8783e50829f4d9655e33374890447ec0ea`.
+Both copies were normalized from CRLF to LF during promotion so Git can audit
+their diffs cleanly; this did not alter any CSV records. The completed
+pre-promotion CRLF candidate had SHA-256
+`0eb939ef226447f66121d44fc6eb13b6b9ef64746958c189588058e26846d364`.
+
+Updated the NERSC Bash, Flux Bash, and Flux tcsh path configs so
+`NOVA_TRAIN_CSV` and `NOVA_TRAIN_CSV_TAE` point to
+`training_labels/tae_like_train.csv`. Updated the standalone Python fallbacks
+in `cnn_raw.py`, `run_loso_10.py`, and `audit_training_provenance.py`, plus the
+labeler help and current training examples, to use the same canonical main
+list.
+
+The pre-promotion `tae_like_train.csv` contents had 2,903 rows and SHA-256
+`2c6c1d7ebb1743a592b0590f089a610d962508ed1bd71e3778e6e679d2afc919`;
+they remain recoverable from Git history. The preserved v2 list and its dated
+2026-08-20 copy remain byte-identical with SHA-256
+`8587aef8876c575c27f4404d44a4a45f9e46ffa210b7efc53ec67e2de149f0ad`.
+Existing RF/CNN checkpoints have not yet been retrained on v3.

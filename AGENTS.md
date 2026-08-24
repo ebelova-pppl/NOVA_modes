@@ -13,6 +13,15 @@
 - `scripts/README.md` — detailed script inventory and collaborator-facing usage notes
 - `docs/project_state.md` — current scientific/project status, model status, and migration notes
 
+## User environments and shell syntax
+- On PPPL Flux, the user's interactive shell is `tcsh`. Write copy-pasteable
+  Flux commands with `tcsh` syntax such as `setenv`, unless the user explicitly
+  requests another shell.
+- On NERSC Perlmutter, the user's interactive shell is `bash`. Write
+  copy-pasteable Perlmutter commands with Bash syntax such as `export`.
+- The shell used internally by automation does not change the required syntax
+  for commands presented to the user.
+
 ## Working style
 - For nontrivial refactors, plan first and summarize the plan before editing.
 - Ask clarifying questions if something in the prompt request is ambiguous.

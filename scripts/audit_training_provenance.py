@@ -873,7 +873,7 @@ def build_argument_parser() -> argparse.ArgumentParser:
         "--train-csv",
         default=os.environ.get(
             "NOVA_TRAIN_CSV",
-            str(REPO_ROOT / "training_labels" / "tae_like_v2_nonG.csv"),
+            str(REPO_ROOT / "training_labels" / "tae_like_train.csv"),
         ),
         help="Canonical training CSV used to select shots and labeled rows.",
     )
