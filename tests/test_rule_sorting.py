@@ -103,6 +103,9 @@ CROSS_WINDOW_FEATURE_NAMES = {
     "cross_window_A_crossing_boundary",
     "cross_window_A_crossing_r",
     "cross_window_A_distance_grid",
+    "cross_window_A_neighbor_rms",
+    "cross_window_A_neighbor_count",
+    "cross_window_A_neighbor_stencil_complete",
     "cross_window_W_max",
     "cross_window_W_sample_r",
     "cross_window_W_crossing_boundary",
@@ -716,6 +719,11 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(two_grid["cross_window_A_crossing_boundary"], "high")
         self.assertAlmostEqual(two_grid["cross_window_A_crossing_r"], 0.35)
         self.assertAlmostEqual(two_grid["cross_window_A_distance_grid"], 1.5)
+        self.assertAlmostEqual(two_grid["cross_window_A_neighbor_rms"], 0.3)
+        self.assertEqual(two_grid["cross_window_A_neighbor_count"], 4)
+        self.assertTrue(
+            two_grid["cross_window_A_neighbor_stencil_complete"]
+        )
         self.assertAlmostEqual(two_grid["cross_window_W_max"], 0.09)
         self.assertAlmostEqual(two_grid["cross_window_W_sample_r"], 0.5)
 
@@ -726,8 +734,33 @@ class RuleAndOverrideTests(unittest.TestCase):
         )
         self.assertFalse(no_crossing["cross_window_candidate_found"])
         self.assertIsNone(no_crossing["cross_window_A_max"])
+        self.assertIsNone(no_crossing["cross_window_A_neighbor_rms"])
+        self.assertIsNone(no_crossing["cross_window_A_neighbor_count"])
+        self.assertIsNone(
+            no_crossing["cross_window_A_neighbor_stencil_complete"]
+        )
         self.assertIsNone(no_crossing["cross_window_W_max"])
         self.assertAlmostEqual(no_crossing["cross_window_half_width_r"], 0.2)
+
+        boundary_mode = np.zeros((1, 11), dtype=float)
+        boundary_mode[0, 0] = 0.5
+        boundary = extract_continuum_crossing_window_features(
+            boundary_mode,
+            [
+                {
+                    "boundary": "low",
+                    "r_cross": 0.0,
+                    "W_peak": 0.0,
+                    "shear_weighted": 0.0,
+                }
+            ],
+            half_width_grid=0,
+        )
+        self.assertEqual(boundary["cross_window_A_neighbor_count"], 2)
+        self.assertFalse(
+            boundary["cross_window_A_neighbor_stencil_complete"]
+        )
+        self.assertIsNone(boundary["cross_window_A_neighbor_rms"])
 
     def test_cross_window_gate_catches_signal_two_grid_steps_from_crossing(self):
         mode = np.zeros_like(self.mode)
@@ -792,6 +825,10 @@ class RuleAndOverrideTests(unittest.TestCase):
         cross_features = two_grid.features["crossing_features"]
         self.assertAlmostEqual(cross_features["cross_window_A_max"], 0.3)
         self.assertAlmostEqual(cross_features["cross_window_W_max"], 0.09)
+        self.assertAlmostEqual(
+            cross_features["cross_window_A_neighbor_rms"],
+            np.sqrt((0.29**2 + 3 * 0.3**2) / 4.0),
+        )
 
         disabled = evaluate_mode(
             self.base,
@@ -859,6 +896,12 @@ class RuleAndOverrideTests(unittest.TestCase):
             energy_only.features["crossing_features"]["cross_window_W_max"],
             0.08,
         )
+        self.assertAlmostEqual(
+            energy_only.features["crossing_features"][
+                "cross_window_A_neighbor_rms"
+            ],
+            0.2,
+        )
 
         amplitude_mode = mode.copy()
         amplitude_mode[1, 82] = 0.25
@@ -873,6 +916,32 @@ class RuleAndOverrideTests(unittest.TestCase):
             ),
         )
         self.assertEqual(amplitude_only.primary_reason, BAD_CONT_CROSS_WINDOW)
+        self.assertAlmostEqual(
+            amplitude_only.features["crossing_features"][
+                "cross_window_A_neighbor_rms"
+            ],
+            0.25,
+        )
+
+        smooth_mode = np.zeros_like(self.mode)
+        smooth_mode[0, 120] = 1.0
+        smooth_mode[1, 76:85] = 0.3
+        smooth = evaluate_mode(
+            self.base,
+            **{**common, "mode": smooth_mode},
+            continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+                half_width_grid=2,
+                amplitude_min=0.25,
+                w_min=0.05,
+            ),
+        )
+        self.assertEqual(smooth.primary_reason, BAD_CONT_CROSS_WINDOW)
+        self.assertAlmostEqual(
+            smooth.features["crossing_features"][
+                "cross_window_A_neighbor_rms"
+            ],
+            0.0,
+        )
 
     def test_grid_scale_gate_precedes_cont_cross_gate(self):
         mode = np.zeros_like(self.mode)

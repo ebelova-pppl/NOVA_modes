@@ -33,7 +33,7 @@ Their calibrated defaults are `r_ax=0.03` inclusive,
 `r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; modes not rejected by
 any gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v7 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v8 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -138,10 +138,24 @@ AND stop evaluating later decision gates
 all crossing windows. `cross_window_W_max` is the largest
 `sum_h |mode_h(r_i)|^2`, normalized by its radial maximum. Record independent
 winning sample radius, crossing boundary/radius, distance in grid intervals,
-and the winning stored harmonic index for amplitude. Override the defaults
-with `--cross_window_half_width_grid`, `--cross_window_amplitude_min`, and
-`--cross_window_w_min`; use `--disable_cont_cross_window` to retain evidence
-without applying the gate. The two threshold comparisons are inclusive.
+and the winning stored harmonic index for amplitude.
+`cross_window_A_neighbor_rms` uses signed values from that winning harmonic
+and sample:
+
+```text
+sqrt(mean((A[j] - A[j+i])^2)), i = -2, -1, +1, +2
+```
+
+Require all four neighbors so the audit value is comparable across modes.
+Record the available neighbor count and complete-stencil status; when a winner
+lies too close to a radial boundary, store JSON `null` for RMS. Because the
+amplitude winner may itself lie two grid intervals from the crossing, its
+signed-neighbor stencil can extend four intervals from the crossing. RMS is
+audit information only and must not alter the gate-4 decision. Override the
+decision thresholds with `--cross_window_half_width_grid`,
+`--cross_window_amplitude_min`, and `--cross_window_w_min`; use
+`--disable_cont_cross_window` to retain evidence without applying the gate.
+The two magnitude-threshold comparisons are inclusive.
 
 The fifth gate measures the global radial-energy envelope
 `W(r)=sum_h |mode_h(r)|^2`, normalized to a peak of one. Search both

@@ -65,8 +65,8 @@ Data format summary
   `nstx_120113/N5/egn05w.1234E+02,good`. The current canonical/default
   good/bad training list is `training_labels/tae_like_train.csv`, an exact
   active copy of the versioned `training_labels/tae_like_v3.csv`. It contains
-  the completed rebuilt-database audit for all 15 shots: 2,639 modes, with 595
-  GOOD and 2,044 BAD labels. Older four-shot TAE-only and mixed TAE/EAE lists
+  the completed rebuilt-database audit for all 15 shots: 2,639 modes, with 592
+  GOOD and 2,047 BAD labels. Older four-shot TAE-only and mixed TAE/EAE lists
   are archived under
   `training_labels/old_4shots_tae_only_labels/` and
   `training_labels/old_4shots_mixed_labels/`.
@@ -88,10 +88,10 @@ Model families
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. Both checkpoints were retrained on the preceding
-  2900-row, 594-GOOD / 2306-BAD v2 snapshot. The current list has one later
-  label correction and now contains 593 GOOD / 2307 BAD; the checkpoints have
-  not yet been refit for that correction. The raw-CNN checkpoint is a full-list
-  refit with `M_target=100`.
+  2900-row, 594-GOOD / 2306-BAD v2 snapshot. The current synchronized v3 list
+  has 2,639 rows with 592 GOOD / 2,047 BAD labels; the checkpoints have not yet
+  been refit on this rebuilt dataset and its later label corrections. The
+  raw-CNN checkpoint is a full-list refit with `M_target=100`.
 - Latest pre-B12 RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
 - An opt-in 25-feature RF experiment adds inner continuum-extremum radial

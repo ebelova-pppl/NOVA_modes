@@ -40,3 +40,6 @@ outputs/loso*
 
 # Generated deterministic rule-calibration runs
 outputs/*_axis_*/
+outputs/v3_gate3_off_all_other_gates/
+outputs/v3_gate3_off_rms025/
+outputs/v3_relabels_gate3_off_rms_audit/

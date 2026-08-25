@@ -40,7 +40,7 @@ DEFAULT_CROSS_WINDOW_W_MIN = 0.05
 DEFAULT_EDGE_R_MIN = 0.97
 DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
 
-RULESET_VERSION = "tae-rules-axis-grid-cont-window-edge-v7"
+RULESET_VERSION = "tae-rules-axis-grid-cont-window-edge-v9"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
 BAD_CONT_CROSS = "BAD_CONT_CROSS"
@@ -51,7 +51,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v7"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v8"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -182,7 +182,6 @@ class ContinuumCrossingWindowConfig:
                 raise ValueError(
                     f"cross_window {name} must be null or finite and in [0, 1]"
                 )
-
     @property
     def enabled(self) -> bool:
         """Return whether either crossing-neighborhood threshold is configured."""
@@ -294,6 +293,9 @@ def empty_continuum_crossing_window_features(
         "cross_window_A_crossing_boundary": None,
         "cross_window_A_crossing_r": None,
         "cross_window_A_distance_grid": None,
+        "cross_window_A_neighbor_rms": None,
+        "cross_window_A_neighbor_count": None,
+        "cross_window_A_neighbor_stencil_complete": None,
         "cross_window_W_max": None,
         "cross_window_W_sample_r": None,
         "cross_window_W_crossing_boundary": None,
@@ -769,6 +771,18 @@ def extract_continuum_crossing_window_features(
 
     amplitude, harmonic_index, sample_index, boundary, r_cross = amplitude_winner
     sample_r = float(radial_grid[sample_index])
+    neighbor_indices = sample_index + np.array([-2, -1, 1, 2], dtype=int)
+    valid_neighbor_indices = neighbor_indices[
+        (neighbor_indices >= 0) & (neighbor_indices < mode_array.shape[1])
+    ]
+    neighbor_count = int(valid_neighbor_indices.size)
+    neighbor_stencil_complete = neighbor_count == 4
+    neighbor_rms: float | None = None
+    if neighbor_stencil_complete:
+        signed_center = float(mode_array[harmonic_index, sample_index])
+        signed_neighbors = mode_array[harmonic_index, neighbor_indices]
+        signed_differences = signed_center - signed_neighbors
+        neighbor_rms = float(np.sqrt(np.mean(signed_differences**2)))
     result.update(
         {
             "cross_window_candidate_found": True,
@@ -778,6 +792,11 @@ def extract_continuum_crossing_window_features(
             "cross_window_A_crossing_boundary": boundary,
             "cross_window_A_crossing_r": r_cross,
             "cross_window_A_distance_grid": abs(sample_r - r_cross) / delta_r,
+            "cross_window_A_neighbor_rms": neighbor_rms,
+            "cross_window_A_neighbor_count": neighbor_count,
+            "cross_window_A_neighbor_stencil_complete": (
+                neighbor_stencil_complete
+            ),
         }
     )
     energy, sample_index, boundary, r_cross = energy_winner

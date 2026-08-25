@@ -24,7 +24,7 @@ For portability, paths in training CSVs should be stored relative to
 The current canonical/default good/bad training list is
 `training_labels/tae_like_train.csv`, an exact copy of the versioned
 `training_labels/tae_like_v3.csv`. It contains the completed rebuilt-database
-audit for all 15 shots: 2,639 rows, with 595 GOOD and 2,044 BAD labels. Older
+audit for all 15 shots: 2,639 rows, with 592 GOOD and 2,047 BAD labels. Older
 four-shot TAE-only and mixed TAE/EAE lists are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
@@ -1027,7 +1027,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-grid-cont-window-edge-v7` ruleset implements the first five ordered
+`tae-rules-axis-grid-cont-window-edge-v9` ruleset implements the first five ordered
 BAD gates but still has no positive GOOD template. Modes that do not fire any
 gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
 reasons and structured features are stored as deterministic JSON; missing
@@ -1035,7 +1035,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v7`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v8`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1048,7 +1048,9 @@ groups are:
   energy winners from the configured neighborhood of all true crossings. The
   latter record the window widths, winning values, sample radii, associated
   crossing boundary/radius, harmonic index for amplitude, and sample distance
-  from the crossing in grid intervals;
+  from the crossing in grid intervals. The amplitude winner also records its
+  signed four-neighbor RMS, available-neighbor count, and complete-stencil
+  status;
 - `crossing_records`: every lower/upper crossing with `boundary`, `r_cross`,
   `W_peak`, and `shear_weighted`, ordered by boundary and radius;
 - `extremum_features`: `match_found`, `ext_dr`, `ext_df_gap`, and
@@ -1160,10 +1162,17 @@ For each crossing, include radial samples satisfying
 crossings, independently retain the largest individual-harmonic absolute
 amplitude `cross_window_A_max` and largest peak-normalized total radial energy
 `cross_window_W_max`, with the winning sample and crossing metadata for each.
+For the amplitude-winning harmonic and radial sample `j`, calculate
+`sqrt(mean((A[j]-A[j+i])**2))` using signed amplitudes at offsets
+`i=-2,-1,+1,+2`. Require all four neighbors; otherwise record a null RMS and
+mark the stencil incomplete. The winner can be shifted within the crossing
+window, so its stencil can reach four grid intervals from the associated
+crossing. This RMS is audit information only and does not alter the decision.
+
 After `BAD_CONT_CROSS`, a mode with `n_cross > 0` returns `BAD` with
 `BAD_CONT_CROSS_WINDOW` when either
 `cross_window_A_max >= amplitude_min` or `cross_window_W_max >= w_min`. These
-comparisons are inclusive. Override the settings with
+magnitude comparisons are inclusive. Override the settings with
 `--cross_window_half_width_grid`, `--cross_window_amplitude_min`, and
 `--cross_window_w_min`; use `--disable_cont_cross_window` to retain the
 measurements while disabling this decision.

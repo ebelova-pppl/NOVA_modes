@@ -23,11 +23,23 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   amplitudes and energy at radial samples within two grid intervals.
  
 ## Data
+- Perlmutter data layout after the rebuilt-database synchronization:
+    - `$CFS/m314/nova2/data` is the current Perlmutter copy of the canonical
+      rebuilt Flux dataset (`data_mixed`)
+    - `$CFS/m314/nova2/data_2026_08_20` preserves the previous Perlmutter
+      dataset snapshot
+    - Perlmutter workflows should keep `$NOVA_DATA` pointed at
+      `$CFS/m314/nova2/data`; use the dated directory only for reproducing
+      pre-synchronization results
+    - rule/model outputs generated before this copy describe the August 20
+      payload even when their stored absolute paths contain the unchanged
+      `.../nova2/data/...` prefix; those results must be rerun before being
+      interpreted against v3
 - Active version-controlled training list:
     - canonical active copy: `training_labels/tae_like_train.csv`
     - versioned source: `training_labels/tae_like_v3.csv`
     - the two files are byte-identical
-    - 2639 labeled TAE-like modes: 595 `good`, 2044 `bad`
+    - 2639 labeled TAE-like modes: 592 `good`, 2047 `bad`
     - complete rebuilt-database audit covering all 15 training shots
     - `configs/paths/nova_paths.nersc.sh`,
       `configs/paths/nova_paths.flux.sh`, and
@@ -111,8 +123,8 @@ Notes:
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
     -	Checkpoint status: retrained on the preceding 2900-row / 15-shot
-      `training_labels/tae_like_v2_nonG.csv` snapshot; the later N9/3222 label
-      correction is not yet reflected in the checkpoint
+      `training_labels/tae_like_v2_nonG.csv` snapshot; the synchronized v3
+      dataset and its later label corrections are not yet reflected
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
     -	Checkpoint training counts: 594 GOOD, 2306 BAD
     -	Latest pre-B12 13-shot OOF accuracy: 0.951
@@ -123,8 +135,8 @@ Notes:
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
     -	Checkpoint status: full-CSV refit on the preceding 2900-row / 15-shot
-      `training_labels/tae_like_v2_nonG.csv` snapshot; the later N9/3222 label
-      correction is not yet reflected in the checkpoint
+      `training_labels/tae_like_v2_nonG.csv` snapshot; the synchronized v3
+      dataset and its later label corrections are not yet reflected
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
     -	Latest v2 split check before full refit: best accuracy 0.9534 at
       epoch 13; final 80-epoch full refit reports no prediction collapse
@@ -4522,3 +4534,225 @@ they remain recoverable from Git history. The preserved v2 list and its dated
 2026-08-20 copy remain byte-identical with SHA-256
 `8587aef8876c575c27f4404d44a4a45f9e46ffa210b7efc53ec67e2de149f0ad`.
 Existing RF/CNN checkpoints have not yet been retrained on v3.
+
+### 2026-08-23: synchronized the rebuilt dataset to Perlmutter
+
+On Perlmutter, moved the former `$CFS/m314/nova2/data` tree to
+`$CFS/m314/nova2/data_2026_08_20`, then copied the complete updated Flux
+rebuilt dataset into the active `$CFS/m314/nova2/data` path. The active path
+therefore remains stable for scripts and relative training-list entries while
+its contents now match the rebuilt dataset used for the completed v3 review.
+The dated directory is the preserved source snapshot for reproducing older
+results.
+
+Keep `$NOVA_DATA=$CFS/m314/nova2/data` for new Perlmutter work. Do not infer
+that an older output used the current payload merely because it records the
+same absolute path: pre-synchronization sorter and feature outputs were
+calculated from the former file contents. Treat the earlier v2 rule summaries
+and continuum-gate ablations as historical, and regenerate their input
+fingerprints and statistics against the current data plus
+`training_labels/tae_like_train.csv` before drawing new conclusions.
+
+### 2026-08-24: reran rule gates on the synchronized data and v3 labels
+
+Reran `sort_shot_rules.py` on all 15 training shots using the current
+Perlmutter data and active v3 labels. The requested configuration enables
+`BAD_AXIS_SPIKE`, `BAD_GRID_SCALE_SPIKE`, `BAD_CONT_CROSS_WINDOW`, and
+`BAD_EDGE_SPIKE`; only gate 3, the exact-point `BAD_CONT_CROSS` test, is
+disabled. The run is under
+`outputs/v3_gate3_off_all_other_gates/`, which is ignored as generated
+calibration output. Its deterministic audit files include the per-shot table,
+all label disagreements, detailed labeled-GOOD continuum-window rejections,
+and the invalid-input record.
+
+The rules discovered 12,128 mode files and evaluated 2,643 TAE-like or mixed
+modes. Of 2,638 rule-evaluated modes matched to active labels, 1,991/2,043
+labeled BAD modes were rejected (97.45% BAD recall) and 534/595 labeled GOOD
+modes were retained for review (89.75% GOOD retention), for 95.72% agreement.
+There are 61 labeled-GOOD rejections and 52 labeled-BAD retentions. Five
+TAE-side modes are not present in the active label list. One additional
+labeled-BAD K51 mode, `N4/egn04w.8769E+01`, is invalid and was not evaluated
+because its metadata contain a non-finite value.
+
+The apparent G-shot GOOD-recall problem is concentrated in Q62. Q62 retains
+only 1/16 labeled-GOOD modes; gate 4 rejects the other 15 with primary reason
+`BAD_CONT_CROSS_WINDOW`. Across the other 14 shots, GOOD retention is
+533/579 (92.06%) while BAD recall remains 1,761/1,810 (97.29%). Within the G
+shots, excluding Q62 gives 64/70 GOOD retained (91.43%) and 890/915 BAD
+rejected (97.27%). Across all shots, the 61 GOOD rejections split into 31
+continuum-window, 21 grid-scale, seven axis, and two edge decisions.
+
+The v3 relabeling is not the source of the Q62-dominated recall loss. On 1,179
+current G-shot paths shared by the archived 2026-08-20 and v3 labels, only 17
+labels changed. With identical current decisions, GOOD retention improves
+from 71.25% to 74.70% and BAD recall from 97.00% to 97.45% under v3.
+
+Gate 4 currently tests only whether amplitude or normalized energy is large
+within two grid intervals of a continuum crossing. It does not distinguish a
+smooth physical structure from a localized resonance-like spike. The next
+continuum-rule revision should therefore add crossing-local morphology—at
+minimum local-maximum status, prominence relative to a smooth two-sided
+baseline, connected half-maximum width, and normalized curvature—before
+changing the global amplitude or energy thresholds.
+
+### 2026-08-24: tested signed-neighbor roughness for gate 4
+
+Measured local signed-amplitude variation for all 854 modes whose primary
+reason in the gate-3-disabled run is BAD_CONT_CROSS_WINDOW: 820 labeled BAD,
+31 labeled GOOD, and three unlabeled. Around gate 4's existing
+amplitude-winning sample and harmonic, the experimental RMS is
+sqrt(mean((A[j]-A[j+i])**2)) for offsets i=-2,-1,+1,+2; the companion
+measurement is the maximum absolute signed difference over the same four
+neighbors. Centering on the current amplitude winner allows the candidate to
+be shifted within the crossing window, while signed differences preserve
+large opposite-sign changes. This winner-centered stencil can extend to four
+grid intervals from the crossing when the winner is at the edge of the
+current window; the exact-crossing-centered alternative remains within two
+intervals but separates the current labels less well.
+
+The amplitude-winner RMS separates the current labels better than the simple
+maximum difference, an all-shifted-center maximum, or an exact-crossing
+center: ROC AUC values are 0.861, 0.831, 0.839, and 0.774, respectively. RMS
+medians are 0.197 for labeled GOOD and 0.516 for labeled BAD.
+
+As an additional gate-4 requirement, RMS 0.20 would retain 716/820 current
+gate-4 BAD rejections and 14/31 GOOD rejections, giving full-rule BAD recall
+92.36% and GOOD retention 92.61%. RMS 0.30 would retain 643/820 BAD and only
+4/31 GOOD rejections, recovering 13/15 Q62 GOOD modes; full-rule BAD recall
+would fall to 88.84% while GOOD retention rises to 94.29%. A threshold of
+0.425 is above every labeled-GOOD RMS in this population but releases 296
+labeled BAD modes before the edge gate. The edge fallback catches only one
+such BAD mode.
+
+The production rule remains unchanged. Detailed per-mode signed samples and
+roughness values are in
+outputs/v3_gate3_off_all_other_gates/crossing_window_roughness_experiment.csv;
+the threshold sweep and full-rule projections are beside it. Before adopting
+a threshold, visually review BAD modes released around RMS 0.20–0.30 and the
+four labeled-GOOD modes still rejected at 0.30, then decide whether to combine
+RMS with sign-reversal count, normalized curvature, or total-energy-envelope
+roughness.
+
+### 2026-08-24: tested nearest-peak width with RMS 0.25
+
+Kept RMS 0.25 as the baseline experimental gate-4 morphology condition and
+measured a complementary peak width for all 854 current continuum-window
+rejections. On the amplitude-winning stored harmonic, the experiment finds
+the nearest signed local extremum inside the associated crossing's inclusive
+plus-or-minus-two-grid window, then uses the shared signed-lobe helper to
+measure its connected full width at half maximum over the complete radial
+grid. Missing local extrema produce an explicit false status and null widths.
+
+The width test does not separate the RMS-low population in the expected
+direction. Among modes below RMS 0.25 with a nearby peak, labeled-BAD median
+width is 5.18 grid intervals and labeled-GOOD median width is 3.17. Smaller
+width as BAD evidence has ROC AUC 0.347; broader width has AUC 0.653. This is
+consistent with gate 2 having already removed the clearest sufficiently large
+one-grid signed spikes.
+
+Adding narrow peak width as an OR condition therefore trades away much of the
+RMS recall improvement. Width at most one grid interval rescues only six BAD
+modes while re-rejecting one GOOD; width at most three rescues 25 BAD and
+re-rejects five GOOD; width at most six rescues 47 BAD and re-rejects seven
+GOOD. Full-rule BAD recall / GOOD retention move from 91.04% / 93.28% for RMS
+0.25 alone to 92.22% / 92.44% at width three and 93.29% / 92.10% at width six.
+
+The production gate remains unchanged. The evidence currently favors testing
+RMS 0.25 alone and retaining peak width only as audit information. Detailed
+measurements, the OR threshold sweep, and review lists for the 131 released
+BAD, 21 recovered GOOD, and ten still-rejected GOOD modes are under
+outputs/v3_gate3_off_all_other_gates/.
+
+### 2026-08-24: added signed-neighbor RMS 0.25 to gate 4
+
+Made the signed amplitude-winner neighbor RMS a production requirement for
+`BAD_CONT_CROSS_WINDOW`. Gate 4 now fires only when a true crossing exists,
+the existing crossing-window magnitude condition is met, and
+`cross_window_A_neighbor_rms >= 0.25`. The RMS uses offsets
+`-2,-1,+1,+2` around the amplitude-winning sample on its stored harmonic.
+All four neighbors are required; incomplete boundary stencils record a null
+RMS and cannot fire gate 4. Added the RMS value, available-neighbor count, and
+complete-stencil flag to the grouped rule features, updated the CLI and shot
+summary, and advanced the ruleset/schema to
+`tae-rules-axis-grid-cont-window-rms-edge-v8` /
+`tae-rule-features-grouped-v8`. The focused rule workflow suite passes all 47
+tests, and the full repository suite passes all 80 tests. The four emitted
+warnings are the pre-existing scikit-learn checkpoint-version warnings.
+
+Reran all 15 synchronized shots under the requested evaluation setup: axis,
+grid-scale, RMS-qualified continuum-window, and edge gates enabled, with
+energy-only gate 3 disabled via `--disable_cont_cross`. Among 2,638
+rule-evaluated modes matched to active v3 labels, the revised configuration
+rejects 1,860/2,043 labeled BAD modes (91.04% BAD recall) and retains
+555/595 labeled GOOD modes (93.28% GOOD retention). Compared with the same
+gate-3-disabled run before the RMS requirement, it newly retains 131 labeled
+BAD modes, recovers 21 labeled GOOD modes, and passes one released labeled-BAD
+mode to `BAD_EDGE_SPIKE`, where it is still rejected. The final disagreement
+totals are 183 labeled-BAD retentions and 40 labeled-GOOD rejections. There
+are also five unlabeled TAE-side modes and the previously known invalid
+labeled-BAD K51 mode.
+
+Newly retained labeled-BAD counts are concentrated in `nstx_135388` (33),
+`nstxuG121123Q62` (21), `nstx_141711` (15), `nstxuG142301Y93` (14),
+`nstxuE205052A01t022` (11), and `nstx_120113` (9); the other shots contribute
+28. The exact 131-mode review list is
+`outputs/v3_gate3_off_all_other_gates/crossing_window_rms025_released_bad.csv`.
+The production rerun is under `outputs/v3_gate3_off_rms025/`, whose per-shot
+`review_tae_like.csv` and `rule_results.csv` files contain all retained modes
+and their v8 RMS evidence. Its root `label_disagreements.csv` contains all 183
+labeled-BAD retentions and 40 labeled-GOOD rejections, with a
+`retention_origin` field separating the 131 newly released BAD modes from the
+52 that were already retained. Root `shot_label_statistics.csv` records the
+same comparison per shot. Peak width remains audit-only and is not part of the
+gate.
+
+### 2026-08-24: reverted RMS gate condition and corrected nine v3 labels
+
+Rejected the signed-neighbor RMS 0.25 experiment as a production decision:
+although it recovered 21 labeled-GOOD modes, it newly retained 131
+labeled-BAD modes, including visually obvious junk whose crossing-local
+behavior was nevertheless smooth. Gate 4 is again the magnitude-only rule
+`n_cross > 0 AND (cross_window_A_max >= 0.25 OR cross_window_W_max >= 0.05)`.
+The four-neighbor signed RMS, available-neighbor count, and complete-stencil
+flag remain deterministic audit fields in grouped feature schema v8, but no
+RMS threshold is exposed or used by the decision. Advanced the behavior
+version to `tae-rules-axis-grid-cont-window-edge-v9`; the feature schema
+remains `tae-rule-features-grouped-v8`.
+
+Applied nine visual-review corrections to both
+`training_labels/tae_like_v3.csv` and its byte-identical active copy
+`training_labels/tae_like_train.csv`. GOOD became BAD for:
+
+- `nstx_120113/N6/egn06w.1418E+02`;
+- `nstx_135388/N4/egn04w.3241E+02`;
+- `nstx_135388/N4/egn04w.3862E+02`;
+- `nstx_141711/N3/egn03w.3421E+02`;
+- `nstxuE204669M03t025/N4/egn04w.7170E+01`;
+- `nstxuE204669M03t025/N4/egn04w.9263E+01`.
+
+BAD became GOOD for:
+
+- `nstxuE202855A01t020/N1/egn01w.8188E+00`;
+- `nstxuE202855A01t020/N1/egn01w.8555E+00`;
+- `nstxuG121123B12/N10/egn10w.1344E+02`.
+
+The active set remains 2,639 unique paths and now contains 592 GOOD and 2,047
+BAD labels. All `family` values are consistent (`tae` for GOOD and `none` for
+BAD), every path resolves under current `$NOVA_DATA`, and both active files
+have SHA-256
+`c690fe038501c8f2b4f0ae05cee28ea2bccbbd2958e6abfe8adb854f27889492`.
+The active RF and CNN checkpoints predate this synchronized v3 set and must be
+retrained later before model metrics are interpreted against these labels.
+
+Regenerated all 15 shots with gate 3 disabled and the magnitude-only gate 4
+under `outputs/v3_relabels_gate3_off_rms_audit/`. All 2,643 v9 decisions and
+primary reasons exactly match the earlier v7 magnitude-only run, while v9 now
+records RMS audit evidence. Against the corrected labels, 1,997/2,046
+rule-evaluated BAD modes are rejected (97.61% BAD recall), 537/592 GOOD modes
+are retained (90.71% GOOD retention), and agreement is 96.06%. The remaining
+disagreements are 49 BAD retentions and 55 GOOD rejections. Five
+rule-evaluated modes remain unlabeled, and the known non-finite K51 mode
+remains the sole invalid input. Root `label_disagreements.csv`,
+`shot_label_statistics.csv`, and `audit_summary.md` contain the current audit.
+The full repository suite passes all 80 tests; the four warnings are the
+pre-existing scikit-learn checkpoint-version warnings.

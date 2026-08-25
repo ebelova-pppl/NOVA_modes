@@ -17,27 +17,41 @@ and Q62 reviewed against their recalculated continua, the exact transferable
 subset of the refreshed `nstxu_204202` mode set, and the fully re-reviewed
 recalculated `nstx_141711` and K51 shots:
 
-- `nstxuE202855A01t020`: 79 rows (50 `good`, 29 `bad`)
-- `nstxuE204669M03t025`: 217 rows (82 `good`, 135 `bad`)
+- `nstxuE202855A01t020`: 79 rows (52 `good`, 27 `bad`)
+- `nstxuE204669M03t025`: 217 rows (80 `good`, 137 `bad`)
 - `nstxuE205052A01t022`: 291 rows (57 `good`, 234 `bad`)
-- `nstxuG121123B12`: 135 rows (19 `good`, 116 `bad`)
+- `nstxuG121123B12`: 135 rows (20 `good`, 115 `bad`)
 - `nstxuG121123J38`: 174 rows (7 `good`, 167 `bad`)
 - `nstxuG142301W29`: 158 rows (7 `good`, 151 `bad`)
-- `nstx_120113`: 174 rows (46 `good`, 128 `bad`)
-- `nstx_135388`: 345 rows (133 `good`, 212 `bad`)
+- `nstx_120113`: 174 rows (45 `good`, 129 `bad`)
+- `nstx_135388`: 345 rows (131 `good`, 214 `bad`)
 - `nstxuG133964S31`: 76 rows (0 `good`, 76 `bad`)
 - `nstxuG142301H47`: 178 rows (12 `good`, 166 `bad`)
 - `nstxuG142301Y93`: 113 rows (1 `good`, 112 `bad`)
 - `nstxuG121123Q62`: 249 rows (16 `good`, 233 `bad`)
 - `nstxu_204202`: 140 rows (62 `good`, 78 `bad`)
-- `nstx_141711`: 158 rows (79 `good`, 79 `bad`)
+- `nstx_141711`: 158 rows (78 `good`, 80 `bad`)
 - `nstxuG121123K51`: 152 rows (24 `good`, 128 `bad`)
 
-The list has 2,639 rows: 595 `good` and 2,044 `bad`. The original six-shot
-block retains its paths, validity labels, ordering, and split scalars from
-`tae_like_v2_nonG.csv`. Thirty stale family fields inherited from v2 were
-normalized without changing validity: 23 `bad,tae` rows became `bad,none`,
-and 7 `good,none` rows became `good,tae`.
+The list has 2,639 rows: 592 `good` and 2,047 `bad`. The original six-shot
+block retains its paths, ordering, and split scalars from
+`tae_like_v2_nonG.csv`; the active validity labels include the later visual
+review corrections described below. Thirty stale family fields inherited
+from v2 were normalized without changing validity: 23 `bad,tae` rows became
+`bad,none`, and 7 `good,none` rows became `good,tae`.
+
+The 2026-08-24 rule-disagreement review made nine additional visual label
+corrections while leaving paths and split scalars unchanged: six GOOD rows
+became BAD (`nstx_120113/N6/egn06w.1418E+02`,
+`nstx_135388/N4/egn04w.3241E+02`,
+`nstx_135388/N4/egn04w.3862E+02`,
+`nstx_141711/N3/egn03w.3421E+02`,
+`nstxuE204669M03t025/N4/egn04w.7170E+01`, and
+`nstxuE204669M03t025/N4/egn04w.9263E+01`) and three BAD rows became GOOD
+(`nstxuE202855A01t020/N1/egn01w.8188E+00`,
+`nstxuE202855A01t020/N1/egn01w.8555E+00`, and
+`nstxuG121123B12/N10/egn10w.1344E+02`). Corresponding family values remain
+consistent: `tae` for GOOD and `none` for BAD.
 
 The 519 refreshed non-G rows use current scalars from the regenerated
 `tae_like.csv` split manifests. Labels for 518 rows come from the active clean
@@ -85,9 +99,10 @@ review in
 `tests/labels_audit/continuum_refresh_2026_08_23/nstx_141711_human_labels_final.csv`
 and regenerated current split scalars. The block contains 79 GOOD and 79 BAD
 labels and includes the explicit post-comparison decisions
-`N7/egn07w.9318E+02=GOOD` and `N8/egn08w.1026E+03=BAD`. Four current N1 modes
-without old v2 labels are BAD. The 102 old-only labels outside the current
-TAE-like split remain quarantined and excluded.
+`N7/egn07w.9318E+02=GOOD` and `N8/egn08w.1026E+03=BAD`. The later disagreement
+review changes `N3/egn03w.3421E+02` to BAD, giving 78 GOOD and 80 BAD. Four
+current N1 modes without old v2 labels are BAD. The 102 old-only labels outside
+the current TAE-like split remain quarantined and excluded.
 
 All 152 current `nstxuG121123K51` TAE-like modes use the finalized whole-shot
 review in
@@ -117,11 +132,11 @@ and must not be restored to the active training set.
 ### `tae_like_train.csv`
 
 Canonical/default TAE-like good/bad training list for RF and CNN training. It
-is an exact byte-for-byte copy of `tae_like_v3.csv`, with 2,639 rows: 595
-`good` and 2,044 `bad`. NERSC and Flux path configs set both
+is an exact byte-for-byte copy of `tae_like_v3.csv`, with 2,639 rows: 592
+`good` and 2,047 `bad`. NERSC and Flux path configs set both
 `NOVA_TRAIN_CSV` and `NOVA_TRAIN_CSV_TAE` to this file. The source and active
 copy have SHA-256
-`7cf7b3cbf07a6af65311867bc109ac8783e50829f4d9655e33374890447ec0ea`.
+`c690fe038501c8f2b4f0ae05cee28ea2bccbbd2958e6abfe8adb854f27889492`.
 
 The pre-promotion 2,903-row contents of this filename remain recoverable from
 Git history; they were replaced intentionally when the completed v3 audit was
