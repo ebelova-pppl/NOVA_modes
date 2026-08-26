@@ -1,5 +1,38 @@
 # Non-G continuum-refresh suspect modes
 
+## Q62 v3 rule-review lists
+
+`q62_v3_good_modes.csv` contains all 16 Q62 modes labeled GOOD in
+`training_labels/tae_like_v3.csv`. It retains portable paths and the v3 family
+and gap-routing columns and is directly usable with `viz/view_modes_csv.py`
+when the data root is supplied.
+
+`q62_v3_bad_first_two_gate_survivors_crossing_amplitude_gt0p3.csv` contains 56
+Q62 modes labeled BAD in v3 that satisfy all of the following against the
+current refreshed local Q62 mode and continuum files:
+
+1. they do not fire `BAD_AXIS_SPIKE` at the calibrated inclusive defaults
+   `r_ax=0.03`, `axis_amplitude_min=0.2`, and
+   `axis_width_max_grid=10`;
+2. they do not fire `BAD_GRID_SCALE_SPIKE` at
+   `grid_scale_amplitude_min=0.3` and
+   `grid_scale_width_max_grid=1`;
+3. at least one true lower/upper continuum crossing has maximum individual
+   stored-harmonic amplitude strictly greater than `0.3` after every signed
+   harmonic is linearly interpolated to the crossing radius.
+
+The v3 Q62 population is 249 modes: 16 GOOD and 233 BAD. Of the BAD modes, 69
+fire the first gate, 68 more fire the second gate, and 96 survive both; 56 of
+the 96 pass the exact-crossing amplitude filter. The crossing CSV records the
+winning signed amplitude, zero-based stored harmonic index, boundary, radius,
+peak-normalized total energy `crossing_W_peak`, crossing count, and SHA-256
+mode-plus-`datcon#` input fingerprint. This exact interpolated harmonic
+amplitude is a review-list measurement, not the v7 `BAD_CONT_CROSS` energy
+condition or its sample-based two-grid crossing-window amplitude.
+
+The source `training_labels/tae_like_v3.csv` SHA-256 used for these lists is
+`7cf7b3cbf07a6af65311867bc109ac8783e50829f4d9655e33374890447ec0ea`.
+
 This directory contains an explicitly non-blind adjudication shortlist for
 the refreshed `nstx_120113` and `nstx_135388` continua.
 

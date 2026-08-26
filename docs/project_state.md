@@ -1,7 +1,26 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-23)
+### Project state (current snapshot, updated 2026-08-26)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-08-26 Q62 v3 deterministic review lists
+
+- Added `tests/labels_audit/continuum_refresh_2026_08_23/q62_v3_good_modes.csv`
+  with all 16 Q62 GOOD modes in `training_labels/tae_like_v3.csv`.
+- Added
+  `q62_v3_bad_first_two_gate_survivors_crossing_amplitude_gt0p3.csv` in the
+  same audit directory. It contains 56 v3-labeled BAD modes that survive the
+  calibrated axis and grid-scale-spike gates and have maximum absolute signed
+  harmonic amplitude strictly greater than 0.3 after interpolation to at
+  least one true continuum crossing.
+- The Q62 v3 population has 233 BAD modes: 69 fire the first gate, 68 more fire
+  the second, and 96 survive both. Of those survivors, 56 meet the requested
+  exact-crossing amplitude condition and 40 have crossings but remain at or
+  below 0.3. All 249 Q62 paths were available locally; the detailed list keeps
+  mode-plus-continuum fingerprints and crossing audit evidence.
+- This review measurement is distinct from v7 gate 3, which thresholds
+  peak-normalized total radial energy at the crossing, and gate 4, which uses
+  amplitudes and energy at radial samples within two grid intervals.
  
 ## Data
 - Active version-controlled training list:
