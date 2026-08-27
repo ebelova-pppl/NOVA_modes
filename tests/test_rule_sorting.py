@@ -43,6 +43,7 @@ from tae_rule_engine import (  # noqa: E402
     BAD_CONT_CROSS,
     BAD_CONT_CROSS_WINDOW,
     BAD_EDGE_SPIKE,
+    BAD_GRID_SCALE_PACKET,
     BAD_GRID_SCALE_SPIKE,
     NO_GOOD_TEMPLATE,
     RULE_FEATURE_EXTRACTION_FAILED,
@@ -55,11 +56,13 @@ from tae_rule_engine import (  # noqa: E402
     ContinuumCrossingConfig,
     ContinuumCrossingWindowConfig,
     EdgeArtifactConfig,
+    GridScalePacketConfig,
     GridScaleSpikeConfig,
     evaluate_mode,
     extract_axis_artifact_features,
     extract_continuum_crossing_window_features,
     extract_edge_artifact_features,
+    extract_grid_scale_packet_features,
     extract_grid_scale_spike_features,
 )
 from tae_rule_io import (  # noqa: E402
@@ -275,6 +278,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         row=None,
         axis_config=None,
         grid_config=None,
+        packet_config=None,
         crossing_config=None,
         cross_window_config=None,
         edge_config=None,
@@ -286,6 +290,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             high2=self.high2,
             axis_artifact_config=axis_config,
             grid_scale_spike_config=grid_config,
+            grid_scale_packet_config=packet_config,
             continuum_crossing_config=crossing_config,
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
@@ -328,9 +333,47 @@ class RuleAndOverrideTests(unittest.TestCase):
             "grid_scale_spike"
         ]
         self.assertFalse(grid_features["grid_scale_candidate_found"])
-        self.assertEqual(grid_features["grid_scale_candidate_width_limit_grid"], 1.0)
+        self.assertIsNone(
+            grid_features["grid_scale_candidate_width_limit_grid"]
+        )
+        self.assertEqual(grid_features["grid_scale_width_max_grid"], 1.0)
+        self.assertEqual(grid_features["grid_scale_high_r_cutoff_r"], 0.7)
+        self.assertEqual(
+            grid_features["grid_scale_high_r_width_max_grid"], 0.75
+        )
+        packet_features = features["numerical_structure_features"][
+            "grid_scale_packet"
+        ]
+        self.assertFalse(
+            packet_features["grid_scale_packet_candidate_found"]
+        )
+        self.assertEqual(
+            packet_features["grid_scale_packet_amplitude_min"], 0.3
+        )
+        self.assertEqual(packet_features["grid_scale_packet_step_min"], 0.2)
+        self.assertEqual(
+            packet_features["grid_scale_packet_min_large_turns"], 3
+        )
+        self.assertEqual(
+            packet_features["grid_scale_packet_window_span_grid"], 4
+        )
+        self.assertEqual(
+            packet_features["grid_scale_packet_peak_r_max"], 0.5
+        )
+        self.assertEqual(
+            packet_features[
+                "grid_scale_packet_radius_qualified_window_count"
+            ],
+            0,
+        )
         axis_features = features["boundary_features"]["axis_artifact"]
         self.assertEqual(axis_features["r_ax"], 0.03)
+        self.assertFalse(axis_features["axis_candidate_found"])
+        self.assertEqual(axis_features["axis_candidate_amplitude_min"], 0.2)
+        self.assertEqual(axis_features["axis_candidate_width_limit_grid"], 10.0)
+        self.assertEqual(axis_features["axis_local_peak_count"], 0)
+        self.assertEqual(axis_features["axis_amplitude_qualified_peak_count"], 0)
+        self.assertEqual(axis_features["axis_width_qualified_peak_count"], 0)
         self.assertEqual(axis_features["axis_peak_harmonic_index"], 3)
         self.assertFalse(axis_features["axis_peak_is_local_max"])
         self.assertGreater(axis_features["axis_halfmax_outer_edge_r"], 0.03)
@@ -460,6 +503,10 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(axis_features["axis_peak_harmonic_index"], 2)
         self.assertAlmostEqual(axis_features["axis_peak_r"], 0.01)
         self.assertTrue(axis_features["axis_peak_is_local_max"])
+        self.assertTrue(axis_features["axis_candidate_found"])
+        self.assertEqual(axis_features["axis_local_peak_count"], 1)
+        self.assertEqual(axis_features["axis_amplitude_qualified_peak_count"], 1)
+        self.assertEqual(axis_features["axis_width_qualified_peak_count"], 1)
         self.assertAlmostEqual(axis_features["axis_halfmax_width_grid"], 1.0)
         self.assertFalse(axis_features["axis_component_touches_boundary"])
 
@@ -483,6 +530,64 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(result.decision, "BAD")
         self.assertEqual(result.primary_reason, BAD_AXIS_SPIKE)
 
+    def test_axis_gate_checks_local_peak_masked_by_larger_rising_flank(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, :9] = [
+            0.0,
+            0.7867,
+            0.1642,
+            -0.4318,
+            -0.6916,
+            -0.8940,
+            -0.9541,
+            -0.9707,
+            -0.9111,
+        ]
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        axis_features = result.features["boundary_features"]["axis_artifact"]
+
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(result.primary_reason, BAD_AXIS_SPIKE)
+        self.assertTrue(axis_features["axis_candidate_found"])
+        self.assertEqual(axis_features["axis_local_peak_count"], 1)
+        self.assertEqual(axis_features["axis_amplitude_qualified_peak_count"], 1)
+        self.assertAlmostEqual(axis_features["axis_peak_r"], 0.005)
+        self.assertAlmostEqual(axis_features["axis_peak"], 0.7867)
+        self.assertTrue(axis_features["axis_peak_is_local_max"])
+        self.assertLess(axis_features["axis_halfmax_width_grid"], 2.0)
+
+    def test_axis_gate_checks_narrower_peak_when_stronger_peak_is_too_broad(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 2] = 0.6
+        mode[2, :9] = [0.0, 0.4, 0.7, 0.9, 1.0, 0.9, 0.7, 0.4, 0.0]
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            axis_artifact_config=AxisArtifactConfig(
+                axis_amplitude_min=0.5,
+                axis_width_max_grid=2.0,
+            ),
+        )
+        axis_features = result.features["boundary_features"]["axis_artifact"]
+
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(result.primary_reason, BAD_AXIS_SPIKE)
+        self.assertTrue(axis_features["axis_candidate_found"])
+        self.assertEqual(axis_features["axis_local_peak_count"], 2)
+        self.assertEqual(axis_features["axis_amplitude_qualified_peak_count"], 2)
+        self.assertEqual(axis_features["axis_width_qualified_peak_count"], 1)
+        self.assertEqual(axis_features["axis_peak_harmonic_index"], 1)
+        self.assertAlmostEqual(axis_features["axis_peak_r"], 0.01)
+        self.assertAlmostEqual(axis_features["axis_peak"], 0.6)
+        self.assertAlmostEqual(axis_features["axis_halfmax_width_grid"], 1.0)
+
     def test_grid_scale_spike_uses_signed_lobe_width(self):
         mode = np.zeros_like(self.mode)
         mode[1, 80] = 0.7
@@ -495,6 +600,9 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(features["grid_scale_peak_sign"], 1)
         self.assertAlmostEqual(features["grid_scale_peak"], 0.7)
         self.assertAlmostEqual(features["grid_scale_halfmax_width_grid"], 0.75)
+        self.assertEqual(
+            features["grid_scale_candidate_width_limit_grid"], 1.0
+        )
 
         result = evaluate_mode(
             self.base,
@@ -508,6 +616,77 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             json.loads(row["rule_triggered_rules"]),
             [BAD_GRID_SCALE_SPIKE],
+        )
+        packet_features = result.features["numerical_structure_features"][
+            "grid_scale_packet"
+        ]
+        self.assertFalse(packet_features["grid_scale_packet_candidate_found"])
+        self.assertEqual(
+            packet_features["grid_scale_packet_turn_qualified_window_count"],
+            0,
+        )
+
+    def test_grid_scale_spike_uses_relaxed_width_above_high_r_cutoff(self):
+        def mode_with_width_between_limits(peak_index):
+            mode = np.zeros_like(self.mode)
+            mode[1, peak_index - 1 : peak_index + 2] = [-0.175, 0.7, -0.175]
+            return mode
+
+        low_r_mode = mode_with_width_between_limits(120)
+        low_r_features = extract_grid_scale_spike_features(low_r_mode)
+        self.assertTrue(low_r_features["grid_scale_candidate_found"])
+        self.assertAlmostEqual(low_r_features["grid_scale_peak_r"], 0.6)
+        self.assertGreater(
+            low_r_features["grid_scale_halfmax_width_grid"], 0.75
+        )
+        self.assertLessEqual(
+            low_r_features["grid_scale_halfmax_width_grid"], 1.0
+        )
+        self.assertEqual(
+            low_r_features["grid_scale_candidate_width_limit_grid"], 1.0
+        )
+
+        cutoff_mode = mode_with_width_between_limits(140)
+        cutoff_features = extract_grid_scale_spike_features(cutoff_mode)
+        self.assertTrue(cutoff_features["grid_scale_candidate_found"])
+        self.assertAlmostEqual(cutoff_features["grid_scale_peak_r"], 0.7)
+        self.assertEqual(
+            cutoff_features["grid_scale_candidate_width_limit_grid"], 1.0
+        )
+
+        high_r_mode = mode_with_width_between_limits(160)
+        high_r_features = extract_grid_scale_spike_features(high_r_mode)
+        self.assertTrue(high_r_features["grid_scale_candidate_found"])
+        self.assertLess(high_r_features["grid_scale_peak"], 0.3)
+        self.assertEqual(
+            high_r_features["grid_scale_candidate_width_limit_grid"], 0.75
+        )
+        high_r_result = evaluate_mode(
+            self.base,
+            mode=high_r_mode,
+            low2=self.low2,
+            high2=self.high2,
+        )
+        self.assertEqual(high_r_result.decision, "REVIEW")
+
+        unresolved_high_r_mode = np.zeros_like(self.mode)
+        unresolved_high_r_mode[1, 160] = 0.7
+        unresolved_high_r_mode[1, 161] = -0.7
+        unresolved_high_r_features = extract_grid_scale_spike_features(
+            unresolved_high_r_mode
+        )
+        self.assertTrue(
+            unresolved_high_r_features["grid_scale_candidate_found"]
+        )
+        self.assertAlmostEqual(
+            unresolved_high_r_features["grid_scale_halfmax_width_grid"],
+            0.75,
+        )
+        self.assertEqual(
+            unresolved_high_r_features[
+                "grid_scale_candidate_width_limit_grid"
+            ],
+            0.75,
         )
 
     def test_grid_scale_gate_requires_both_amplitude_and_width(self):
@@ -528,6 +707,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             mode=resolved,
             low2=self.low2,
             high2=self.high2,
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
+            ),
         )
         self.assertEqual(resolved_result.decision, "REVIEW")
         features = extract_grid_scale_spike_features(
@@ -535,6 +717,149 @@ class RuleAndOverrideTests(unittest.TestCase):
             width_max_grid=1.0,
         )
         self.assertFalse(features["grid_scale_candidate_found"])
+
+    def test_grid_scale_packet_gate_catches_repeated_same_sign_excursions(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 93:98] = [0.571, 0.329, 1.0, 0.014, 0.329]
+        features = extract_grid_scale_packet_features(mode)
+
+        self.assertTrue(features["grid_scale_packet_candidate_found"])
+        self.assertEqual(features["grid_scale_packet_peak_harmonic_index"], 1)
+        self.assertAlmostEqual(features["grid_scale_packet_peak_r"], 0.475)
+        self.assertEqual(features["grid_scale_packet_peak_r_max"], 0.5)
+        self.assertGreaterEqual(
+            features["grid_scale_packet_radius_qualified_window_count"], 1
+        )
+        self.assertEqual(features["grid_scale_packet_large_step_count"], 4)
+        self.assertEqual(features["grid_scale_packet_large_turn_count"], 3)
+        self.assertEqual(
+            features["grid_scale_packet_direction_change_count"], 3
+        )
+        self.assertEqual(features["grid_scale_packet_sign_change_count"], 0)
+        self.assertEqual(
+            features["grid_scale_packet_window_values"],
+            [0.0, 0.571, 0.329, 1.0, 0.014],
+        )
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            grid_scale_spike_config=GridScaleSpikeConfig(
+                amplitude_min=None,
+            ),
+        )
+        self.assertEqual(result.primary_reason, BAD_GRID_SCALE_PACKET)
+        self.assertEqual(result.triggered_rules, (BAD_GRID_SCALE_PACKET,))
+
+    def test_grid_scale_packet_gate_does_not_reject_one_isolated_spike(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80] = 1.0
+        features = extract_grid_scale_packet_features(mode)
+
+        self.assertFalse(features["grid_scale_packet_candidate_found"])
+        self.assertEqual(
+            features["grid_scale_packet_turn_qualified_window_count"], 0
+        )
+
+    def test_grid_scale_packet_gate_does_not_reject_three_large_steps_without_three_turns(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80:85] = [0.0, 0.3, 0.0, 0.3, 0.29]
+        features = extract_grid_scale_packet_features(mode)
+
+        self.assertFalse(features["grid_scale_packet_candidate_found"])
+        self.assertEqual(
+            features["grid_scale_packet_turn_qualified_window_count"], 0
+        )
+
+    def test_grid_scale_packet_thresholds_are_inclusive(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80:85] = [0.0, 0.2, 0.0, 0.3, 0.0]
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            grid_scale_spike_config=GridScaleSpikeConfig(
+                amplitude_min=None,
+            ),
+        )
+        features = result.features["numerical_structure_features"][
+            "grid_scale_packet"
+        ]
+
+        self.assertEqual(result.primary_reason, BAD_GRID_SCALE_PACKET)
+        self.assertAlmostEqual(features["grid_scale_packet_peak"], 0.3)
+        self.assertEqual(features["grid_scale_packet_large_step_count"], 4)
+        self.assertEqual(features["grid_scale_packet_large_turn_count"], 3)
+
+    def test_grid_scale_packet_rejects_impossible_turn_configuration(self):
+        with self.assertRaisesRegex(ValueError, "min_large_turns"):
+            GridScalePacketConfig(
+                min_large_turns=4,
+                window_span_grid=4,
+            )
+
+    def test_grid_scale_packet_rejects_invalid_peak_radius_cutoff(self):
+        with self.assertRaisesRegex(ValueError, "peak_r_max"):
+            GridScalePacketConfig(peak_r_max=1.01)
+
+    def test_null_packet_amplitude_disables_gate_but_keeps_measurement(self):
+        mode = np.zeros_like(self.mode)
+        mode[1, 80:85] = [0.0, 0.4, 0.0, 0.8, 0.0]
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=self.low2,
+            high2=self.high2,
+            grid_scale_spike_config=GridScaleSpikeConfig(
+                amplitude_min=None,
+            ),
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
+            ),
+        )
+        features = result.features["numerical_structure_features"][
+            "grid_scale_packet"
+        ]
+
+        self.assertEqual(result.decision, "REVIEW")
+        self.assertTrue(features["grid_scale_packet_candidate_found"])
+        self.assertAlmostEqual(features["grid_scale_packet_peak"], 0.8)
+
+    def test_grid_scale_packet_peak_radius_cutoff_is_inclusive(self):
+        mode = np.zeros_like(self.mode)
+        mode[2, 97:102] = [0.0, 0.4, 0.0, 0.8, 0.0]
+        features = extract_grid_scale_packet_features(mode)
+
+        self.assertTrue(features["grid_scale_packet_candidate_found"])
+        self.assertAlmostEqual(features["grid_scale_packet_peak_r"], 0.5)
+
+    def test_grid_scale_packet_gate_excludes_high_radius_windows_by_default(self):
+        mode = np.zeros_like(self.mode)
+        mode[2, 196:201] = [0.0, 0.4, 0.0, 0.8, 0.0]
+        features = extract_grid_scale_packet_features(mode)
+
+        self.assertFalse(features["grid_scale_packet_candidate_found"])
+        self.assertGreater(
+            features["grid_scale_packet_turn_qualified_window_count"], 0
+        )
+        self.assertEqual(
+            features["grid_scale_packet_radius_qualified_window_count"], 0
+        )
+
+        unrestricted = extract_grid_scale_packet_features(
+            mode,
+            peak_r_max=None,
+        )
+        self.assertTrue(unrestricted["grid_scale_packet_candidate_found"])
+        self.assertAlmostEqual(
+            unrestricted["grid_scale_packet_window_start_r"], 0.98
+        )
+        self.assertAlmostEqual(
+            unrestricted["grid_scale_packet_window_end_r"], 1.0
+        )
 
     def test_null_grid_scale_amplitude_disables_gate_but_keeps_measurement(self):
         mode = np.zeros_like(self.mode)
@@ -979,6 +1304,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             mode=mode,
             low2=np.full(mode.shape[1], 0.5**2),
             high2=np.full(mode.shape[1], 1.5**2),
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
+            ),
         )
         self.assertEqual(result.decision, "BAD")
         self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
@@ -995,6 +1323,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             mode=mode,
             low2=low2,
             high2=high2,
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
+            ),
         )
         self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
         self.assertAlmostEqual(
@@ -1012,6 +1343,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             edge_artifact_config=EdgeArtifactConfig(
                 r_edge_min=0.97,
                 edge_width_max_grid=None,
+            ),
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
             ),
         )
         self.assertEqual(disabled.decision, "REVIEW")
@@ -1051,6 +1385,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             mode=mode,
             low2=np.full(mode.shape[1], 0.5**2),
             high2=upper**2,
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
+            ),
         )
 
         self.assertGreater(
@@ -1083,6 +1420,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             grid_scale_spike_config=GridScaleSpikeConfig(
                 amplitude_min=None,
                 width_max_grid=None,
+            ),
+            grid_scale_packet_config=GridScalePacketConfig(
+                amplitude_min=None,
             ),
             continuum_crossing_config=ContinuumCrossingConfig(
                 w_cross_threshold=None
@@ -1374,7 +1714,11 @@ class WorkflowOutputTests(unittest.TestCase):
             root = Path(temporary)
             shot = make_tae_shot(root)
             out_dir = root / "out"
-            first = run_shot(shot, out_dir)
+            first = run_shot(
+                shot,
+                out_dir,
+                grid_scale_packet_amplitude_min=None,
+            )
             self.assertEqual(set(path.name for path in out_dir.iterdir()), REQUIRED_OUTPUTS)
             for name in REQUIRED_OUTPUTS:
                 if name.endswith(".csv"):
@@ -1390,6 +1734,27 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertTrue(first.summary["grid_scale_spike_gate_enabled"])
             self.assertEqual(first.summary["grid_scale_spike_amplitude_min"], 0.3)
             self.assertEqual(first.summary["grid_scale_spike_width_max_grid"], 1.0)
+            self.assertEqual(
+                first.summary["grid_scale_spike_high_r_cutoff_r"], 0.7
+            )
+            self.assertEqual(
+                first.summary["grid_scale_spike_high_r_width_max_grid"],
+                0.75,
+            )
+            self.assertFalse(first.summary["grid_scale_packet_gate_enabled"])
+            self.assertIsNone(
+                first.summary["grid_scale_packet_amplitude_min"]
+            )
+            self.assertEqual(first.summary["grid_scale_packet_step_min"], 0.2)
+            self.assertEqual(
+                first.summary["grid_scale_packet_min_large_turns"], 3
+            )
+            self.assertEqual(
+                first.summary["grid_scale_packet_window_span_grid"], 4
+            )
+            self.assertEqual(
+                first.summary["grid_scale_packet_peak_r_max"], 0.5
+            )
             self.assertTrue(first.summary["continuum_crossing_gate_enabled"])
             self.assertEqual(first.summary["continuum_crossing_w_threshold"], 0.03)
             self.assertTrue(
@@ -1438,7 +1803,11 @@ class WorkflowOutputTests(unittest.TestCase):
             )
 
             before = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
-            run_shot(shot, out_dir)
+            run_shot(
+                shot,
+                out_dir,
+                grid_scale_packet_amplitude_min=None,
+            )
             after = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
             self.assertEqual(before, after)
 
@@ -1490,6 +1859,8 @@ class WorkflowOutputTests(unittest.TestCase):
                 root / "out",
                 grid_scale_amplitude_min=0.6,
                 grid_scale_width_max_grid=1.0,
+                grid_scale_high_r_cutoff_r=0.8,
+                grid_scale_high_r_width_max_grid=0.7,
             )
 
         self.assertEqual(result.summary["n_preliminary_bad"], 1)
@@ -1497,8 +1868,57 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertEqual(result.summary["grid_scale_spike_amplitude_min"], 0.6)
         self.assertEqual(result.summary["grid_scale_spike_width_max_grid"], 1.0)
         self.assertEqual(
+            result.summary["grid_scale_spike_high_r_cutoff_r"], 0.8
+        )
+        self.assertEqual(
+            result.summary["grid_scale_spike_high_r_width_max_grid"], 0.7
+        )
+        self.assertEqual(
             result.final_rows[0]["rule_primary_reason"],
             BAD_GRID_SCALE_SPIKE,
+        )
+
+    def test_run_shot_applies_packet_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = np.zeros((4, 101), dtype=float)
+            mode[2, 48:53] = [0.0, 0.4, 0.0, 0.8, 0.0]
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=101,
+                mode=mode,
+            )
+            write_datcon(shot / "N1" / "datcon1", nr=101)
+            result = run_shot(
+                shot,
+                root / "out",
+                grid_scale_amplitude_min=None,
+                grid_scale_packet_amplitude_min=0.7,
+                grid_scale_packet_step_min=0.3,
+                grid_scale_packet_min_large_turns=3,
+                grid_scale_packet_window_span_grid=4,
+                grid_scale_packet_peak_r_max=0.6,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertTrue(result.summary["grid_scale_packet_gate_enabled"])
+        self.assertEqual(
+            result.summary["grid_scale_packet_amplitude_min"], 0.7
+        )
+        self.assertEqual(result.summary["grid_scale_packet_step_min"], 0.3)
+        self.assertEqual(
+            result.summary["grid_scale_packet_min_large_turns"], 3
+        )
+        self.assertEqual(
+            result.summary["grid_scale_packet_window_span_grid"], 4
+        )
+        self.assertEqual(result.summary["grid_scale_packet_peak_r_max"], 0.6)
+        self.assertEqual(
+            result.final_rows[0]["rule_primary_reason"],
+            BAD_GRID_SCALE_PACKET,
         )
 
     def test_run_shot_applies_cont_cross_gate_and_reports_threshold(self):
@@ -1606,6 +2026,7 @@ class WorkflowOutputTests(unittest.TestCase):
                 root / "out",
                 edge_r_min=0.97,
                 edge_width_max_grid=4.0,
+                grid_scale_packet_amplitude_min=None,
             )
 
         self.assertEqual(result.summary["n_preliminary_bad"], 1)
@@ -1622,14 +2043,22 @@ class WorkflowOutputTests(unittest.TestCase):
             root = Path(temporary)
             shot = make_tae_shot(root)
             initial_out = root / "initial"
-            run_shot(shot, initial_out)
+            run_shot(
+                shot,
+                initial_out,
+                grid_scale_packet_amplitude_min=None,
+            )
             _fields, rows = read_dict_csv(initial_out / "rule_results.csv")
             override_path = root / "overrides.csv"
             write_dict_csv(override_path, MANUAL_OVERRIDE_FIELDS, [override_row(rows[0])])
 
             final_out = root / "final"
             result = run_shot(
-                shot, final_out, manual_overrides=override_path, rf_model=None
+                shot,
+                final_out,
+                manual_overrides=override_path,
+                rf_model=None,
+                grid_scale_packet_amplitude_min=None,
             )
             final_row = result.final_rows[0]
             self.assertEqual(final_row["rule_decision"], "REVIEW")
@@ -1648,7 +2077,10 @@ class WorkflowOutputTests(unittest.TestCase):
             values.tofile(mode_path)
             stale_mode_out = root / "stale_mode"
             stale_mode_result = run_shot(
-                shot, stale_mode_out, manual_overrides=override_path
+                shot,
+                stale_mode_out,
+                manual_overrides=override_path,
+                grid_scale_packet_amplitude_min=None,
             )
             self.assertEqual(stale_mode_result.final_rows[0]["final_decision"], "REVIEW")
             self.assertEqual(stale_mode_result.summary["n_stale_overrides"], 1)
@@ -1658,7 +2090,10 @@ class WorkflowOutputTests(unittest.TestCase):
             datcon.write_text(datcon.read_text() + "\n")
             stale_datcon_out = root / "stale_datcon"
             stale_datcon_result = run_shot(
-                shot, stale_datcon_out, manual_overrides=override_path
+                shot,
+                stale_datcon_out,
+                manual_overrides=override_path,
+                grid_scale_packet_amplitude_min=None,
             )
             self.assertEqual(
                 stale_datcon_result.final_rows[0]["final_decision"], "REVIEW"

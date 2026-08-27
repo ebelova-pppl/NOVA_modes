@@ -6,9 +6,17 @@ from pathlib import Path
 
 from path_utils import resolve_mode_csv_path
 
-PATH_HEADER_NAMES = frozenset({"path", "filepath", "mode_path"})
+PATH_HEADER_NAMES = frozenset({"path", "filepath", "mode_path", "mode_key"})
 LABEL_HEADER_NAMES = frozenset(
-    {"label", "validity", "class", "target", "manual_label", "rf_label"}
+    {
+        "label",
+        "validity",
+        "training_validity",
+        "class",
+        "target",
+        "manual_label",
+        "rf_label",
+    }
 )
 LABEL_VALUE_NAMES = frozenset({"good", "bad", "g", "b", "skip", "s"})
 
@@ -57,9 +65,10 @@ def read_mode_csv_entries(
     """
     Read a NOVA mode-list CSV with an optional header row.
 
-    Supported path headers: ``path``, ``filepath``, ``mode_path``.
-    Supported label headers: ``label``, ``validity``, ``class``, ``target``,
-    ``manual_label``, ``rf_label``.
+    Supported path headers: ``path``, ``filepath``, ``mode_path``,
+    ``mode_key``. Supported label headers: ``label``, ``validity``,
+    ``training_validity``, ``class``, ``target``, ``manual_label``,
+    ``rf_label``.
 
     If no header is present, the first column is treated as the path and the
     second column, when present, is treated as the label.

@@ -33,6 +33,13 @@ DEFAULT_AXIS_AMPLITUDE_MIN = 0.2
 DEFAULT_AXIS_WIDTH_MAX_GRID = 10.0
 DEFAULT_GRID_SCALE_AMPLITUDE_MIN = 0.3
 DEFAULT_GRID_SCALE_WIDTH_MAX_GRID = 1.0
+DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R = 0.7
+DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID = 0.75
+DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN = 0.3
+DEFAULT_GRID_SCALE_PACKET_STEP_MIN = 0.2
+DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS = 3
+DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID = 4
+DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX = 0.5
 DEFAULT_W_CROSS_THRESHOLD = 0.03
 DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID = 2
 DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN = 0.25
@@ -40,9 +47,12 @@ DEFAULT_CROSS_WINDOW_W_MIN = 0.05
 DEFAULT_EDGE_R_MIN = 0.97
 DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
 
-RULESET_VERSION = "tae-rules-axis-grid-cont-window-edge-v9"
+RULESET_VERSION = (
+    "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-v14"
+)
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
+BAD_GRID_SCALE_PACKET = "BAD_GRID_SCALE_PACKET"
 BAD_CONT_CROSS = "BAD_CONT_CROSS"
 BAD_CONT_CROSS_WINDOW = "BAD_CONT_CROSS_WINDOW"
 BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
@@ -51,7 +61,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v8"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v13"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -108,10 +118,14 @@ class AxisArtifactConfig:
 
 @dataclass(frozen=True)
 class GridScaleSpikeConfig:
-    """Thresholds for the unresolved signed-harmonic spike gate."""
+    """Thresholds for the radius-dependent unresolved signed-lobe gate."""
 
     amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN
     width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID
+    high_r_cutoff_r: float = DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R
+    high_r_width_max_grid: float | None = (
+        DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID
+    )
 
     def __post_init__(self) -> None:
         if self.amplitude_min is not None and (
@@ -129,11 +143,83 @@ class GridScaleSpikeConfig:
                 "grid_scale width_max_grid must be null or a finite "
                 "nonnegative number"
             )
+        if not math.isfinite(self.high_r_cutoff_r) or not (
+            0.0 <= self.high_r_cutoff_r <= 1.0
+        ):
+            raise ValueError(
+                "grid_scale high_r_cutoff_r must be finite and in [0, 1]"
+            )
+        if self.high_r_width_max_grid is not None and (
+            not math.isfinite(self.high_r_width_max_grid)
+            or self.high_r_width_max_grid < 0.0
+        ):
+            raise ValueError(
+                "grid_scale high_r_width_max_grid must be null or a finite "
+                "nonnegative number"
+            )
 
     @property
     def enabled(self) -> bool:
-        """Return whether both thresholds required by the gate are configured."""
-        return self.amplitude_min is not None and self.width_max_grid is not None
+        """Return whether amplitude and at least one radial width are configured."""
+        return self.amplitude_min is not None and (
+            self.width_max_grid is not None
+            or self.high_r_width_max_grid is not None
+        )
+
+
+@dataclass(frozen=True)
+class GridScalePacketConfig:
+    """Thresholds for repeated large turning points in a harmonic window."""
+
+    amplitude_min: float | None = DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN
+    step_min: float = DEFAULT_GRID_SCALE_PACKET_STEP_MIN
+    min_large_turns: int = DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS
+    window_span_grid: int = DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID
+    peak_r_max: float | None = DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX
+
+    def __post_init__(self) -> None:
+        if self.amplitude_min is not None and (
+            not math.isfinite(self.amplitude_min)
+            or not 0.0 <= self.amplitude_min <= 1.0
+        ):
+            raise ValueError(
+                "grid_scale_packet amplitude_min must be null or finite "
+                "and in [0, 1]"
+            )
+        if not math.isfinite(self.step_min) or not 0.0 <= self.step_min <= 2.0:
+            raise ValueError(
+                "grid_scale_packet step_min must be finite and in [0, 2]"
+            )
+        if self.peak_r_max is not None and (
+            not math.isfinite(self.peak_r_max)
+            or not 0.0 <= self.peak_r_max <= 1.0
+        ):
+            raise ValueError(
+                "grid_scale_packet peak_r_max must be null or finite and "
+                "in [0, 1]"
+            )
+        for name, value in (
+            ("min_large_turns", self.min_large_turns),
+            ("window_span_grid", self.window_span_grid),
+        ):
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise ValueError(f"grid_scale_packet {name} must be an integer")
+            if value < 1:
+                raise ValueError(f"grid_scale_packet {name} must be positive")
+        if self.window_span_grid < 2:
+            raise ValueError(
+                "grid_scale_packet window_span_grid must be at least 2"
+            )
+        if self.min_large_turns > self.window_span_grid - 1:
+            raise ValueError(
+                "grid_scale_packet min_large_turns cannot exceed the number "
+                "of interior samples (window_span_grid - 1)"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether the packet amplitude threshold is configured."""
+        return self.amplitude_min is not None
 
 
 @dataclass(frozen=True)
@@ -214,10 +300,18 @@ class EdgeArtifactConfig:
 
 def empty_axis_artifact_features(
     r_ax: float = DEFAULT_AXIS_R_AX,
+    amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
+    width_max_grid: float | None = DEFAULT_AXIS_WIDTH_MAX_GRID,
 ) -> dict[str, Any]:
     """Return the stable axis-artifact feature shape with null measurements."""
     return {
         "r_ax": r_ax,
+        "axis_candidate_found": None,
+        "axis_candidate_amplitude_min": amplitude_min,
+        "axis_candidate_width_limit_grid": width_max_grid,
+        "axis_local_peak_count": None,
+        "axis_amplitude_qualified_peak_count": None,
+        "axis_width_qualified_peak_count": None,
         "axis_peak": None,
         "axis_peak_harmonic_index": None,
         "axis_peak_r": None,
@@ -232,12 +326,19 @@ def empty_axis_artifact_features(
 def empty_grid_scale_spike_features(
     width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
     *,
+    high_r_cutoff_r: float = DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
+    high_r_width_max_grid: float | None = (
+        DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID
+    ),
     candidate_found: bool | None = None,
 ) -> dict[str, Any]:
     """Return the stable grid-scale-spike shape with null measurements."""
     return {
         "grid_scale_candidate_found": candidate_found,
-        "grid_scale_candidate_width_limit_grid": width_max_grid,
+        "grid_scale_width_max_grid": width_max_grid,
+        "grid_scale_high_r_cutoff_r": high_r_cutoff_r,
+        "grid_scale_high_r_width_max_grid": high_r_width_max_grid,
+        "grid_scale_candidate_width_limit_grid": None,
         "grid_scale_peak": None,
         "grid_scale_peak_signed_amplitude": None,
         "grid_scale_peak_sign": None,
@@ -248,6 +349,54 @@ def empty_grid_scale_spike_features(
         "grid_scale_halfmax_inner_edge_r": None,
         "grid_scale_halfmax_outer_edge_r": None,
         "grid_scale_component_touches_boundary": None,
+    }
+
+
+def empty_grid_scale_packet_features(
+    amplitude_min: float | None = DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN,
+    step_min: float = DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
+    min_large_turns: int = DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS,
+    window_span_grid: int = DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
+    peak_r_max: float | None = DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX,
+    *,
+    candidate_found: bool | None = None,
+    turn_qualified_window_count: int | None = None,
+    radius_qualified_window_count: int | None = None,
+    amplitude_qualified_window_count: int | None = None,
+) -> dict[str, Any]:
+    """Return the stable grid-scale-packet shape with null measurements."""
+    return {
+        "grid_scale_packet_candidate_found": candidate_found,
+        "grid_scale_packet_amplitude_min": amplitude_min,
+        "grid_scale_packet_step_min": step_min,
+        "grid_scale_packet_min_large_turns": min_large_turns,
+        "grid_scale_packet_window_span_grid": window_span_grid,
+        "grid_scale_packet_peak_r_max": peak_r_max,
+        "grid_scale_packet_turn_qualified_window_count": (
+            turn_qualified_window_count
+        ),
+        "grid_scale_packet_radius_qualified_window_count": (
+            radius_qualified_window_count
+        ),
+        "grid_scale_packet_amplitude_qualified_window_count": (
+            amplitude_qualified_window_count
+        ),
+        "grid_scale_packet_peak": None,
+        "grid_scale_packet_peak_signed_amplitude": None,
+        "grid_scale_packet_peak_harmonic_index": None,
+        "grid_scale_packet_peak_r": None,
+        "grid_scale_packet_window_start_index": None,
+        "grid_scale_packet_window_end_index": None,
+        "grid_scale_packet_window_start_r": None,
+        "grid_scale_packet_window_end_r": None,
+        "grid_scale_packet_large_step_count": None,
+        "grid_scale_packet_large_turn_count": None,
+        "grid_scale_packet_max_step": None,
+        "grid_scale_packet_step_rms": None,
+        "grid_scale_packet_total_variation": None,
+        "grid_scale_packet_direction_change_count": None,
+        "grid_scale_packet_sign_change_count": None,
+        "grid_scale_packet_window_values": None,
     }
 
 
@@ -309,10 +458,12 @@ def empty_rule_features(
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
+    grid_scale_packet_config: GridScalePacketConfig | None = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
+    packet_config = grid_scale_packet_config or GridScalePacketConfig()
     edge_config = edge_artifact_config or EdgeArtifactConfig()
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
@@ -324,7 +475,16 @@ def empty_rule_features(
         "resolution_features": {},
         "numerical_structure_features": {
             "grid_scale_spike": empty_grid_scale_spike_features(
-                grid_config.width_max_grid
+                grid_config.width_max_grid,
+                high_r_cutoff_r=grid_config.high_r_cutoff_r,
+                high_r_width_max_grid=grid_config.high_r_width_max_grid,
+            ),
+            "grid_scale_packet": empty_grid_scale_packet_features(
+                packet_config.amplitude_min,
+                packet_config.step_min,
+                packet_config.min_large_turns,
+                packet_config.window_span_grid,
+                packet_config.peak_r_max,
             ),
         },
         "crossing_features": {
@@ -339,7 +499,11 @@ def empty_rule_features(
             **{name: None for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES},
         },
         "boundary_features": {
-            "axis_artifact": empty_axis_artifact_features(axis_config.r_ax),
+            "axis_artifact": empty_axis_artifact_features(
+                axis_config.r_ax,
+                axis_config.axis_amplitude_min,
+                axis_config.axis_width_max_grid,
+            ),
             "edge_artifact": empty_edge_artifact_features(
                 edge_config.r_edge_min
             ),
@@ -352,6 +516,7 @@ def grouped_rule_features(
     feature_status: Mapping[str, Any],
     axis_artifact_features: Mapping[str, Any],
     grid_scale_spike_features: Mapping[str, Any],
+    grid_scale_packet_features: Mapping[str, Any],
     edge_artifact_features: Mapping[str, Any],
     continuum_crossing_window_features: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -365,6 +530,7 @@ def grouped_rule_features(
         "resolution_features": {},
         "numerical_structure_features": {
             "grid_scale_spike": dict(grid_scale_spike_features),
+            "grid_scale_packet": dict(grid_scale_packet_features),
         },
         "crossing_features": {
             **{
@@ -504,18 +670,36 @@ def extract_grid_scale_spike_features(
     mode: np.ndarray,
     *,
     width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    high_r_cutoff_r: float = DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
+    high_r_width_max_grid: float | None = (
+        DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID
+    ),
 ) -> dict[str, Any]:
-    """Find the strongest signed local lobe within a grid-width limit.
+    """Find the strongest signed local lobe within its radial width limit.
 
     Each positive maximum or negative minimum is measured on its signed
     harmonic profile over the complete radial grid. This deliberately avoids
-    ``abs(mode)``, which can join unresolved adjacent ``+A/-A`` lobes.
+    ``abs(mode)``, which can join unresolved adjacent ``+A/-A`` lobes. Peaks
+    strictly above ``high_r_cutoff_r`` use ``high_r_width_max_grid``; all
+    others use ``width_max_grid``.
     """
     if width_max_grid is not None and (
         not math.isfinite(width_max_grid) or width_max_grid < 0.0
     ):
         raise ValueError(
             "grid-scale width_max_grid must be null or a finite nonnegative number"
+        )
+    if not math.isfinite(high_r_cutoff_r) or not 0.0 <= high_r_cutoff_r <= 1.0:
+        raise ValueError(
+            "grid-scale high_r_cutoff_r must be finite and in [0, 1]"
+        )
+    if high_r_width_max_grid is not None and (
+        not math.isfinite(high_r_width_max_grid)
+        or high_r_width_max_grid < 0.0
+    ):
+        raise ValueError(
+            "grid-scale high_r_width_max_grid must be null or a finite "
+            "nonnegative number"
         )
     mode_array = np.asarray(mode, dtype=float)
     if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
@@ -524,15 +708,19 @@ def extract_grid_scale_spike_features(
         )
     if not np.all(np.isfinite(mode_array)):
         raise ValueError("mode contains non-finite values")
-    if width_max_grid is None:
+    if width_max_grid is None and high_r_width_max_grid is None:
         return empty_grid_scale_spike_features(
             width_max_grid,
+            high_r_cutoff_r=high_r_cutoff_r,
+            high_r_width_max_grid=high_r_width_max_grid,
             candidate_found=False,
         )
 
     radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
     candidates: list[dict[str, Any]] = []
-    width_tolerance = 64.0 * np.finfo(float).eps * max(1.0, width_max_grid)
+    cutoff_tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0, abs(high_r_cutoff_r)
+    )
     for harmonic_index, profile in enumerate(mode_array):
         for peak_index, _plateau_left, _plateau_right in _signed_local_extrema(
             profile
@@ -544,18 +732,34 @@ def extract_grid_scale_spike_features(
                     radial_grid=radial_grid,
                 )
             )
-            if width_grid > width_max_grid + width_tolerance:
+            peak_r = float(radial_grid[peak_index])
+            candidate_width_limit = (
+                high_r_width_max_grid
+                if peak_r > high_r_cutoff_r + cutoff_tolerance
+                else width_max_grid
+            )
+            if candidate_width_limit is None:
+                continue
+            width_tolerance = 64.0 * np.finfo(float).eps * max(
+                1.0, candidate_width_limit
+            )
+            if width_grid > candidate_width_limit + width_tolerance:
                 continue
             signed_amplitude = float(profile[peak_index])
             candidates.append(
                 {
                     "grid_scale_candidate_found": True,
-                    "grid_scale_candidate_width_limit_grid": float(width_max_grid),
+                    "grid_scale_width_max_grid": width_max_grid,
+                    "grid_scale_high_r_cutoff_r": high_r_cutoff_r,
+                    "grid_scale_high_r_width_max_grid": high_r_width_max_grid,
+                    "grid_scale_candidate_width_limit_grid": float(
+                        candidate_width_limit
+                    ),
                     "grid_scale_peak": abs(signed_amplitude),
                     "grid_scale_peak_signed_amplitude": signed_amplitude,
                     "grid_scale_peak_sign": 1 if signed_amplitude > 0.0 else -1,
                     "grid_scale_peak_harmonic_index": int(harmonic_index),
-                    "grid_scale_peak_r": float(radial_grid[peak_index]),
+                    "grid_scale_peak_r": peak_r,
                     "grid_scale_halfmax_width_r": width_r,
                     "grid_scale_halfmax_width_grid": width_grid,
                     "grid_scale_halfmax_inner_edge_r": inner_edge,
@@ -566,7 +770,9 @@ def extract_grid_scale_spike_features(
 
     if not candidates:
         return empty_grid_scale_spike_features(
-            float(width_max_grid),
+            width_max_grid,
+            high_r_cutoff_r=high_r_cutoff_r,
+            high_r_width_max_grid=high_r_width_max_grid,
             candidate_found=False,
         )
     return min(
@@ -580,18 +786,244 @@ def extract_grid_scale_spike_features(
     )
 
 
+def extract_grid_scale_packet_features(
+    mode: np.ndarray,
+    *,
+    amplitude_min: float | None = DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN,
+    step_min: float = DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
+    min_large_turns: int = DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS,
+    window_span_grid: int = DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
+    peak_r_max: float | None = DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX,
+) -> dict[str, Any]:
+    """Find repeated large turning points on one signed harmonic.
+
+    Every complete ``window_span_grid + 1`` sample window is considered. A
+    large turn is an interior sample whose two adjacent signed-value steps
+    both meet ``step_min`` and have opposing signs. A packet candidate has at
+    least ``min_large_turns`` such extrema and its largest absolute sample is
+    centered at or below ``peak_r_max`` when that cutoff is configured. The
+    selected candidate has the largest absolute amplitude, followed
+    deterministically by turn count, step count, total variation, harmonic
+    index, and window location.
+    """
+    config = GridScalePacketConfig(
+        amplitude_min=amplitude_min,
+        step_min=step_min,
+        min_large_turns=min_large_turns,
+        window_span_grid=window_span_grid,
+        peak_r_max=peak_r_max,
+    )
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+    if mode_array.shape[1] <= config.window_span_grid:
+        return empty_grid_scale_packet_features(
+            config.amplitude_min,
+            config.step_min,
+            config.min_large_turns,
+            config.window_span_grid,
+            config.peak_r_max,
+            candidate_found=False,
+            turn_qualified_window_count=0,
+            radius_qualified_window_count=0,
+            amplitude_qualified_window_count=(
+                None if config.amplitude_min is None else 0
+            ),
+        )
+
+    radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
+    step_tolerance = 64.0 * np.finfo(float).eps * max(1.0, config.step_min)
+    radius_tolerance = 64.0 * np.finfo(float).eps
+    amplitude_tolerance = (
+        None
+        if config.amplitude_min is None
+        else 64.0
+        * np.finfo(float).eps
+        * max(1.0, config.amplitude_min)
+    )
+    candidates: list[dict[str, Any]] = []
+    turn_qualified_count = 0
+    radius_qualified_count = 0
+    amplitude_qualified_count = 0
+    n_samples = config.window_span_grid + 1
+    for harmonic_index, profile in enumerate(mode_array):
+        profile_steps = np.diff(profile)
+        large_steps = (
+            np.abs(profile_steps) >= config.step_min - step_tolerance
+        )
+        large_turns = (
+            large_steps[:-1]
+            & large_steps[1:]
+            & (profile_steps[:-1] * profile_steps[1:] < 0.0)
+        )
+        window_turn_counts = np.convolve(
+            large_turns.astype(int),
+            np.ones(config.window_span_grid - 1, dtype=int),
+            mode="valid",
+        )
+        qualified_starts = np.flatnonzero(
+            window_turn_counts >= config.min_large_turns
+        )
+        for raw_start_index in qualified_starts:
+            turn_qualified_count += 1
+            start_index = int(raw_start_index)
+            end_index = start_index + config.window_span_grid
+            window = profile[start_index : start_index + n_samples]
+            signed_steps = profile_steps[start_index:end_index]
+            step_magnitudes = np.abs(signed_steps)
+            large_step_count = int(
+                np.count_nonzero(
+                    step_magnitudes >= config.step_min - step_tolerance
+                )
+            )
+            large_turn_count = int(window_turn_counts[start_index])
+
+            peak_offset = int(np.argmax(np.abs(window)))
+            peak_signed_amplitude = float(window[peak_offset])
+            peak = abs(peak_signed_amplitude)
+            peak_index = start_index + peak_offset
+            peak_r = float(radial_grid[peak_index])
+            if (
+                config.peak_r_max is not None
+                and peak_r > config.peak_r_max + radius_tolerance
+            ):
+                continue
+            radius_qualified_count += 1
+            if (
+                config.amplitude_min is not None
+                and amplitude_tolerance is not None
+                and peak >= config.amplitude_min - amplitude_tolerance
+            ):
+                amplitude_qualified_count += 1
+            direction_change_count = int(
+                np.count_nonzero(signed_steps[:-1] * signed_steps[1:] < 0.0)
+            )
+            sign_change_count = int(
+                np.count_nonzero(window[:-1] * window[1:] < 0.0)
+            )
+            candidates.append(
+                {
+                    "grid_scale_packet_candidate_found": True,
+                    "grid_scale_packet_amplitude_min": config.amplitude_min,
+                    "grid_scale_packet_step_min": config.step_min,
+                    "grid_scale_packet_min_large_turns": (
+                        config.min_large_turns
+                    ),
+                    "grid_scale_packet_window_span_grid": (
+                        config.window_span_grid
+                    ),
+                    "grid_scale_packet_peak_r_max": config.peak_r_max,
+                    "grid_scale_packet_turn_qualified_window_count": None,
+                    "grid_scale_packet_radius_qualified_window_count": None,
+                    "grid_scale_packet_amplitude_qualified_window_count": None,
+                    "grid_scale_packet_peak": peak,
+                    "grid_scale_packet_peak_signed_amplitude": (
+                        peak_signed_amplitude
+                    ),
+                    "grid_scale_packet_peak_harmonic_index": int(
+                        harmonic_index
+                    ),
+                    "grid_scale_packet_peak_r": peak_r,
+                    "grid_scale_packet_window_start_index": int(start_index),
+                    "grid_scale_packet_window_end_index": int(end_index),
+                    "grid_scale_packet_window_start_r": float(
+                        radial_grid[start_index]
+                    ),
+                    "grid_scale_packet_window_end_r": float(
+                        radial_grid[end_index]
+                    ),
+                    "grid_scale_packet_large_step_count": large_step_count,
+                    "grid_scale_packet_large_turn_count": large_turn_count,
+                    "grid_scale_packet_max_step": float(
+                        np.max(step_magnitudes)
+                    ),
+                    "grid_scale_packet_step_rms": float(
+                        np.sqrt(np.mean(np.square(step_magnitudes)))
+                    ),
+                    "grid_scale_packet_total_variation": float(
+                        np.sum(step_magnitudes)
+                    ),
+                    "grid_scale_packet_direction_change_count": (
+                        direction_change_count
+                    ),
+                    "grid_scale_packet_sign_change_count": sign_change_count,
+                    "grid_scale_packet_window_values": [
+                        float(value) for value in window
+                    ],
+                }
+            )
+
+    if not candidates:
+        return empty_grid_scale_packet_features(
+            config.amplitude_min,
+            config.step_min,
+            config.min_large_turns,
+            config.window_span_grid,
+            config.peak_r_max,
+            candidate_found=False,
+            turn_qualified_window_count=turn_qualified_count,
+            radius_qualified_window_count=radius_qualified_count,
+            amplitude_qualified_window_count=(
+                None if config.amplitude_min is None else 0
+            ),
+        )
+
+    selected = min(
+        candidates,
+        key=lambda candidate: (
+            -candidate["grid_scale_packet_peak"],
+            -candidate["grid_scale_packet_large_turn_count"],
+            -candidate["grid_scale_packet_large_step_count"],
+            -candidate["grid_scale_packet_total_variation"],
+            candidate["grid_scale_packet_peak_harmonic_index"],
+            candidate["grid_scale_packet_window_start_index"],
+        ),
+    )
+    selected["grid_scale_packet_turn_qualified_window_count"] = (
+        turn_qualified_count
+    )
+    selected["grid_scale_packet_radius_qualified_window_count"] = (
+        radius_qualified_count
+    )
+    selected["grid_scale_packet_amplitude_qualified_window_count"] = (
+        None if config.amplitude_min is None else amplitude_qualified_count
+    )
+    return selected
+
+
 def extract_axis_artifact_features(
     mode: np.ndarray,
     *,
     r_ax: float = DEFAULT_AXIS_R_AX,
+    amplitude_min: float | None = None,
+    width_max_grid: float | None = None,
 ) -> dict[str, Any]:
-    """Measure the strongest harmonic amplitude in the inclusive axis window.
+    """Select the strongest width-qualified local peak in the axis window.
 
-    The half-maximum component and local-maximum test use the complete radial
-    profile of the selected stored harmonic, not only the axis search window.
+    Every local maximum of every absolute harmonic profile centered in the
+    inclusive axis window is measured on the complete radial grid. When a
+    amplitude and width limits are supplied, the strongest peak satisfying
+    both is the decision candidate. If none qualifies, retain the strongest
+    raw window amplitude as fallback audit information.
     """
     if not math.isfinite(r_ax) or not 0.0 < r_ax <= 1.0:
         raise ValueError("axis r_ax must be finite and in (0, 1]")
+    if amplitude_min is not None and (
+        not math.isfinite(amplitude_min) or not 0.0 <= amplitude_min <= 1.0
+    ):
+        raise ValueError(
+            "axis amplitude_min must be null or finite and in [0, 1]"
+        )
+    if width_max_grid is not None and (
+        not math.isfinite(width_max_grid) or width_max_grid < 0.0
+    ):
+        raise ValueError(
+            "axis width_max_grid must be null or a finite nonnegative number"
+        )
     mode_array = np.asarray(mode, dtype=float)
     if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
         raise ValueError(
@@ -608,83 +1040,120 @@ def extract_axis_artifact_features(
         raise ValueError("axis window contains no radial grid samples")
 
     absolute_mode = np.abs(mode_array)
+
+    def measure_peak(
+        harmonic_index: int,
+        peak_index: int,
+        *,
+        is_local_max: bool,
+    ) -> dict[str, Any]:
+        profile = absolute_mode[harmonic_index]
+        inner_edge, outer_edge, width_r, width_grid, touches_boundary = (
+            _signed_halfmax_component(
+                profile,
+                peak_index=peak_index,
+                radial_grid=radial_grid,
+            )
+        )
+        return {
+            "axis_peak": float(profile[peak_index]),
+            "axis_peak_harmonic_index": int(harmonic_index),
+            "axis_peak_r": float(radial_grid[peak_index]),
+            "axis_peak_is_local_max": is_local_max,
+            "axis_halfmax_width_r": width_r,
+            "axis_halfmax_width_grid": width_grid,
+            "axis_halfmax_outer_edge_r": outer_edge,
+            "axis_component_touches_boundary": touches_boundary,
+        }
+
+    local_candidates: list[dict[str, Any]] = []
+    local_peak_keys: set[tuple[int, int]] = set()
+    for harmonic_index, profile in enumerate(absolute_mode):
+        for peak_index, _plateau_left, _plateau_right in _signed_local_extrema(
+            profile
+        ):
+            if radial_grid[peak_index] > r_ax + radial_tolerance:
+                continue
+            local_peak_keys.add((harmonic_index, peak_index))
+            local_candidates.append(
+                measure_peak(
+                    harmonic_index,
+                    peak_index,
+                    is_local_max=True,
+                )
+            )
+
     window = absolute_mode[:, axis_indices]
-    harmonic_index, window_index = np.unravel_index(np.argmax(window), window.shape)
-    peak_index = int(axis_indices[window_index])
-    peak = float(absolute_mode[harmonic_index, peak_index])
-    profile = absolute_mode[harmonic_index]
-
-    # Treat a flat-topped peak as one plateau and compare its outer neighbors.
-    tolerance = 64.0 * np.finfo(float).eps * max(1.0, peak)
-    plateau_left = peak_index
-    while (
-        plateau_left > 0
-        and abs(float(profile[plateau_left - 1]) - peak) <= tolerance
-    ):
-        plateau_left -= 1
-    plateau_right = peak_index
-    while (
-        plateau_right < n_radial - 1
-        and abs(float(profile[plateau_right + 1]) - peak) <= tolerance
-    ):
-        plateau_right += 1
-    left_is_lower = (
-        plateau_left == 0
-        or float(profile[plateau_left - 1]) < peak - tolerance
+    fallback_harmonic, fallback_window_index = np.unravel_index(
+        np.argmax(window), window.shape
     )
-    right_is_lower = (
-        plateau_right == n_radial - 1
-        or float(profile[plateau_right + 1]) < peak - tolerance
-    )
-    has_outer_neighbor = plateau_left > 0 or plateau_right < n_radial - 1
-    is_local_max = bool(
-        peak > 0.0 and has_outer_neighbor and left_is_lower and right_is_lower
+    fallback_peak_index = int(axis_indices[fallback_window_index])
+    fallback = measure_peak(
+        int(fallback_harmonic),
+        fallback_peak_index,
+        is_local_max=(
+            (int(fallback_harmonic), fallback_peak_index) in local_peak_keys
+        ),
     )
 
-    half_maximum = 0.5 * peak
-    component_left = peak_index
-    while component_left > 0 and profile[component_left - 1] >= half_maximum:
-        component_left -= 1
-    component_right = peak_index
-    while (
-        component_right < n_radial - 1
-        and profile[component_right + 1] >= half_maximum
-    ):
-        component_right += 1
+    amplitude_qualified: list[dict[str, Any]] = []
+    if amplitude_min is not None:
+        amplitude_qualified = [
+            candidate
+            for candidate in local_candidates
+            if candidate["axis_peak"] >= amplitude_min
+        ]
 
-    if component_left == 0:
-        inner_edge = 0.0
-    else:
-        inner_edge = _interpolate_threshold_crossing(
-            float(radial_grid[component_left - 1]),
-            float(profile[component_left - 1]),
-            float(radial_grid[component_left]),
-            float(profile[component_left]),
-            half_maximum,
+    width_qualified: list[dict[str, Any]] = []
+    if width_max_grid is not None:
+        width_tolerance = 64.0 * np.finfo(float).eps * max(
+            1.0, width_max_grid
         )
-    if component_right == n_radial - 1:
-        outer_edge = 1.0
-    else:
-        outer_edge = _interpolate_threshold_crossing(
-            float(radial_grid[component_right + 1]),
-            float(profile[component_right + 1]),
-            float(radial_grid[component_right]),
-            float(profile[component_right]),
-            half_maximum,
+        width_qualified = [
+            candidate
+            for candidate in local_candidates
+            if candidate["axis_halfmax_width_grid"]
+            <= width_max_grid + width_tolerance
+        ]
+
+    decision_candidates: list[dict[str, Any]] = []
+    if amplitude_min is not None and width_max_grid is not None:
+        decision_candidates = [
+            candidate
+            for candidate in width_qualified
+            if candidate["axis_peak"] >= amplitude_min
+        ]
+
+    if decision_candidates:
+        selected = min(
+            decision_candidates,
+            key=lambda candidate: (
+                -candidate["axis_peak"],
+                candidate["axis_halfmax_width_grid"],
+                candidate["axis_peak_harmonic_index"],
+                candidate["axis_peak_r"],
+            ),
         )
-    width_r = max(0.0, outer_edge - inner_edge)
-    radial_interval = 1.0 / (n_radial - 1)
+    else:
+        selected = fallback
 
     return {
         "r_ax": float(r_ax),
-        "axis_peak": peak,
-        "axis_peak_harmonic_index": int(harmonic_index),
-        "axis_peak_r": float(radial_grid[peak_index]),
-        "axis_peak_is_local_max": is_local_max,
-        "axis_halfmax_width_r": float(width_r),
-        "axis_halfmax_width_grid": float(width_r / radial_interval),
-        "axis_halfmax_outer_edge_r": float(outer_edge),
-        "axis_component_touches_boundary": bool(component_left == 0),
+        "axis_candidate_found": (
+            None
+            if amplitude_min is None or width_max_grid is None
+            else bool(decision_candidates)
+        ),
+        "axis_candidate_amplitude_min": amplitude_min,
+        "axis_candidate_width_limit_grid": width_max_grid,
+        "axis_local_peak_count": len(local_candidates),
+        "axis_amplitude_qualified_peak_count": (
+            None if amplitude_min is None else len(amplitude_qualified)
+        ),
+        "axis_width_qualified_peak_count": (
+            None if width_max_grid is None else len(width_qualified)
+        ),
+        **selected,
     }
 
 
@@ -976,6 +1445,7 @@ def evaluate_mode(
     high2: np.ndarray | None = None,
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    grid_scale_packet_config: GridScalePacketConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
@@ -983,6 +1453,7 @@ def evaluate_mode(
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
+    packet_config = grid_scale_packet_config or GridScalePacketConfig()
     crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
@@ -1021,6 +1492,7 @@ def evaluate_mode(
                 grid_config,
                 edge_config,
                 cross_window_config,
+                packet_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -1029,10 +1501,25 @@ def evaluate_mode(
     try:
         if mode is None or low2 is None or high2 is None:
             raise ValueError("mode, low2, and high2 arrays are required")
-        axis_features = extract_axis_artifact_features(mode, r_ax=axis_config.r_ax)
+        axis_features = extract_axis_artifact_features(
+            mode,
+            r_ax=axis_config.r_ax,
+            amplitude_min=axis_config.axis_amplitude_min,
+            width_max_grid=axis_config.axis_width_max_grid,
+        )
         grid_scale_features = extract_grid_scale_spike_features(
             mode,
             width_max_grid=grid_config.width_max_grid,
+            high_r_cutoff_r=grid_config.high_r_cutoff_r,
+            high_r_width_max_grid=grid_config.high_r_width_max_grid,
+        )
+        grid_scale_packet_features = extract_grid_scale_packet_features(
+            mode,
+            amplitude_min=packet_config.amplitude_min,
+            step_min=packet_config.step_min,
+            min_large_turns=packet_config.min_large_turns,
+            window_span_grid=packet_config.window_span_grid,
+            peak_r_max=packet_config.peak_r_max,
         )
         edge_features = extract_edge_artifact_features(
             mode,
@@ -1080,6 +1567,7 @@ def evaluate_mode(
             feature_status,
             axis_features,
             grid_scale_features,
+            grid_scale_packet_features,
             edge_features,
             cross_window_features,
         )
@@ -1100,6 +1588,7 @@ def evaluate_mode(
                 grid_config,
                 edge_config,
                 cross_window_config,
+                packet_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -1110,6 +1599,7 @@ def evaluate_mode(
     if (
         amplitude_min is not None
         and width_max_grid is not None
+        and axis_features["axis_candidate_found"]
         and axis_features["axis_peak_is_local_max"]
         and axis_features["axis_peak"] >= amplitude_min
         and axis_features["axis_halfmax_width_grid"] <= width_max_grid
@@ -1144,6 +1634,26 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_GRID_SCALE_SPIKE,
             triggered_rules=(BAD_GRID_SCALE_SPIKE,),
+            features=features,
+        )
+
+    if (
+        packet_config.enabled
+        and grid_scale_packet_features["grid_scale_packet_candidate_found"]
+        and grid_scale_packet_features["grid_scale_packet_peak"]
+        >= packet_config.amplitude_min
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_GRID_SCALE_PACKET,
+            triggered_rules=(BAD_GRID_SCALE_PACKET,),
             features=features,
         )
 

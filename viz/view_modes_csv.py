@@ -29,7 +29,7 @@ def read_mode_csv(csv_path: str, base_dir: Optional[str] = None):
     Accepts CSV with either:
       - path,label
       - path
-      - an optional header row using path/filepath/mode_path
+      - an optional header row using path/filepath/mode_path/mode_key
     Relative paths are resolved under base_dir, or left to the shared reader's
     default path resolution if base_dir is None.
     Returns:

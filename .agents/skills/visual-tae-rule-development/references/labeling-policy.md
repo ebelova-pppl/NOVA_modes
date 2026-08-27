@@ -312,9 +312,9 @@ disqualifying pattern is radial structure at the grid scale carrying
 appreciable amplitude inside the connected mode body, especially when it
 creates several neighboring sharp peaks rather than one smooth lobe.
 
-The second deterministic BAD gate screens the clearest unresolved spikes
-before a later alternating-packet rule is developed. Search every stored
-harmonic over the complete normalized radial grid. Treat positive local maxima
+The second deterministic BAD gate screens the clearest unresolved spikes.
+Search every stored harmonic over the complete normalized radial grid. Treat
+positive local maxima
 and negative local minima as separate signed lobes, and linearly interpolate
 the connected half-maximum edges on the sign-adjusted harmonic profile. Do not
 measure the component on `abs(mode)`, which can join adjacent `+A/-A` samples
@@ -334,9 +334,27 @@ and keep both thresholds configurable. For audit output, record the strongest
 candidate meeting the configured width limit, its signed amplitude and sign,
 zero-based stored harmonic index, radius, interpolated inner and outer edges,
 width in normalized radius and radial-grid intervals, and whether the
-half-maximum component touches a radial boundary. A mode that does not fire
-this strict one-grid gate can still be BAD under a later alternating-sign rule
-or another numerical-structure rule.
+half-maximum component touches a radial boundary.
+
+The provisional gate 2b screens short packets whose individually large peaks
+can be slightly wider than the strict one-grid lobe limit. On every stored
+harmonic, scan all complete five-sample windows. Let
+`d[i] = A[i+1] - A[i]`. Count an interior sample as a large turn only when both
+adjacent steps satisfy `abs(d) >= 0.2` and their directions oppose,
+`d[i-1] * d[i] < 0`. Reject with `BAD_GRID_SCALE_PACKET` when all three
+interior samples are large turns and the window contains
+`max(abs(A)) >= 0.3` whose largest absolute sample is centered at the inclusive
+radius `r <= 0.5`. The magnitude and radius comparisons are inclusive; the
+direction reversal is strict. Counting both signed local maxima and minima
+retains same-sign sharp peaks separated by deep troughs while excluding a
+single steep but smooth peak. Record raw large-step, unconstrained
+direction-change, signed-amplitude sign-change, all-radius turn-qualified, and
+radius-qualified window counts for calibration.
+
+The low-radius cutoff protects physical edge-localized harmonics, where several
+grid-scale turns can occur in otherwise resolved mode structure. Retain the
+selected window and peak radii and continue to audit GOOD rejections below the
+cutoff.
 
 ## Touching versus crossing
 

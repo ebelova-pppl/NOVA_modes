@@ -238,18 +238,26 @@ python scripts/sort_shot_rules.py \
 ```
 
 This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. Five ordered BAD gates currently reject a calibrated
+routing conventions. Six ordered BAD decisions currently reject a calibrated
 narrow local maximum at `r <= 0.03` (`BAD_AXIS_SPIKE`), a large unresolved
-signed lobe (`BAD_GRID_SCALE_SPIKE`), or a true continuum crossing with
-`W_star_max > 0.03` (`BAD_CONT_CROSS`). A second crossing gate rejects when an
+signed lobe (`BAD_GRID_SCALE_SPIKE`), a short packet containing repeated large
+grid-scale turning points (`BAD_GRID_SCALE_PACKET`), or a true continuum crossing
+with `W_star_max > 0.03` (`BAD_CONT_CROSS`). A second crossing gate rejects when an
 inclusive ±2-grid neighborhood of any true crossing has individual-harmonic
 absolute amplitude at least `0.25` or peak-normalized radial energy at least
 `0.05` (`BAD_CONT_CROSS_WINDOW`). The final gate rejects a global total-energy
 peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
-(`BAD_EDGE_SPIKE`). The active axis defaults require
-normalized amplitude at least `0.2` and full width at half maximum no greater
-than `10` radial-grid intervals; the grid-scale defaults require amplitude at
-least `0.3` and width no greater than one grid interval. Other valid TAE-side
+(`BAD_EDGE_SPIKE`). The axis gate checks every absolute-harmonic local maximum
+centered at `r <= 0.03`; the active defaults require normalized amplitude at
+least `0.2` and full width at half maximum no greater than `10` radial-grid
+intervals. The grid-scale defaults require amplitude at
+least `0.3` and width no greater than one grid interval through `r=0.7`, but
+use the stricter width limit `0.75` for peaks at `r>0.7`.
+The packet gate scans every five-sample window of every stored harmonic. A
+sharp turn requires two adjacent signed-amplitude steps of magnitude at least
+`0.2` whose signs oppose. The gate rejects when the window's absolute peak is
+at least `0.3`, its peak is centered at the inclusive radius `r <= 0.5`, and
+all three possible interior samples are sharp turns. Other valid TAE-side
 modes remain `REVIEW`, not `GOOD`, with primary reason `NO_GOOD_TEMPLATE`.
 Invalid inputs remain `INVALID`, and valid EAE-like modes are routed without a
 fabricated rule decision.
@@ -268,7 +276,13 @@ without running an RF model.
 
 Override the calibrated defaults with `--axis_amplitude_min VALUE`,
 `--axis_width_max_grid VALUE`, `--grid_scale_amplitude_min VALUE`,
-`--grid_scale_width_max_grid VALUE`, `--w_cross_threshold VALUE`,
+`--grid_scale_width_max_grid VALUE`, `--grid_scale_high_r_cutoff_r VALUE`,
+`--grid_scale_high_r_width_max_grid VALUE`,
+`--grid_scale_packet_amplitude_min VALUE`,
+`--grid_scale_packet_step_min VALUE`,
+`--grid_scale_packet_min_large_turns VALUE`,
+`--grid_scale_packet_window_span_grid VALUE`,
+`--grid_scale_packet_peak_r_max VALUE`, `--w_cross_threshold VALUE`,
 `--cross_window_half_width_grid VALUE`,
 `--cross_window_amplitude_min VALUE`, `--cross_window_w_min VALUE`,
 `--edge_r_min VALUE`, and `--edge_width_max_grid VALUE`. The matching disable

@@ -43,3 +43,8 @@ outputs/*_axis_*/
 outputs/v3_gate3_off_all_other_gates/
 outputs/v3_gate3_off_rms025/
 outputs/v3_relabels_gate3_off_rms_audit/
+outputs/v3_relabels_gate3_off_grid_highr075/
+outputs/v3_relabels_gate3_off_axis_all_peaks/
+outputs/v3_relabels_gate3_off_packet_steps3_allr/
+outputs/v3_relabels_gate3_off_packet_turns3_allr/
+outputs/v3_relabels_gate3_off_packet_turns3_rle05/

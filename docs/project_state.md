@@ -4756,3 +4756,363 @@ remains the sole invalid input. Root `label_disagreements.csv`,
 `shot_label_statistics.csv`, and `audit_summary.md` contain the current audit.
 The full repository suite passes all 80 tests; the four warnings are the
 pre-existing scikit-learn checkpoint-version warnings.
+
+### 2026-08-25: relax the grid-scale width criterion above r=0.7
+
+Changed `BAD_GRID_SCALE_SPIKE` to use a radius-dependent signed-lobe FWHM
+limit. The amplitude threshold remains `0.3`. Peaks centered at `r <= 0.7`
+retain the inclusive one-grid-interval limit, while peaks strictly above
+`r=0.7` now use the inclusive `0.75`-grid-interval limit. The radial cutoff
+comparison includes a floating-point tolerance so a stored grid location
+represented as `0.7000000000000001` remains in the documented low-radius
+branch.
+
+The defaults are configurable as:
+
+```yaml
+grid_scale_spike:
+  amplitude_min: 0.3
+  width_max_grid: 1
+  high_r_cutoff_r: 0.7
+  high_r_width_max_grid: 0.75
+```
+
+Added the corresponding CLI options
+`--grid_scale_high_r_cutoff_r` and
+`--grid_scale_high_r_width_max_grid`. Shot and per-`n` summaries record both
+new settings. Grouped rule features now record the base width, high-radius
+cutoff, high-radius width, and width actually applied to the selected
+candidate. Advanced the behavior and grouped-feature versions to
+`tae-rules-axis-grid-highr-cont-window-edge-v10` and
+`tae-rule-features-grouped-v9`. The focused rule suite passes all 48 tests,
+including the exact cutoff and inclusive high-radius width boundary; the full
+repository suite passes all 81 tests. The four warnings are the existing
+scikit-learn checkpoint-version warnings.
+
+Regenerated all 15 synchronized shots with gate 3 disabled under
+`outputs/v3_relabels_gate3_off_grid_highr075/`. Against the corrected v3
+labels, the new rule rejects 1,994/2,046 labeled BAD modes (97.46% BAD recall)
+and retains 552/592 labeled GOOD modes (93.24% GOOD retention), for 96.51%
+agreement. Relative to the v9 uniform one-grid-width run, 54 modes change
+primary reason: 36 are still rejected by `BAD_CONT_CROSS_WINDOW`, while 18
+move from BAD to REVIEW. Those 18 comprise 15 labeled GOOD and three labeled
+BAD modes. The intended `nstx_135388` modes
+`N6/egn06w.4630E+02`, `N7/egn07w.4950E+02`, and
+`N10/egn10w.4546E+02` all move to REVIEW. The three added BAD retentions are
+`nstx_135388/N4/egn04w.3862E+02`,
+`nstx_135388/N4/egn04w.7832E+02`, and
+`nstxuE204669M03t025/N4/egn04w.9263E+01`.
+
+The generated root audit contains `label_disagreements.csv`,
+`shot_label_statistics.csv`, `audit_summary.md`, and
+`rule_changes_from_uniform_grid_width.csv`. Five evaluated modes remain
+unlabeled, and the known non-finite K51 input remains the sole invalid mode.
+
+### 2026-08-25: make the axis gate check every qualifying local peak
+
+Corrected a masking limitation in `BAD_AXIS_SPIKE`. The earlier extractor
+first selected the largest absolute amplitude inside `r <= 0.03` and then
+tested only that sample for local-maximum status. A larger rising flank or a
+stronger broad peak could therefore hide another local peak that independently
+met the amplitude and width thresholds.
+
+The revised gate enumerates every local maximum of every absolute stored
+harmonic profile centered in the inclusive axis window. It measures each
+connected FWHM on the complete radial grid and rejects when any candidate has
+amplitude at least `0.2` and FWHM no greater than 10 grid intervals. When
+multiple candidates qualify, the output records the strongest one using a
+stable amplitude, width, harmonic-index, and radius ordering. The grouped
+features also record candidate-found status, both configured thresholds, total
+local-peak count, and amplitude- and width-qualified counts. If no candidate
+qualifies, the previous strongest-window measurement is retained as fallback
+audit information.
+
+This fixes `nstxuG142301W29/N4/egn04w.2072E+02`: the former candidate was the
+rising flank at `r=0.03` (amplitude `0.954127`, FWHM `8.605945` grid intervals,
+local-maximum status false), which masked a genuine local peak at `r=0.005`
+with amplitude `0.786694` and FWHM `1.131878` grid intervals. The revised gate
+returns `BAD_AXIS_SPIKE` using the latter peak.
+
+Advanced the behavior and grouped-feature versions to
+`tae-rules-axis-all-peaks-grid-highr-cont-window-edge-v11` and
+`tae-rule-features-grouped-v10`. Added regression tests for a local peak hidden
+by a larger rising flank and for a narrow qualifying peak hidden by a stronger
+but over-width local peak. The focused rule suite passes all 50 tests, the full
+repository suite passes all 83 tests, and the sorter skill validates. The four
+warnings remain the existing scikit-learn checkpoint-version warnings.
+
+Regenerated the synchronized 15-shot, gate-3-disabled audit under
+`outputs/v3_relabels_gate3_off_axis_all_peaks/`. Relative to the preceding v10
+run, 29 modes change primary reason: 23 remain BAD but move to the earlier axis
+reason, while six move from REVIEW to BAD. The six decision changes are three
+currently labeled BAD modes:
+
+- `nstx_135388/N2/egn02w.3455E+02`;
+- `nstxuG121123B12/N7/egn07w.2697E+02`;
+- `nstxuG142301W29/N4/egn04w.2072E+02`;
+
+and three currently labeled GOOD modes requiring visual review:
+
+- `nstx_120113/N2/egn02w.1148E+02`, peak amplitude `0.229835`, `r=0.005`,
+  FWHM `1.260998` grid intervals;
+- `nstx_141711/N2/egn02w.4308E+02`, peak amplitude `0.232232`, `r=0.01`,
+  FWHM `1.949379` grid intervals;
+- `nstx_141711/N2/egn02w.4512E+02`, peak amplitude `0.267970`, `r=0.005`,
+  FWHM `1.294211` grid intervals.
+
+Against current v3 labels, the revised configuration rejects 1,997/2,046 BAD
+modes (97.61% BAD recall), retains 549/592 GOOD modes (92.74% GOOD retention),
+and has 96.51% agreement. Thus it recovers three previously retained BAD modes
+at the cost of rejecting three currently GOOD-labeled modes, leaving aggregate
+agreement unchanged. The root audit includes `label_disagreements.csv`,
+`shot_label_statistics.csv`, `audit_summary.md`, and
+`rule_changes_from_single_axis_peak.csv`. Five evaluated modes remain unlabeled,
+and the known non-finite K51 input remains the sole invalid mode.
+
+### 2026-08-25: audit an all-harmonic local-peak branch for the edge gate
+
+Audited, but did not implement, an axis-like second branch for
+`BAD_EDGE_SPIKE`. The proposed branch checks every local maximum of every
+absolute stored-harmonic profile centered in the inclusive `r >= 0.97` edge
+window, measures its connected FWHM on the complete radial grid, and would
+reject when amplitude is at least `0.2` and FWHM is no greater than 10 grid
+intervals. The audit was limited to the 598 current REVIEW modes that reach
+gate 5, plus the three modes already rejected by the existing edge gate.
+
+The proposed branch would newly reject 50 REVIEW modes: 49 currently labeled
+GOOD and only one currently labeled BAD,
+`nstxuE204669M03t025/N4/egn04w.9263E+01`. Raising the amplitude threshold to
+`0.25` still produces 46 new rejections (45 GOOD, one BAD), while `0.3`
+produces 31 (30 GOOD, one BAD). At `0.1`, it produces 74 (66 GOOD and eight
+BAD). The result is not caused by rising flanks: the audited candidates are
+true local maxima and their widths use both half-maximum edges over the full
+radial grid.
+
+This strong overlap with currently GOOD modes supports retaining the existing
+total radial-energy-envelope decision for now. It also confirms the reason for
+using `W(r)=sum_h |mode_h(r)|^2`: physical edge-localized modes can contain
+narrow individual harmonics while their combined envelope remains resolved or
+peaks farther inward. The production v11 rule and skill were not changed. The
+deterministic audit tables are in
+`outputs/v3_relabels_gate3_off_axis_all_peaks/edge_harmonic_all_peaks_audit.csv`,
+`edge_harmonic_new_candidates.csv`, and
+`edge_harmonic_threshold_summary.csv`.
+
+### 2026-08-25: add and audit a provisional grid-scale packet gate
+
+Added an ordered `BAD_GRID_SCALE_PACKET` decision immediately after
+`BAD_GRID_SCALE_SPIKE`. For every stored harmonic, the provisional gate scans
+each complete five-sample/four-interval radial window over the full radial
+domain. It rejects when the window contains a peak amplitude of at least
+`0.3` and at least three adjacent signed-amplitude steps have magnitude at
+least `0.2`. Comparisons are inclusive. The gate has no radial cutoff in this
+first test. The defaults are configurable as:
+
+```yaml
+grid_scale_packet:
+  amplitude_min: 0.3
+  step_min: 0.2
+  min_large_steps: 3
+  window_span_grid: 4
+```
+
+The grouped audit feature records the selected window, peak location and
+harmonic index, large-step count, maximum and RMS step, total variation,
+direction-change count, sign-change count, and signed five-sample values.
+Disabling the gate suppresses only its BAD decision and retains these
+measurements. Advanced the ruleset and grouped-feature versions to
+`tae-rules-axis-all-peaks-grid-highr-packet-cont-window-edge-v12` and
+`tae-rule-features-grouped-v11`. The sorter CLI and shot/per-`n` summaries
+record all packet settings. Documentation and the sorter and visual-rule
+skills identify the decision as provisional.
+
+The intended unresolved examples are caught:
+
+- `nstx_135388/N8/egn08w.1998E+02`: selected `r=0.475` window, four qualifying
+  steps, three direction changes, total variation `2.213`;
+- `nstx_135388/N9/egn09w.2702E+02`: selected `r=0.105` window, four qualifying
+  steps, three direction changes, total variation `2.761`.
+
+However, the requested broad defaults are not selective enough. Regenerating
+all 15 synchronized shots with continuum-energy gate 3 disabled under
+`outputs/v3_relabels_gate3_off_packet_steps3_allr/` changes 471 previous REVIEW
+decisions to BAD: 45 currently labeled BAD and 426 currently labeled GOOD.
+BAD rejection rises from 1,997/2,046 (97.61%) to 2,042/2,046 (99.80%), but GOOD
+retention collapses from 549/592 (92.74%) to 123/592 (20.78%); overall labeled
+agreement falls from 96.51% to 82.07%. The new rejections occur throughout the
+radius: 120 at `r <= 0.7`, 238 at `0.7 < r < 0.9`, and 113 at `r >= 0.9`.
+Thus a radial cutoff alone cannot repair the three-step rule.
+
+An exact follow-up scan of all 598 previous REVIEW modes shows that requiring
+all four steps and all three possible step-direction reversals reduces the new
+rejections to 40 (13 BAD, 27 GOOD). Adding `packet_peak_r <= 0.7` reduces this
+to 17 (nine BAD, eight GOOD) and retains both intended examples. With that
+strict structural condition and radius cutoff, raising `step_min` to `0.24`
+and `amplitude_min` to `0.7` gives seven candidates (five BAD, two GOOD) while
+still retaining both examples; `step_min >= 0.25` loses N8/1998. These are
+calibration results only, not production-default changes.
+
+The root audit includes `audit_summary.md`, `packet_rule_changes.csv`,
+`packet_new_rejections.csv`, `packet_new_rejections_by_radius.csv`,
+`packet_new_rejections_by_direction_changes.csv`,
+`packet_refinement_sweep.csv`,
+`packet_refinement_steps4_dir3_rle07_candidates.csv`, and
+`packet_strict_threshold_sweep.csv`. The next scientific decision is whether
+to require alternating step direction, all four large steps, and a radial
+cutoff before retaining this gate as an active default.
+
+The focused rule suite and full 89-test repository suite pass, and both
+updated local skills pass their structural validators.
+
+### 2026-08-25: replace packet step count with three large turning points
+
+Replaced the overly broad gate-2b step-count decision with a signed local-turn
+definition. For a five-sample/four-interval window, define
+`d[i] = A[i+1] - A[i]`. An interior sample is a large turn only when both
+adjacent steps meet the inclusive magnitude threshold and their directions
+strictly oppose:
+
+```text
+abs(d[i-1]) >= packet_step_min
+AND abs(d[i]) >= packet_step_min
+AND d[i-1] * d[i] < 0
+```
+
+The provisional gate now requires an absolute window peak of at least `0.3`
+and all three possible interior samples to be large turns at
+`packet_step_min=0.2`. This counts sharp signed local maxima and minima,
+including same-sign peaks separated by deep troughs, while excluding a single
+steep but smooth rise and fall. Raw large-step count, unconstrained
+direction-change count, signed-amplitude sign-change count, and the signed
+window values remain audit fields. The selected feature also records
+`grid_scale_packet_large_turn_count`; the qualified-window count now refers to
+the turn condition.
+
+Renamed the configuration and CLI setting from `min_large_steps` /
+`--grid_scale_packet_min_large_steps` to `min_large_turns` /
+`--grid_scale_packet_min_large_turns`. Advanced the behavior and grouped
+feature versions to
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-cont-window-edge-v13` and
+`tae-rule-features-grouped-v12`. The packet screen remains active by default,
+runs over all radii, and remains ordered after `BAD_GRID_SCALE_SPIKE` and before
+the continuum gates. The focused suite passes all 58 tests, the full repository
+suite passes all 91 tests, and both updated local skills validate. The four
+warnings remain the existing scikit-learn checkpoint-version warnings.
+
+Regenerated all 15 synchronized shots with continuum-energy gate 3 disabled
+under `outputs/v3_relabels_gate3_off_packet_turns3_allr/`. Relative to the v11
+axis-all-peaks baseline, the revised packet gate changes 40 previous REVIEW
+decisions to BAD: 13 currently labeled BAD and 27 currently labeled GOOD. This
+is substantially more selective than the rejected three-large-step experiment,
+which changed 471 REVIEW decisions (45 BAD and 426 GOOD).
+
+The complete v13 configuration rejects 2,010/2,046 rule-evaluated labeled BAD
+modes (98.24% BAD recall), retains 522/592 labeled GOOD modes (88.18% GOOD
+retention), and gives 95.98% labeled agreement. The v11 baseline values were
+97.61% BAD recall, 92.74% GOOD retention, and 96.51% agreement. Thus the
+all-radius turn gate recovers 13 additional BAD modes at the cost of 27
+additional GOOD rejections.
+
+Both intended unresolved examples are rejected with four large steps and three
+large turns: `nstx_135388/N8/egn08w.1998E+02` at selected packet peak
+`r=0.475`, and `nstx_135388/N9/egn09w.2702E+02` at `r=0.105`. Of the 40 new
+rejections, the selected packet peak is at `r <= 0.7` for 16 (nine BAD, seven
+GOOD), at `0.7 < r < 0.9` for 23 (four BAD, 19 GOOD), and at `r >= 0.9` for one
+GOOD. The prior exact window-level projection of an inclusive `r <= 0.7`
+candidate cutoff contains 17 modes (nine BAD and eight GOOD) because one mode
+has qualifying windows on both sides of the cutoff. This supports testing a
+radial cutoff next: most all-radius additions above `r=0.7` are currently GOOD.
+
+The root audit contains `audit_summary.md`, `packet_rule_changes.csv`,
+`packet_new_rejections.csv`, `packet_new_rejections_by_radius.csv`,
+`label_disagreements.csv`, and `shot_label_statistics.csv`. This is non-blind
+calibration against the active labels, not an independent visual validation.
+
+### 2026-08-25: make sorter audit CSVs directly viewable
+
+Fixed `viz/view_modes_csv.py` failing on packet and disagreement audit tables
+whose portable path column is named `mode_key`. The shared `mode_csv` reader
+previously recognized only `path`, `filepath`, and `mode_path`; it therefore
+treated an unrecognized header row as headerless data and attempted to open
+the first cell, `shot`, as `$NOVA_DATA/shot`.
+
+Added `mode_key` as a supported path header and `training_validity` as a
+supported label header. Existing audit CSVs require no regeneration. Verified
+the real 40-row `packet_new_rejections.csv`: its first portable key resolves to
+the existing synchronized NOVA file and its GOOD label is read correctly.
+Added a shared-reader regression test, updated viewer documentation, and passed
+the full 92-test repository suite. The four warnings remain the existing
+scikit-learn checkpoint-version warnings.
+
+### 2026-08-25: project packet-turn radius cutoffs
+
+Audited, but did not implement, inclusive upper-radius limits for the v13
+three-large-turn packet gate. The calculation scanned every qualifying window
+of all 598 modes that were REVIEW in the v11 axis-all-peaks baseline; it did not
+simply filter each mode's already-selected all-radius winner. Thresholds remain
+`amplitude_min=0.3`, `step_min=0.2`, three large turns, and a five-sample
+window.
+
+With `packet_peak_r <= 0.6`, the gate newly rejects eight baseline REVIEW
+modes: six currently labeled BAD and two currently labeled GOOD. Relative to
+the all-radius v13 gate, this saves 25 of its 27 additional GOOD rejections but
+also releases seven of its 13 additional BAD rejections. Both intended
+`nstx_135388` examples remain rejected: N8/1998 peaks at `r=0.475` and N9/2702
+at `r=0.105`.
+
+Projected complete-rule metrics for `r <= 0.6` are 2,003/2,046 BAD rejected
+(97.90% BAD recall), 547/592 GOOD retained (92.40% GOOD retention), and 96.66%
+labeled agreement. These improve on the v11 baseline values of 97.61%, 92.74%,
+and 96.51% by recovering six BAD modes at the cost of two GOOD modes. They are
+also substantially better balanced than the all-radius gate's 98.24% BAD
+recall, 88.18% GOOD retention, and 95.98% agreement.
+
+The sweep also shows `r <= 0.5` is slightly cleaner on current labels: it
+recovers the same six BAD modes while rejecting only one GOOD, for 97.90% BAD
+recall, 92.57% GOOD retention, and 96.70% agreement. This is a non-blind
+calibration observation and not yet a production threshold change.
+
+Deterministic audit tables are in the current packet output root:
+`packet_radius_cutoff_sweep.csv`, `packet_rle06_projection.csv`,
+`packet_rle07_projection.csv`, and `packet_modes_saved_by_rle06.csv`.
+
+### 2026-08-25: limit the packet-turn gate to `r <= 0.5`
+
+Promoted the cleanest projected packet radius threshold to the active default.
+`BAD_GRID_SCALE_PACKET` now requires the largest absolute sample in its
+qualifying five-sample window to be centered at the inclusive radius
+`r <= 0.5`. It still requires `amplitude_min=0.3`, `step_min=0.2`, and all
+three possible interior samples to be large signed turning points. Every
+complete window is still scanned so the feature record can distinguish the
+all-radius turn-qualified count from the radius-qualified count. The selected
+candidate records `grid_scale_packet_peak_r_max=0.5`; the shot and per-`n`
+summaries record the same setting. Added
+`--grid_scale_packet_peak_r_max` for calibration overrides.
+
+Advanced the behavior and grouped-feature versions to
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-v14`
+and `tae-rule-features-grouped-v13`. README and both local rule-development
+skills now document the inclusive low-radius condition and the rationale for
+protecting resolved high-radius/edge-localized structure.
+
+Regenerated all 15 synchronized shots with continuum-energy gate 3 disabled
+and all other active gates enabled under
+`outputs/v3_relabels_gate3_off_packet_turns3_rle05/`. Against the active v3
+labels, 2,638 modes are rule-evaluated and the known non-finite
+`nstxuG121123K51/N4/egn04w.8769E+01` remains INVALID. The complete
+configuration rejects 2,003/2,046 evaluated BAD labels (97.90%), retains
+548/592 GOOD labels (92.57%), and agrees on 2,551/2,638 evaluated labels
+(96.70%). The 87 disagreements comprise 43 BAD-retained and 44 GOOD-rejected
+modes.
+
+Relative to the v11 axis-all-peaks baseline, the radius-limited packet gate
+changes seven REVIEW decisions to BAD: six labeled BAD and one labeled GOOD.
+Both motivating unresolved modes remain rejected: `nstx_135388` N8/1998 at
+selected packet peak `r=0.475` and N9/2702 at `r=0.105`. The root output
+contains `label_disagreements.csv`, `packet_new_rejections.csv`,
+`shot_label_statistics.csv`, and `audit_summary.md`; the CSVs are directly
+viewable through `viz/view_modes_csv.py`. This remains non-blind calibration
+against current labels, not independent validation.
+
+The full repository suite passes all 94 tests, both updated local skills pass
+their structural validators, and `git diff --check` passes.

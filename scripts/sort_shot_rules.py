@@ -45,6 +45,13 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_EDGE_R_MIN,
     DEFAULT_EDGE_WIDTH_MAX_GRID,
     DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
+    DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
+    DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID,
+    DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN,
+    DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS,
+    DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX,
+    DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
+    DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
     DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
     DEFAULT_W_CROSS_THRESHOLD,
     RULESET_VERSION,
@@ -52,6 +59,7 @@ from tae_rule_engine import (  # noqa: E402
     ContinuumCrossingConfig,
     ContinuumCrossingWindowConfig,
     EdgeArtifactConfig,
+    GridScalePacketConfig,
     GridScaleSpikeConfig,
     evaluate_mode,
 )
@@ -135,6 +143,14 @@ SHOT_SUMMARY_FIELDS = [
     "grid_scale_spike_gate_enabled",
     "grid_scale_spike_amplitude_min",
     "grid_scale_spike_width_max_grid",
+    "grid_scale_spike_high_r_cutoff_r",
+    "grid_scale_spike_high_r_width_max_grid",
+    "grid_scale_packet_gate_enabled",
+    "grid_scale_packet_amplitude_min",
+    "grid_scale_packet_step_min",
+    "grid_scale_packet_min_large_turns",
+    "grid_scale_packet_window_span_grid",
+    "grid_scale_packet_peak_r_max",
     "continuum_crossing_gate_enabled",
     "continuum_crossing_w_threshold",
     "continuum_crossing_window_gate_enabled",
@@ -713,12 +729,14 @@ def build_summary(
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    grid_scale_packet_config: GridScalePacketConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
 ) -> dict[str, Any]:
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
+    packet_config = grid_scale_packet_config or GridScalePacketConfig()
     crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
@@ -782,6 +800,16 @@ def build_summary(
         "grid_scale_spike_gate_enabled": grid_config.enabled,
         "grid_scale_spike_amplitude_min": grid_config.amplitude_min,
         "grid_scale_spike_width_max_grid": grid_config.width_max_grid,
+        "grid_scale_spike_high_r_cutoff_r": grid_config.high_r_cutoff_r,
+        "grid_scale_spike_high_r_width_max_grid": (
+            grid_config.high_r_width_max_grid
+        ),
+        "grid_scale_packet_gate_enabled": packet_config.enabled,
+        "grid_scale_packet_amplitude_min": packet_config.amplitude_min,
+        "grid_scale_packet_step_min": packet_config.step_min,
+        "grid_scale_packet_min_large_turns": packet_config.min_large_turns,
+        "grid_scale_packet_window_span_grid": packet_config.window_span_grid,
+        "grid_scale_packet_peak_r_max": packet_config.peak_r_max,
         "continuum_crossing_gate_enabled": crossing_config.enabled,
         "continuum_crossing_w_threshold": crossing_config.w_cross_threshold,
         "continuum_crossing_window_gate_enabled": cross_window_config.enabled,
@@ -812,6 +840,7 @@ def _summary_by_n(
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
+    grid_scale_packet_config: GridScalePacketConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
@@ -861,6 +890,7 @@ def _summary_by_n(
             rel_freq_tol=rel_freq_tol,
             axis_artifact_config=axis_artifact_config,
             grid_scale_spike_config=grid_scale_spike_config,
+            grid_scale_packet_config=grid_scale_packet_config,
             continuum_crossing_config=continuum_crossing_config,
             continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
@@ -942,6 +972,23 @@ def run_shot(
     axis_width_max_grid: float | None = DEFAULT_AXIS_WIDTH_MAX_GRID,
     grid_scale_amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
     grid_scale_width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    grid_scale_high_r_cutoff_r: float = DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
+    grid_scale_high_r_width_max_grid: float | None = (
+        DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID
+    ),
+    grid_scale_packet_amplitude_min: float | None = (
+        DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN
+    ),
+    grid_scale_packet_step_min: float = DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
+    grid_scale_packet_min_large_turns: int = (
+        DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS
+    ),
+    grid_scale_packet_window_span_grid: int = (
+        DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID
+    ),
+    grid_scale_packet_peak_r_max: float | None = (
+        DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX
+    ),
     w_cross_threshold: float | None = DEFAULT_W_CROSS_THRESHOLD,
     cross_window_half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
     cross_window_amplitude_min: float | None = DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
@@ -960,6 +1007,15 @@ def run_shot(
     grid_config = GridScaleSpikeConfig(
         amplitude_min=grid_scale_amplitude_min,
         width_max_grid=grid_scale_width_max_grid,
+        high_r_cutoff_r=grid_scale_high_r_cutoff_r,
+        high_r_width_max_grid=grid_scale_high_r_width_max_grid,
+    )
+    packet_config = GridScalePacketConfig(
+        amplitude_min=grid_scale_packet_amplitude_min,
+        step_min=grid_scale_packet_step_min,
+        min_large_turns=grid_scale_packet_min_large_turns,
+        window_span_grid=grid_scale_packet_window_span_grid,
+        peak_r_max=grid_scale_packet_peak_r_max,
     )
     crossing_config = ContinuumCrossingConfig(
         w_cross_threshold=w_cross_threshold,
@@ -1009,6 +1065,7 @@ def run_shot(
             high2=None if feature_data is None else feature_data.high2,
             axis_artifact_config=axis_config,
             grid_scale_spike_config=grid_config,
+            grid_scale_packet_config=packet_config,
             continuum_crossing_config=crossing_config,
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
@@ -1049,6 +1106,7 @@ def run_shot(
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
         grid_scale_spike_config=grid_config,
+        grid_scale_packet_config=packet_config,
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
@@ -1065,6 +1123,7 @@ def run_shot(
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
         grid_scale_spike_config=grid_config,
+        grid_scale_packet_config=packet_config,
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
@@ -1124,7 +1183,10 @@ def parse_args() -> argparse.Namespace:
         "--axis_r_ax",
         type=float,
         default=DEFAULT_AXIS_R_AX,
-        help="Inclusive normalized radial window r <= r_ax used to find the axis peak",
+        help=(
+            "Inclusive normalized radial window r <= r_ax used to find all "
+            "axis local peaks"
+        ),
     )
     parser.add_argument(
         "--axis_amplitude_min",
@@ -1168,11 +1230,89 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--grid_scale_high_r_cutoff_r",
+        type=float,
+        default=DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
+        help=(
+            "Peaks strictly above this normalized radius use the high-r "
+            "grid-scale width limit "
+            f"(default: {DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R:g})"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_high_r_width_max_grid",
+        type=float,
+        default=DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID,
+        help=(
+            "Maximum signed-lobe half-maximum width in radial intervals for "
+            "BAD_GRID_SCALE_SPIKE peaks strictly above the high-r cutoff "
+            f"(default: {DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID:g})"
+        ),
+    )
+    parser.add_argument(
         "--disable_grid_scale_spike",
         action="store_true",
         help=(
             "Calculate grid-scale features at the configured width but disable "
             "the BAD_GRID_SCALE_SPIKE decision gate"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_packet_amplitude_min",
+        type=float,
+        default=DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN,
+        help=(
+            "Minimum absolute amplitude in a qualifying short window for "
+            "BAD_GRID_SCALE_PACKET "
+            f"(default: {DEFAULT_GRID_SCALE_PACKET_AMPLITUDE_MIN})"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_packet_step_min",
+        type=float,
+        default=DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
+        help=(
+            "Minimum absolute signed-amplitude difference between adjacent "
+            "radial samples counted as a large packet step "
+            f"(default: {DEFAULT_GRID_SCALE_PACKET_STEP_MIN})"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_packet_min_large_turns",
+        type=int,
+        default=DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS,
+        help=(
+            "Minimum number of sharp turning points whose two adjacent "
+            "steps are large and oppositely directed in one packet window "
+            f"(default: {DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS})"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_packet_window_span_grid",
+        type=int,
+        default=DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
+        help=(
+            "Packet window span in radial grid intervals; the number of "
+            "samples is one larger "
+            f"(default: {DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID})"
+        ),
+    )
+    parser.add_argument(
+        "--grid_scale_packet_peak_r_max",
+        type=float,
+        default=DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX,
+        help=(
+            "Inclusive maximum radius of a qualifying packet window's "
+            "largest absolute sample "
+            f"(default: {DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_grid_scale_packet",
+        action="store_true",
+        help=(
+            "Calculate short-window packet features but disable the "
+            "BAD_GRID_SCALE_PACKET decision gate"
         ),
     )
     parser.add_argument(
@@ -1287,6 +1427,23 @@ def main() -> None:
             else args.grid_scale_amplitude_min
         ),
         grid_scale_width_max_grid=args.grid_scale_width_max_grid,
+        grid_scale_high_r_cutoff_r=args.grid_scale_high_r_cutoff_r,
+        grid_scale_high_r_width_max_grid=(
+            args.grid_scale_high_r_width_max_grid
+        ),
+        grid_scale_packet_amplitude_min=(
+            None
+            if args.disable_grid_scale_packet
+            else args.grid_scale_packet_amplitude_min
+        ),
+        grid_scale_packet_step_min=args.grid_scale_packet_step_min,
+        grid_scale_packet_min_large_turns=(
+            args.grid_scale_packet_min_large_turns
+        ),
+        grid_scale_packet_window_span_grid=(
+            args.grid_scale_packet_window_span_grid
+        ),
+        grid_scale_packet_peak_r_max=args.grid_scale_packet_peak_r_max,
         w_cross_threshold=(
             None if args.disable_cont_cross else args.w_cross_threshold
         ),
@@ -1329,7 +1486,20 @@ def main() -> None:
         "Grid-scale spike gate: "
         f"enabled={summary['grid_scale_spike_gate_enabled']} "
         f"amplitude_min={summary['grid_scale_spike_amplitude_min']} "
-        f"width_max_grid={summary['grid_scale_spike_width_max_grid']}"
+        f"width_max_grid={summary['grid_scale_spike_width_max_grid']} "
+        f"high_r_cutoff_r={summary['grid_scale_spike_high_r_cutoff_r']} "
+        "high_r_width_max_grid="
+        f"{summary['grid_scale_spike_high_r_width_max_grid']}"
+    )
+    print(
+        "Grid-scale packet gate: "
+        f"enabled={summary['grid_scale_packet_gate_enabled']} "
+        f"amplitude_min={summary['grid_scale_packet_amplitude_min']} "
+        f"step_min={summary['grid_scale_packet_step_min']} "
+        f"min_large_turns={summary['grid_scale_packet_min_large_turns']} "
+        "window_span_grid="
+        f"{summary['grid_scale_packet_window_span_grid']} "
+        f"peak_r_max={summary['grid_scale_packet_peak_r_max']}"
     )
     print(
         "Continuum-crossing gate: "

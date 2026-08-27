@@ -19,30 +19,39 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. The first five ordered rejection gates detect narrow
-near-axis spikes, unresolved signed-harmonic spikes anywhere in radius, and
-continuum crossings carrying appreciable exact-point or nearby amplitude and
+TAE/EAE/mixed split. Six ordered BAD decisions detect narrow near-axis spikes,
+unresolved signed-harmonic spikes and short large-turn packets whose strongest
+window sample is at `r <= 0.5`, continuum crossings carrying appreciable exact-point or nearby amplitude and
 normalized radial energy, followed by a narrow globally dominant energy
 envelope at the outer radial boundary.
 Their calibrated defaults are `r_ax=0.03` inclusive,
 `axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
-`grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`, and
+`grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`,
+`grid_scale_high_r_cutoff_r=0.7`,
+`grid_scale_high_r_width_max_grid=0.75`, packet defaults
+`grid_scale_packet_amplitude_min=0.3`,
+`grid_scale_packet_step_min=0.2`,
+`grid_scale_packet_min_large_turns=3`, and
+`grid_scale_packet_window_span_grid=4`, with inclusive
+`grid_scale_packet_peak_r_max=0.5`; continuum defaults begin with
 `w_cross_threshold=0.03`, crossing-window defaults
 `cross_window_half_width_grid=2`, `cross_window_amplitude_min=0.25`, and
 `cross_window_w_min=0.05`, with provisional edge defaults
 `r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; modes not rejected by
 any gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v8 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v13 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
 status plus the three inner-extremum measurements in `extremum_features`. Keep
 the axis measurements under
 `boundary_features.axis_artifact`, the outer energy-envelope and edge-harmonic
-audit measurements under `boundary_features.edge_artifact`, and the unresolved
-signed-lobe measurements under `numerical_structure_features.grid_scale_spike`;
-reserve an empty object for `resolution_features`. These are named deterministic
+audit measurements under `boundary_features.edge_artifact`, the unresolved
+signed-lobe measurements under `numerical_structure_features.grid_scale_spike`,
+and short-window repeated-turn evidence under
+`numerical_structure_features.grid_scale_packet`; reserve an empty object for
+`resolution_features`. These are named deterministic
 measurements; no RF checkpoint or prediction is used to produce them. Keep
 `signed_delta` and
 `fraction_below_upper2` as routing audit columns rather than rule features.
@@ -54,12 +63,17 @@ NOVA mode arrays use normalized radius and normalized mode amplitude. Address
 the first array axis as the zero-based stored harmonic index; do not infer a
 physical poloidal-`m` offset unless run metadata establishes that mapping.
 
-The axis extractor searches `r <= r_ax` for the largest absolute amplitude
-over all stored harmonics and records the peak, stored harmonic index, radius,
-local-maximum status, connected half-maximum width in normalized radius and
-grid intervals, outer edge, and whether the component includes `r=0`. Determine
-the local maximum and both half-maximum edges from the selected harmonic's full
-radial profile. Do not truncate the width calculation at `r_ax`.
+The axis extractor searches every absolute harmonic profile for every local
+maximum centered at `r <= r_ax`. Measure every candidate's connected
+half-maximum component on its full radial profile; do not truncate the width at
+`r_ax`. A candidate qualifies only when it meets both configured amplitude and
+width thresholds. If one or more qualify, record the strongest qualifying peak,
+its stored harmonic index, radius, connected half-maximum width in normalized
+radius and grid intervals, outer edge, and whether the component includes
+`r=0`, then reject the mode. Also record the total local-peak count and the
+amplitude- and width-qualified counts. A larger rising flank or broad local
+peak must not mask a narrower qualifying local peak. If no candidate qualifies,
+retain the strongest raw axis-window amplitude as fallback audit information.
 
 Override the calibrated gate when testing alternate thresholds:
 
@@ -71,38 +85,77 @@ python scripts/sort_shot_rules.py \
   --axis_width_max_grid GRID_INTERVALS
 ```
 
-The default inclusive `--axis_r_ax` is `0.03`. When the axis candidate is a true
-local maximum, its amplitude meets the minimum, and its full-grid half-maximum
-width does not exceed the configured maximum, return `BAD` with primary reason
-`BAD_AXIS_SPIKE` and stop later decision gates. A narrow local maximum centered
-at `r <= 0.03` is a boundary artifact regardless of an otherwise plausible
-morphology family. A broad component extending beyond the window or the rising
-flank of a mode centered outside it must not be made artificially narrow. Use
+The default inclusive `--axis_r_ax` is `0.03`. When any local maximum meets the
+amplitude minimum and its full-grid half-maximum width does not exceed the
+configured maximum, return `BAD` with primary reason `BAD_AXIS_SPIKE` and stop
+later decision gates. A narrow local maximum centered at `r <= 0.03` is a
+boundary artifact regardless of an otherwise plausible morphology family. A
+broad component extending beyond the window or the rising flank of a mode
+centered outside it must not be made artificially narrow. Use
 `--disable_axis_artifact` only when a feature-only run is explicitly needed.
 
 The second gate searches every stored harmonic over the complete radial grid.
 For each positive local maximum or negative local minimum, measure the connected
 signed lobe above half of its own absolute peak. Never measure this component on
 `abs(mode)`, because adjacent `+A/-A` samples would be joined into a falsely
-broad component. Among lobes no wider than the configured limit, record the
-strongest candidate, its signed amplitude, sign, zero-based stored harmonic
-index, radius, interpolated inner and outer half-maximum edges, width in
-normalized radius and grid intervals, and whether the component touches either
-radial boundary.
+broad component. Peaks at or below `grid_scale_high_r_cutoff_r` use
+`grid_scale_width_max_grid`; peaks strictly above that cutoff use
+`grid_scale_high_r_width_max_grid`. The cutoff belongs to the low-r branch,
+and both width comparisons are inclusive. Among lobes no wider than their
+applicable limit, record the strongest candidate, its signed amplitude, sign,
+zero-based stored harmonic index, radius, interpolated inner and outer
+half-maximum edges, width in normalized radius and grid intervals, and whether
+the component touches either radial boundary.
 
 The calibrated second gate is:
 
 ```text
 IF grid_scale_peak >= 0.3
-AND grid_scale_halfmax_width_grid <= 1
+AND ((grid_scale_peak_r <= 0.7
+      AND grid_scale_halfmax_width_grid <= 1)
+     OR (grid_scale_peak_r > 0.7
+         AND grid_scale_halfmax_width_grid <= 0.75))
 THEN BAD_GRID_SCALE_SPIKE
 AND stop evaluating later decision gates
 ```
 
 It runs only after `BAD_AXIS_SPIKE`. Override its thresholds with
-`--grid_scale_amplitude_min` and `--grid_scale_width_max_grid`; use
+`--grid_scale_amplitude_min`, `--grid_scale_width_max_grid`,
+`--grid_scale_high_r_cutoff_r`, and
+`--grid_scale_high_r_width_max_grid`; use
 `--disable_grid_scale_spike` for a feature-only run. The shot and per-`n`
 summaries record enable state and exact settings.
+
+Treat the repeated-turn packet screen as gate 2b so the established gate-3/4/5
+terminology remains stable. Scan every complete five-sample window on every
+stored harmonic. Let `d[i] = A[i+1] - A[i]`. Count
+an interior sample as a large turn only when both adjacent steps meet
+`abs(d) >= 0.2` and their directions oppose, `d[i-1] * d[i] < 0`. The
+provisional gate is:
+
+```text
+IF max(abs(A)) in the window >= 0.3
+AND all 3 interior samples are large turns
+AND the largest absolute sample is centered at r <= 0.5
+THEN BAD_GRID_SCALE_PACKET
+AND stop evaluating later decision gates
+```
+
+The magnitude comparisons are inclusive; the direction reversal is strict.
+This counts sharp signed local maxima and minima, so same-sign peaks separated
+by deep troughs remain eligible while a single steep smooth peak is not a
+packet. Record the selected window's signed values, stored harmonic index,
+sample and radial bounds, peak and peak radius, large-step and large-turn
+counts, maximum step, step RMS, total variation, unconstrained direction-change
+and sign-change counts, and the counts of all-radius turn-qualified,
+radius-qualified, and amplitude-qualified windows. Retain the peak and window
+radii for audit. The peak-radius comparison is inclusive.
+Override the provisional settings with
+`--grid_scale_packet_amplitude_min`, `--grid_scale_packet_step_min`,
+`--grid_scale_packet_min_large_turns`, and
+`--grid_scale_packet_window_span_grid`, and
+`--grid_scale_packet_peak_r_max`; use `--disable_grid_scale_packet` to retain
+evidence without applying the decision.
 
 The third gate uses the existing deterministic true-crossing measurements. A
 crossing is a lower/upper continuum boundary intersection recorded by the
@@ -117,7 +170,7 @@ AND stop evaluating later decision gates
 ```
 
 The comparison is intentionally strict (`>`). This gate runs only after
-`BAD_GRID_SCALE_SPIKE`. Override the threshold with `--w_cross_threshold`; use
+`BAD_GRID_SCALE_PACKET`. Override the threshold with `--w_cross_threshold`; use
 `--disable_cont_cross` to retain the same crossing features while disabling the
 decision.
 
@@ -176,7 +229,7 @@ This gate runs only after `BAD_CONT_CROSS_WINDOW`. Override its settings with
 `--edge_r_min` and `--edge_width_max_grid`; use `--disable_edge_artifact` to
 retain both envelope and harmonic audit measurements without applying the
 decision. The edge threshold is inclusive. Shot and per-`n` summaries record
-the enable state and exact threshold for all five gates.
+the enable state and exact threshold for all six BAD decisions.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or
