@@ -38,6 +38,8 @@ RULE_OUTPUT_FIELDS = [
     "rule_triggered_rules",
     "rule_version",
     "rule_features",
+    "rule_survivor_policy",
+    "rule_survivor_accepted",
     "manual_decision",
     "manual_reason",
     "reviewer",

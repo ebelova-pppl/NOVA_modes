@@ -408,6 +408,8 @@ def run_sort_fold(args: argparse.Namespace, shot: str, env: dict[str, str]) -> N
         args.python,
         "-u",
         str(args.repo_root / "scripts" / "sort_shot_mixed.py"),
+        "--method",
+        "rf-cnn",
         "--shot_dir",
         str(shot_dir),
         "--rf_model",

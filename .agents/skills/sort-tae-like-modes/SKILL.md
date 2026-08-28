@@ -1,6 +1,6 @@
 ---
 name: sort-tae-like-modes
-description: "Deterministically preprocess and sort one NOVA shot into TAE-like, mixed, EAE-like, invalid, BAD, REVIEW, and GOOD outputs with auditable rule reasons, reusable fingerprinted manual overrides, and optional RF-only ranking of final-GOOD close-frequency representatives. Use for one-shot NOVA TAE preprocessing, rule-based sorting, reproducible output regeneration, output auditing, or explicit post-rule adjudication without CNN or model-based classification."
+description: "Deterministically preprocess and sort one NOVA shot into TAE-like, mixed, EAE-like, invalid, BAD, REVIEW, and GOOD outputs with auditable rule reasons, an explicit production survivor policy, reusable fingerprinted manual overrides, and optional RF-only ranking of final-GOOD close-frequency representatives. Use for one-shot NOVA TAE preprocessing, rule-based production sorting, conservative rule calibration, reproducible output regeneration, output auditing, or explicit post-rule adjudication without CNN classification."
 ---
 
 # Sort TAE-Like Modes
@@ -11,13 +11,14 @@ ranking as separate stages.
 
 ## Run the deterministic workflow
 
-For production sorting, use the immutable named preset:
+For production sorting, use the canonical mixed-shot sorter. Rules are the
+default; specify the method explicitly in saved commands for clear provenance:
 
 ```bash
-python scripts/sort_shot_rules.py \
+python scripts/sort_shot_mixed.py \
+  --method rules \
   --shot_dir /path/to/SHOT \
-  --out_dir /path/to/sort-output \
-  --rule_config tae_rules_production_v1
+  --out_dir /path/to/sort-output
 ```
 
 The preset is `configs/rules/tae_rules_production_v1.yaml`. It pins the v14
@@ -27,7 +28,25 @@ with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and
 per-`n` summaries.
 
-For calibration or feature-only work, use the configurable interface:
+The rule engine deliberately has no positive GOOD template. Keep the two
+decisions distinct:
+
+```text
+gate fired         -> rule_decision=BAD -> automatic final BAD
+no gate fired      -> rule_decision=REVIEW
+                   -> final_decision=GOOD by accept-as-good-v1
+manual override    -> applied after the automatic final decision
+final GOOD         -> optional duplicate ranking
+```
+
+Do not rewrite `rule_decision` or `rule_primary_reason=NO_GOOD_TEMPLATE` when
+the production workflow promotes a survivor. Confirm the
+`accept-as-good-v1` policy identity and `n_rule_survivors_accepted` in the
+summaries and final-classification audit.
+
+For conservative calibration or feature-only work, use the configurable
+interface. It does not apply the production survivor policy, so pass-all-gates
+modes remain final REVIEW:
 
 ```bash
 python scripts/sort_shot_rules.py \
@@ -55,8 +74,9 @@ Their calibrated defaults are `r_ax=0.03` inclusive,
 `w_cross_threshold=0.03`, crossing-window defaults
 `cross_window_half_width_grid=2`, `cross_window_amplitude_min=0.25`, and
 `cross_window_w_min=0.05`, with provisional edge defaults
-`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; modes not rejected by
-any gate remain `REVIEW` with `NO_GOOD_TEMPLATE`, never `GOOD`.
+`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; the engine returns
+`REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
+production `accept-as-good-v1` workflow policy promotes those survivors.
 
 For every valid TAE-side mode, `rule_features` uses the grouped v13 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
@@ -250,12 +270,15 @@ decision. The edge threshold is inclusive. Shot and per-`n` summaries record
 the enable state and exact threshold for all six BAD decisions.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
-without final rule results are needed. Do not run `sort_shot_mixed.py`, RF, or
-CNN to make deterministic or manual classifications.
+without final rule results are needed. For deterministic production, run
+`sort_shot_mixed.py --method rules`; never select `--method rf-cnn` or use a
+CNN prediction to make a rule decision.
 
 ## Add explicit adjudication
 
-Create or update fingerprinted overrides from a sorter output:
+Create or update fingerprinted overrides from a production sorter output. The
+`review` scope selects the preserved preliminary `rule_decision`, so it still
+finds pass-all-gates survivors even though their final decision is GOOD:
 
 ```bash
 python scripts/label_modes_fast.py /path/to/SHOT \
@@ -266,14 +289,15 @@ python scripts/label_modes_fast.py /path/to/SHOT \
   --no-rf
 ```
 
-Use `--adjudication all` only when preliminary GOOD and BAD rows should also be
+Use `--adjudication all` only when gate-rejected BAD rows should also be
 eligible. Supply a nonempty reason for every decision. This is a non-blind
 post-rule action; do not describe it as independent validation.
 
 Rebuild deterministically after adjudication:
 
 ```bash
-python scripts/sort_shot_rules.py \
+python scripts/sort_shot_mixed.py \
+  --method rules \
   --shot_dir /path/to/SHOT \
   --out_dir /path/to/sort-output \
   --manual_overrides /path/to/manual_overrides.csv
@@ -283,13 +307,18 @@ The sorter applies an override only when its stored mode-plus-`datcon#`
 fingerprint matches. Inspect stale, ambiguous, or ineligible override counts in
 `shot_summary.csv`.
 
+Use the same override file option with `sort_shot_rules.py` only when rebuilding
+the conservative REVIEW-preserving audit instead of production outputs.
+
 ## Rank final-GOOD duplicates when requested
 
-Add `--rf_model /path/to/model.joblib` only to rank representatives among
-final-GOOD close-frequency modes. RF scores must not alter rule, manual, or
-final decisions. Without a usable RF checkpoint—or if one cluster cannot be
-fully scored—the workflow retains every affected member and records the
-fallback in `frequency_cluster_report.txt` and `frequency_clusters.csv`.
+With `sort_shot_mixed.py --method rules` or `sort_shot_rules.py`, add
+`--rf_model /path/to/model.joblib` only to rank representatives among
+final-GOOD close-frequency modes. RF scores must not alter rule, survivor-
+policy, manual, or final decisions. Without a usable RF checkpoint—or if one
+cluster cannot be fully scored—the workflow retains every affected member and
+records the fallback in `frequency_cluster_report.txt` and
+`frequency_clusters.csv`. Do not supply or load a CNN for this method.
 
 ## Audit outputs
 
@@ -308,5 +337,8 @@ Start with:
 Treat `rule_triggered_rules` as per-mode audit detail, not as summary-count
 input. Confirm the manual-override SHA-256 in the summary when overrides were
 supplied. The summary also records whether each implemented gate was enabled
-and its exact thresholds. Do not add timestamps while regenerating
-deterministic outputs.
+and its exact thresholds. For production runs, also confirm
+`accept-as-good-v1` and `n_rule_survivors_accepted`; automatic survivors remain
+REVIEW only in the rule-decision columns and appear as GOOD in final outputs.
+`review_tae_like.csv` is normally empty unless a manual REVIEW override is
+present. Do not add timestamps while regenerating deterministic outputs.

@@ -44,7 +44,7 @@ The active RF checkpoint uses schema `rf_w_star_max_22_v2`: compared with the
 previous 22-feature checkpoint, raw `omega` was removed and the
 continuum-crossing feature `W_star_max` was added.
 
-The default `sort_shot_mixed.py` fusion thresholds were selected from four-shot
-LOSO checks. Expanded 10-shot LOSO makes raw CNN strongest overall, while the
-combined policy retains better GOOD recall on the sparse NSTX-U G-case group.
-Threshold retuning remains pending that tradeoff.
+The legacy `sort_shot_mixed.py --method rf-cnn` fusion thresholds were selected
+from four-shot LOSO checks. Expanded 10-shot LOSO makes raw CNN strongest
+overall, while the combined policy retains better GOOD recall on the sparse
+NSTX-U G-case group. Threshold retuning remains pending that tradeoff.

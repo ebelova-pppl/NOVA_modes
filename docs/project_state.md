@@ -3,6 +3,56 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-08-28 deterministic rules integrated into the canonical sorter
+
+- Added decision-method dispatch to `scripts/sort_shot_mixed.py` through
+  `--method {rules,rf-cnn}`. `rules` is the default production method;
+  `rf-cnn` is the explicit legacy classifier/fusion method and requires both
+  RF and CNN checkpoints.
+- The production rules method automatically loads the unchanged immutable
+  `tae_rules_production_v1` configuration. Its identity remains schema
+  `tae-rule-run-config-v1`, ruleset
+  `tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-v14`,
+  and SHA-256
+  `a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39`.
+  Gates 1, 2, 2b, 4, and 5 remain enabled and exact-point continuum gate 3
+  remains disabled.
+- Preserved the scientific rule-engine semantics: a pass-all-gates mode still
+  has `rule_decision=REVIEW` and
+  `rule_primary_reason=NO_GOOD_TEMPLATE`. The separately versioned and audited
+  `accept-as-good-v1` workflow policy promotes that survivor to automatic
+  final GOOD for production. Gate-rejected rows remain automatic BAD.
+- Production decision order is deterministic rules, survivor promotion,
+  fingerprint-matched manual overrides, then final-GOOD close-frequency
+  handling. Rule, policy, manual, and final-decision provenance remain
+  separate rather than rewriting the preliminary rule verdict.
+- Under the rules method, `--rf_model` is optional and is used only to rank
+  representatives inside final-GOOD close-frequency clusters. Without a
+  usable checkpoint, all members of each affected cluster are retained and
+  the fallback is reported. The rules method never loads a CNN.
+- `scripts/sort_shot_rules.py` remains the conservative calibration and audit
+  interface. It does not apply `accept-as-good-v1`; modes that pass every gate
+  remain final REVIEW there. Its configurable threshold interface and frozen-
+  preset audit path remain available.
+- Documentation now treats `sort_shot_mixed.py --method rules` as canonical
+  production, while retaining explicit `--method rf-cnn` commands for legacy
+  reproducibility.
+- Validation is complete: all 103 repository tests pass, including seven new
+  method-integration tests covering CLI isolation, survivor promotion, BAD
+  preservation, manual and stale overrides, no-RF cluster fallback, output
+  lists, and byte-stable regeneration. Importing the canonical sorter under
+  rules mode does not import `joblib`, scikit-learn, PyTorch,
+  `cnn_infer_common`, or the legacy `sort_shot` module.
+- Bounded smoke runs on the local 141-mode `data/nstxu_204202` sample passed.
+  The default rules method reproduced 98 preliminary BAD and 43 pass-all-gate
+  survivors; without RF it retained all 43 and reported
+  `SKIPPED_NO_RF_CHECKPOINT`, while optional RF ranking retained 42 after one
+  duplicate removal. Explicit `--method rf-cnn` also completed with the
+  refreshed checkpoints, producing 45 GOOD before clustering and 44 final
+  GOOD. Its ten classification/list/cluster outputs matched the pre-integration
+  sorter byte-for-byte; only summaries intentionally add the method identity.
+  The frozen production-v1 SHA-256 remained unchanged.
+
 ## 2026-08-28 active RF/raw-CNN refresh and deterministic-sorter direction
 
 - Refreshed the active RF and raw-CNN artifacts from the current canonical
@@ -39,12 +89,11 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 - No new shot-wise LOSO evaluation or RF/CNN fusion retuning was performed in
   this refresh. The split and row-wise CV results should not be interpreted as
   cross-shot generalization estimates.
-- Planned direction: replace the RF/CNN classification-and-fusion stage in
-  `sort_shot_mixed.py` with the deterministic `tae_rule_engine.py` path. This
-  is not implemented yet. Until then, `sort_shot_mixed.py` remains the
-  canonical RF/CNN sorter and the refreshed models are interim dependencies;
-  deterministic production sorting remains available separately through
-  `sort_shot_rules.py --rule_config tae_rules_production_v1`.
+- The refreshed checkpoints remain available for the explicit legacy
+  `sort_shot_mixed.py --method rf-cnn` path. The deterministic-rule integration
+  described above supersedes the earlier plan to keep production rule sorting
+  in a separate entry point; `sort_shot_rules.py` is now reserved for
+  conservative calibration and audit runs.
 
 ## 2026-08-28 B12 upper/lower continuum-crossing comparison
 

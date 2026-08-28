@@ -3,12 +3,14 @@
 sort_shot_mixed.py
 ==================
 
-Process one mixed TAE/EAE shot directory without moving files:
+Process one mixed TAE/EAE shot directory without moving files. The default
+``rules`` method applies the frozen deterministic production configuration;
+the legacy ``rf-cnn`` method preserves the existing model-fusion workflow.
 
 1. validate candidate NOVA mode files,
 2. route valid modes into TAE-like / EAE-like / mixed groups,
-3. run both the RF classifier and a CNN checkpoint on TAE-like modes,
-4. combine RF/CNN probabilities with a confidence policy,
+3. classify TAE-side modes with deterministic rules or RF + CNN,
+4. accept deterministic gate survivors or combine RF/CNN probabilities,
 5. remove close-frequency near-duplicates from the GOOD TAE list, and
 6. write shot-level CSV outputs, summaries, and optional QC plots.
 
@@ -27,28 +29,59 @@ from __future__ import annotations
 import argparse
 import csv
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
-import joblib
 import numpy as np
-from sklearn.metrics import classification_report, confusion_matrix
 
-from cnn_infer_common import load_cnn_classifier
 from cont_features import load_datcon_for_mode
 from mode_features import radial_centroid, radial_width
 from mode_csv import read_mode_csv_entries
 from nova_mode_loader import load_mode_from_nova
-from sort_shot import (
-    build_mode_dict,
-    classify_mode_rf,
-    iter_n_dirs,
-    postprocess_good_modes,
-    write_cluster_csv,
-    write_cluster_report,
-)
 from tae_eae_features import upper2_scalars
+from tae_rule_config import PRODUCTION_RULE_CONFIG_NAME
+
+
+DEFAULT_METHOD = "rules"
+RULES_METHOD = "rules"
+RF_CNN_METHOD = "rf-cnn"
+DEFAULT_RULE_CONFIG = PRODUCTION_RULE_CONFIG_NAME
+
+AI_ONLY_OPTIONS = frozenset(
+    {
+        "--cnn_model",
+        "--cnn_model_kind",
+        "--device",
+        "--label_csv",
+        "--model_eval_threshold",
+        "--make_plots",
+        "--verbose",
+        "--gold_good_rf_threshold",
+        "--gold_good_cnn_threshold",
+        "--silver_good_rf_threshold",
+        "--silver_good_cnn_threshold",
+        "--cnn_rescue_rf_threshold",
+        "--cnn_rescue_cnn_threshold",
+        "--gold_bad_threshold",
+        "--silver_bad_threshold",
+        "--rf_only_good_threshold",
+        "--rf_score_weight",
+        "--cnn_score_weight",
+    }
+)
+
+RULE_CONFIG_OWNED_OPTIONS = frozenset(
+    {
+        "--rel_freq_tol",
+        "--fraction_tae_threshold",
+        "--fraction_eae_threshold",
+        "--signed_delta_eae_threshold",
+    }
+)
+
+RULE_ONLY_OPTIONS = frozenset({"--rule_config", "--manual_overrides"})
 
 
 ALL_OUTPUT_FIELDS = [
@@ -81,6 +114,7 @@ ALL_OUTPUT_FIELDS = [
 
 SHOT_SUMMARY_FIELDS = [
     "shot",
+    "method",
     "n_total_files",
     "n_failed_load",
     "n_nan_or_invalid",
@@ -132,16 +166,41 @@ INVALID_REASON_NAMES = {
 }
 
 
-def parse_args() -> argparse.Namespace:
+def _explicit_options(argv: Sequence[str]) -> set[str]:
+    return {
+        token.split("=", 1)[0]
+        for token in argv
+        if token.startswith("--")
+    }
+
+
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    raw_args = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(
         description=(
             "Process one mixed TAE/EAE NOVA shot, route EAE-like modes away, "
-            "score TAE-like modes with RF + CNN, and write QC outputs."
+            "classify TAE-side modes with deterministic rules (default) or "
+            "the legacy RF-CNN combination, and write auditable outputs."
         )
     )
+    ap.add_argument(
+        "--method",
+        choices=[RULES_METHOD, RF_CNN_METHOD],
+        default=DEFAULT_METHOD,
+        help="Decision backend. Defaults to deterministic production rules.",
+    )
     ap.add_argument("--shot_dir", required=True, help="Shot directory containing N1, N2, ...")
-    ap.add_argument("--rf_model", required=True, help="RF classifier .joblib path")
-    ap.add_argument("--cnn_model", required=True, help="CNN checkpoint .pt path")
+    ap.add_argument(
+        "--rf_model",
+        help=(
+            "RF classifier .joblib path. Required for --method rf-cnn; under "
+            "rules it is optional and used only for duplicate ranking."
+        ),
+    )
+    ap.add_argument(
+        "--cnn_model",
+        help="CNN checkpoint .pt path; required only for --method rf-cnn",
+    )
     ap.add_argument(
         "--cnn_model_kind",
         choices=[
@@ -156,6 +215,18 @@ def parse_args() -> argparse.Namespace:
         help="CNN checkpoint kind. Use auto for checkpoints with model_type metadata.",
     )
     ap.add_argument("--out_dir", required=True, help="Directory for CSV outputs and reports")
+    ap.add_argument(
+        "--rule_config",
+        default=DEFAULT_RULE_CONFIG,
+        help=(
+            "Named deterministic configuration under configs/rules, or an "
+            "explicit JSON-compatible YAML path (rules method only)"
+        ),
+    )
+    ap.add_argument(
+        "--manual_overrides",
+        help="Fingerprint-validated manual override CSV (rules method only)",
+    )
     ap.add_argument("--device", default=None, help="Torch device for CNN inference, e.g. cpu or cuda")
     ap.add_argument("--n_min", type=int, default=1, help="Smallest N directory to scan")
     ap.add_argument("--n_max", type=int, default=10, help="Largest N directory to scan")
@@ -206,7 +277,36 @@ def parse_args() -> argparse.Namespace:
         default=0.5,
         help="CNN weight used in weighted p_avg for duplicate-clustering scores",
     )
-    return ap.parse_args()
+    args = ap.parse_args(raw_args)
+    explicit = _explicit_options(raw_args)
+    if args.method == RULES_METHOD:
+        conflicts = sorted(explicit & (AI_ONLY_OPTIONS | RULE_CONFIG_OWNED_OPTIONS))
+        if conflicts:
+            ap.error(
+                "--method rules uses its named rule configuration and does not "
+                "accept these RF-CNN or config-owned options: "
+                + ", ".join(conflicts)
+            )
+    else:
+        missing = [
+            option
+            for option, value in (
+                ("--rf_model", args.rf_model),
+                ("--cnn_model", args.cnn_model),
+            )
+            if not value
+        ]
+        if missing:
+            ap.error(
+                "--method rf-cnn requires " + " and ".join(missing)
+            )
+        conflicts = sorted(explicit & RULE_ONLY_OPTIONS)
+        if conflicts:
+            ap.error(
+                "--method rf-cnn does not accept rule-only options: "
+                + ", ".join(conflicts)
+            )
+    return args
 
 
 def make_base_row(path: str, shot: str, n: int) -> dict[str, Any]:
@@ -271,6 +371,8 @@ def preflight_n_dirs(
     Find populated N# directories and ensure the expected datcon# file exists
     and is readable before processing any modes from the shot.
     """
+    from sort_shot import iter_n_dirs
+
     populated: list[tuple[int, Path, list[Path]]] = []
     for n, ndir in iter_n_dirs(str(shot_dir), n_min=n_min, n_max=n_max):
         files = sorted(ndir.glob(pattern))
@@ -535,6 +637,8 @@ def _evaluation_metrics(
     *,
     model_name: str,
 ) -> dict[str, Any]:
+    from sklearn.metrics import confusion_matrix
+
     cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
     tn, fp, fn, tp = (int(value) for value in cm.ravel())
     n = int(y_true.size)
@@ -571,6 +675,8 @@ def write_labeled_evaluation_outputs(
     threshold: float = 0.5,
     cnn_checkpoint_kind: str = "auto",
 ) -> None:
+    from sklearn.metrics import classification_report, confusion_matrix
+
     labels, label_stats = load_label_map(label_csv, shot=shot)
     scored_rows = [row for row in rows if row.get("status") == "scored"]
     matched_rows = [
@@ -698,6 +804,8 @@ def build_good_mode_dicts(
     median_k: int = 3,
     max_step: int = 2,
 ) -> list[dict[str, Any]]:
+    from sort_shot import build_mode_dict
+
     good_modes: list[dict[str, Any]] = []
     for row in rows:
         if row.get("status") != "scored" or row.get("final_label") != "good":
@@ -766,6 +874,7 @@ def build_summary_row(
 
     summary = {
         "shot": shot,
+        "method": RF_CNN_METHOD,
         "n_total_files": len(rows),
         "n_failed_load": sum(row.get("rejection_reason") == "mode_load_failed" for row in rows),
         "n_nan_or_invalid": sum(row.get("rejection_reason") in INVALID_REASON_NAMES for row in rows),
@@ -833,6 +942,8 @@ def write_outputs(
     summary_by_n_rows: Sequence[dict[str, Any]],
     rel_freq_tol: float,
 ) -> None:
+    from sort_shot import write_cluster_csv, write_cluster_report
+
     rows_sorted = sorted(rows, key=row_sort_key)
     good_rows = [
         row for row in rows_sorted if row.get("status") == "scored" and row.get("final_label") == "good"
@@ -1074,8 +1185,13 @@ def make_plots(rows: Sequence[dict[str, Any]], out_dir: Path) -> None:
         print(f"[plots] Failed gap-split diagnostic plot: {type(exc).__name__}: {exc}")
 
 
-def main() -> None:
-    args = parse_args()
+def run_rf_cnn_method(args: argparse.Namespace) -> None:
+    """Run the preserved RF-CNN fusion workflow."""
+    import joblib
+
+    from cnn_infer_common import load_cnn_classifier
+    from sort_shot import classify_mode_rf, postprocess_good_modes
+
     shot_dir = Path(args.shot_dir).expanduser().resolve()
     out_dir = Path(args.out_dir).expanduser()
     if not shot_dir.is_dir():
@@ -1271,6 +1387,7 @@ def main() -> None:
         make_plots(rows, out_dir)
 
     print("=== Mixed-shot summary ===")
+    print(f"Method: {RF_CNN_METHOD}")
     print(f"Shot: {shot}")
     print(f"Total files: {summary_row['n_total_files']}")
     print(
@@ -1290,6 +1407,67 @@ def main() -> None:
     if args.label_csv:
         print("Wrote model evaluation: model_evaluation_report.txt")
     print(f"Wrote outputs to: {out_dir}")
+
+
+def run_rules_method(args: argparse.Namespace):
+    """Run deterministic production rules through the shared workflow."""
+    from sort_shot_rules import (
+        RULE_SURVIVOR_POLICY_ACCEPT,
+        run_configured_shot,
+    )
+
+    try:
+        result = run_configured_shot(
+            args.shot_dir,
+            args.out_dir,
+            rule_config=args.rule_config,
+            manual_overrides=args.manual_overrides,
+            rf_model=args.rf_model,
+            n_min=args.n_min,
+            n_max=args.n_max,
+            pattern=args.pattern,
+            rule_survivor_policy=RULE_SURVIVOR_POLICY_ACCEPT,
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+
+    summary = result.summary
+    print("=== Mixed-shot summary ===")
+    print(f"Method: {RULES_METHOD}")
+    print(f"Shot: {summary['shot']}")
+    print(f"Total files: {summary['n_total_files']}")
+    print(
+        "Gap split: "
+        f"tae_like={summary['n_tae_like']} "
+        f"mixed={summary['n_mixed']} "
+        f"eae_like={summary['n_eae_like']}"
+    )
+    print(
+        "Rule decisions: "
+        f"bad={summary['n_preliminary_bad']} "
+        f"survivors_accepted={summary['n_rule_survivors_accepted']} "
+        f"final_review={summary['n_final_review']}"
+    )
+    print(
+        "Final GOOD modes: "
+        f"before_clustering={summary['n_final_good_before_clustering']} "
+        f"after_clustering={summary['n_final_good']}"
+    )
+    print(
+        "Rule configuration: "
+        f"{summary['rule_configuration_name']} "
+        f"sha256={summary['rule_configuration_sha256']}"
+    )
+    print(f"Wrote outputs to: {Path(args.out_dir).expanduser()}")
+    return result
+
+
+def main() -> None:
+    args = parse_args()
+    if args.method == RULES_METHOD:
+        run_rules_method(args)
+    else:
+        run_rf_cnn_method(args)
 
 
 if __name__ == "__main__":

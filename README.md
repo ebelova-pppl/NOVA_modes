@@ -123,32 +123,41 @@ Current best models
   although the NSTX-U G-case folds remain the weakest group.
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
-- `sort_shot_mixed.py` still defaults to the older RF-leaning fusion policy
-  chosen from four-shot LOSO checks. The symmetric-recipe 10-shot LOSO check
-  in `outputs/loso_10_onecycle_both/` makes raw CNN the strongest aggregate
-  model, while the combined policy retains better GOOD recall on the sparse
-  NSTX-U G-case group. Fusion retuning is still pending that tradeoff.
-- Planned direction: replace the RF/CNN classification stage in
-  `sort_shot_mixed.py` with the deterministic `tae_rule_engine.py` workflow.
-  Until that integration is implemented, `sort_shot_mixed.py` remains the
-  canonical RF/CNN sorter; deterministic production runs use
-  `sort_shot_rules.py --rule_config tae_rules_production_v1`.
+- `sort_shot_mixed.py` is the canonical production orchestrator. Its default
+  `--method rules` path loads the immutable `tae_rules_production_v1`
+  configuration; `--method rf-cnn` preserves the older RF-leaning fusion
+  policy as an explicit legacy option. The rule and AI decision engines stay
+  separate while sharing validation, routing, output, and duplicate-removal
+  conventions.
+- Under the production rule method, a mode that fires no rejection gate keeps
+  the engine verdict `rule_decision=REVIEW` and
+  `rule_primary_reason=NO_GOOD_TEMPLATE`, then the audited
+  `accept-as-good-v1` workflow policy promotes it to final `GOOD`. Manual
+  overrides are applied after that policy. An optional RF checkpoint may rank
+  final-GOOD duplicate representatives, but it cannot change rule decisions;
+  no CNN is loaded by the rules method.
 
-## Classify new NSTX-U shots on Flux (no training)
+## Sort new NSTX-U shots on Flux (no training)
 
-For a user who only wants to sort new NSTX-U E-like NOVA output, do **not**
-train new models. The production workflow is to pull the current repository,
-use the version-controlled active models, and run `scripts/sort_shot_mixed.py`
-once per shot:
+For a user who only wants to sort new NOVA output, do **not** train new
+models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
+The default method is deterministic rules and loads the frozen
+`tae_rules_production_v1` configuration automatically:
 
-- RF model: `models/nova_mode_classifier.joblib`
-- raw-CNN model: `models/nova_cnn_raw.pt`
-- sorter: `scripts/sort_shot_mixed.py`
+```text
+rejection gate fired -> BAD
+all gates passed     -> rule REVIEW/NO_GOOD_TEMPLATE
+                     -> final GOOD by accept-as-good-v1
+manual overrides     -> applied to the automatic final decision
+final GOOD           -> optional close-frequency duplicate ranking
+```
 
-Do not use checkpoints from `models/old_4shots_models/` for new production
-sorting. NSTX-U G-case shots are currently treated as a separate regime and
-should not be used for routine NOVA-C candidate selection until the G-shot
-policy is retuned.
+The promotion is a workflow policy, not a positive rule-engine template. Both
+the preliminary rule verdict and the audited promotion source remain in the
+outputs. Rules mode never loads a CNN. Supplying `--rf_model` is optional and
+uses RF only to rank final-GOOD close-frequency representatives; without a
+usable RF checkpoint, all members of affected clusters are retained and the
+fallback is reported.
 
 Default Flux shell is usually `tcsh`:
 
@@ -160,7 +169,6 @@ conda activate /p/hym/conda_envs/nova-perlmutter
 
 cd /path/to/your/NOVA_modes
 git pull
-ls -lh models/nova_mode_classifier.joblib models/nova_cnn_raw.pt
 source configs/paths/nova_paths.flux.csh
 nova_env
 
@@ -179,7 +187,6 @@ conda activate /p/hym/conda_envs/nova-perlmutter
 
 cd /path/to/your/NOVA_modes
 git pull
-ls -lh models/nova_mode_classifier.joblib models/nova_cnn_raw.pt
 source configs/paths/nova_paths.flux.sh
 nova_env
 
@@ -196,13 +203,9 @@ For `tcsh`:
 ```tcsh
 setenv SHOT_NAME nstxu_example_shot
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+  --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
-  --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
-  --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
-  --cnn_model_kind cnn_raw \
-  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME" \
-  --device cpu \
-  --make_plots
+  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
 For bash:
@@ -210,6 +213,41 @@ For bash:
 ```bash
 export SHOT_NAME=nstxu_example_shot
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+  --method rules \
+  --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
+```
+
+The input shot directory is expected to contain `N1`, `N2`, ... subdirectories
+with `egn*` mode files and matching `datcon<N>` continuum files. The sorter
+does not move or modify the input modes; it writes CSV outputs and reports into
+`$NOVA_SORT_OUT/$SHOT_NAME`.
+
+Most useful outputs for the default rules method:
+
+- `good_tae_final.csv` — final GOOD TAE-like modes after optional duplicate
+  ranking.
+  Includes `rad_loc` and `rad_width` for comparing the mode location/width
+  with beam-ion density profiles before launching NOVA-C growth-rate runs.
+- `good_tae_unchecked.csv` — promoted or manually adjudicated GOOD TAE-like
+  modes before duplicate handling.
+- `bad_tae_like.csv` — TAE-like modes rejected by deterministic gates or a
+  manual override.
+- `review_tae_like.csv` — modes whose final classification remains REVIEW;
+  automatic production survivors are promoted and do not remain here.
+- `rule_results.csv` and `final_classifications.csv` — preliminary rule
+  verdicts, survivor-policy provenance, and final decisions.
+- `eae_like.csv` — valid modes routed away as EAE-like.
+- `shot_summary.csv` and `frequency_cluster_report.txt` — run summary and
+  duplicate-cluster audit, including rule-configuration and survivor-policy
+  identity.
+
+To reproduce the legacy RF+CNN classifier and fusion workflow, select it
+explicitly and provide both checkpoints:
+
+```tcsh
+python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+  --method rf-cnn \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
   --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
   --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
@@ -219,37 +257,28 @@ python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --make_plots
 ```
 
-The input shot directory is expected to contain `N1`, `N2`, ... subdirectories
-with `egn*` mode files and matching `datcon<N>` continuum files. The sorter
-does not move or modify the input modes; it writes CSV outputs and reports into
-`$NOVA_SORT_OUT/$SHOT_NAME`.
-
-Most useful outputs:
-
-- `good_tae_final.csv` — final deduplicated GOOD TAE-like modes.
-  Includes `rad_loc` and `rad_width` for comparing the mode location/width
-  with beam-ion density profiles before launching NOVA-C growth-rate runs.
-- `good_tae_unchecked.csv` — GOOD TAE-like modes before duplicate removal.
-- `bad_tae_like.csv` — TAE-like modes rejected by the RF/CNN policy.
-- `eae_like.csv` — modes routed away as EAE-like, not RF/CNN-scored as TAEs.
-- `flagged_tae_like.csv` — overlapping QC list for borderline or RF/CNN
-  disagreement cases.
-- `shot_summary.csv` and `frequency_cluster_report.txt` — run summary and
-  duplicate-cluster audit.
+The legacy method requires both model checkpoints. Do not use checkpoints
+from `models/old_4shots_models/` for new runs. Its
+`flagged_tae_like.csv` remains an overlapping RF/CNN disagreement and
+borderline-QC list. NSTX-U G-case shots are a distinct AI-model regime; do not
+interpret legacy RF+CNN results there as equivalent to the deterministic
+production rules.
 
 If the goal is only to classify new shots, do not run `rf_train_classify.py`,
 `cnn_raw.py`, `cnn_straightened.py`, or `cnn_hybrid.py`. Those scripts are for
 developing or retraining models, not for routine sorting.
 
-## Deterministic TAE rule-sorting scaffold
+## Deterministic TAE rule sorting
 
-For production rule sorting, use the frozen named configuration:
+For production rule sorting, use the canonical mixed-shot orchestrator. Rules
+are the default, although spelling out the method is recommended in saved run
+commands:
 
 ```bash
-python scripts/sort_shot_rules.py \
+python scripts/sort_shot_mixed.py \
+  --method rules \
   --shot_dir /path/to/shot \
-  --out_dir /path/to/rule_sort_output \
-  --rule_config tae_rules_production_v1
+  --out_dir /path/to/rule_sort_output
 ```
 
 `configs/rules/tae_rules_production_v1.yaml` pins the routing values, ruleset,
@@ -257,15 +286,18 @@ gate enable states, and thresholds validated on the 14 active shots. Gates 1,
 2, 2b, 4, and 5 are enabled; exact-point continuum gate 3 is explicitly
 disabled. The sorter records the configuration name, schema, and SHA-256 in
 all shot and per-`n` summaries and rejects threshold/gate overrides when the
-named configuration is selected.
+named configuration is selected. It also records the `accept-as-good-v1`
+survivor policy that promotes pass-all-gates `REVIEW` rows to production
+`GOOD` before manual overrides and duplicate processing.
 
-For auditable rule development without RF/CNN classification, process one shot
-with the configurable interface:
+For conservative rule auditing and threshold development, use the separate
+calibration CLI. It does not apply the production survivor policy: pass-all-
+gates modes remain `REVIEW`, never automatic `GOOD`.
 
 ```bash
 python scripts/sort_shot_rules.py \
   --shot_dir /path/to/shot \
-  --out_dir /path/to/rule_sort_output
+  --out_dir /path/to/rule_audit_output
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
@@ -289,9 +321,10 @@ sharp turn requires two adjacent signed-amplitude steps of magnitude at least
 `0.2` whose signs oppose. The gate rejects when the window's absolute peak is
 at least `0.3`, its peak is centered at the inclusive radius `r <= 0.5`, and
 all three possible interior samples are sharp turns. Other valid TAE-side
-modes remain `REVIEW`, not `GOOD`, with primary reason `NO_GOOD_TEMPLATE`.
-Invalid inputs remain `INVALID`, and valid EAE-like modes are routed without a
-fabricated rule decision.
+modes receive the engine verdict `REVIEW`, not `GOOD`, with primary reason
+`NO_GOOD_TEMPLATE`. The production orchestrator then promotes those survivors;
+the calibration CLI leaves them as REVIEW. Invalid inputs remain `INVALID`,
+and valid EAE-like modes are routed without a fabricated rule decision.
 
 Each valid TAE-side result includes a grouped, deterministic `rule_features`
 object containing the active RF 22-feature calculations, six crossing
@@ -305,7 +338,8 @@ normalized; harmonic identifiers are reported as zero-based stored indices
 without inferring a physical poloidal-`m` offset. This reuses the calculations
 without running an RF model.
 
-Override the calibrated defaults with `--axis_amplitude_min VALUE`,
+In `sort_shot_rules.py` calibration runs, override the calibrated defaults
+with `--axis_amplitude_min VALUE`,
 `--axis_width_max_grid VALUE`, `--grid_scale_amplitude_min VALUE`,
 `--grid_scale_width_max_grid VALUE`, `--grid_scale_high_r_cutoff_r VALUE`,
 `--grid_scale_high_r_width_max_grid VALUE`,
@@ -320,7 +354,10 @@ Override the calibrated defaults with `--axis_amplitude_min VALUE`,
 switches retain measurements while disabling each decision gate. The run
 summary records every gate's enable state and exact thresholds.
 
-Optional manual adjudication writes fingerprinted overrides separately:
+Optional production adjudication writes fingerprinted overrides separately.
+Use `--adjudication review`; it selects the preserved preliminary rule verdict,
+so automatic survivors remain eligible even though their final decision is
+GOOD:
 
 ```bash
 python scripts/label_modes_fast.py /path/to/shot \
@@ -330,7 +367,8 @@ python scripts/label_modes_fast.py /path/to/shot \
   --reviewer REVIEWER_ID \
   --no-rf
 
-python scripts/sort_shot_rules.py \
+python scripts/sort_shot_mixed.py \
+  --method rules \
   --shot_dir /path/to/shot \
   --out_dir /path/to/rule_sort_output \
   --manual_overrides /path/to/manual_overrides.csv
@@ -357,14 +395,16 @@ never loads or runs a CNN model.
   same OneCycleLR plus gradient-clipping recipe. If a LOSO raw-CNN run
   collapses toward the majority class, try `cnn_raw.py --pos_weight auto` to
   weight missed GOOD modes by `n_bad/n_good` during training.
-- Run `sort_shot_mixed.py` for a mixed TAE/EAE shot when you want one pass that
-  routes EAE-like modes away, combines RF + CNN TAE decisions, and removes
-  close-frequency duplicate TAEs. Raw, straightened, and hybrid CNN checkpoints
-  are supported through the shared CNN inference path. The default fusion
-  policy is still RF-leaning from the four-shot baseline. It has been
-  revalidated with the expanded models, but threshold retuning remains pending
-  because CNN is strongest overall while fusion better protects the sparse
-  NSTX-U G-case regime.
+- Run `sort_shot_mixed.py --method rules` for the canonical production pass:
+  it routes EAE-like modes away, applies the frozen rejection rules, promotes
+  rule survivors under `accept-as-good-v1`, applies manual overrides, and
+  optionally uses RF only for duplicate ranking.
+- Run `sort_shot_mixed.py --method rf-cnn` with both model checkpoints only
+  when the legacy combined RF+CNN decision path is required. Raw,
+  straightened, and hybrid CNN checkpoints are supported through the shared
+  CNN inference path; the legacy default fusion policy remains RF-leaning.
+- Run `sort_shot_rules.py` for conservative deterministic calibration or
+  audit runs where gate survivors must remain REVIEW.
 - Run `sort_shot.py` when you want the older single-model shot sorter and
   duplicate-removal workflow.
 - Use cleaned mode set for further analysis (e.g., NOVA-C, surrogate models)

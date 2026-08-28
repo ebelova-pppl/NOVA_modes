@@ -54,6 +54,7 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
     DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
     DEFAULT_W_CROSS_THRESHOLD,
+    NO_GOOD_TEMPLATE,
     RULESET_VERSION,
     AxisArtifactConfig,
     ContinuumCrossingConfig,
@@ -63,7 +64,10 @@ from tae_rule_engine import (  # noqa: E402
     GridScaleSpikeConfig,
     evaluate_mode,
 )
-from tae_rule_config import load_rule_run_configuration  # noqa: E402
+from tae_rule_config import (  # noqa: E402
+    PRODUCTION_RULE_CONFIG_NAME,
+    load_rule_run_configuration,
+)
 from tae_rule_io import (  # noqa: E402
     ALLOWED_FINAL_DECISIONS,
     MANUAL_OVERRIDE_FIELDS,
@@ -81,6 +85,13 @@ from tae_rule_io import (  # noqa: E402
 SIMILARITY_THRESHOLD = 0.90
 RADIAL_LOCATION_TOLERANCE = 0.10
 RADIAL_WIDTH_TOLERANCE = 0.05
+
+RULE_SURVIVOR_POLICY_REVIEW = "review"
+RULE_SURVIVOR_POLICY_ACCEPT = "accept-as-good-v1"
+RULE_SURVIVOR_POLICIES = {
+    RULE_SURVIVOR_POLICY_REVIEW,
+    RULE_SURVIVOR_POLICY_ACCEPT,
+}
 
 CLUSTER_FIELDS = [
     "ntor",
@@ -100,6 +111,7 @@ CLUSTER_FIELDS = [
 
 SHOT_SUMMARY_FIELDS = [
     "shot",
+    "method",
     "n_total_files",
     "n_invalid",
     "n_tae_like",
@@ -110,6 +122,8 @@ SHOT_SUMMARY_FIELDS = [
     "n_preliminary_review",
     "n_preliminary_good",
     "n_preliminary_invalid",
+    "rule_survivor_policy",
+    "n_rule_survivors_accepted",
     "n_final_bad",
     "n_final_review",
     "n_final_good_before_clustering",
@@ -230,6 +244,39 @@ class ShotRunResult:
     duplicate_result: DuplicateResult
 
 
+def apply_rule_survivor_policy(
+    rows: Sequence[Mapping[str, Any]],
+    policy: str,
+) -> list[dict[str, Any]]:
+    """Apply a workflow decision to modes that passed every BAD gate.
+
+    The underlying rule verdict remains REVIEW/NO_GOOD_TEMPLATE. Production
+    sorting may accept those survivors as final GOOD without presenting that
+    workflow policy as a positive rule-engine decision.
+    """
+    if policy not in RULE_SURVIVOR_POLICIES:
+        allowed = ", ".join(sorted(RULE_SURVIVOR_POLICIES))
+        raise ValueError(f"rule_survivor_policy must be one of: {allowed}")
+
+    output: list[dict[str, Any]] = []
+    for source_row in rows:
+        row = dict(source_row)
+        if row.get("rule_decision") in ALLOWED_FINAL_DECISIONS:
+            row["rule_survivor_policy"] = policy
+            row["rule_survivor_accepted"] = False
+        if (
+            policy == RULE_SURVIVOR_POLICY_ACCEPT
+            and row.get("processing_status") == "RULE_EVALUATED"
+            and row.get("rule_decision") == "REVIEW"
+            and row.get("rule_primary_reason") == NO_GOOD_TEMPLATE
+        ):
+            row["rule_survivor_accepted"] = True
+            row["final_decision"] = "GOOD"
+            row["decision_source"] = "rule_survivor_policy"
+        output.append(row)
+    return output
+
+
 def normalize_manual_decision(value: str) -> str:
     """Normalize a nonempty manual decision to GOOD, BAD, or REVIEW."""
     normalized = value.strip().upper()
@@ -334,6 +381,10 @@ def apply_manual_overrides(
                 "override not applied because mode_key is not unique in the "
                 "current rows or override file"
             )
+            if row.get("rule_survivor_accepted") is True:
+                row["rule_survivor_accepted"] = False
+                row["final_decision"] = "REVIEW"
+                row["decision_source"] = "override_review_required"
             if key not in counted_ambiguous_keys:
                 ambiguous += len(candidates)
                 counted_ambiguous_keys.add(key)
@@ -348,6 +399,10 @@ def apply_manual_overrides(
                 "stored override fingerprint does not match current mode/datcon inputs; "
                 "review this mode again"
             )
+            if row.get("rule_survivor_accepted") is True:
+                row["rule_survivor_accepted"] = False
+                row["final_decision"] = "REVIEW"
+                row["decision_source"] = "override_review_required"
             stale += 1
             output.append(row)
             continue
@@ -371,6 +426,7 @@ def apply_manual_overrides(
                 "override_message": "",
                 "final_decision": decision,
                 "decision_source": "manual_override",
+                "rule_survivor_accepted": False,
             }
         )
         applied += 1
@@ -770,6 +826,7 @@ def build_summary(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
     rule_configuration_sha256: str = "",
@@ -792,6 +849,7 @@ def build_summary(
     final_good_before = sum(row.get("final_decision") == "GOOD" for row in rows)
     summary = {
         "shot": shot,
+        "method": "rules",
         "n_total_files": len(rows),
         "n_invalid": sum(row.get("final_decision") == "INVALID" for row in rows),
         "n_tae_like": sum(row.get("gap_region") == "tae_like" for row in rows),
@@ -805,6 +863,10 @@ def build_summary(
         "n_preliminary_good": sum(row.get("rule_decision") == "GOOD" for row in rule_rows),
         "n_preliminary_invalid": sum(
             row.get("rule_decision") == "INVALID" for row in rule_rows
+        ),
+        "rule_survivor_policy": rule_survivor_policy,
+        "n_rule_survivors_accepted": sum(
+            row.get("rule_survivor_accepted") is True for row in rows
         ),
         "n_final_bad": sum(row.get("final_decision") == "BAD" for row in rows),
         "n_final_review": sum(row.get("final_decision") == "REVIEW" for row in rows),
@@ -887,6 +949,7 @@ def _summary_by_n(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
     rule_configuration_sha256: str = "",
@@ -940,6 +1003,7 @@ def _summary_by_n(
             continuum_crossing_config=continuum_crossing_config,
             continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
+            rule_survivor_policy=rule_survivor_policy,
             rule_configuration_name=rule_configuration_name,
             rule_configuration_schema_version=rule_configuration_schema_version,
             rule_configuration_sha256=rule_configuration_sha256,
@@ -1044,6 +1108,7 @@ def run_shot(
     cross_window_w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN,
     edge_r_min: float = DEFAULT_EDGE_R_MIN,
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
+    rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
     rule_configuration_sha256: str = "",
@@ -1051,6 +1116,9 @@ def run_shot(
     """Run the complete noninteractive deterministic workflow for one shot."""
     if rel_freq_tol <= 0.0 or not math.isfinite(rel_freq_tol):
         raise ValueError("rel_freq_tol must be a finite positive number")
+    if rule_survivor_policy not in RULE_SURVIVOR_POLICIES:
+        allowed = ", ".join(sorted(RULE_SURVIVOR_POLICIES))
+        raise ValueError(f"rule_survivor_policy must be one of: {allowed}")
     axis_config = AxisArtifactConfig(
         r_ax=axis_r_ax,
         axis_amplitude_min=axis_amplitude_min,
@@ -1136,7 +1204,11 @@ def run_shot(
     else:
         overrides = []
         override_digest = ""
-    final_rows, override_audit = apply_manual_overrides(preliminary_rows, overrides)
+    automatic_rows = apply_rule_survivor_policy(
+        preliminary_rows,
+        rule_survivor_policy,
+    )
+    final_rows, override_audit = apply_manual_overrides(automatic_rows, overrides)
     duplicate_result = deduplicate_final_good(
         final_rows,
         rf_model_path=rf_model,
@@ -1162,6 +1234,7 @@ def run_shot(
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
+        rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
         rule_configuration_sha256=rule_configuration_sha256,
@@ -1182,6 +1255,7 @@ def run_shot(
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
+        rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
         rule_configuration_sha256=rule_configuration_sha256,
@@ -1202,6 +1276,36 @@ def run_shot(
         final_rows=tuple(final_rows),
         summary=summary,
         duplicate_result=duplicate_result,
+    )
+
+
+def run_configured_shot(
+    shot_dir: str | Path,
+    out_dir: str | Path,
+    *,
+    rule_config: str | Path = PRODUCTION_RULE_CONFIG_NAME,
+    manual_overrides: str | Path | None = None,
+    rf_model: str | Path | None = None,
+    n_min: int = 1,
+    n_max: int = 10,
+    pattern: str = "egn*",
+    rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
+) -> ShotRunResult:
+    """Run one shot from a strict named rule configuration."""
+    configuration = load_rule_run_configuration(rule_config)
+    return run_shot(
+        shot_dir,
+        out_dir,
+        manual_overrides=manual_overrides,
+        rf_model=rf_model,
+        n_min=n_min,
+        n_max=n_max,
+        pattern=pattern,
+        rule_survivor_policy=rule_survivor_policy,
+        rule_configuration_name=configuration.name,
+        rule_configuration_schema_version=configuration.schema_version,
+        rule_configuration_sha256=configuration.sha256,
+        **configuration.run_kwargs,
     )
 
 

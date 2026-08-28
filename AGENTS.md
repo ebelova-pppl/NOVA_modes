@@ -1,7 +1,12 @@
 # NOVA mode classifier repo
 
 ## Repository expectations
-- Canonical sorter is `scripts/sort_shot_mixed.py` using RF and CNN models.
+- Canonical sorter is `scripts/sort_shot_mixed.py`. Its default
+  `--method rules` path uses the frozen deterministic production rules;
+  `--method rf-cnn` keeps the RF+CNN workflow as an explicit legacy option.
+- `scripts/sort_shot_rules.py` is the conservative deterministic calibration
+  and audit CLI: gate survivors remain `REVIEW` there rather than being
+  promoted to production `GOOD`.
 - Current model pipelines are `scripts/rf_train_classify.py`, `scripts/cnn_raw.py`,
   `scripts/cnn_straightened.py`, and `scripts/cnn_hybrid.py`.
 - Do not hardcode NERSC or Flux absolute paths.

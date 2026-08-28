@@ -31,10 +31,21 @@ from mode_features import (  # noqa: E402
     compute_features_for_mode,
 )
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
-from sort_shot_mixed import classify_gap_region as mixed_classify_gap_region  # noqa: E402
+from sort_shot_mixed import (  # noqa: E402
+    DEFAULT_METHOD,
+    DEFAULT_RULE_CONFIG,
+    RF_CNN_METHOD,
+    RULES_METHOD,
+    classify_gap_region as mixed_classify_gap_region,
+    parse_args as parse_mixed_args,
+    run_rules_method,
+)
 from sort_shot_rules import (  # noqa: E402
     OverrideAudit,
+    RULE_SURVIVOR_POLICY_ACCEPT,
+    RULE_SURVIVOR_POLICY_REVIEW,
     apply_manual_overrides,
+    apply_rule_survivor_policy,
     build_summary,
     deduplicate_final_good,
     load_manual_overrides,
@@ -1715,6 +1726,333 @@ class DuplicateHandlingTests(unittest.TestCase):
         self.assertEqual(
             result.cluster_records[0]["status"], "SKIPPED_RF_SCORING_FAILED"
         )
+
+
+class MixedSorterMethodIntegrationTests(unittest.TestCase):
+    def _common_args(self) -> list[str]:
+        return [
+            "--shot_dir",
+            "/tmp/synthetic_shot",
+            "--out_dir",
+            "/tmp/synthetic_out",
+        ]
+
+    def test_rules_is_default_and_accepts_optional_rf_for_dedup_only(self):
+        args = parse_mixed_args(self._common_args())
+        self.assertEqual(DEFAULT_METHOD, RULES_METHOD)
+        self.assertEqual(args.method, RULES_METHOD)
+        self.assertEqual(args.rule_config, DEFAULT_RULE_CONFIG)
+        self.assertEqual(args.rule_config, PRODUCTION_RULE_CONFIG_NAME)
+        self.assertIsNone(args.rf_model)
+
+        with_rf = parse_mixed_args(
+            [*self._common_args(), "--rf_model", "/tmp/ranker.joblib"]
+        )
+        self.assertEqual(with_rf.method, RULES_METHOD)
+        self.assertEqual(with_rf.rf_model, "/tmp/ranker.joblib")
+
+    def test_method_specific_parser_validation_is_strict(self):
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                parse_mixed_args([*self._common_args(), "--cnn_model", "cnn.pt"])
+            with self.assertRaises(SystemExit):
+                parse_mixed_args([*self._common_args(), "--rel_freq_tol", "0.03"])
+            with self.assertRaises(SystemExit):
+                parse_mixed_args([*self._common_args(), "--method", RF_CNN_METHOD])
+            with self.assertRaises(SystemExit):
+                parse_mixed_args(
+                    [
+                        *self._common_args(),
+                        "--method",
+                        RF_CNN_METHOD,
+                        "--rf_model",
+                        "rf.joblib",
+                    ]
+                )
+
+        legacy = parse_mixed_args(
+            [
+                *self._common_args(),
+                "--method",
+                RF_CNN_METHOD,
+                "--rf_model",
+                "rf.joblib",
+                "--cnn_model",
+                "cnn.pt",
+            ]
+        )
+        self.assertEqual(legacy.method, RF_CNN_METHOD)
+
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                parse_mixed_args(
+                    [
+                        *self._common_args(),
+                        "--method",
+                        RF_CNN_METHOD,
+                        "--rf_model",
+                        "rf.joblib",
+                        "--cnn_model",
+                        "cnn.pt",
+                        "--manual_overrides",
+                        "manual.csv",
+                    ]
+                )
+
+    def test_survivor_policy_preserves_rule_verdict_and_never_promotes_bad(self):
+        review = {
+            "path": "/data/shot/N1/review",
+            "processing_status": "RULE_EVALUATED",
+            "rule_decision": "REVIEW",
+            "rule_primary_reason": NO_GOOD_TEMPLATE,
+            "final_decision": "REVIEW",
+            "decision_source": "rule_engine",
+        }
+        bad = {
+            "path": "/data/shot/N1/bad",
+            "processing_status": "RULE_EVALUATED",
+            "rule_decision": "BAD",
+            "rule_primary_reason": BAD_AXIS_SPIKE,
+            "final_decision": "BAD",
+            "decision_source": "rule_engine",
+        }
+
+        conservative = apply_rule_survivor_policy(
+            [review, bad], RULE_SURVIVOR_POLICY_REVIEW
+        )
+        self.assertEqual(
+            [row["final_decision"] for row in conservative], ["REVIEW", "BAD"]
+        )
+        self.assertFalse(conservative[0]["rule_survivor_accepted"])
+
+        production = apply_rule_survivor_policy(
+            [review, bad], RULE_SURVIVOR_POLICY_ACCEPT
+        )
+        self.assertEqual(production[0]["rule_decision"], "REVIEW")
+        self.assertEqual(production[0]["rule_primary_reason"], NO_GOOD_TEMPLATE)
+        self.assertEqual(production[0]["final_decision"], "GOOD")
+        self.assertEqual(production[0]["decision_source"], "rule_survivor_policy")
+        self.assertTrue(production[0]["rule_survivor_accepted"])
+        self.assertEqual(production[1]["rule_decision"], "BAD")
+        self.assertEqual(production[1]["final_decision"], "BAD")
+        self.assertFalse(production[1]["rule_survivor_accepted"])
+
+    def test_rules_method_promotes_survivors_writes_good_lists_and_is_stable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(
+                root,
+                names=("egn01w.low", "egn01w.high"),
+            )
+            out_dir = root / "out"
+            args = parse_mixed_args(
+                ["--shot_dir", str(shot), "--out_dir", str(out_dir)]
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                first = run_rules_method(args)
+
+            preliminary = [
+                row for row in first.preliminary_rows if row.get("rule_version")
+            ]
+            self.assertEqual(len(preliminary), 2)
+            self.assertTrue(
+                all(row["rule_decision"] == "REVIEW" for row in preliminary)
+            )
+            self.assertTrue(
+                all(row["rule_primary_reason"] == NO_GOOD_TEMPLATE for row in preliminary)
+            )
+            self.assertTrue(
+                all(row["final_decision"] == "REVIEW" for row in preliminary)
+            )
+
+            final = [row for row in first.final_rows if row.get("rule_version")]
+            self.assertEqual(len(final), 2)
+            self.assertTrue(all(row["rule_decision"] == "REVIEW" for row in final))
+            self.assertTrue(all(row["final_decision"] == "GOOD" for row in final))
+            self.assertTrue(all(row["rule_survivor_accepted"] is True for row in final))
+            self.assertTrue(all(row["selected_final"] is True for row in final))
+            self.assertEqual(
+                first.summary["rule_survivor_policy"],
+                RULE_SURVIVOR_POLICY_ACCEPT,
+            )
+            self.assertEqual(first.summary["method"], RULES_METHOD)
+            self.assertEqual(first.summary["n_rule_survivors_accepted"], 2)
+            self.assertEqual(first.summary["n_preliminary_review"], 2)
+            self.assertEqual(first.summary["n_final_review"], 0)
+            self.assertEqual(first.summary["n_final_good_before_clustering"], 2)
+            self.assertEqual(first.summary["n_final_good"], 2)
+            self.assertEqual(
+                first.summary["duplicate_processing_status"],
+                "SKIPPED_NO_RF_CHECKPOINT",
+            )
+            self.assertFalse(first.summary["continuum_crossing_gate_enabled"])
+
+            _fields, good_unchecked = read_dict_csv(
+                out_dir / "good_tae_unchecked.csv"
+            )
+            _fields, good_final = read_dict_csv(out_dir / "good_tae_final.csv")
+            _fields, review_rows = read_dict_csv(out_dir / "review_tae_like.csv")
+            _fields, clusters = read_dict_csv(out_dir / "frequency_clusters.csv")
+            self.assertEqual(len(good_unchecked), 2)
+            self.assertEqual(len(good_final), 2)
+            self.assertEqual(review_rows, [])
+            self.assertEqual(len(clusters), 2)
+            self.assertEqual(
+                {row["cluster_status"] for row in clusters},
+                {"SKIPPED_NO_RF_CHECKPOINT"},
+            )
+            self.assertEqual(
+                {row["action"] for row in clusters},
+                {"KEEP"},
+            )
+
+            before = {
+                path.name: path.read_bytes() for path in sorted(out_dir.iterdir())
+            }
+            with contextlib.redirect_stdout(io.StringIO()):
+                second = run_rules_method(args)
+            after = {
+                path.name: path.read_bytes() for path in sorted(out_dir.iterdir())
+            }
+            self.assertEqual(first.summary, second.summary)
+            self.assertEqual(before, after)
+
+    def test_rules_method_does_not_promote_gate_rejection(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = np.zeros((4, 101), dtype=float)
+            mode[2, 1] = 1.0
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=101,
+                mode=mode,
+            )
+            write_datcon(shot / "N1" / "datcon1", nr=101)
+            args = parse_mixed_args(
+                [
+                    "--method",
+                    RULES_METHOD,
+                    "--shot_dir",
+                    str(shot),
+                    "--out_dir",
+                    str(root / "out"),
+                ]
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = run_rules_method(args)
+
+            row = next(row for row in result.final_rows if row.get("rule_version"))
+            self.assertEqual(row["rule_decision"], "BAD")
+            self.assertEqual(row["rule_primary_reason"], BAD_AXIS_SPIKE)
+            self.assertEqual(row["final_decision"], "BAD")
+            self.assertFalse(row["rule_survivor_accepted"])
+            self.assertEqual(result.summary["n_rule_survivors_accepted"], 0)
+            self.assertEqual(result.summary["n_final_good"], 0)
+            _fields, bad_rows = read_dict_csv(root / "out" / "bad_tae_like.csv")
+            _fields, good_rows = read_dict_csv(
+                root / "out" / "good_tae_unchecked.csv"
+            )
+            self.assertEqual(len(bad_rows), 1)
+            self.assertEqual(good_rows, [])
+
+    def test_manual_override_can_demote_an_accepted_rule_survivor(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            initial_args = parse_mixed_args(
+                [
+                    "--shot_dir",
+                    str(shot),
+                    "--out_dir",
+                    str(root / "initial"),
+                ]
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                initial = run_rules_method(initial_args)
+            accepted = next(
+                row for row in initial.final_rows if row.get("rule_version")
+            )
+            self.assertEqual(accepted["rule_decision"], "REVIEW")
+            self.assertEqual(accepted["final_decision"], "GOOD")
+
+            override_path = root / "manual.csv"
+            write_dict_csv(
+                override_path,
+                MANUAL_OVERRIDE_FIELDS,
+                [override_row(accepted, decision="BAD")],
+            )
+            final_args = parse_mixed_args(
+                [
+                    "--shot_dir",
+                    str(shot),
+                    "--out_dir",
+                    str(root / "final"),
+                    "--manual_overrides",
+                    str(override_path),
+                ]
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = run_rules_method(final_args)
+
+            row = next(row for row in result.final_rows if row.get("rule_version"))
+            self.assertEqual(row["rule_decision"], "REVIEW")
+            self.assertFalse(row["rule_survivor_accepted"])
+            self.assertEqual(row["final_decision"], "BAD")
+            self.assertEqual(row["decision_source"], "manual_override")
+            self.assertEqual(row["override_status"], "APPLIED")
+            self.assertEqual(result.summary["n_overrides_applied"], 1)
+            self.assertEqual(
+                json.loads(result.summary["transition_counts_json"]),
+                {"REVIEW->BAD": 1},
+            )
+            self.assertEqual(result.summary["n_final_good"], 0)
+
+    def test_stale_override_blocks_automatic_survivor_acceptance(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            initial_args = parse_mixed_args(
+                [
+                    "--shot_dir",
+                    str(shot),
+                    "--out_dir",
+                    str(root / "initial"),
+                ]
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                initial = run_rules_method(initial_args)
+            accepted = next(
+                row for row in initial.final_rows if row.get("rule_version")
+            )
+
+            stale = override_row(accepted, decision="BAD")
+            stale["input_fingerprint"] = "0" * 64
+            override_path = root / "stale.csv"
+            write_dict_csv(override_path, MANUAL_OVERRIDE_FIELDS, [stale])
+            final_args = parse_mixed_args(
+                [
+                    "--shot_dir",
+                    str(shot),
+                    "--out_dir",
+                    str(root / "final"),
+                    "--manual_overrides",
+                    str(override_path),
+                ]
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = run_rules_method(final_args)
+
+            row = next(row for row in result.final_rows if row.get("rule_version"))
+            self.assertEqual(row["rule_decision"], "REVIEW")
+            self.assertEqual(row["final_decision"], "REVIEW")
+            self.assertFalse(row["rule_survivor_accepted"])
+            self.assertEqual(row["decision_source"], "override_review_required")
+            self.assertEqual(row["override_status"], "STALE_FINGERPRINT")
+            self.assertEqual(result.summary["n_stale_overrides"], 1)
+            self.assertEqual(result.summary["n_final_good"], 0)
 
 
 class WorkflowOutputTests(unittest.TestCase):
