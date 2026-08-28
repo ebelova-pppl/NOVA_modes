@@ -63,6 +63,7 @@ from tae_rule_engine import (  # noqa: E402
     GridScaleSpikeConfig,
     evaluate_mode,
 )
+from tae_rule_config import load_rule_run_configuration  # noqa: E402
 from tae_rule_io import (  # noqa: E402
     ALLOWED_FINAL_DECISIONS,
     MANUAL_OVERRIDE_FIELDS,
@@ -128,6 +129,9 @@ SHOT_SUMMARY_FIELDS = [
     "manual_override_sha256",
     "primary_reason_counts_json",
     "rule_set_version",
+    "rule_configuration_name",
+    "rule_configuration_schema_version",
+    "rule_configuration_sha256",
     "fraction_tae_threshold",
     "fraction_eae_threshold",
     "signed_delta_eae_threshold",
@@ -163,6 +167,39 @@ SHOT_SUMMARY_FIELDS = [
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[field for field in SHOT_SUMMARY_FIELDS if field != "shot"]]
+
+RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
+    {
+        "--rel_freq_tol",
+        "--fraction_tae_threshold",
+        "--fraction_eae_threshold",
+        "--signed_delta_eae_threshold",
+        "--axis_r_ax",
+        "--axis_amplitude_min",
+        "--axis_width_max_grid",
+        "--disable_axis_artifact",
+        "--grid_scale_amplitude_min",
+        "--grid_scale_width_max_grid",
+        "--grid_scale_high_r_cutoff_r",
+        "--grid_scale_high_r_width_max_grid",
+        "--disable_grid_scale_spike",
+        "--grid_scale_packet_amplitude_min",
+        "--grid_scale_packet_step_min",
+        "--grid_scale_packet_min_large_turns",
+        "--grid_scale_packet_window_span_grid",
+        "--grid_scale_packet_peak_r_max",
+        "--disable_grid_scale_packet",
+        "--w_cross_threshold",
+        "--disable_cont_cross",
+        "--cross_window_half_width_grid",
+        "--cross_window_amplitude_min",
+        "--cross_window_w_min",
+        "--disable_cont_cross_window",
+        "--edge_r_min",
+        "--edge_width_max_grid",
+        "--disable_edge_artifact",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -733,6 +770,9 @@ def build_summary(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    rule_configuration_name: str = "",
+    rule_configuration_schema_version: str = "",
+    rule_configuration_sha256: str = "",
 ) -> dict[str, Any]:
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
@@ -785,6 +825,9 @@ def build_summary(
         "manual_override_sha256": override_sha256,
         "primary_reason_counts_json": stable_json(_primary_reason_counts(rows)),
         "rule_set_version": RULESET_VERSION,
+        "rule_configuration_name": rule_configuration_name,
+        "rule_configuration_schema_version": rule_configuration_schema_version,
+        "rule_configuration_sha256": rule_configuration_sha256,
         "fraction_tae_threshold": fraction_tae_threshold,
         "fraction_eae_threshold": fraction_eae_threshold,
         "signed_delta_eae_threshold": signed_delta_eae_threshold,
@@ -844,6 +887,9 @@ def _summary_by_n(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    rule_configuration_name: str = "",
+    rule_configuration_schema_version: str = "",
+    rule_configuration_sha256: str = "",
 ) -> list[dict[str, Any]]:
     by_n: dict[int, list[Mapping[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -894,6 +940,9 @@ def _summary_by_n(
             continuum_crossing_config=continuum_crossing_config,
             continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
+            rule_configuration_name=rule_configuration_name,
+            rule_configuration_schema_version=rule_configuration_schema_version,
+            rule_configuration_sha256=rule_configuration_sha256,
         )
         summaries.append({"shot": shot, "n": ntor, **summary})
     return summaries
@@ -995,6 +1044,9 @@ def run_shot(
     cross_window_w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN,
     edge_r_min: float = DEFAULT_EDGE_R_MIN,
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
+    rule_configuration_name: str = "",
+    rule_configuration_schema_version: str = "",
+    rule_configuration_sha256: str = "",
 ) -> ShotRunResult:
     """Run the complete noninteractive deterministic workflow for one shot."""
     if rel_freq_tol <= 0.0 or not math.isfinite(rel_freq_tol):
@@ -1110,6 +1162,9 @@ def run_shot(
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
+        rule_configuration_name=rule_configuration_name,
+        rule_configuration_schema_version=rule_configuration_schema_version,
+        rule_configuration_sha256=rule_configuration_sha256,
     )
     summary_by_n = _summary_by_n(
         final_rows,
@@ -1127,6 +1182,9 @@ def run_shot(
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
+        rule_configuration_name=rule_configuration_name,
+        rule_configuration_schema_version=rule_configuration_schema_version,
+        rule_configuration_sha256=rule_configuration_sha256,
     )
     write_outputs(
         out_dir=output_dir,
@@ -1147,7 +1205,18 @@ def run_shot(
     )
 
 
-def parse_args() -> argparse.Namespace:
+def _explicit_rule_config_overrides(argv: Sequence[str]) -> list[str]:
+    """Return config-owned CLI options explicitly supplied by the caller."""
+    supplied = {
+        token.split("=", 1)[0]
+        for token in argv
+        if token.startswith("--")
+    }
+    return sorted(supplied & RULE_CONFIG_OVERRIDE_OPTIONS)
+
+
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    raw_args = list(sys.argv[1:] if argv is None else argv)
     parser = argparse.ArgumentParser(
         description=(
             "Preprocess and deterministically rule-sort one NOVA shot. RF is "
@@ -1156,6 +1225,14 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--shot_dir", required=True, help="Shot containing N1, N2, ...")
     parser.add_argument("--out_dir", required=True, help="Output directory")
+    parser.add_argument(
+        "--rule_config",
+        help=(
+            "Frozen rule-run configuration name under configs/rules, or an "
+            "explicit JSON-compatible YAML path. Config-owned threshold and "
+            "gate flags cannot be combined with this option."
+        ),
+    )
     parser.add_argument(
         "--manual_overrides",
         help="Reusable manual_overrides.csv to validate and apply",
@@ -1397,7 +1474,27 @@ def parse_args() -> argparse.Namespace:
             "the BAD_EDGE_SPIKE decision gate"
         ),
     )
-    return parser.parse_args()
+    args = parser.parse_args(raw_args)
+    args.rule_configuration_name = ""
+    args.rule_configuration_schema_version = ""
+    args.rule_configuration_sha256 = ""
+    if args.rule_config:
+        conflicts = _explicit_rule_config_overrides(raw_args)
+        if conflicts:
+            parser.error(
+                "--rule_config freezes its gate and threshold values; remove "
+                "these conflicting options: " + ", ".join(conflicts)
+            )
+        try:
+            configuration = load_rule_run_configuration(args.rule_config)
+        except ValueError as exc:
+            parser.error(str(exc))
+        for key, value in configuration.run_kwargs.items():
+            setattr(args, key, value)
+        args.rule_configuration_name = configuration.name
+        args.rule_configuration_schema_version = configuration.schema_version
+        args.rule_configuration_sha256 = configuration.sha256
+    return args
 
 
 def main() -> None:
@@ -1460,6 +1557,11 @@ def main() -> None:
         edge_width_max_grid=(
             None if args.disable_edge_artifact else args.edge_width_max_grid
         ),
+        rule_configuration_name=args.rule_configuration_name,
+        rule_configuration_schema_version=(
+            args.rule_configuration_schema_version
+        ),
+        rule_configuration_sha256=args.rule_configuration_sha256,
     )
     summary = result.summary
     print(f"Shot: {summary['shot']}")
@@ -1475,6 +1577,13 @@ def main() -> None:
         f"GOOD before clustering={summary['n_final_good_before_clustering']} "
         f"GOOD final={summary['n_final_good']}"
     )
+    if summary["rule_configuration_name"]:
+        print(
+            "Rule configuration: "
+            f"{summary['rule_configuration_name']} "
+            f"schema={summary['rule_configuration_schema_version']} "
+            f"sha256={summary['rule_configuration_sha256']}"
+        )
     print(
         "Axis artifact gate: "
         f"enabled={summary['axis_artifact_gate_enabled']} "

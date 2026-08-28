@@ -1,4 +1,6 @@
 import csv
+import contextlib
+import io
 import json
 import os
 import subprocess
@@ -36,7 +38,13 @@ from sort_shot_rules import (  # noqa: E402
     build_summary,
     deduplicate_final_good,
     load_manual_overrides,
+    parse_args,
     run_shot,
+)
+from tae_rule_config import (  # noqa: E402
+    PRODUCTION_RULE_CONFIG_NAME,
+    RULE_CONFIG_SCHEMA_VERSION,
+    load_rule_run_configuration,
 )
 from tae_rule_engine import (  # noqa: E402
     BAD_AXIS_SPIKE,
@@ -52,6 +60,7 @@ from tae_rule_engine import (  # noqa: E402
     RULE_FEATURE_NAMES,
     RULE_FEATURE_SCHEMA_VERSION,
     RULE_FEATURE_SOURCE_SCHEMA_VERSION,
+    RULESET_VERSION,
     AxisArtifactConfig,
     ContinuumCrossingConfig,
     ContinuumCrossingWindowConfig,
@@ -1709,6 +1718,97 @@ class DuplicateHandlingTests(unittest.TestCase):
 
 
 class WorkflowOutputTests(unittest.TestCase):
+    def test_named_production_configuration_is_frozen_and_audited(self):
+        configuration = load_rule_run_configuration(PRODUCTION_RULE_CONFIG_NAME)
+        self.assertEqual(configuration.name, "tae_rules_production_v1")
+        self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
+        self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
+        self.assertEqual(
+            configuration.sha256,
+            "a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39",
+        )
+        self.assertEqual(
+            dict(configuration.run_kwargs),
+            {
+                "fraction_tae_threshold": 0.5,
+                "fraction_eae_threshold": 0.4,
+                "signed_delta_eae_threshold": -0.1,
+                "rel_freq_tol": 0.02,
+                "axis_r_ax": 0.03,
+                "axis_amplitude_min": 0.2,
+                "axis_width_max_grid": 10.0,
+                "grid_scale_amplitude_min": 0.3,
+                "grid_scale_width_max_grid": 1.0,
+                "grid_scale_high_r_cutoff_r": 0.7,
+                "grid_scale_high_r_width_max_grid": 0.75,
+                "grid_scale_packet_amplitude_min": 0.3,
+                "grid_scale_packet_step_min": 0.2,
+                "grid_scale_packet_min_large_turns": 3,
+                "grid_scale_packet_window_span_grid": 4,
+                "grid_scale_packet_peak_r_max": 0.5,
+                "w_cross_threshold": None,
+                "cross_window_half_width_grid": 2,
+                "cross_window_amplitude_min": 0.25,
+                "cross_window_w_min": 0.05,
+                "edge_r_min": 0.97,
+                "edge_width_max_grid": 10.0,
+            },
+        )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            result = run_shot(
+                shot,
+                root / "out",
+                **configuration.run_kwargs,
+                rule_configuration_name=configuration.name,
+                rule_configuration_schema_version=configuration.schema_version,
+                rule_configuration_sha256=configuration.sha256,
+            )
+
+        self.assertEqual(
+            result.summary["rule_configuration_name"], configuration.name
+        )
+        self.assertEqual(
+            result.summary["rule_configuration_schema_version"],
+            configuration.schema_version,
+        )
+        self.assertEqual(
+            result.summary["rule_configuration_sha256"], configuration.sha256
+        )
+        self.assertTrue(result.summary["axis_artifact_gate_enabled"])
+        self.assertTrue(result.summary["grid_scale_spike_gate_enabled"])
+        self.assertTrue(result.summary["grid_scale_packet_gate_enabled"])
+        self.assertFalse(result.summary["continuum_crossing_gate_enabled"])
+        self.assertIsNone(result.summary["continuum_crossing_w_threshold"])
+        self.assertTrue(
+            result.summary["continuum_crossing_window_gate_enabled"]
+        )
+        self.assertTrue(result.summary["edge_artifact_gate_enabled"])
+
+        with tempfile.TemporaryDirectory() as temporary:
+            modified = Path(temporary) / "modified.yaml"
+            modified.write_text(configuration.source_path.read_text() + "\n")
+            with self.assertRaisesRegex(ValueError, "frozen configuration"):
+                load_rule_run_configuration(modified)
+
+    def test_named_configuration_rejects_cli_threshold_overrides(self):
+        common = [
+            "--shot_dir",
+            "/tmp/shot",
+            "--out_dir",
+            "/tmp/out",
+            "--rule_config",
+            PRODUCTION_RULE_CONFIG_NAME,
+        ]
+        args = parse_args(common)
+        self.assertEqual(args.rule_configuration_name, PRODUCTION_RULE_CONFIG_NAME)
+        self.assertIsNone(args.w_cross_threshold)
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                parse_args([*common, "--cross_window_w_min", "0.1"])
+
     def test_complete_output_contract_summary_counts_and_idempotence(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

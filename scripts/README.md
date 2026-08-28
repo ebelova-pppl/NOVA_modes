@@ -1013,7 +1013,35 @@ This noninteractive one-shot workflow preserves the canonical
 close-frequency structural-similarity conventions while replacing RF/CNN
 classification with versioned deterministic rules.
 
-Run the complete workflow with:
+For production runs, select the frozen configuration explicitly:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rule_sort_output \
+  --rule_config tae_rules_production_v1
+```
+
+The version-controlled configuration is
+`configs/rules/tae_rules_production_v1.yaml`, stored as strict
+JSON-compatible YAML so loading requires no additional package. It pins the
+current v14 ruleset, routing thresholds, relative-frequency tolerance, all
+gate thresholds, and these gate states:
+
+- enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
+  (`BAD_GRID_SCALE_PACKET`), 4 (`BAD_CONT_CROSS_WINDOW`), and 5
+  (`BAD_EDGE_SPIKE`);
+- disabled: gate 3 (`BAD_CONT_CROSS`), while retaining its frozen latent
+  threshold `W_star_max > 0.03` for possible future comparison.
+
+The sorter refuses config-owned CLI threshold or gate flags together with
+`--rule_config`, preventing a modified run from retaining the production-v1
+identity. `shot_summary.csv`, `shot_summary_wide.csv`, and
+`shot_summary_by_n.csv` record `rule_configuration_name`,
+`rule_configuration_schema_version`, and `rule_configuration_sha256`.
+
+For rule development and threshold experiments, run the configurable workflow
+without a named configuration:
 
 ```bash
 python scripts/sort_shot_rules.py \

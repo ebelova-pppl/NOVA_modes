@@ -11,6 +11,24 @@ ranking as separate stages.
 
 ## Run the deterministic workflow
 
+For production sorting, use the immutable named preset:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/SHOT \
+  --out_dir /path/to/sort-output \
+  --rule_config tae_rules_production_v1
+```
+
+The preset is `configs/rules/tae_rules_production_v1.yaml`. It pins the v14
+ruleset and routing values, enables gates 1, 2, 2b, 4, and 5, and explicitly
+disables exact-point continuum gate 3. Do not combine a named configuration
+with config-owned threshold or gate flags; the CLI rejects such overrides.
+Confirm the configuration name, schema version, and SHA-256 in the shot and
+per-`n` summaries.
+
+For calibration or feature-only work, use the configurable interface:
+
 ```bash
 python scripts/sort_shot_rules.py \
   --shot_dir /path/to/SHOT \

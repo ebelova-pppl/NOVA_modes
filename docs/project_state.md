@@ -3,6 +3,38 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-08-27 froze `tae_rules_production_v1`
+
+- Added the executable named configuration
+  `configs/rules/tae_rules_production_v1.yaml`, using schema
+  `tae-rule-run-config-v1` and pinning ruleset
+  `tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-v14`.
+  Its SHA-256 is
+  `a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39`.
+- The preset freezes the TAE/EAE routing thresholds and relative-frequency
+  tolerance along with every rule threshold. Gates 1, 2, 2b, 4, and 5 are
+  enabled. Exact-point continuum gate 3 is explicitly disabled, while its
+  latent comparison threshold remains recorded as `W_star_max > 0.03` in the
+  configuration.
+- Production invocation is
+  `python scripts/sort_shot_rules.py --shot_dir SHOT --out_dir OUT --rule_config tae_rules_production_v1`.
+  The CLI rejects any config-owned threshold or gate option in the same run,
+  so an altered run cannot retain the production-v1 identity. Omitting
+  `--rule_config` retains the prior configurable interface for calibration.
+- Added strict configuration loading without a new package dependency: the
+  `.yaml` file is JSON-compatible YAML and is parsed with the Python standard
+  library. The loader validates the complete schema and pinned ruleset, then
+  reuses the existing rule dataclasses for numerical threshold validation.
+- Shot-wide and per-`n` deterministic summaries now record
+  `rule_configuration_name`, `rule_configuration_schema_version`, and
+  `rule_configuration_sha256`. Focused tests lock the complete production
+  value set, verify gate 3 is disabled, and verify CLI overrides are rejected.
+- Validation completed with all 96 repository tests passing. A production-preset
+  smoke run on the local `data/nstxu_204202` sample completed successfully,
+  wrote the expected configuration identity into its summaries, and matched
+  the prior calibrated output for all 68 mode keys shared with the comparison
+  run.
+
 ## 2026-08-27 Q62 suspended pending upper-boundary correction
 
 - The user visually inspected every upper-continuum crossing for all current
@@ -28,6 +60,19 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   this suspension on an older list that included Q62; they must not be
   described as Q62-free models and should be retrained later from the active
   14-shot list.
+- Filtering the current synchronized v14 rule audit to those 14 shots gives
+  2,389 evaluable labels plus the known invalid K51 mode. With every active
+  gate except exact-point continuum gate 3 enabled, the rules reject
+  1,773/1,813 evaluated BAD modes (97.79%), retain 547/576 GOOD modes as
+  REVIEW (94.97%), and agree with 2,320/2,389 evaluated labels (97.11%). The
+  69 disagreements are 40 BAD-retained and 29 GOOD-rejected modes.
+- The seven non-G shots reject 879/899 BAD (97.78%) and retain 483/505 GOOD
+  (95.64%), for 97.01% agreement and 96.02% GOOD precision among retained
+  modes. The seven remaining G shots reject 894/914 evaluated BAD (97.81%)
+  and retain 64/71 GOOD (90.14%), for 97.26% agreement and 76.19% retained-set
+  GOOD precision. The G/non-G difference is therefore not BAD recall; it is
+  lower G-shot GOOD retention and substantially more BAD contamination
+  relative to the much smaller retained-GOOD population.
 - This is an explicit non-blind scientific data-quality exclusion based on
   the user's complete visual audit, not a classifier-performance decision.
 

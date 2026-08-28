@@ -231,8 +231,24 @@ developing or retraining models, not for routine sorting.
 
 ## Deterministic TAE rule-sorting scaffold
 
+For production rule sorting, use the frozen named configuration:
+
+```bash
+python scripts/sort_shot_rules.py \
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rule_sort_output \
+  --rule_config tae_rules_production_v1
+```
+
+`configs/rules/tae_rules_production_v1.yaml` pins the routing values, ruleset,
+gate enable states, and thresholds validated on the 14 active shots. Gates 1,
+2, 2b, 4, and 5 are enabled; exact-point continuum gate 3 is explicitly
+disabled. The sorter records the configuration name, schema, and SHA-256 in
+all shot and per-`n` summaries and rejects threshold/gate overrides when the
+named configuration is selected.
+
 For auditable rule development without RF/CNN classification, process one shot
-with:
+with the configurable interface:
 
 ```bash
 python scripts/sort_shot_rules.py \
@@ -240,7 +256,7 @@ python scripts/sort_shot_rules.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-This path reuses the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
+Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
 routing conventions. Six ordered BAD decisions currently reject a calibrated
 narrow local maximum at `r <= 0.03` (`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), a short packet containing repeated large
