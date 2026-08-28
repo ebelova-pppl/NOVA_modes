@@ -1,7 +1,66 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-26)
+### Project state (current snapshot, updated 2026-08-27)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-08-27 Q62 suspended pending upper-boundary correction
+
+- The user visually inspected every upper-continuum crossing for all current
+  Q62 TAE-side modes. Only the `n=3` modes show resonance-like structure at
+  the upper crossing. Modes at every other `n` appear insensitive to that
+  crossing, while their lower-boundary crossings retain the usual response.
+  This whole-shot, boundary-specific inconsistency is now treated as evidence
+  of an error in the Q62 upper gap-boundary calculation.
+- Suspended Q62 from active model training and future aggregate rule/model
+  evaluation until the continuum calculation is corrected and the shot is
+  rechecked. The canonical `training_labels/tae_like_train.csv` now excludes
+  exactly the 249 Q62 rows and contains 2,390 unique rows across 14 shots:
+  576 GOOD and 1,814 BAD. Its SHA-256 is
+  `ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d`.
+- Preserved `training_labels/tae_like_v3.csv` unchanged as the complete
+  reviewed 15-shot snapshot: 2,639 rows, including the 16 GOOD / 233 BAD Q62
+  labels. The Q62 human reviews, crossing audits, and sorter outputs also
+  remain unchanged for provenance. Suspension does not relabel or delete
+  those modes.
+- NERSC and Flux configurations continue to point to
+  `training_labels/tae_like_train.csv`, so new training and LOSO runs exclude
+  Q62 automatically. Existing RF and CNN checkpoints were trained before
+  this suspension on an older list that included Q62; they must not be
+  described as Q62-free models and should be retrained later from the active
+  14-shot list.
+- This is an explicit non-blind scientific data-quality exclusion based on
+  the user's complete visual audit, not a classifier-performance decision.
+
+## 2026-08-27 Q62 upper/lower continuum-crossing audit
+
+- Confirmed that the current Q62 TAE-side sorter manifest is complete: 249
+  modes (219 strict TAE-like and 30 mixed). Of these, 232 cross the upper
+  continuum boundary, 99 cross the lower boundary, and 17 are lower-only.
+- Added a non-blind, boundary-specific diagnostic audit under
+  `outputs/v3_relabels_gate3_off_packet_turns3_rle05/nstxuG121123Q62/`:
+  `q62_all_tae_modes_crossing_audit.csv` is the viewer-ready 249-mode list,
+  `q62_crossing_records_detailed.csv` contains all 865 individual crossings,
+  and `q62_upper_crossing_modes_ranked.csv` ranks all 232 upper-crossing modes
+  by local signed-harmonic variation.
+- Across all crossings, the median local signed-amplitude neighbor RMS is
+  0.0691 at the upper boundary and 0.1832 at the lower boundary. The
+  asymmetry is stronger after only gates 1 and 2 are excluded: for the 100
+  upper-crossing and 60 lower-crossing survivors, the per-crossing medians are
+  0.0323 and 0.1634, respectively; the upper/lower 90th percentiles are 0.2637
+  and 0.9839.
+- Visually inspected crossing-overlay plots for all 28 gate-1/2-surviving
+  modes with upper-boundary RMS at least 0.25. None is a convincing clean,
+  isolated upper-crossing resonance: the apparent exceptions are broad mode
+  lobes, edge-localized structure, or unresolved oscillatory packets already
+  present across a wider radial interval. This supports a systematic Q62
+  upper-boundary issue, but does not by itself prove that the `datcon` upper
+  boundary is wrong.
+- A literal morphology claim for all 249 modes is not possible: 138 modes
+  already fail gate 1 or 2, and their axis/grid-scale artifacts can obscure
+  crossing behavior. The complete list and detailed records preserve those
+  modes for follow-up. This audit was explicitly non-blind because labels and
+  rule results were already exposed; it did not change labels or production
+  rules.
 
 ## 2026-08-26 Q62 v3 deterministic review lists
 
@@ -36,15 +95,20 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
       `.../nova2/data/...` prefix; those results must be rerun before being
       interpreted against v3
 - Active version-controlled training list:
-    - canonical active copy: `training_labels/tae_like_train.csv`
-    - versioned source: `training_labels/tae_like_v3.csv`
-    - the two files are byte-identical
-    - 2639 labeled TAE-like modes: 592 `good`, 2047 `bad`
-    - complete rebuilt-database audit covering all 15 training shots
+    - canonical active list: `training_labels/tae_like_train.csv`
+    - derived from the preserved `training_labels/tae_like_v3.csv` snapshot
+      by excluding all 249 Q62 rows
+    - 2390 labeled TAE-like modes: 576 `good`, 1814 `bad`
+    - 14 active training shots; Q62 is suspended pending correction of its
+      upper continuum boundary
     - `configs/paths/nova_paths.nersc.sh`,
       `configs/paths/nova_paths.flux.sh`, and
       `configs/paths/nova_paths.flux.csh` point `NOVA_TRAIN_CSV` /
       `NOVA_TRAIN_CSV_TAE` at this list
+- Preserved complete v3 snapshot:
+    - `training_labels/tae_like_v3.csv`
+    - 2639 labeled modes across all 15 reviewed shots: 592 `good`, 2047 `bad`
+    - retains 249 suspended Q62 rows for provenance and later re-review
 - Preserved pre-v3 list:
     - `training_labels/tae_like_v2_nonG.csv`
     - 2900 labeled TAE-like modes: 593 `good`, 2307 `bad`

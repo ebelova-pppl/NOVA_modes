@@ -6,7 +6,7 @@ training, splitting, and auditing classifier datasets.
 Paths in active training CSVs should be stored relative to `$NOVA_DATA`, for
 example `nstx_120113/N5/egn05w.1234E+02`.
 
-## Active rebuilt-database list
+## Preserved rebuilt-database label snapshot
 
 ### `tae_like_v3.csv`
 
@@ -35,8 +35,8 @@ recalculated `nstx_141711` and K51 shots:
 
 The list has 2,639 rows: 592 `good` and 2,047 `bad`. The original six-shot
 block retains its paths, ordering, and split scalars from
-`tae_like_v2_nonG.csv`; the active validity labels include the later visual
-review corrections described below. Thirty stale family fields inherited
+`tae_like_v2_nonG.csv`; the validity labels include the later visual review
+corrections described below. Thirty stale family fields inherited
 from v2 were normalized without changing validity: 23 `bad,tae` rows became
 `bad,none`, and 7 `good,none` rows became `good,tae`.
 
@@ -117,8 +117,11 @@ shots, the transferred `nstxu_204202` subset, and the fully reviewed
 `nstx_141711` and K51 shots, unique relative paths, allowed labels, no `skip`
 or error rows, consistent family/validity values, and 2,639 mode files
 resolving under `/p/hym/ebelova/NOVA/data_mixed`. This is the complete rebuilt
-15-shot label set, including all audited G shots. The active
-`tae_like_train.csv` is an exact copy of this versioned source.
+15-shot label set, including all audited G shots. It remains the preserved
+reviewed source snapshot. Q62 is suspended from active training because its
+upper continuum boundary is now considered suspect; its rows remain here for
+provenance and possible reinstatement after the continuum calculation is
+corrected and reviewed.
 
 The exact-label transfer component for `nstxu_204202` is retained in
 `tests/labels_audit/continuum_refresh_2026_08_23/nstxu_204202_transferred_labels.csv`.
@@ -132,11 +135,17 @@ and must not be restored to the active training set.
 ### `tae_like_train.csv`
 
 Canonical/default TAE-like good/bad training list for RF and CNN training. It
-is an exact byte-for-byte copy of `tae_like_v3.csv`, with 2,639 rows: 592
-`good` and 2,047 `bad`. NERSC and Flux path configs set both
-`NOVA_TRAIN_CSV` and `NOVA_TRAIN_CSV_TAE` to this file. The source and active
-copy have SHA-256
-`c690fe038501c8f2b4f0ae05cee28ea2bccbbd2958e6abfe8adb854f27889492`.
+is derived from `tae_like_v3.csv` by excluding all 249
+`nstxuG121123Q62` rows. It has 2,390 rows across 14 shots: 576 `good` and
+1,814 `bad`. NERSC and Flux path configs set both `NOVA_TRAIN_CSV` and
+`NOVA_TRAIN_CSV_TAE` to this file. Its SHA-256 is
+`ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d`.
+
+The complete reviewed v3 snapshot is unchanged at 2,639 rows and retains the
+16 GOOD / 233 BAD Q62 labels. Do not restore those rows to the active list
+until the upper continuum-boundary calculation is corrected and the shot is
+rechecked. Existing RF and CNN checkpoints predate this suspension and are not
+Q62-free models.
 
 The pre-promotion 2,903-row contents of this filename remain recoverable from
 Git history; they were replaced intentionally when the completed v3 audit was

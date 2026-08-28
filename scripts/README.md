@@ -22,9 +22,10 @@ For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
 The current canonical/default good/bad training list is
-`training_labels/tae_like_train.csv`, an exact copy of the versioned
-`training_labels/tae_like_v3.csv`. It contains the completed rebuilt-database
-audit for all 15 shots: 2,639 rows, with 592 GOOD and 2,047 BAD labels. Older
+`training_labels/tae_like_train.csv`. It contains 2,390 rows from 14 shots,
+with 576 GOOD and 1,814 BAD labels. Q62 is suspended pending correction of its
+suspect upper continuum boundary; its 249 reviewed rows remain preserved in
+the complete 15-shot `training_labels/tae_like_v3.csv` snapshot. Older
 four-shot TAE-only and mixed TAE/EAE lists are archived under
 `training_labels/old_4shots_tae_only_labels/` and
 `training_labels/old_4shots_mixed_labels/`.
@@ -1376,7 +1377,7 @@ The first retained Flux audit is
 
 Driver for leave-one-shot-out checks over all shots in the selected training
 CSV. The filename is historical; with the current `tae_like_train.csv` it
-creates 15 folds. It:
+creates 14 folds because Q62 is suspended. It:
 
 - creates one `train.csv` and `test.csv` split per held-out shot from
   the selected `--train_csv` list,

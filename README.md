@@ -63,11 +63,13 @@ Data format summary
 - Training label CSVs in `training_labels/` store mode paths relative to
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current canonical/default
-  good/bad training list is `training_labels/tae_like_train.csv`, an exact
-  active copy of the versioned `training_labels/tae_like_v3.csv`. It contains
-  the completed rebuilt-database audit for all 15 shots: 2,639 modes, with 592
-  GOOD and 2,047 BAD labels. Older four-shot TAE-only and mixed TAE/EAE lists
-  are archived under
+  good/bad training list is `training_labels/tae_like_train.csv`. It contains
+  2,390 modes from 14 shots, with 576 GOOD and 1,814 BAD labels. Q62 is
+  suspended because a whole-shot visual audit indicates that its upper
+  continuum boundary may be incorrect. The complete 2,639-row reviewed
+  15-shot snapshot, including the preserved 249 Q62 labels, remains in
+  `training_labels/tae_like_v3.csv`. Older four-shot TAE-only and mixed
+  TAE/EAE lists are archived under
   `training_labels/old_4shots_tae_only_labels/` and
   `training_labels/old_4shots_mixed_labels/`.
 - Internal conventions:
@@ -88,10 +90,11 @@ Model families
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. Both checkpoints were retrained on the preceding
-  2900-row, 594-GOOD / 2306-BAD v2 snapshot. The current synchronized v3 list
-  has 2,639 rows with 592 GOOD / 2,047 BAD labels; the checkpoints have not yet
-  been refit on this rebuilt dataset and its later label corrections. The
-  raw-CNN checkpoint is a full-list refit with `M_target=100`.
+  2900-row, 594-GOOD / 2306-BAD v2 snapshot, which included the older Q62
+  block. The current active list has 2,390 rows with Q62 suspended; the
+  checkpoints have not yet been refit on this rebuilt dataset, its later label
+  corrections, or the Q62 exclusion. The raw-CNN checkpoint is a full-list
+  refit with `M_target=100`.
 - Latest pre-B12 RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
 - An opt-in 25-feature RF experiment adds inner continuum-extremum radial

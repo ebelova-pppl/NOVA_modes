@@ -39,8 +39,8 @@ setenv NOVA_DATA "/p/hym/ebelova/NOVA/data_mixed"
 # Main NOVA shot database on Flux.
 setenv NOVA_DITW_ROOT "/p/nstxdigtwin/energetic_particles/nova/DiTw"
 
-setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like_train.csv"
-setenv NOVA_TRAIN_CSV_TAE "${NOVA_REPO}/training_labels/tae_like_train.csv"
+setenv NOVA_TRAIN_CSV "${NOVA_REPO}/training_labels/tae_like_train.csv"       # Active audited 14-shot set; Q62 suspended
+setenv NOVA_TRAIN_CSV_TAE "${NOVA_REPO}/training_labels/tae_like_train.csv"   # Active audited 14-shot set; Q62 suspended
 
 # Flux is CPU-only for this workflow. Override after sourcing only if needed.
 setenv NOVA_TORCH_DEVICE cpu

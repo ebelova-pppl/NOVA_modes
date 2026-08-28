@@ -23,8 +23,8 @@ export NOVA_RESULTS="/global/cfs/cdirs/m314/nova2/results"
 export NOVA_RUN="$SCRATCH/nova_s"    # dir on NERSC scratch for RF and CNN runs
 
 # Version-controlled labeled training list
-export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"       # Active audited 15-shot TAE-like training set
-export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"   # Active audited 15-shot TAE-like training set
+export NOVA_TRAIN_CSV="$NOVA_REPO/training_labels/tae_like_train.csv"       # Active audited 14-shot set; Q62 suspended
+export NOVA_TRAIN_CSV_TAE="$NOVA_REPO/training_labels/tae_like_train.csv"   # Active audited 14-shot set; Q62 suspended
 export NOVA_TRAIN_CSV_MIXED="$NOVA_REPO/training_labels/all_modes.csv" # Includes TAE+EAE data (for now used fro splitting TAEs vs EAEs, in future for training TAE+EAE models)
 
 # Optional Torch device override for CNN scripts:
