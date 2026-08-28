@@ -1,7 +1,91 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-27)
+### Project state (current snapshot, updated 2026-08-28)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-08-28 active RF/raw-CNN refresh and deterministic-sorter direction
+
+- Refreshed the active RF and raw-CNN artifacts from the current canonical
+  `training_labels/tae_like_train.csv`. The input has 2,390 rows across 14
+  shots (576 GOOD and 1,814 BAD), excludes all 249 suspended Q62 rows, and has
+  SHA-256
+  `ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d`.
+- The RF run used the production 22-feature `rf_w_star_max_22_v2` schema. Its
+  five-fold row-wise CV accuracies were `0.9414`, `0.9372`, `0.9393`, `0.9414`,
+  and `0.9644` (mean `0.9448`). The stratified 239-row holdout has CM
+  `[[169, 12], [4, 54]]`, accuracy `0.933`, and GOOD precision/recall/F1
+  `0.818 / 0.931 / 0.871`; see `outputs/rf_out.txt`.
+- `evaluate_classifier()` temporarily refits the RF pipeline on a 90% split
+  to produce the holdout report, then explicitly refits it on all 2,390 rows
+  before saving. The active checkpoint and the model embedded in the bundle
+  are therefore full-list fits; the bundle also preserves all 2,390 feature
+  rows and labels.
+- The refreshed RF artifacts are `models/nova_mode_classifier.joblib`
+  (SHA-256
+  `b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c`)
+  and `models/nova_mode_classifier_bundle.joblib` (SHA-256
+  `3d3baa239ecd2cda55f4ba3ae7123df97ed3d59b7975b624101788ca390dd2f3`).
+- The raw-CNN 80/20 stratified split used seed 42, batch size 8, robust
+  normalization, `M_target=100`, `R_target=201`, unweighted loss, OneCycleLR,
+  and gradient clipping. Its best held-out checkpoint was epoch 40 with CM
+  `[[353, 9], [13, 102]]`, accuracy `0.9539`, and GOOD
+  precision/recall/F1 `0.919 / 0.887 / 0.903` on 477 rows. A fresh model was
+  then refit for 80 epochs on all 2,390 rows. Its final training-set health
+  check predicted 576 GOOD and found no collapse; this is a fit-health check,
+  not an independent validation metric.
+- The active raw-CNN checkpoint is `models/nova_cnn_raw.pt` (SHA-256
+  `872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e`),
+  with `saved_training_scope=full_csv_refit`; see `outputs/cnn_raw.txt`.
+- No new shot-wise LOSO evaluation or RF/CNN fusion retuning was performed in
+  this refresh. The split and row-wise CV results should not be interpreted as
+  cross-shot generalization estimates.
+- Planned direction: replace the RF/CNN classification-and-fusion stage in
+  `sort_shot_mixed.py` with the deterministic `tae_rule_engine.py` path. This
+  is not implemented yet. Until then, `sort_shot_mixed.py` remains the
+  canonical RF/CNN sorter and the refreshed models are interim dependencies;
+  deterministic production sorting remains available separately through
+  `sort_shot_rules.py --rule_config tae_rules_production_v1`.
+
+## 2026-08-28 B12 upper/lower continuum-crossing comparison
+
+- Repeated the Q62 boundary-specific neighbor-RMS audit without changing its
+  definitions on all 136 current B12 TAE-side modes: 129 strict TAE-like and
+  seven mixed. All 136 cross the upper boundary, 56 cross the lower boundary,
+  and 80 are upper-only. The 542 detailed records comprise 418 upper and 124
+  lower crossings.
+- The viewer-ready mode table, all detailed crossing records, upper-crossing
+  ranking, and summary are under
+  `outputs/v3_relabels_gate3_off_packet_turns3_rle05/nstxuG121123B12/` as
+  `b12_all_tae_modes_crossing_audit.csv`,
+  `b12_crossing_records_detailed.csv`,
+  `b12_upper_crossing_modes_ranked.csv`, and
+  `b12_crossing_audit_summary.md`.
+- The current v3 training snapshot supplies 20 GOOD and 115 BAD labels. The
+  one additional manifest mode, `N7/egn07w.1888E+02`, retains its previously
+  adjudicated SKIP status and is included in the physical crossing statistics
+  but remains excluded from training.
+- Across all crossings, the lower/upper median signed-neighbor RMS values are
+  0.1935/0.0308, and the 90th percentiles are 0.6402/0.6539. After excluding
+  primary gate-1 `BAD_AXIS_SPIKE` and gate-2 `BAD_GRID_SCALE_SPIKE` decisions,
+  70 modes survive: all 20 GOOD, 49 BAD, and the one SKIP. Their lower/upper
+  crossing counts are 94/99 (97 upper records have complete RMS stencils),
+  with median RMS 0.2114/0.01419 and 90th percentiles 0.6402/0.4561. There are
+  26 lower-crossing and 16 upper-crossing survivor modes with at least one RMS
+  of 0.25 or greater.
+- Most surviving B12 upper crossings carry very little mode structure: their
+  median crossing energy is 0.000184 and median crossing-window harmonic
+  amplitude is 0.0166, compared with 0.0239 and 0.2758 at the lower boundary.
+  This helps explain the small upper median. Among the 20 surviving GOOD modes,
+  upper-crossing RMS has median 0.0102 and 90th percentile 0.0867; none reaches
+  0.25. The six GOOD modes with lower crossings are also smooth by this metric
+  (median 0.0218, 90th percentile 0.0941, none at or above 0.25).
+- B12 therefore shows that a small median upper-crossing neighbor RMS is not
+  unique to Q62 and is not, by itself, proof of an incorrect upper boundary.
+  Q62 still has the more strongly suppressed upper tail after gates 1 and 2:
+  its upper/lower 90th percentiles are 0.2637/0.9839, versus 0.4561/0.6402 for
+  B12. Neighbor RMS is a local signed-variation proxy rather than a resonance
+  detector, so the existing Q62 whole-shot visual observation and an upstream
+  continuum calculation check remain the decisive follow-ups.
 
 ## 2026-08-27 froze `tae_rules_production_v1`
 
@@ -231,11 +315,14 @@ Notes:
 1.	RF (Random Forest)
     -	Scalar + structure-derived + continuum features (22)
     -	Active checkpoint: `models/nova_mode_classifier.joblib`
-    -	Checkpoint status: retrained on the preceding 2900-row / 15-shot
-      `training_labels/tae_like_v2_nonG.csv` snapshot; the synchronized v3
-      dataset and its later label corrections are not yet reflected
+    -	Checkpoint source: current 2,390-row / 14-shot
+      `training_labels/tae_like_train.csv`, with Q62 excluded
+    -	Saved fit scope: all 2,390 rows (576 GOOD and 1,814 BAD); the 90/10
+      evaluation is followed by an explicit full-list deployment refit
     -	Current schema: previous RF features minus `omega`, plus `W_star_max`
-    -	Checkpoint training counts: 594 GOOD, 2306 BAD
+    -	Current 14-shot row-wise five-fold CV mean accuracy: 0.9448
+    -	Current 14-shot 10% holdout CM: `[[169, 12], [4, 54]]`
+    -	Current holdout GOOD precision/recall/F1: 0.818 / 0.931 / 0.871
     -	Latest pre-B12 13-shot OOF accuracy: 0.951
     -	Latest pre-B12 13-shot OOF CM: `[[1967, 37], [91, 515]]`
     -	Latest pre-B12 GOOD precision/recall/F1: 0.933 / 0.850 / 0.889
@@ -243,12 +330,13 @@ Notes:
 2.	CNN (raw)
     -	Padded/truncated (m,r)
     -	Active checkpoint: `models/nova_cnn_raw.pt`
-    -	Checkpoint status: full-CSV refit on the preceding 2900-row / 15-shot
-      `training_labels/tae_like_v2_nonG.csv` snapshot; the synchronized v3
-      dataset and its later label corrections are not yet reflected
+    -	Checkpoint status: 80-epoch full-CSV refit on the current 2,390-row /
+      14-shot `training_labels/tae_like_train.csv`, with Q62 excluded
     -	Current default raw preprocessing: `M_target=100`, `R_target=201`
-    -	Latest v2 split check before full refit: best accuracy 0.9534 at
-      epoch 13; final 80-epoch full refit reports no prediction collapse
+    -	Current 14-shot split check before full refit: best accuracy 0.9539 at
+      epoch 40, CM `[[353, 9], [13, 102]]`, GOOD
+      precision/recall/F1 0.919 / 0.887 / 0.903
+    -	Final full-list fit-health check reports no prediction collapse
     -	Latest pre-B12 13-shot M100 held-out split check: CM `[[394, 6], [9, 112]]`,
       accuracy 0.971, GOOD precision/recall/F1 0.949 / 0.926 / 0.937
     -	Previous 13-shot M54 held-out split check: CM `[[394, 6], [18, 103]]`,
@@ -286,6 +374,9 @@ From cont_features.py:
 -	view_modes_csv.py
 -	sort_shot.py
 -	sort_shot_mixed.py
+-	make_tae_like_list.py
+-	tae_rule_engine.py
+-	sort_shot_rules.py
 -	run_loso_10.py
 -	split_tae_eae.py
 ### RF

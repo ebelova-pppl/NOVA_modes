@@ -1,0 +1,109 @@
+python $NOVA_REPO/scripts/cnn_raw.py \
+>   --train_csv $NOVA_TRAIN_CSV \
+>   --data_dir $NOVA_DATA \
+>   --refit_full_before_save \
+>   --model_out $NOVA_REPO/models/nova_cnn_raw.pt \
+>   --M_target 100 \
+>   --batch_size 8 \
+>   --cache_data
+
+Training CSV: /global/homes/e/ebelova/src_nova/training_labels/tae_like_train.csv
+Data dir: /global/cfs/cdirs/m314/nova2/data
+Total modes: 2390 | Train: 1913 | Test: 477
+Raw preprocessing: R_target=201, M_target=100, input_channels=1, continuum_branch=False, continuum_branch_zero_inputs=False
+Training recipe: OneCycleLR initial_lr=0.001, max_lr=0.02, pct_start=0.1, final_lr=1e-05, grad_clip_norm=1
+Loss pos_weight: none
+Cached 1913 raw CNN samples in 45.8s
+Cached 477 raw CNN samples in 11.2s
+Device: cuda
+CUDA available: True
+CUDA_VISIBLE_DEVICES: <unset>
+CUDA device 0: NVIDIA A100-PCIE-40GB
+CUDA memory free/total: 38.48 GiB / 39.49 GiB
+CUDA memory allocated/reserved by this process: 0.00 GiB / 0.00 GiB
+Epoch   1/80 | loss=0.5696 | test_acc=0.7589 | lr=1.72e-03 | elapsed=3.2s
+Epoch   5/80 | loss=0.2857 | test_acc=0.9015 | lr=1.41e-02 | elapsed=1.1s
+Epoch  10/80 | loss=0.1530 | test_acc=0.9308 | lr=2.00e-02 | elapsed=1.1s
+Epoch  15/80 | loss=0.1133 | test_acc=0.9224 | lr=1.95e-02 | elapsed=1.1s
+Epoch  20/80 | loss=0.0754 | test_acc=0.9392 | lr=1.87e-02 | elapsed=1.2s
+Epoch  25/80 | loss=0.0568 | test_acc=0.9308 | lr=1.74e-02 | elapsed=1.0s
+Epoch  30/80 | loss=0.0257 | test_acc=0.9350 | lr=1.57e-02 | elapsed=1.1s
+Epoch  35/80 | loss=0.0328 | test_acc=0.9413 | lr=1.38e-02 | elapsed=1.0s
+Epoch  40/80 | loss=0.0181 | test_acc=0.9539 | lr=1.17e-02 | elapsed=1.1s
+Epoch  45/80 | loss=0.0011 | test_acc=0.9266 | lr=9.57e-03 | elapsed=0.9s
+Epoch  50/80 | loss=0.0037 | test_acc=0.9350 | lr=7.42e-03 | elapsed=1.3s
+Epoch  55/80 | loss=0.0000 | test_acc=0.9329 | lr=5.39e-03 | elapsed=1.2s
+Epoch  60/80 | loss=0.0000 | test_acc=0.9413 | lr=3.58e-03 | elapsed=1.1s
+Epoch  65/80 | loss=0.0000 | test_acc=0.9413 | lr=2.07e-03 | elapsed=1.2s
+Epoch  70/80 | loss=0.0000 | test_acc=0.9413 | lr=9.46e-04 | elapsed=0.9s
+Epoch  75/80 | loss=0.0000 | test_acc=0.9392 | lr=2.47e-04 | elapsed=1.1s
+Epoch  80/80 | loss=0.0000 | test_acc=0.9413 | lr=1.00e-05 | elapsed=0.8s
+Best test acc: 0.9539 (epoch 40)
+
+Misclassified modes:
+Path,  true_label,  pred_label,  p_good
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301Y93/N9/egn09w.1633E+02, bad, good, 1.000
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.3508E+02, good, bad, 0.010
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N8/egn08w.2242E+03, bad, good, 0.999
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N8/egn08w.1049E+03, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N8/egn08w.2639E+02, good, bad, 0.003
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301W29/N4/egn04w.2238E+02, bad, good, 1.000
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123B12/N8/egn08w.2892E+02, bad, good, 0.996
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123B12/N9/egn09w.2865E+02, bad, good, 1.000
+/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N1/egn01w.8555E+00, good, bad, 0.015
+/global/cfs/cdirs/m314/nova2/data/nstx_141711/N8/egn08w.1470E+03, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301H47/N10/egn10w.2416E+02, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123J38/N10/egn10w.1795E+02, good, bad, 0.022
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N9/egn09w.2306E+02, bad, good, 0.532
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123B12/N10/egn10w.1565E+02, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301Y93/N9/egn09w.1539E+02, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstxuE202855A01t020/N10/egn10w.3637E+01, good, bad, 0.341
+/global/cfs/cdirs/m314/nova2/data/nstx_135388/N4/egn04w.7336E+02, bad, good, 0.973
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123B12/N9/egn09w.2347E+02, bad, good, 0.978
+/global/cfs/cdirs/m314/nova2/data/nstxuG142301W29/N8/egn08w.2847E+02, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstxuG121123K51/N9/egn09w.2153E+02, good, bad, 0.010
+/global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N9/egn09w.8038E+01, good, bad, 0.000
+/global/cfs/cdirs/m314/nova2/data/nstxuE205052A01t022/N7/egn07w.1630E+02, bad, good, 1.000
+
+Good modes p_good range: 3.7335808e-37 1.0
+mean p_good | true good: 0.8737591
+Bad modes p_good range: 0.0 0.9999683
+mean p_good | true bad : 0.027414054
+
+Confusion matrix (rows=actual [bad,good], cols=pred [bad,good]):
+[[353   9]
+ [ 13 102]]
+
+Classification report:
+              precision    recall  f1-score   support
+
+         bad       0.96      0.98      0.97       362
+        good       0.92      0.89      0.90       115
+
+    accuracy                           0.95       477
+   macro avg       0.94      0.93      0.94       477
+weighted avg       0.95      0.95      0.95       477
+
+
+Refitting final raw CNN on all 2390 labeled modes for 80 epochs before saving.
+Full-fit recipe: OneCycleLR initial_lr=0.001, max_lr=0.02, pct_start=0.1, final_lr=1e-05, grad_clip_norm=1
+Cached 2390 raw CNN samples in 1.8s
+Full-fit epoch   1/80 | loss=0.5593 | lr=1.72e-03 | elapsed=1.5s
+Full-fit epoch   5/80 | loss=0.2343 | lr=1.41e-02 | elapsed=1.5s
+Full-fit epoch  10/80 | loss=0.1596 | lr=2.00e-02 | elapsed=1.9s
+Full-fit epoch  15/80 | loss=0.1124 | lr=1.95e-02 | elapsed=1.5s
+Full-fit epoch  20/80 | loss=0.0835 | lr=1.87e-02 | elapsed=1.4s
+Full-fit epoch  25/80 | loss=0.0686 | lr=1.74e-02 | elapsed=1.8s
+Full-fit epoch  30/80 | loss=0.0362 | lr=1.57e-02 | elapsed=1.9s
+Full-fit epoch  35/80 | loss=0.0326 | lr=1.38e-02 | elapsed=1.5s
+Full-fit epoch  40/80 | loss=0.0160 | lr=1.17e-02 | elapsed=1.5s
+Full-fit epoch  45/80 | loss=0.0179 | lr=9.57e-03 | elapsed=1.8s
+Full-fit epoch  50/80 | loss=0.0009 | lr=7.42e-03 | elapsed=1.8s
+Full-fit epoch  55/80 | loss=0.0000 | lr=5.39e-03 | elapsed=1.3s
+Full-fit epoch  60/80 | loss=0.0000 | lr=3.58e-03 | elapsed=1.6s
+Full-fit epoch  65/80 | loss=0.0000 | lr=2.07e-03 | elapsed=1.5s
+Full-fit epoch  70/80 | loss=0.0000 | lr=9.46e-04 | elapsed=1.5s
+Full-fit epoch  75/80 | loss=0.0000 | lr=2.47e-04 | elapsed=1.5s
+Full-fit epoch  80/80 | loss=0.0000 | lr=1.00e-05 | elapsed=1.8s
+
+Saved CNN to /global/homes/e/ebelova/src_nova/models/nova_cnn_raw.pt (full_csv_refit)

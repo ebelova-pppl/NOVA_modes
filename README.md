@@ -89,20 +89,27 @@ Model families
 
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
-  `models/nova_cnn_raw.pt`. Both checkpoints were retrained on the preceding
-  2900-row, 594-GOOD / 2306-BAD v2 snapshot, which included the older Q62
-  block. The current active list has 2,390 rows with Q62 suspended; the
-  checkpoints have not yet been refit on this rebuilt dataset, its later label
-  corrections, or the Q62 exclusion. The raw-CNN checkpoint is a full-list
-  refit with `M_target=100`.
-- Latest pre-B12 RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
+  `models/nova_cnn_raw.pt`. The 2026-08-28 refresh used the current canonical
+  `training_labels/tae_like_train.csv`: 2,390 rows from 14 shots, with 576
+  GOOD and 1,814 BAD labels and Q62 excluded. Both saved checkpoints are
+  full-list refits; the RF uses the production 22-feature schema and the raw
+  CNN uses `M_target=100` and `R_target=201`.
+- The refreshed RF run reports mean five-fold row-wise CV accuracy `0.9448` on
+  all 2,390 rows. Its 239-row stratified holdout has CM
+  `[[169, 12], [4, 54]]`, accuracy `0.933`, and GOOD
+  precision/recall/F1 `0.818 / 0.931 / 0.871`.
+- The refreshed raw-CNN split check with `M_target=100` has CM
+  `[[353, 9], [13, 102]]`, accuracy `0.9539`, and GOOD
+  precision/recall/F1 `0.919 / 0.887 / 0.903`. The saved checkpoint is a
+  fresh 80-epoch refit on all 2,390 rows with no prediction-collapse warning.
+- Previous pre-B12 RF 13-shot OOF check: CM `[[1967, 37], [91, 515]]`, accuracy
   `0.951`, GOOD recall `0.850`, GOOD precision `0.933`, GOOD F1 `0.889`.
 - An opt-in 25-feature RF experiment adds inner continuum-extremum radial
   mismatch, signed frequency clearance, and the fraction of total mode energy
   within `|r-r_e| <= 0.03`. It reduced shuffled-fold FN from `92` to `89`, but
   true shot-wise LOSO FN remained `130` and G-shot FN changed `31 -> 32`. The
   active 22-feature model is unchanged; see `docs/project_state.md`.
-- Latest pre-B12 raw-CNN 13-shot held-out split check with `M_target=100`: CM
+- Previous pre-B12 raw-CNN 13-shot held-out split check with `M_target=100`: CM
   `[[394, 6], [9, 112]]`, accuracy `0.971`, GOOD recall `0.926`, GOOD
   precision `0.949`, GOOD F1 `0.937`. The raw-CNN default harmonic window is
   now `M_target=100`.
@@ -121,6 +128,11 @@ Current best models
   in `outputs/loso_10_onecycle_both/` makes raw CNN the strongest aggregate
   model, while the combined policy retains better GOOD recall on the sparse
   NSTX-U G-case group. Fusion retuning is still pending that tradeoff.
+- Planned direction: replace the RF/CNN classification stage in
+  `sort_shot_mixed.py` with the deterministic `tae_rule_engine.py` workflow.
+  Until that integration is implemented, `sort_shot_mixed.py` remains the
+  canonical RF/CNN sorter; deterministic production runs use
+  `sort_shot_rules.py --rule_config tae_rules_production_v1`.
 
 ## Classify new NSTX-U shots on Flux (no training)
 

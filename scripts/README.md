@@ -226,7 +226,19 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
-Most recent pre-B12 13-shot TAE-like raw-CNN retraining checks:
+Current 14-shot raw-CNN refresh from
+`training_labels/tae_like_train.csv` (2,390 rows; batch size 8,
+`M_target=100`, seed 42, unweighted loss):
+
+- best 20% stratified-split checkpoint at epoch 40: accuracy=`0.9539`,
+  CM=`[[353, 9], [13, 102]]`, GOOD precision/recall/F1=
+  `0.919 / 0.887 / 0.903`
+- active checkpoint: fresh 80-epoch full-CSV refit on all 2,390 rows, with
+  `M_target=100`, `R_target=201`, robust normalization, and no detected
+  prediction collapse
+- log: `outputs/cnn_raw.txt`
+
+Previous pre-B12 13-shot TAE-like raw-CNN retraining checks:
 
 - `cnn_raw.py`, `M_target=100`, batch size 32: accuracy=`0.971`,
   CM=`[[394, 6], [9, 112]]`, GOOD precision/recall/F1=`0.949 / 0.926 / 0.937`
@@ -338,6 +350,20 @@ python "$NOVA_REPO/scripts/rf_train_classify.py" \
   --model_out "$NOVA_REPO/models/nova_mode_classifier.joblib"
 ```
 
+The current script runs five-fold cross-validation on the complete input and
+reports a 90/10 stratified evaluation. It then explicitly refits the pipeline
+on all input rows before saving the deployment checkpoint.
+
+Current 14-shot RF refresh from `training_labels/tae_like_train.csv`:
+
+- input: 2,390 rows (576 GOOD and 1,814 BAD); mean five-fold row-wise CV
+  accuracy=`0.9448`
+- 239-row stratified holdout: CM=`[[169, 12], [4, 54]]`, accuracy=`0.933`,
+  GOOD precision/recall/F1=`0.818 / 0.931 / 0.871`
+- saved checkpoint fit: all 2,390 rows (576 GOOD and 1,814 BAD), using the
+  production 22-feature `rf_w_star_max_22_v2` schema
+- log: `outputs/rf_out.txt`
+
 Most recent RF OOF check, run on the 13-shot list before merging B12:
 
 - CM=`[[1967, 37], [91, 515]]`
@@ -345,9 +371,10 @@ Most recent RF OOF check, run on the 13-shot list before merging B12:
 - GOOD precision/recall/F1=`0.933 / 0.850 / 0.889`
 - output: `outputs/rf_oof_13shots/`
 
-The active RF checkpoint is `models/nova_mode_classifier.joblib`, retrained
-on `training_labels/tae_like_v2_nonG.csv`. Previous four-shot RF checkpoints
-are archived under `models/old_4shots_models/`.
+The active RF checkpoint is `models/nova_mode_classifier.joblib`, refreshed
+from the current Q62-free `training_labels/tae_like_train.csv` as described
+above. Previous four-shot RF checkpoints are archived under
+`models/old_4shots_models/`.
 
 The component six-shot list is `training_labels/additions/tae_like_6new.csv`, with
 relative `$NOVA_DATA` paths and the same full schema as `tae_like_train.csv`.
@@ -851,11 +878,19 @@ Shot-level workflow for mixed TAE/EAE runs. It does not move files. Instead, it:
 
 Current operational note: this is the main large-shot sorting path for the
 active models. The top-level RF and raw-CNN checkpoints have been retrained
-on `training_labels/tae_like_v2_nonG.csv`. The current production use is
-NSTX-U E-like shot sorting for NOVA-C candidate selection.
+from the current 14-shot `training_labels/tae_like_train.csv` and refit on all
+2,390 rows. The current production use is NSTX-U E-like shot sorting for
+NOVA-C candidate selection.
 **NSTX-U G-case shots are treated as a separate regime** for now because
 their narrow, strongly varying TAE gap gives sparse GOOD-mode labels and
 weaker LOSO performance.
+
+The planned migration is to replace this script's RF/CNN classification and
+fusion stage with the deterministic rules engine. That integration has not
+been made yet: `sort_shot_mixed.py` still uses RF/CNN, while the existing
+model-independent production entry point is `sort_shot_rules.py` with
+`--rule_config tae_rules_production_v1`. The refreshed checkpoints therefore
+remain the interim active dependencies for `sort_shot_mixed.py`.
 
 Close-frequency duplicate removal enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
