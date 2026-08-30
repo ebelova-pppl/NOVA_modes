@@ -1,6 +1,6 @@
 ---
 name: sort-tae-like-modes
-description: "Deterministically preprocess and sort one NOVA shot into TAE-like, mixed, EAE-like, invalid, BAD, REVIEW, and GOOD outputs with auditable rule reasons, an explicit production survivor policy, reusable fingerprinted manual overrides, and optional RF-only ranking of final-GOOD close-frequency representatives. Use for one-shot NOVA TAE preprocessing, rule-based production sorting, conservative rule calibration, reproducible output regeneration, output auditing, or explicit post-rule adjudication without CNN classification."
+description: "Deterministically preprocess and sort one NOVA shot into TAE-like, mixed, EAE-like, invalid, BAD, REVIEW, and GOOD outputs with auditable rule reasons, an explicit production survivor policy, reusable fingerprinted manual overrides, and RF-only selection of final-GOOD frequency/structure representatives. Use for one-shot NOVA TAE preprocessing, rule-based production sorting, conservative rule calibration, reproducible output regeneration, output auditing, or explicit post-rule adjudication without CNN classification."
 ---
 
 # Sort TAE-Like Modes
@@ -18,6 +18,7 @@ default; specify the method explicitly in saved commands for clear provenance:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/SHOT \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/sort-output
 ```
 
@@ -36,13 +37,22 @@ gate fired         -> rule_decision=BAD -> automatic final BAD
 no gate fired      -> rule_decision=REVIEW
                    -> final_decision=GOOD by accept-as-good-v1
 manual override    -> applied after the automatic final decision
-final GOOD         -> optional duplicate ranking
+final GOOD         -> RF-ranked frequency/structure deduplication
 ```
 
 Do not rewrite `rule_decision` or `rule_primary_reason=NO_GOOD_TEMPLATE` when
 the production workflow promotes a survivor. Confirm the
 `accept-as-good-v1` policy identity and `n_rule_survivors_accepted` in the
 summaries and final-classification audit.
+
+RF is a post-decision ranker, not a rule classifier. The production command
+must supply the active compatible checkpoint so close-frequency,
+structurally matched final-GOOD modes can be reduced to one representative per
+matched structural group. If RF is omitted, unloadable, or cannot score a
+whole cluster, retain every affected member and report the fallback; treat
+that as an audit/failure-safe result rather than the intended deduplicated
+production list. Never use RF to change a rule, survivor-policy, manual, or
+final decision.
 
 For conservative calibration or feature-only work, use the configurable
 interface. It does not apply the production survivor policy, so pass-all-gates
@@ -271,8 +281,9 @@ the enable state and exact threshold for all six BAD decisions.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. For deterministic production, run
-`sort_shot_mixed.py --method rules`; never select `--method rf-cnn` or use a
-CNN prediction to make a rule decision.
+`sort_shot_mixed.py --method rules` with the RF checkpoint used only for
+post-decision deduplication; never select `--method rf-cnn` or use an RF or CNN
+prediction to make a rule decision.
 
 ## Add explicit adjudication
 
@@ -299,6 +310,7 @@ Rebuild deterministically after adjudication:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/SHOT \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/sort-output \
   --manual_overrides /path/to/manual_overrides.csv
 ```
@@ -310,15 +322,17 @@ fingerprint matches. Inspect stale, ambiguous, or ineligible override counts in
 Use the same override file option with `sort_shot_rules.py` only when rebuilding
 the conservative REVIEW-preserving audit instead of production outputs.
 
-## Rank final-GOOD duplicates when requested
+## Deduplicate final-GOOD production outputs
 
-With `sort_shot_mixed.py --method rules` or `sort_shot_rules.py`, add
-`--rf_model /path/to/model.joblib` only to rank representatives among
-final-GOOD close-frequency modes. RF scores must not alter rule, survivor-
-policy, manual, or final decisions. Without a usable RF checkpoint—or if one
-cluster cannot be fully scored—the workflow retains every affected member and
-records the fallback in `frequency_cluster_report.txt` and
-`frequency_clusters.csv`. Do not supply or load a CNN for this method.
+With `sort_shot_mixed.py --method rules`, supply
+`--rf_model /path/to/model.joblib` in production to rank representatives among
+final-GOOD modes that match in both frequency and structure. RF scores must not
+alter rule, survivor-policy, manual, or final decisions. Without a usable RF
+checkpoint—or if one cluster cannot be fully scored—the workflow retains every
+affected member and records the fallback in `frequency_cluster_report.txt` and
+`frequency_clusters.csv`; this is supported for conservative audits, including
+`sort_shot_rules.py`, but is not a deduplicated production result. Do not
+supply or load a CNN for this method.
 
 ## Audit outputs
 

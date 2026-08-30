@@ -1,5 +1,5 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-28)
+### Project state (current snapshot, updated 2026-08-30)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
@@ -26,17 +26,20 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   fingerprint-matched manual overrides, then final-GOOD close-frequency
   handling. Rule, policy, manual, and final-decision provenance remain
   separate rather than rewriting the preliminary rule verdict.
-- Under the rules method, `--rf_model` is optional and is used only to rank
-  representatives inside final-GOOD close-frequency clusters. Without a
-  usable checkpoint, all members of each affected cluster are retained and
-  the fallback is reported. The rules method never loads a CNN.
+- Under the rules method, RF is used only after final decisions to rank
+  representatives inside close-frequency, structurally matched final-GOOD
+  groups. The standard production command supplies the active `--rf_model` so
+  those duplicates are removed. The CLI still permits omission as a safe
+  audit fallback, which retains all affected members and reports the skipped
+  deduplication. The rules method never loads a CNN.
 - `scripts/sort_shot_rules.py` remains the conservative calibration and audit
   interface. It does not apply `accept-as-good-v1`; modes that pass every gate
   remain final REVIEW there. Its configurable threshold interface and frozen-
   preset audit path remain available.
-- Documentation now treats `sort_shot_mixed.py --method rules` as canonical
-  production, while retaining explicit `--method rf-cnn` commands for legacy
-  reproducibility.
+- Documentation now treats `sort_shot_mixed.py --method rules --rf_model ...`
+  as canonical deduplicated production, while retaining explicit
+  `--method rf-cnn` commands for legacy reproducibility and no-RF rules runs as
+  conservative audit/fallback operation.
 - Validation is complete: all 103 repository tests pass, including seven new
   method-integration tests covering CLI isolation, survivor promotion, BAD
   preservation, manual and stale overrides, no-RF cluster fallback, output
@@ -5365,3 +5368,33 @@ against current labels, not independent validation.
 
 The full repository suite passes all 94 tests, both updated local skills pass
 their structural validators, and `git diff --check` passes.
+
+### 2026-08-30: align the Flux RF runtime with scikit-learn 1.9.0
+
+Updated the shared Flux environment documentation after user validation of
+`/p/hym/conda_envs/nova-perlmutter` with scikit-learn `1.9.0`, matching the
+current Perlmutter-trained RF checkpoint. This removes the estimator-unpickle
+version warning previously produced by Flux's scikit-learn `1.7.2` runtime.
+
+Scikit-learn `1.9.0` declares `narwhals>=2.0.1` as a runtime dependency. The
+initial `--no-deps` upgrade omitted it, so the Flux instructions now recommend
+normal dependency resolution and document the targeted Narwhals repair plus
+`pip check` and version verification. The installation is persistent in the
+shared conda prefix; users must activate that prefix and confirm `which python`
+before changing it.
+
+### 2026-08-30: make RF-ranked deduplication explicit in production commands
+
+Corrected the maintained production documentation and local sorter skill so
+every standard `sort_shot_mixed.py --method rules` command supplies
+`models/nova_mode_classifier.joblib`. The deterministic gates and
+`accept-as-good-v1` survivor policy still make all classification decisions;
+RF remains isolated to the subsequent close-frequency and structural-match
+resolver, where its `p_good` score selects the representative to keep.
+
+The CLI behavior is unchanged. A missing, unloadable, or partially failing RF
+checkpoint still retains every affected cluster member and records
+`SKIPPED_NO_RF_CHECKPOINT` or `SKIPPED_RF_SCORING_FAILED`. Documentation now
+labels that behavior as a conservative audit/failure-safe fallback rather than
+the complete production workflow, because it does not yield the intended
+deduplicated final-GOOD list.

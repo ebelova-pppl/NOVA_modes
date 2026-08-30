@@ -2,11 +2,12 @@
 module load python
 module load pytorch     # for CNN models, runs on GPU or CPU
 
-Currently using this versions: # need same setting on Flux to use Perlmutter-trained models on Flux, 
-                               # and to ensure reproducibility of results across platforms.
+Currently using these versions: # need the same settings on Flux to use Perlmutter-trained models on Flux,
+                                # and to ensure reproducibility of results across platforms.
 Perlmutter:
 numpy   2.1.2
-sklearn 1.7.2
+scikit-learn 1.9.0
+narwhals >=2.0.1  # runtime dependency of scikit-learn 1.9.0
 torch   2.8.0+cu129
 
 #Flux
@@ -23,10 +24,23 @@ in /p/hym:
 conda env setup the same as Perlmutter:
 /p/hym/conda_envs/nova-perlmutter
 numpy   2.1.2
-sklearn 1.7.2
+scikit-learn 1.9.0
+narwhals >=2.0.1
 torch   2.8.0+cu128 # cuda doesn't matter on flux, it is CPU only
 
-To check, use:
+If this existing Flux environment still has an older scikit-learn, upgrade the
+active environment without `--no-deps` so Narwhals is installed too:
+
+python -m pip install --upgrade "scikit-learn==1.9.0" "narwhals>=2.0.1"
+
+An installation previously done with `--no-deps` can be repaired with:
+
+python -m pip install "narwhals>=2.0.1"
+
+These commands change the activated `/p/hym/conda_envs/nova-perlmutter`
+environment persistently. Confirm the Python path before installing, then
+check the environment:
 
 which python
-python -c "import sys, numpy, sklearn, torch; print(sys.executable); print('numpy', numpy.__version__); print('sklearn', sklearn.__version__); print('torch', torch.__version__); print('cuda available:', torch.cuda.is_available())"
+python -m pip check
+python -c "import sys, numpy, sklearn, narwhals, torch; print(sys.executable); print('numpy', numpy.__version__); print('sklearn', sklearn.__version__); print('narwhals', narwhals.__version__); print('torch', torch.__version__); print('cuda available:', torch.cuda.is_available())"

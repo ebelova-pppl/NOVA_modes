@@ -165,6 +165,17 @@ nova_cpu_smoke
 nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
+The shared Flux environment uses scikit-learn `1.9.0` to match the current
+Perlmutter-trained RF checkpoint. That release requires `narwhals>=2.0.1`.
+Install scikit-learn without `--no-deps`, or repair an earlier no-dependency
+upgrade in the activated environment with:
+
+```tcsh
+python -m pip install "narwhals>=2.0.1"
+python -m pip check
+python -c "import sys, sklearn, narwhals; print(sys.executable); print('sklearn', sklearn.__version__); print('narwhals', narwhals.__version__)"
+```
+
 Experimental continuum-branch LOSO can be run through the same LOSO driver:
 
 ```bash
@@ -887,10 +898,12 @@ engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
 `accept-as-good-v1` workflow policy then promotes that survivor to final GOOD.
 Fingerprint-matched manual overrides are applied after this automatic policy.
-Final-GOOD modes proceed to duplicate handling. An optional `--rf_model`
-ranks only close-frequency representatives; without a usable RF checkpoint,
-all members of each affected cluster are retained and the fallback is
-reported. This method never loads a CNN.
+Final-GOOD modes proceed to duplicate handling. The production command supplies
+`--rf_model` to rank representatives in close-frequency, structurally matched
+groups. Without a usable RF checkpoint, all members of each affected cluster
+are retained and the fallback is reported; that safe fallback is useful for
+audits but is not the intended deduplicated production result. This method
+never loads a CNN.
 
 The explicit legacy `--method rf-cnn` path requires both `--rf_model` and
 `--cnn_model`. It preserves the existing RF/CNN probabilities, fusion tiers,
@@ -909,10 +922,11 @@ legacy RF+CNN backend, not to method selection by omission.
 Close-frequency duplicate handling enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
 modes. This avoids chained clusters where several adjacent modes are close but
-the first and last mode are separated by more than `--rel_freq_tol`. Rules
-mode uses an RF score only when an optional compatible checkpoint is supplied;
-otherwise, it retains all affected members rather than making an unranked
-drop. Legacy RF+CNN mode continues to rank with `p_avg`.
+the first and last mode are separated by more than `--rel_freq_tol`. The
+production rules recipe supplies a compatible RF checkpoint so the resolver
+can retain the highest-RF representative in each structurally matched group.
+If RF is omitted, rules mode retains all affected members rather than making
+an unranked drop. Legacy RF+CNN mode continues to rank with `p_avg`.
 
 The main outputs are:
 
@@ -1027,6 +1041,7 @@ default. Keeping it explicit in saved commands makes provenance clearer:
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
@@ -1038,8 +1053,9 @@ setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
 setenv NOVA_SORT_OUT /path/to/output_dir
 ```
 
-Add `--rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib"` only when RF
-ranking of final-GOOD duplicate representatives is wanted.
+The RF checkpoint in this production command is a duplicate ranker only; it
+does not participate in deterministic rule decisions. Omit it only for an
+explicit no-deduplication audit or fallback run.
 
 To run the explicit legacy RF+CNN method on Flux:
 
@@ -1061,6 +1077,7 @@ At NERSC, Bash syntax applies. A production rules run is:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/nstx_135388 \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/sort_outputs/nstx_135388
 ```
 
@@ -1109,6 +1126,7 @@ For production runs:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output
 ```
 
@@ -1436,6 +1454,7 @@ automatic survivor policy:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output \
   --manual_overrides /path/to/manual_overrides.csv
 ```
@@ -1448,17 +1467,19 @@ fingerprint matches current inputs. Stale, ambiguous, ineligible, and unmatched
 override counts are reported. The summary stores the SHA-256 of the exact
 override file used.
 
-### Final-GOOD duplicate ranking
+### Final-GOOD production deduplication
 
-Under `sort_shot_mixed.py --method rules` or `sort_shot_rules.py`, pass
-`--rf_model /path/to/model.joblib` only when final GOOD modes exist and an
-RF-ranked representative is desired. RF `p_good` becomes
+The production `sort_shot_mixed.py --method rules` recipe passes
+`--rf_model /path/to/model.joblib` so close-frequency, structurally matched
+final-GOOD modes are reduced to RF-ranked representatives. RF `p_good` becomes
 `duplicate_rank_score` with source `rf_p_good`; it cannot change rule, manual,
 or final decisions. Only final GOOD modes are scored. A missing/unloadable
 checkpoint retains every member of each affected close-frequency cluster with
 `SKIPPED_NO_RF_CHECKPOINT`. A scoring failure for one member retains that whole
 cluster with `SKIPPED_RF_SCORING_FAILED`. CNN models are never loaded or run by
-this workflow.
+this workflow. Omitting RF remains supported for conservative audit runs,
+including `sort_shot_rules.py`, but intentionally skips production
+deduplication.
 
 ---
 

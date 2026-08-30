@@ -133,9 +133,10 @@ Current best models
   the engine verdict `rule_decision=REVIEW` and
   `rule_primary_reason=NO_GOOD_TEMPLATE`, then the audited
   `accept-as-good-v1` workflow policy promotes it to final `GOOD`. Manual
-  overrides are applied after that policy. An optional RF checkpoint may rank
-  final-GOOD duplicate representatives, but it cannot change rule decisions;
-  no CNN is loaded by the rules method.
+  overrides are applied after that policy. The production command supplies the
+  active RF checkpoint to rank representatives and remove close-frequency,
+  structurally matched duplicates. RF cannot change rule decisions, and no
+  CNN is loaded by the rules method.
 
 ## Sort new NSTX-U shots on Flux (no training)
 
@@ -149,15 +150,16 @@ rejection gate fired -> BAD
 all gates passed     -> rule REVIEW/NO_GOOD_TEMPLATE
                      -> final GOOD by accept-as-good-v1
 manual overrides     -> applied to the automatic final decision
-final GOOD           -> optional close-frequency duplicate ranking
+final GOOD           -> RF-ranked frequency/structure deduplication
 ```
 
 The promotion is a workflow policy, not a positive rule-engine template. Both
 the preliminary rule verdict and the audited promotion source remain in the
-outputs. Rules mode never loads a CNN. Supplying `--rf_model` is optional and
-uses RF only to rank final-GOOD close-frequency representatives; without a
-usable RF checkpoint, all members of affected clusters are retained and the
-fallback is reported.
+outputs. Rules mode never loads a CNN. The standard production recipe supplies
+`--rf_model` only to rank representatives within final-GOOD close-frequency,
+structurally matched groups. Omitting it is supported as a conservative audit
+fallback, but retains all affected cluster members and therefore does not
+produce the intended deduplicated production list.
 
 Default Flux shell is usually `tcsh`:
 
@@ -175,6 +177,17 @@ nova_env
 setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
 setenv NOVA_SORT_OUT "$NOVA_DITW_ROOT/sort_outputs"
 mkdir -p "$NOVA_SORT_OUT"
+```
+
+The shared Flux environment currently uses scikit-learn `1.9.0` to match the
+Perlmutter-trained RF checkpoint. Scikit-learn `1.9.0` requires
+`narwhals>=2.0.1`; do not use `--no-deps` when installing it. To repair an
+earlier no-dependency upgrade in the activated environment, run:
+
+```tcsh
+python -m pip install "narwhals>=2.0.1"
+python -m pip check
+python -c "import sys, sklearn, narwhals; print(sys.executable); print('sklearn', sklearn.__version__); print('narwhals', narwhals.__version__)"
 ```
 
 Bash users should replace the `tcsh` setup lines with:
@@ -205,6 +218,7 @@ setenv SHOT_NAME nstxu_example_shot
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
@@ -215,6 +229,7 @@ export SHOT_NAME=nstxu_example_shot
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
+  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
@@ -225,8 +240,8 @@ does not move or modify the input modes; it writes CSV outputs and reports into
 
 Most useful outputs for the default rules method:
 
-- `good_tae_final.csv` — final GOOD TAE-like modes after optional duplicate
-  ranking.
+- `good_tae_final.csv` — final GOOD TAE-like representatives after RF-ranked
+  frequency/structure deduplication.
   Includes `rad_loc` and `rad_width` for comparing the mode location/width
   with beam-ion density profiles before launching NOVA-C growth-rate runs.
 - `good_tae_unchecked.csv` — promoted or manually adjudicated GOOD TAE-like
@@ -278,6 +293,7 @@ commands:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output
 ```
 
@@ -370,16 +386,17 @@ python scripts/label_modes_fast.py /path/to/shot \
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
+  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output \
   --manual_overrides /path/to/manual_overrides.csv
 ```
 
 An override is applied only while its SHA-256 input fingerprint matches the
-current mode and corresponding `datcon#` contents. An optional `--rf_model`
-is used only to rank representatives inside final-GOOD close-frequency
-clusters. If it is absent, unloadable, or fails on one cluster member, every
-affected cluster member is retained and the fallback is reported. This path
-never loads or runs a CNN model.
+current mode and corresponding `datcon#` contents. The production
+`--rf_model` is used only to rank representatives inside final-GOOD
+close-frequency, structurally matched groups. If it is absent, unloadable, or
+fails on one cluster member, every affected cluster member is retained and the
+fallback is reported. This path never loads or runs a CNN model.
 
 ## Typical workflow (hand labeling, (re-)training, checks etc)
 
@@ -398,7 +415,7 @@ never loads or runs a CNN model.
 - Run `sort_shot_mixed.py --method rules` for the canonical production pass:
   it routes EAE-like modes away, applies the frozen rejection rules, promotes
   rule survivors under `accept-as-good-v1`, applies manual overrides, and
-  optionally uses RF only for duplicate ranking.
+  uses RF only to select representatives among frequency/structure duplicates.
 - Run `sort_shot_mixed.py --method rf-cnn` with both model checkpoints only
   when the legacy combined RF+CNN decision path is required. Raw,
   straightened, and hybrid CNN checkpoints are supported through the shared
@@ -432,7 +449,8 @@ Minimal install / enviroment
 - Python packages:
     - numpy
     - scipy
-    - scikit-learn (RF)
+    - scikit-learn 1.9.0 (RF)
+    - narwhals >=2.0.1 (required by scikit-learn 1.9.0)
     - torch (CNN)
 
 Notes
