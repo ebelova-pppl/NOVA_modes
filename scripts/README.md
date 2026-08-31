@@ -146,13 +146,13 @@ runs the raw CNN through the same Slurm launch path. The helpers default to
 `salloc` command.
 
 On PPPL Flux with the default `tcsh` shell, source
-`configs/paths/nova_paths.flux.csh`. The Flux config keeps the environment
-minimal: it resolves `NOVA_REPO` from the current Git checkout, sets
-`NOVA_MODELS=$NOVA_REPO/models`, sets `NOVA_TRAIN_CSV` and
-`NOVA_TRAIN_CSV_TAE`, defaults `NOVA_TORCH_DEVICE=cpu`, and provides CPU
-helpers. It does not set a default `NOVA_DATA`; pass absolute mode/shot paths
-or set `NOVA_DATA` yourself for training and inspection workflows that use
-relative CSV paths.
+`configs/paths/nova_paths.flux.csh`. It resolves `NOVA_REPO` from the current
+Git checkout; sets `NOVA_MODELS`, the rebuilt training root `$NOVA_DATA`, the
+live shot root `$NOVA_DITW_ROOT`, `NOVA_TRAIN_CSV`, and
+`NOVA_TRAIN_CSV_TAE`; defaults `NOVA_TORCH_DEVICE=cpu`; and provides CPU
+helpers. The Bash companion `configs/paths/nova_paths.flux.sh` currently sets
+`$NOVA_DITW_ROOT` but not `$NOVA_DATA`, so Bash users must set a training root
+themselves for workflows that resolve relative CSV paths.
 
 ```tcsh
 module load anaconda3

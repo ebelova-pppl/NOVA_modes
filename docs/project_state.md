@@ -5398,3 +5398,115 @@ checkpoint still retains every affected cluster member and records
 labels that behavior as a conservative audit/failure-safe fallback rather than
 the complete production workflow, because it does not yield the intended
 deduplicated final-GOOD list.
+
+### 2026-08-30: refresh active-model metadata and distinguish Flux data roots
+
+Replaced stale 2,900-row checkpoint metadata in `models/README.md` with the
+current Q62-free 14-shot refresh: 2,390 unique training modes (576 GOOD and
+1,814 BAD), RF schema `rf_w_star_max_22_v2`, the row-wise RF validation
+metrics, the raw-CNN split metrics and subsequent 80-epoch full-list refit,
+the scikit-learn 1.9.0/Narwhals runtime requirement, and current artifact and
+training-list hashes. The README now states explicitly that these row-wise
+checks are not shot-held-out validation and that no new LOSO or fusion
+retuning was performed.
+
+Also clarified the separate Flux data roles. `$NOVA_DATA` is the rebuilt
+training database used to resolve relative label paths, while
+`$NOVA_DITW_ROOT` is the live DiTw source used for production shot sorting.
+The repository Flux `tcsh` path config defines both when sourced; its Bash
+companion currently defines only `$NOVA_DITW_ROOT` and leaves `$NOVA_DATA`
+caller-defined. Corrected the older generalized statement in
+`scripts/README.md` so it now distinguishes the two configs.
+
+A bounded inventory audit explains the apparent `nstx_120113` count
+discrepancy. `$NOVA_DATA/nstx_120113` has 541 direct modes: 133 strict
+TAE-like, 41 mixed, and 367 EAE-like, so 174 is its TAE-side aggregate.
+`$NOVA_DITW_ROOT/nstx_120113` has 341 direct modes: 54 TAE-like, no mixed
+modes, and 287 EAE-like. All 341 live mode files are byte-identical to
+matching training-database files; the training root has 200 additional paths.
+
+For `nstx_135388/N8`, `$NOVA_DATA` has 113 modes and no zero-byte files.
+`$NOVA_DITW_ROOT` has 112 modes and exactly three zero-byte files:
+`egn08w.2197E+02`, `egn08w.2861E+02`, and `egn08w.3062E+02`. Their training
+copies are each 675,392 bytes. `egn08w.7331E+02` is an additional complete
+training-root mode absent from the live root; the other 109 common N8 mode
+files are byte-identical. This audit changed documentation only, not
+configuration, training data, model artifacts, or sorter outputs.
+
+### 2026-08-30: run production rules sorting for the seven active G-shots
+
+Ran `scripts/sort_shot_mixed.py --method rules` for all seven G-shots present
+in the active Q62-free training CSV, using live inputs under
+`$NOVA_DITW_ROOT`, the active
+`$NOVA_REPO/models/nova_mode_classifier.joblib` checkpoint for post-rule
+deduplication, and one new per-shot directory under the user-selected
+`$NOVA_SORT_OUT`. The RF artifact SHA-256 was
+`b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c`.
+The Flux runtime used Python 3.11.15, scikit-learn 1.9.0, joblib 1.5.3, and
+Narwhals 2.25.0.
+
+| Shot | Inputs | Invalid | TAE-like | Mixed | EAE-like | Final BAD | Final GOOD |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `nstxuG121123B12` | 637 | 0 | 129 | 7 | 501 | 113 | 23 |
+| `nstxuG121123J38` | 620 | 0 | 165 | 9 | 446 | 157 | 17 |
+| `nstxuG121123K51` | 766 | 1 | 148 | 3 | 614 | 127 | 24 |
+| `nstxuG133964S31` | 830 | 0 | 52 | 24 | 754 | 75 | 1 |
+| `nstxuG142301H47` | 1,016 | 0 | 162 | 16 | 838 | 168 | 10 |
+| `nstxuG142301W29` | 1,060 | 0 | 149 | 9 | 902 | 151 | 7 |
+| `nstxuG142301Y93` | 651 | 0 | 100 | 13 | 538 | 111 | 2 |
+| **Total** | **5,580** | **1** | **905** | **81** | **4,593** | **902** | **84** |
+
+All outputs record `tae_rules_production_v1`, configuration SHA-256
+`a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39`,
+the frozen v14 rule set, and survivor policy `accept-as-good-v1`. There were
+no manual overrides and no final REVIEW rows. The sole invalid input is the
+known `nstxuG121123K51/N4/egn04w.8769E+01`, rejected as `INVALID_METADATA`
+because its metadata contain a non-finite value.
+
+RF processing completed without fallback for all 35 rows belonging to
+multi-mode close-frequency clusters; every such row records `PROCESSED_RF`
+and `rf_p_good`. `nstxuG133964S31` and `nstxuG142301Y93` had no multi-mode
+close-frequency clusters. No shot lost a final-GOOD mode during clustering:
+all 84 accepted survivors remained final GOOD because no close-frequency
+members also matched closely enough in structure to require representative
+removal. CSV row accounting, routing partitions, final-list counts, and
+configuration fields passed the post-run audit. No code, configuration,
+training data, or model artifact was changed.
+
+### 2026-08-30: run legacy RF-CNN sorting for the seven active G-shots
+
+Ran the paired comparison workflow for the same seven active G-shots with
+`scripts/sort_shot_mixed.py --method rf-cnn`, live inputs under
+`$NOVA_DITW_ROOT`, the active RF and raw-CNN checkpoints, automatic CNN kind
+detection, and explicit CPU inference. Each shot was written to a new
+per-shot directory under the requested AI output root. The artifact SHA-256
+values were
+`b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c`
+for the RF and
+`872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e`
+for the raw CNN. The Flux runtime used Python 3.11.15, scikit-learn 1.9.0,
+joblib 1.5.3, Narwhals 2.25.0, and CPU-only PyTorch 2.8.0+cu128.
+
+| Shot | Inputs | Invalid | TAE-like | Mixed | EAE-like | Final BAD | Flagged BAD | Final GOOD |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `nstxuG121123B12` | 637 | 0 | 129 | 7 | 501 | 116 | 1 | 20 |
+| `nstxuG121123J38` | 620 | 0 | 165 | 9 | 446 | 167 | 3 | 7 |
+| `nstxuG121123K51` | 766 | 1 | 148 | 3 | 614 | 127 | 0 | 24 |
+| `nstxuG133964S31` | 830 | 0 | 52 | 24 | 754 | 76 | 0 | 0 |
+| `nstxuG142301H47` | 1,016 | 0 | 162 | 16 | 838 | 166 | 0 | 12 |
+| `nstxuG142301W29` | 1,060 | 0 | 149 | 9 | 902 | 151 | 0 | 7 |
+| `nstxuG142301Y93` | 651 | 0 | 100 | 13 | 538 | 112 | 0 | 1 |
+| **Total** | **5,580** | **1** | **905** | **81** | **4,593** | **915** | **4** | **71** |
+
+The flagged count is a subset of final BAD, not a separate decision class.
+All 986 valid TAE-side modes have finite RF, CNN, and combined scores. Routing
+path sets and the rejected-input set match the paired deterministic-rules
+runs exactly. The sole invalid input is again
+`nstxuG121123K51/N4/egn04w.8769E+01`, rejected for non-finite metadata.
+
+The legacy frequency-cluster files contain 34 rows across five shots; every
+action is KEEP and `mode_clusters_removed=0` for all seven shots.
+`nstxuG133964S31` and `nstxuG142301Y93` have no multi-mode close-frequency
+clusters. CSV row accounting, score completeness, decision partitions, final
+lists, routing agreement, and rejected-mode agreement passed the post-run
+audit. No code, configuration, training data, or model artifact was changed.
