@@ -1,0 +1,62 @@
+{
+  "schema_version": "tae-rule-run-config-v2",
+  "name": "tae_rules_production_v2",
+  "rule_set_version": "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-v15",
+  "routing": {
+    "fraction_tae_threshold": 0.5,
+    "fraction_eae_threshold": 0.4,
+    "signed_delta_eae_threshold": -0.1,
+    "include_mixed_in_tae_like": true
+  },
+  "deduplication": {
+    "rel_freq_tol": 0.02
+  },
+  "gates": {
+    "axis_artifact": {
+      "enabled": true,
+      "r_ax": 0.03,
+      "amplitude_min": 0.2,
+      "width_max_grid": 10.0
+    },
+    "grid_scale_spike": {
+      "enabled": true,
+      "amplitude_min": 0.3,
+      "width_max_grid": 1.0,
+      "high_r_cutoff_r": 0.7,
+      "high_r_width_max_grid": 0.75
+    },
+    "grid_scale_packet": {
+      "enabled": true,
+      "amplitude_min": 0.3,
+      "step_min": 0.2,
+      "min_large_turns": 3,
+      "window_span_grid": 4,
+      "peak_r_max": 0.5
+    },
+    "continuum_crossing": {
+      "enabled": false,
+      "w_cross_threshold": 0.03
+    },
+    "continuum_crossing_window": {
+      "enabled": true,
+      "half_width_grid": 2,
+      "amplitude_min": 0.25,
+      "w_min": 0.05
+    },
+    "edge_artifact": {
+      "enabled": true,
+      "r_edge_min": 0.97,
+      "width_max_grid": 10.0
+    },
+    "interior_unresolved_envelope": {
+      "enabled": true,
+      "peak_r_max": 0.5,
+      "width_max_grid": 2.0,
+      "extremum_r_min": 0.03,
+      "extremum_r_max": 0.5,
+      "ext_dr_max": 0.02,
+      "ext_df_gap_min": 0.0,
+      "ext_df_gap_max": 0.04
+    }
+  }
+}

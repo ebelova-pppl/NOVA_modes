@@ -1,7 +1,205 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-30)
+### Project state (current snapshot, updated 2026-08-31)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-08-31 interior unresolved-envelope gate and production v2
+
+- Added the final ordered rejection
+  `BAD_INTERIOR_UNRESOLVED_ENVELOPE`. It runs only after all existing axis,
+  signed-spike, packet, crossing, crossing-window, and edge gates, preserving
+  every established primary reason and ensuring its continuum-extremum
+  exception cannot rescue an earlier rejection.
+- The gate reuses the existing global total-energy envelope
+  `W(r)=sum_m |xi_m(r)|^2`; it does not measure a single harmonic. It rejects
+  when the connected component around the tallest unsmoothed `W(r)` sample has
+  FWHM no greater than two radial-grid intervals and the global energy peak is
+  at the inclusive radius `r<=0.5`.
+- A candidate is exempted only when a gate-specific continuum-extremum match
+  satisfies `ext_dr<=0.02` and `0<=ext_df_gap<=0.04`. That search accepts upper
+  minima and lower maxima centered in the inclusive interval
+  `0.03<=r<=0.50`, using finite neighboring samples outside the search limit
+  when needed to recognize an extremum exactly at a boundary. The established
+  experimental RF25/RF31 extremum calculation still stops at `r=0.40`, so RF
+  feature and checkpoint semantics are unchanged.
+- Populated `resolution_features.interior_unresolved_envelope` with the
+  configured limits, reused total-energy peak/FWHM evidence, separate
+  extremum measurements, candidate status, and exception status. Advanced the
+  deterministic identities to ruleset
+  `tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-v15`
+  and grouped feature schema `tae-rule-features-grouped-v14`.
+- Added the current frozen `configs/rules/tae_rules_production_v2.yaml`, schema
+  `tae-rule-run-config-v2`, SHA-256
+  `7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f`.
+  The canonical `sort_shot_mixed.py --method rules` path now selects v2. The
+  historical production-v1 file remains byte-for-byte unchanged for
+  provenance and is executed from its corresponding historical checkout.
+- A separate non-blind 14-shot recomputation confirms that 26 current v14
+  survivors meet the radius/width condition. The extended extremum exception
+  protects 24 of them, including all 19 labeled-GOOD candidates. The new gate
+  rejects exactly the two labeled-BAD Y93 survivors
+  `N3/egn03w.8350E+01` and `N8/egn08w.9431E+01`, with no new labeled-GOOD
+  conflict. Projected active-label results are 1,775/1,813 evaluable BAD modes
+  rejected, 38 BAD survivors, 547/576 GOOD survivors, 97.20% evaluated-label
+  agreement, and 93.50% GOOD precision among rule survivors.
+- Executed production-v2 through `sort_shot_rules.py` on all 14 bounded live
+  training-shot trees. All 2,390 active labels were represented; the known
+  non-finite K51 `N4/8769` remained `INVALID`, and the evaluable decision
+  matrix exactly matched the projection: BAD labels `1775 BAD / 38 REVIEW`,
+  GOOD labels `29 BAD / 547 REVIEW`. Only the two Y93 modes above received the
+  new primary reason. All shot summaries recorded one identical v2
+  configuration/ruleset/SHA identity.
+- The complete repository suite passes all 115 tests. This includes inclusive
+  width/radius and exception boundaries, extended-search endpoints, no-match
+  and out-of-range cases, high-radius exclusion, single-harmonic versus total
+  energy, prior-gate precedence, disablement, CLI/config freezing, summaries,
+  and canonical sorter integration. Both local skills pass structural
+  validation. A canonical `sort_shot_mixed.py --method rules` smoke run on
+  `nstx_120113` loaded production-v2, evaluated 174 TAE-side modes, promoted
+  46 survivors, and completed RF duplicate processing with no fallback.
+
+## 2026-08-31 first post-training K34 rules versus RF-CNN run
+
+- Ran the new live DiTw case `$NOVA_DITW_ROOT/nstxuG121123K34` through both
+  canonical `sort_shot_mixed.py --method rules` and explicit legacy
+  `--method rf-cnn`. Results are under
+  `/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K34` and
+  `/p/hym/ebelova/NOVA/sort_outputs_ai/nstxuG121123K34`, respectively. The
+  Flux runtime used Python 3.11.15, scikit-learn 1.9.0, Narwhals 2.25.0,
+  joblib 1.5.3, and CPU PyTorch 2.8.0+cu128.
+- The shot contains 1,258 nonempty `egn*` files. All ten required `datcon#`
+  files are present and nonempty. Both methods discovered exactly the same
+  paths and rejected the same 97 N4 files as invalid. In every rejected file,
+  only the stored `gamma_d` scalar is `NaN`; `omega`, `nr`, `ntor`, derived
+  `nhar`, and every mode-array value are finite. The remaining routing is 147
+  TAE-like, 13 mixed, and 1,001 EAE-like, leaving 160 valid TAE-side modes.
+- Production-v2 rules rejected 159 modes and promoted one survivor,
+  `N6/egn06w.7044E+02`, to final GOOD. The rules run records the v15
+  configuration SHA-256
+  `7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f`.
+  No close-frequency cluster was present, so no GOOD mode was removed.
+- Legacy RF-CNN also produced 159 BAD and one final GOOD, but selected a
+  different mode: `N9/egn09w.6028E+02`. All 160 RF, CNN, and combined scores
+  are finite; nine rows are in the overlapping flagged QC list. The two
+  methods agree on 158 BAD decisions and disagree only on the two GOOD modes:
+  rules promote N6/7044 while RF-CNN assigns it `gold_bad`, whereas rules
+  reject N9/6028 as `BAD_GRID_SCALE_SPIKE` and RF-CNN retains it through the
+  `flagged_rf_only_good` tier. No code, configuration, label, or model artifact
+  was changed.
+
+## 2026-08-31 K70 rules versus RF-CNN run
+
+- Ran `$NOVA_DITW_ROOT/nstxuG121123K70` through production-v2 rules with RF
+  duplicate ranking and through legacy RF-CNN with the active raw-CNN
+  checkpoint on CPU. Results are under the matching K70 directories in
+  `/p/hym/ebelova/NOVA/sort_outputs` and
+  `/p/hym/ebelova/NOVA/sort_outputs_ai`.
+- Preflight and post-run audits found 478 nonempty mode files, finite
+  `omega`, `gamma_d`, dimensions, toroidal metadata, mode arrays, and weights,
+  plus ten present and parseable continuum files. Both methods have zero
+  invalid/rejected inputs and identical routing: 81 TAE-like, seven mixed,
+  and 390 EAE-like. All 88 RF, CNN, and combined scores are finite.
+- Both methods produce 81 BAD and seven final GOOD modes with no duplicate
+  removal, but only four GOOD modes are common. Rules alone retain
+  `N2/egn02w.2546E+02`, `N2/egn02w.2596E+02`, and
+  `N7/egn07w.2519E+02`; RF-CNN assigns them two `gold_bad` and one
+  `silver_bad` decision. RF-CNN alone retains `N10/egn10w.2862E+02`,
+  `N10/egn10w.3121E+02`, and `N7/egn07w.2651E+02`; rules reject these as two
+  `BAD_AXIS_SPIKE` and one `BAD_INTERIOR_UNRESOLVED_ENVELOPE`. Overall the
+  methods agree on 82/88 TAE-side decisions. Added the six-row audit CSV
+  `outputs/k70_rules_vs_rf_cnn_disagreements.csv`, SHA-256
+  `52773d57e189efc83fad52c03b26a19a89d90a3e9a21864b4683017de230975d`.
+  No code, configuration, label, or model artifact was changed.
+
+## 2026-08-31 non-blind K70 N7/2651 axis-gate audit
+
+- Investigated why rules reject `nstxuG121123K70/N7/egn07w.2651E+02` as
+  `BAD_AXIS_SPIKE` although its plotted main envelope does not look sharply
+  unresolved. This is a non-blind diagnostic after both rules and RF-CNN
+  results were known.
+- The gate fires on a secondary negative lobe in zero-based stored harmonic 8,
+  not on the main radial envelope. Its local absolute maximum is 0.326182 at
+  the inclusive boundary `r=0.030`; the connected half-maximum component runs
+  from approximately `r=0.02257` to `0.03524`, width 0.01267 or 2.534 radial
+  grid intervals. It therefore satisfies the frozen axis thresholds
+  `amplitude>=0.2`, center `r<=0.03`, and width no greater than ten intervals.
+  The component does not touch `r=0`.
+- The physical-looking counterevidence is substantial. Total radial energy
+  peaks at `r=0.090` with connected FWHM 4.727 grid intervals; the near-axis
+  bump reaches 10.25% of peak `W` pointwise but contributes only 1.378% of
+  integrated energy at `r<=0.03`. The main envelope is close to an inner
+  continuum extremum (`ext_dr=0.015`, `ext_df_gap=0.0357`) with 71.4% local
+  energy. Its only true continuum crossing is a remote high-boundary crossing
+  near `r=0.913` with normalized crossing energy `6.86e-7`.
+- Thus the implementation matches the current rule, but the signed structure
+  does not support calling this lobe detached. The negative near-axis lobe is
+  part of the same harmonic's continuous nodal structure leading into its main
+  positive lobe. The axis extractor instead operates on `abs(xi_h)`, treats
+  each absolute local maximum independently, and does not test signed
+  continuity with the mode body. With a ten-grid-interval upper limit it can
+  therefore classify a resolved physical lobe as an axis spike. This case is
+  a legitimate possible false positive/manual-review candidate. Any proposed
+  tightening of the width limit or addition of a signed-coherence criterion
+  should be audited across all existing axis rejections rather than tuned from
+  this exposed case alone. No rule, label, model, or sorter output was changed.
+
+## 2026-08-31 non-blind axis-width and extremum-exception audit
+
+- Recomputed all 2,390 active Q62-free training rows from the synchronized
+  Flux data at `axis_width_max_grid` values 2, 3, 5, and 10, holding every
+  other production-v2 setting fixed and evaluating every released case through
+  the later gates. The width-10 run exactly reproduced the documented matrix:
+  1,775/1,813 evaluable BAD labels rejected, 547/576 GOOD labels retained, and
+  the known non-finite K51 input invalid.
+- The baseline has 625 `BAD_AXIS_SPIKE` modes: 617 BAD and eight GOOD labels.
+  Limits 2, 3, and 5 leave respectively 471, 547, and 596 axis rejections. At
+  width 2, later gates absorb 126 of the 151 released BAD labels, but 25 BAD
+  labels become REVIEW; three GOOD labels are recovered. Overall evaluated-
+  label agreement changes from 97.20% at width 10 to 96.27% at width 2.
+- Non-blind signed inspection supports the three recovered GOOD cases as
+  resolved/coherent axis lobes, while many of the 25 released BAD cases still
+  have clear axis-dominated peaks, detached lobes, or short packets just wider
+  than two intervals. A global width-2 replacement is therefore not safe.
+- A blanket continuum-extremum exception is also unsafe. Of 68 aligned
+  width-10 axis cases, 66 are labeled BAD. At width 10 the exception would
+  recover two GOOD but newly retain 17 BAD labels after later gates; at width
+  2 it recovers no additional GOOD and newly retains seven BAD labels.
+- Audited a narrower hybrid that always rejects axis peaks of width at most
+  two, but applies the 2--10 branch only to non-extremum modes. It recovers the
+  two aligned GOOD labels, while later gates catch 15 affected BAD labels and
+  ten BAD labels become REVIEW. Agreement is 96.86%, still below production.
+- On K70, a global width-2 gate releases N7/2651 as desired but also leaves
+  N1/2987 and N6/3129 as survivors; signed plots show axis pathology in those
+  two. The hybrid retains them as BAD and leaves N7/2651 as its only new K70
+  survivor; N10/2862 remains axis BAD with width 1.557.
+- The leading next design is a two-branch rule: preserve the sharp width-2
+  rejection, then require explicit signed detachment/packet or comparable
+  structure evidence for widths in `(2,10]`, allowing extremum localization
+  to relax only that broader branch. Full CSVs, targeted candidate lists,
+  diagnostics, metadata, and the report are in
+  `outputs/axis_width_audit_20260831/`. No production rule, configuration,
+  label, model, or sorter output was changed.
+
+## 2026-08-31 deferred axis change and live-input issue registry
+
+- Deferred any `BAD_AXIS_SPIKE` production change. The present calibration
+  tradeoff—recovering two labeled GOOD modes while releasing ten labeled BAD
+  modes under the candidate hybrid—is not decisive enough. The frozen
+  production-v2 rule remains unchanged while more post-training shots are
+  examined.
+- Started the incremental live-input registry in
+  `audits/main_dataset_input_issues/`. It currently records exact affected
+  paths for the known K51 `gamma_d=NaN` input, the K34 N4 NaN group, and the
+  three zero-byte live `nstx_135388/N8` files. Paths are portable and relative
+  to `$NOVA_DITW_ROOT`; the registry explicitly does not claim full-tree
+  coverage yet.
+- Re-audited all 1,258 K34 `egn*` files and the ten required continuum files.
+  Exactly 97 N4 files have `gamma_d=NaN`, and those paths match the canonical
+  rules run's rejected set one-for-one. K34 has no missing or empty required
+  `datcon#`, zero-byte mode, parse/shape, toroidal-number, harmonic-count,
+  non-finite mode-array, or invalid-weight problem. Expected continuum
+  missing-value sentinels handled by the shared loader are excluded from the
+  defect registry. No rule, label, model, or sorter output was changed.
 
 ## 2026-08-28 deterministic rules integrated into the canonical sorter
 
@@ -5510,3 +5708,243 @@ action is KEEP and `mode_clusters_removed=0` for all seven shots.
 clusters. CSV row accounting, score completeness, decision partitions, final
 lists, routing agreement, and rejected-mode agreement passed the post-run
 audit. No code, configuration, training data, or model artifact was changed.
+
+### 2026-08-30: compare rules and RF-CNN on the seven active G-shots
+
+Paired the completed deterministic-rules and legacy RF-CNN outputs by
+shot-relative mode key. All 5,580 discovered input paths, all routing path
+sets, and the rejected-input set match exactly. The sole rejected input is the
+known non-finite `nstxuG121123K51/N4/egn04w.8769E+01`; the remaining 986
+TAE-side modes have paired GOOD/BAD decisions.
+
+The pre-deduplication decision matrix is:
+
+| Rules decision | RF-CNN BAD | RF-CNN GOOD |
+| --- | ---: | ---: |
+| BAD | 895 | 7 |
+| GOOD | 20 | 64 |
+
+Thus the methods agree on 959/986 modes (97.26%). The 27 disagreements are 20
+rules-GOOD/RF-CNN-BAD modes and seven rules-BAD/RF-CNN-GOOD modes. Per shot:
+
+| Shot | Both BAD | Rules BAD / AI GOOD | Rules GOOD / AI BAD | Both GOOD | Disagreements |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `nstxuG121123B12` | 113 | 0 | 3 | 20 | 3 |
+| `nstxuG121123J38` | 157 | 0 | 10 | 7 | 10 |
+| `nstxuG121123K51` | 126 | 1 | 1 | 23 | 2 |
+| `nstxuG133964S31` | 75 | 0 | 1 | 0 | 1 |
+| `nstxuG142301H47` | 165 | 3 | 1 | 9 | 4 |
+| `nstxuG142301W29` | 149 | 2 | 2 | 5 | 4 |
+| `nstxuG142301Y93` | 110 | 1 | 2 | 0 | 3 |
+
+For the seven rules-BAD/RF-CNN-GOOD conflicts, the primary deterministic
+reasons are four `BAD_CONT_CROSS_WINDOW`, two `BAD_AXIS_SPIKE`, and one
+`BAD_GRID_SCALE_PACKET`. RF-CNN assigns all seven to `gold_good`; none carries
+an RF/CNN disagreement or threshold flag. The 20 rules-GOOD/RF-CNN-BAD modes
+all passed every deterministic gate and retain
+`rule_primary_reason=NO_GOOD_TEMPLATE`. RF-CNN assigns 11 to `gold_bad`, five
+to `silver_bad`, and four to `flagged_borderline_or_disagreement`. Those four
+are near-threshold/large-score-gap cases; neither classifier crosses its GOOD
+threshold, so their explicit model-disagreement flag remains false.
+
+Deduplication does not explain any classification difference. All 35 rules
+cluster rows record `PROCESSED_RF` and KEEP; every stored rules rank score
+exactly matches the paired RF-CNN `p_rf_good`. The legacy RF-CNN cluster files
+contain 34 KEEP rows and no DROP rows. Consequently, the pre- and post-dedup
+sets are unchanged: rules retain 84 final GOOD, RF-CNN retains 71, 64 are
+common, 20 are rules-only, and seven are RF-CNN-only.
+
+The active G-shot label subset contains 986 rows: 915 BAD and 71 GOOD. Of
+these, 985 have valid paired decisions; the remaining row is the known K51
+invalid mode. The live B12 run also contains the previously adjudicated SKIP
+mode `N7/egn07w.1888E+02`, which is not in the active training CSV. Against
+the 985 evaluable labels, rules give CM `[[894, 20], [7, 64]]`, 97.26%
+agreement, and GOOD precision/recall/F1 `0.762 / 0.901 / 0.826`. RF-CNN gives
+CM `[[914, 0], [0, 71]]` and 100% agreement. Every method disagreement is in
+the direction of the saved label: the 20 rules-only modes are labeled BAD and
+the seven RF-CNN-only modes are labeled GOOD.
+
+That perfect RF-CNN label agreement is resubstitution, not independent
+validation. Both active model checkpoints are full-list fits to this same
+training CSV. A bounded byte audit also found all 986 labeled live G-shot mode
+payloads and all 70 corresponding `datcon#` files identical to the Flux
+training-database copies, with no missing or mismatched files. The current
+labels were also used non-blindly during deterministic-rule calibration.
+Therefore this comparison identifies the exact policy conflicts, but it does
+not adjudicate them scientifically; visual morphology/continuum review or
+shot-held-out evidence is still required.
+
+Added the viewer-ready 27-row audit
+`outputs/gshot_rules_vs_rf_cnn_disagreements.csv`. It includes absolute live
+paths and portable mode keys, routing values, input fingerprints, both final
+decisions, rule reasons, RF/CNN/combined probabilities, AI tiers and flags,
+final-selection fields, and active training labels. Its SHA-256 is
+`cdaddf5543fd9dd502ce73f34dea5720fd174121f070030bf146c48f11f803b6`.
+No code, configuration, training data, model artifact, or per-shot sorter
+output was changed.
+
+### 2026-08-30: non-blind W29 three-mode packet-gate audit
+
+Investigated why the production rules reject
+`nstxuG142301W29/N7/egn07w.2103E+02` but promote the visually similar
+`N8/egn08w.2304E+02` and `N10/egn10w.1779E+02`. There is no live W29
+`N10/egn10w.1179E+02`; the disagreement CSV contains 1779. This was an
+explicit non-blind diagnostic after both rules and RF-CNN decisions were
+known, not an independent relabeling.
+
+N7/2103 alone fires `BAD_GRID_SCALE_PACKET`. Its selected stored harmonic 9
+has five samples from `r=0.125` through `0.145` equal to
+`[0.1904, 0.4182, -0.1928, 0.8750, 0.3102]`. All four adjacent steps have
+absolute magnitude at least 0.2 and alternate direction, producing all three
+required large interior turns; the peak is 0.875 at `r=0.14`, below the
+inclusive packet radius limit 0.5.
+
+The closest N8/2304 window, on stored harmonic 11 from `r=0.085` through
+`0.105`, is `[0.0867, 0.1417, 0.5771, -0.0374, 0.2506]`. It has only two
+qualified large turns because the first step is 0.0549. The closest N10/1779
+window, on stored harmonic 14 from `r=0.200` through `0.220`, is
+`[0.0961, 0.2663, -0.0891, 0.9319, 0.2738]`; it also has only two qualified
+turns because its first step is 0.1703, narrowly below the 0.2 threshold.
+Both therefore miss the all-three-turn condition.
+
+All other active BAD gates also remain below threshold for N8/2304 and
+N10/1779. Their qualifying narrow signed-spike amplitudes are 0.0905 and
+0.1921, below the 0.3 spike cutoff; axis peaks are 0.0041 and 0.0640, below
+0.2; crossing-window maxima are respectively `A=0.00097, W=1.67e-6` and
+`A=0.0827, W=0.00724`, below `A>=0.25` or `W>=0.05`; and neither total-energy
+peak is near the `r>=0.97` edge. The rule engine therefore leaves both as
+REVIEW with `NO_GOOD_TEMPLATE`, after which `accept-as-good-v1` promotes them
+to final GOOD. It does not positively recognize them as GOOD morphology.
+
+This trio exposes a hard-threshold cliff rather than a code-execution error.
+The active labels and full-fit RF-CNN call N7/2103 GOOD and the other two BAD,
+the exact opposite of the deterministic results for all three. Their similar
+visual morphology means any change to the packet step threshold or required
+turn count should be evaluated across the complete labeled audit, not tuned
+from these three exposed examples alone. No rule, label, model, or sorter
+output was changed.
+
+### 2026-08-30: non-blind Y93 unresolved-inner-peak audit
+
+Investigated why production rules promote
+`nstxuG142301Y93/N3/egn03w.8350E+01` and
+`N8/egn08w.9431E+01` even though both look numerical. This was an explicit
+non-blind rule audit after the decisions and labels were known. Label-free raw
+signed-harmonic, radial-energy, and continuum diagnostics confirm that both
+have needle-like total-energy peaks near the inner radius: N3 peaks at
+`r=0.055` with total-energy FWHM `1.428` grid intervals, while N8 peaks at
+`r=0.060` with FWHM `1.087` grid intervals. N3 also has jagged small-r
+structure and weak detached high-r features.
+
+The current production rules contain no generic interior total-energy-width
+gate. The signed-lobe spike gate instead requires both amplitude at least 0.3
+and signed-lobe FWHM no greater than one grid interval at these radii. N3's
+dominant stored harmonic 6 reaches 1.0 at `r=0.055`, but its signed-lobe FWHM
+is `1.881` grid intervals; its strongest lobe satisfying the one-grid width
+limit has amplitude only `0.226`. N8's dominant stored harmonic 16 reaches
+1.0 at `r=0.060`, but its signed-lobe FWHM is `1.323` grid intervals; its
+strongest one-grid-qualified lobe has amplitude only `0.098`. Both therefore
+miss `BAD_GRID_SCALE_SPIKE` through the width/amplitude conjunction.
+
+Neither mode forms the repeated-turn pattern required by
+`BAD_GRID_SCALE_PACKET`: the closest amplitude- and radius-qualified
+five-sample window has only one large turn for each mode, versus the required
+three. The N3 subdominant stored harmonic 7 does have three qualifying large
+turns over its complete radial profile, but no five-sample window contains
+all three. Its best local window has two large turns and peak amplitude only
+`0.173`, below the packet amplitude threshold 0.3. The same harmonic's
+strongest lobe reaches `0.390`, but its signed FWHM is `1.083` grid intervals,
+just above the spike-gate limit 1. Their peaks also lie outside the axis gate
+(`r<=0.03`) and far inside the edge gate (`r>=0.97`). Crossing-window maxima
+remain below the active `A>=0.25` or `W>=0.05` thresholds: N3 has `A=0.107`,
+`W=0.0111`; N8 has `A=0.000882`, `W=1.75e-6`.
+
+Continuum-extremum alignment does not promote either mode and is not a
+positive decision gate. N3 has `ext_dr=0.070` and `ext_df_gap=-0.341`; N8 is
+closer in radius at `ext_dr=0.015`, but its `ext_df_gap=-0.138` places the
+mode frequency on the continuum side rather than the local gap side. With no
+BAD gate fired, both retain `rule_decision=REVIEW` and
+`rule_primary_reason=NO_GOOD_TEMPLATE`; `accept-as-good-v1` alone promotes
+them to final GOOD.
+
+Both active v3 labels are BAD, and the full-fit RF-CNN also assigns both to
+`gold_bad`; this is resubstitution evidence rather than independent
+validation. The pair exposes a missing deterministic screen for unresolved
+interior total-energy envelopes, plus hard width cliffs in the existing
+signed-lobe screen. No rule, label, model, or sorter output was changed.
+
+### 2026-08-31: non-blind narrow interior energy-envelope calibration
+
+Audited the proposal to reject very narrow total-energy envelopes unless the
+mode is aligned with a continuum extremum in both radius and frequency. This
+was an explicit non-blind calibration against the active 14-shot training
+list, not independent validation. Measurements were recomputed directly from
+all 2,390 synchronized files under the training data root rather than relying
+on the incomplete live Flux sorter outputs. The frozen v14 rules reproduce
+the documented 2,389 evaluable labels plus the known non-finite K51 input:
+1,773 BAD labels are rejected, 40 BAD labels survive, 547 GOOD labels survive,
+and 29 GOOD labels are rejected.
+
+A blanket all-radius total-energy width gate is unsafe because the current
+`W(r)` FWHM is only the connected half-maximum component around the single
+tallest grid sample. In multi-peaked edge families, that component can be one
+or two grid intervals wide even though the total radial envelope is broad and
+resolved. Among current rule survivors, raw connected `W(r)` FWHM at most 1.5
+grid intervals includes six BAD and 15 GOOD labels. Even after the existing
+inner-extremum exception, an all-radius gate would reject three BAD and four
+GOOD modes. The gate therefore needs an explicit interior-peak scope.
+
+Non-blind signed-harmonic inspection of the five active labeled-GOOD rule
+survivors with `r_peak>0.6` and connected FWHM at most two grid intervals found
+no convincing genuinely narrow edge envelope. For example,
+`nstx_135388/N3/egn03w.5494E+02` has `r_peak=0.925` and connected
+`FWHM_grid=1.565`, but its 10--90% integrated-energy interval is
+`r=0.565--0.912`, `W>=0.05` spans approximately `r=0.36--0.96`, and a modestly
+smoothed FWHM is about 0.30 in normalized radius. Likewise,
+`nstx_135388/N2/egn02w.6059E+02` has `r_peak=0.950` and connected
+`FWHM_grid=1.220`, while its 10--90% interval is `r=0.522--0.939` and
+`W>=0.05` spans about `r=0.43--0.97`. Their signed harmonics form coherent,
+outward-shifting broad edge families. These examples correct the earlier
+interpretation: a narrow connected peak is not a narrow overall envelope.
+
+The cleanest tested candidate is:
+
+```text
+IF W_energy_FWHM_grid <= 2
+AND W_energy_peak_r <= 0.5
+AND NOT (
+  inner_extremum_match_found
+  AND ext_dr <= 0.02
+  AND 0 <= ext_df_gap <= 0.04
+)
+THEN BAD_INTERIOR_UNRESOLVED_ENVELOPE
+```
+
+The extremum search must cover `0.03 <= r <= 0.50`, rather than stop at the
+existing experimental-feature boundary 0.40. The sole apparent labeled-GOOD
+conflict at the 1.5-grid cutoff,
+`nstxuE202855A01t020/N6/egn06w.2444E+01`, peaks at `r=0.400` beside an upper
+continuum minimum just outside the old search boundary. Extending the search
+changes its match from `ext_dr=0.240`, `ext_df_gap=-0.120` to
+`ext_dr=0`, `ext_df_gap=0.00435`, with 71.7% of integrated energy near the
+extremum, and correctly applies the exception.
+
+With that extended search, both FWHM cutoffs 1.5 and 2.0 newly reject exactly
+the two labeled-BAD Y93 survivors `N3/egn03w.8350E+01` and
+`N8/egn08w.9431E+01`, with no labeled-GOOD loss. A cutoff of 2 grid intervals
+is the natural largest few-grid-interval threshold with the clean current
+result. Increasing it to 2.5 rejects two BAD and two GOOD survivors; increasing
+it to 3 rejects three BAD and two GOOD survivors. The candidate would improve
+active BAD recall from 97.79% to 97.90%, retained-set GOOD precision from
+93.19% to 93.50%, and overall agreement from 97.11% to 97.20%, while preserving
+94.97% GOOD retention.
+
+Continuum alignment is only an exception to this one narrow-envelope gate; it
+is not proof that a mode is physical and must never rescue an earlier axis,
+signed-spike, packet, crossing, or edge rejection. Five currently labeled-BAD
+survivors with FWHM at most 2 and `r_peak<=0.5` satisfy the proposed exception:
+E202855 N10/1210, J38 N8/2974, K51 N9/3938, W29 N8/2304, and W29 N10/1779.
+They remain an explicit visual/morphology adjudication set for other rules.
+At this calibration stage no code, rule configuration, labels, models, or
+sorter outputs were changed; the subsequently implemented production-v2 gate
+is recorded in the current-state section above.

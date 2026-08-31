@@ -211,6 +211,72 @@ class ContinuumExtremumFeatureTests(unittest.TestCase):
             EXTREMUM_FEATURE_DEFAULTS,
         )
 
+    def test_rule_specific_search_extends_past_point_four_without_changing_legacy(self):
+        mode = np.exp(-((self.r - 0.45) / 0.025) ** 2)[None, :]
+        lower = np.full_like(self.r, 0.5)
+        upper = 1.2 + 4.0 * (self.r - 0.45) ** 2
+
+        legacy, legacy_match = continuum_extremum_features(
+            mode,
+            1.19,
+            lower**2,
+            upper**2,
+            r=self.r,
+            return_match_status=True,
+        )
+        extended, extended_match = continuum_extremum_features(
+            mode,
+            1.19,
+            lower**2,
+            upper**2,
+            r=self.r,
+            r_min=0.03,
+            r_max=0.5,
+            return_match_status=True,
+            filter_candidates_after_detection=True,
+        )
+
+        self.assertFalse(legacy_match)
+        self.assertEqual(legacy, EXTREMUM_FEATURE_DEFAULTS)
+        self.assertTrue(extended_match)
+        self.assertAlmostEqual(extended["ext_dr"], 0.0)
+        self.assertAlmostEqual(extended["ext_df_gap"], (1.2 - 1.19) / 1.19)
+
+    def test_rule_specific_extremum_search_includes_point_five_boundary_only(self):
+        lower = np.full_like(self.r, 0.5)
+        at_boundary_mode = np.exp(-((self.r - 0.5) / 0.025) ** 2)[None, :]
+        at_boundary_upper = 1.2 + 4.0 * (self.r - 0.5) ** 2
+        boundary, boundary_match = continuum_extremum_features(
+            at_boundary_mode,
+            1.19,
+            lower**2,
+            at_boundary_upper**2,
+            r=self.r,
+            r_min=0.03,
+            r_max=0.5,
+            return_match_status=True,
+            filter_candidates_after_detection=True,
+        )
+
+        outside_mode = np.exp(-((self.r - 0.55) / 0.025) ** 2)[None, :]
+        outside_upper = 1.2 + 4.0 * (self.r - 0.55) ** 2
+        outside, outside_match = continuum_extremum_features(
+            outside_mode,
+            1.19,
+            lower**2,
+            outside_upper**2,
+            r=self.r,
+            r_min=0.03,
+            r_max=0.5,
+            return_match_status=True,
+            filter_candidates_after_detection=True,
+        )
+
+        self.assertTrue(boundary_match)
+        self.assertAlmostEqual(boundary["ext_dr"], 0.0)
+        self.assertFalse(outside_match)
+        self.assertEqual(outside, EXTREMUM_FEATURE_DEFAULTS)
+
 
 class ContinuumScalarTests(unittest.TestCase):
     def test_datcon_loader_repairs_joint_outer_tail_spike(self):

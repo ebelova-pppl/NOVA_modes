@@ -1,0 +1,4 @@
+issue_id,shot,n,issue_type,field,affected_files,source_root,sorter_effect,status,verified_on,notes
+DITW-001,nstxuG121123K51,4,nonfinite_scalar,gamma_d,1,$NOVA_DITW_ROOT,INVALID_METADATA,open_source_data_issue,2026-08-31,The only non-finite value in the binary file is the stored gamma_d scalar.
+DITW-002,nstxuG121123K34,4,nonfinite_scalar,gamma_d,97,$NOVA_DITW_ROOT,INVALID_METADATA,open_source_data_issue,2026-08-31,The 97 paths exactly match the canonical rules sorter's rejected set for K34.
+DITW-003,nstx_135388,8,zero_byte_mode_file,file_size,3,$NOVA_DITW_ROOT,MODE_LOAD_FAILED,open_source_data_issue,2026-08-31,All three listed live-source mode files have size zero.

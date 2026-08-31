@@ -1,7 +1,18 @@
 # Deterministic TAE rule configurations
 
-`tae_rules_production_v1.yaml` is the frozen deterministic production preset.
-The canonical sorter loads it automatically under its default rules method:
+`tae_rules_production_v2.yaml` is the current frozen deterministic production
+preset. It adds the final `BAD_INTERIOR_UNRESOLVED_ENVELOPE` gate with an
+inclusive `r_peak <= 0.5`, connected total-energy FWHM no greater than two
+grid intervals, and a gate-specific continuum-extremum exception requiring
+`ext_dr <= 0.02` and `0 <= ext_df_gap <= 0.04`. The exception search covers
+candidate centers through `r=0.50` without changing the established RF
+extremum-feature definition.
+
+`tae_rules_production_v1.yaml` remains byte-for-byte as the historical v14
+preset. Use the corresponding historical checkout to execute that pinned
+ruleset.
+The canonical sorter loads production-v2 automatically under its default rules
+method:
 
 ```bash
 python scripts/sort_shot_mixed.py \
@@ -27,7 +38,7 @@ For a conservative audit of this exact preset without survivor promotion, run:
 python scripts/sort_shot_rules.py \
   --shot_dir /path/to/SHOT \
   --out_dir /path/to/audit-output \
-  --rule_config tae_rules_production_v1
+  --rule_config tae_rules_production_v2
 ```
 
 Use `sort_shot_rules.py` without `--rule_config` for threshold calibration and

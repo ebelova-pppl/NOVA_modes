@@ -22,9 +22,10 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v1.yaml`. It pins the v14
-ruleset and routing values, enables gates 1, 2, 2b, 4, and 5, and explicitly
-disables exact-point continuum gate 3. Do not combine a named configuration
+The preset is `configs/rules/tae_rules_production_v2.yaml`. It pins the v15
+ruleset and routing values, enables gates 1, 2, 2b, 4, 5, and the final
+interior-envelope gate, and explicitly disables exact-point continuum gate 3.
+Do not combine a named configuration
 with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and
 per-`n` summaries.
@@ -66,11 +67,13 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. Six ordered BAD decisions detect narrow near-axis spikes,
-unresolved signed-harmonic spikes and short large-turn packets whose strongest
-window sample is at `r <= 0.5`, continuum crossings carrying appreciable exact-point or nearby amplitude and
-normalized radial energy, followed by a narrow globally dominant energy
-envelope at the outer radial boundary.
+TAE/EAE/mixed split. Seven ordered BAD decisions detect narrow near-axis
+spikes, unresolved signed-harmonic spikes and short large-turn packets whose
+strongest window sample is at `r <= 0.5`, continuum crossings carrying
+appreciable exact-point or nearby amplitude and normalized radial energy, a
+narrow globally dominant energy envelope at the outer radial boundary, and a
+few-grid-interval interior total-energy envelope without a qualifying nearby
+continuum extremum.
 Their calibrated defaults are `r_ax=0.03` inclusive,
 `axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
 `grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`,
@@ -84,11 +87,13 @@ Their calibrated defaults are `r_ax=0.03` inclusive,
 `w_cross_threshold=0.03`, crossing-window defaults
 `cross_window_half_width_grid=2`, `cross_window_amplitude_min=0.25`, and
 `cross_window_w_min=0.05`, with provisional edge defaults
-`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; the engine returns
+`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; the final interior
+defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
+`0<=ext_df_gap<=0.04`; the engine returns
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v13 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v14 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -98,8 +103,9 @@ the axis measurements under
 audit measurements under `boundary_features.edge_artifact`, the unresolved
 signed-lobe measurements under `numerical_structure_features.grid_scale_spike`,
 and short-window repeated-turn evidence under
-`numerical_structure_features.grid_scale_packet`; reserve an empty object for
-`resolution_features`. These are named deterministic
+`numerical_structure_features.grid_scale_packet`; store the final
+total-energy-width gate and its separate extended extremum match under
+`resolution_features.interior_unresolved_envelope`. These are named deterministic
 measurements; no RF checkpoint or prediction is used to produce them. Keep
 `signed_delta` and
 `fraction_below_upper2` as routing audit columns rather than rule features.
@@ -277,7 +283,41 @@ This gate runs only after `BAD_CONT_CROSS_WINDOW`. Override its settings with
 `--edge_r_min` and `--edge_width_max_grid`; use `--disable_edge_artifact` to
 retain both envelope and harmonic audit measurements without applying the
 decision. The edge threshold is inclusive. Shot and per-`n` summaries record
-the enable state and exact threshold for all six BAD decisions.
+the enable state and exact threshold for every BAD decision.
+
+The final gate reuses the same global total-energy evidence; it never measures
+the width of one harmonic. Its calibrated decision is:
+
+```text
+IF energy_peak_r <= 0.5
+AND connected_total_energy_FWHM_grid <= 2
+AND NOT (
+  gate_specific_extremum_match_found
+  AND ext_dr <= 0.02
+  AND 0 <= ext_df_gap <= 0.04
+)
+THEN BAD_INTERIOR_UNRESOLVED_ENVELOPE
+AND stop evaluating later decision gates
+```
+
+Evaluate it only after every earlier BAD gate so the exception cannot rescue
+an axis, signed-spike, packet, crossing, or edge rejection. The peak-radius,
+width, radial-mismatch, and signed frequency-clearance comparisons are all
+inclusive. Search upper minima and lower maxima with centers in
+`0.03 <= r <= 0.50`, using full finite-neighbor context at both search limits.
+Keep this match separate from the experimental RF extremum feature, whose
+established search still ends at `r=0.40`. The connected FWHM is the component
+containing the tallest unsmoothed `W(r)` sample; it can be artificially narrow
+for a broad, rippled edge envelope, so do not remove the `r_peak <= 0.5`
+restriction without calibrating a robust whole-envelope width. Override the
+settings with `--interior_envelope_peak_r_max`,
+`--interior_envelope_width_max_grid`,
+`--interior_envelope_extremum_r_min`,
+`--interior_envelope_extremum_r_max`, `--interior_envelope_ext_dr_max`,
+`--interior_envelope_ext_df_gap_min`, and
+`--interior_envelope_ext_df_gap_max`; use
+`--disable_interior_unresolved_envelope` to retain evidence without applying
+the decision.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. For deterministic production, run

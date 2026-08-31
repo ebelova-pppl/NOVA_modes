@@ -520,15 +520,34 @@ def _smooth_finite_blocks(values, kernel=EXTREMUM_SMOOTHING_KERNEL):
     return smoothed
 
 
-def _extremum_candidates(boundary, smoothed, r, omega, kind, r_min, r_max):
-    """Return upper-minimum or lower-maximum candidates in the inner region."""
-    search_mask = (
-        np.isfinite(boundary)
-        & np.isfinite(smoothed)
-        & (r >= r_min)
-        & (r <= r_max)
-    )
+def _extremum_candidates(
+    boundary,
+    smoothed,
+    r,
+    omega,
+    kind,
+    r_min,
+    r_max,
+    *,
+    filter_candidates_after_detection=False,
+):
+    """Return upper-minimum or lower-maximum candidates in the inner region.
+
+    By default the radial search interval defines the blocks passed to
+    ``find_peaks``, preserving the established RF-feature behavior.  The
+    opt-in post-detection filter instead finds extrema with their full finite
+    neighbor context and then keeps centers in the inclusive interval.  This
+    lets a rule treat an extremum exactly at a configured search boundary as a
+    physical interior candidate without changing the frozen RF defaults.
+    """
+    finite_mask = np.isfinite(boundary) & np.isfinite(smoothed)
+    search_mask = finite_mask
+    if not filter_candidates_after_detection:
+        search_mask = search_mask & (r >= r_min) & (r <= r_max)
     candidates = []
+    radial_tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0, abs(r_min), abs(r_max)
+    )
     for block in _finite_blocks(search_mask):
         block_indices = np.arange(r.size)[block]
         # Endpoints of a valid/search block are deliberately excluded by
@@ -539,6 +558,12 @@ def _extremum_candidates(boundary, smoothed, r, omega, kind, r_min, r_max):
         peaks, properties = find_peaks(signal, prominence=0.0)
         for local_index, prominence in zip(peaks, properties["prominences"]):
             index = int(block_indices[local_index])
+            if filter_candidates_after_detection and not (
+                r_min - radial_tolerance
+                <= float(r[index])
+                <= r_max + radial_tolerance
+            ):
+                continue
             frequency = float(boundary[index])
             if kind == "upper_min":
                 df_gap = (frequency - omega) / omega
@@ -601,6 +626,7 @@ def continuum_extremum_features(
     df_scale=EXTREMUM_DF_SCALE,
     energy_half_width=EXTREMUM_ENERGY_HALF_WIDTH,
     return_match_status=False,
+    filter_candidates_after_detection=False,
 ):
     """Measure joint mode alignment with an inner continuum-gap extremum.
 
@@ -617,7 +643,10 @@ def continuum_extremum_features(
     ``ext_energy_frac`` is the fraction of integrated W(r) within a fixed
     radial half-width of the matched extremum. With ``return_match_status``,
     return ``(features, matched)`` so rule-facing consumers can distinguish a
-    real match from the RF fallback tuple.
+    real match from the RF fallback tuple.  The optional
+    ``filter_candidates_after_detection`` retains full-neighbor context for
+    extrema centered exactly at ``r_min`` or ``r_max``; it defaults to false
+    so established RF feature values remain unchanged.
     """
     def result(features, matched):
         if return_match_status:
@@ -656,11 +685,25 @@ def continuum_extremum_features(
     high_smoothed = _smooth_finite_blocks(high)
 
     candidates = _extremum_candidates(
-        high, high_smoothed, r, omega, "upper_min", r_min, r_max
+        high,
+        high_smoothed,
+        r,
+        omega,
+        "upper_min",
+        r_min,
+        r_max,
+        filter_candidates_after_detection=filter_candidates_after_detection,
     )
     candidates.extend(
         _extremum_candidates(
-            low, low_smoothed, r, omega, "lower_max", r_min, r_max
+            low,
+            low_smoothed,
+            r,
+            omega,
+            "lower_max",
+            r_min,
+            r_max,
+            filter_candidates_after_detection=filter_candidates_after_detection,
         )
     )
     if not candidates:

@@ -64,6 +64,7 @@ from tae_rule_engine import (  # noqa: E402
     BAD_EDGE_SPIKE,
     BAD_GRID_SCALE_PACKET,
     BAD_GRID_SCALE_SPIKE,
+    BAD_INTERIOR_UNRESOLVED_ENVELOPE,
     NO_GOOD_TEMPLATE,
     RULE_FEATURE_EXTRACTION_FAILED,
     RULE_FEATURE_GROUP_NAMES,
@@ -78,6 +79,7 @@ from tae_rule_engine import (  # noqa: E402
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
+    InteriorUnresolvedEnvelopeConfig,
     evaluate_mode,
     extract_axis_artifact_features,
     extract_continuum_crossing_window_features,
@@ -202,6 +204,15 @@ def make_tae_shot(root: Path, *, names: tuple[str, ...] = ("egn01w.one",)) -> Pa
     return shot
 
 
+def narrow_total_energy_mode(
+    *, nr: int = 65, peak_index: int = 32
+) -> np.ndarray:
+    """Return a smooth harmonic whose total-W FWHM is exactly two intervals."""
+    mode = np.zeros((4, nr), dtype=float)
+    mode[1, peak_index - 1 : peak_index + 2] = [np.sqrt(0.5), 1.0, np.sqrt(0.5)]
+    return mode
+
+
 def override_row(result_row: dict[str, str], decision: str = "GOOD") -> dict[str, str]:
     return {
         "mode_key": result_row["mode_key"],
@@ -302,6 +313,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         crossing_config=None,
         cross_window_config=None,
         edge_config=None,
+        interior_config=None,
     ):
         return evaluate_mode(
             self.base if row is None else row,
@@ -314,6 +326,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             continuum_crossing_config=crossing_config,
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
+            interior_unresolved_envelope_config=interior_config,
         )
 
     def test_unmatched_partial_ruleset_returns_review_with_valid_json(self):
@@ -348,7 +361,18 @@ class RuleAndOverrideTests(unittest.TestCase):
             {"match_found", *EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES},
         )
         self.assertTrue(features["extremum_features"]["match_found"])
-        self.assertEqual(features["resolution_features"], {})
+        interior_features = features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+        self.assertEqual(interior_features["peak_r_max"], 0.5)
+        self.assertEqual(interior_features["width_max_grid"], 2.0)
+        self.assertEqual(interior_features["extremum_r_min"], 0.03)
+        self.assertEqual(interior_features["extremum_r_max"], 0.5)
+        self.assertEqual(interior_features["ext_dr_max"], 0.02)
+        self.assertEqual(interior_features["ext_df_gap_min"], 0.0)
+        self.assertEqual(interior_features["ext_df_gap_max"], 0.04)
+        self.assertFalse(interior_features["candidate_found"])
+        self.assertFalse(interior_features["extremum_exception_applied"])
         grid_features = features["numerical_structure_features"][
             "grid_scale_spike"
         ]
@@ -499,6 +523,13 @@ class RuleAndOverrideTests(unittest.TestCase):
                 "grid_scale_candidate_found"
             ]
         )
+        interior_features = features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+        self.assertIsNone(interior_features["candidate_found"])
+        self.assertIsNone(interior_features["energy_peak_r"])
+        self.assertIsNone(interior_features["extremum_match_found"])
+        self.assertIsNone(interior_features["extremum_exception_applied"])
 
     def test_narrow_axis_spike_fires_first_bad_gate(self):
         mode = np.zeros_like(self.mode)
@@ -717,6 +748,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             mode=low_amplitude,
             low2=self.low2,
             high2=self.high2,
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                width_max_grid=None,
+            ),
         )
         self.assertEqual(low_result.decision, "REVIEW")
 
@@ -729,6 +763,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             high2=self.high2,
             grid_scale_packet_config=GridScalePacketConfig(
                 amplitude_min=None,
+            ),
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                width_max_grid=None,
             ),
         )
         self.assertEqual(resolved_result.decision, "REVIEW")
@@ -839,6 +876,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             grid_scale_packet_config=GridScalePacketConfig(
                 amplitude_min=None,
             ),
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                width_max_grid=None,
+            ),
         )
         features = result.features["numerical_structure_features"][
             "grid_scale_packet"
@@ -892,6 +932,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             grid_scale_spike_config=GridScaleSpikeConfig(
                 amplitude_min=None,
                 width_max_grid=1.0,
+            ),
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                width_max_grid=None,
             ),
         )
         features = result.features["numerical_structure_features"][
@@ -956,6 +999,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             amplitude_min=None,
             w_min=None,
         )
+        disabled_interior = InteriorUnresolvedEnvelopeConfig(
+            width_max_grid=None,
+        )
 
         result = evaluate_mode(
             self.base,
@@ -968,6 +1014,7 @@ class RuleAndOverrideTests(unittest.TestCase):
                 w_cross_threshold=0.05
             ),
             continuum_crossing_window_config=disabled_cross_window,
+            interior_unresolved_envelope_config=disabled_interior,
         )
         self.assertEqual(result.decision, "BAD")
         self.assertEqual(result.primary_reason, BAD_CONT_CROSS)
@@ -989,6 +1036,7 @@ class RuleAndOverrideTests(unittest.TestCase):
                 w_cross_threshold=None
             ),
             continuum_crossing_window_config=disabled_cross_window,
+            interior_unresolved_envelope_config=disabled_interior,
         )
         self.assertEqual(disabled_result.decision, "REVIEW")
         self.assertEqual(
@@ -1010,6 +1058,7 @@ class RuleAndOverrideTests(unittest.TestCase):
                 w_cross_threshold=measured_threshold
             ),
             continuum_crossing_window_config=disabled_cross_window,
+            interior_unresolved_envelope_config=disabled_interior,
         )
         self.assertEqual(equal_result.decision, "REVIEW")
 
@@ -1024,6 +1073,7 @@ class RuleAndOverrideTests(unittest.TestCase):
                 w_cross_threshold=0.0
             ),
             continuum_crossing_window_config=disabled_cross_window,
+            interior_unresolved_envelope_config=disabled_interior,
         )
         self.assertEqual(no_cross_result.decision, "REVIEW")
         self.assertEqual(
@@ -1457,6 +1507,270 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(result.primary_reason, BAD_CONT_CROSS_WINDOW)
         self.assertEqual(result.triggered_rules, (BAD_CONT_CROSS_WINDOW,))
 
+    def test_interior_envelope_gate_includes_exact_width_and_radius_limits(self):
+        mode = narrow_total_energy_mode()
+        low2 = np.full(mode.shape[1], 0.5**2)
+        high2 = np.full(mode.shape[1], 1.5**2)
+
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=low2,
+            high2=high2,
+        )
+        features = result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(result.primary_reason, BAD_INTERIOR_UNRESOLVED_ENVELOPE)
+        self.assertEqual(
+            result.triggered_rules,
+            (BAD_INTERIOR_UNRESOLVED_ENVELOPE,),
+        )
+        self.assertTrue(features["candidate_found"])
+        self.assertAlmostEqual(features["energy_peak_r"], 0.5)
+        self.assertAlmostEqual(features["energy_halfmax_width_grid"], 2.0)
+        self.assertFalse(features["extremum_match_found"])
+        self.assertFalse(features["extremum_exception_applied"])
+
+    def test_interior_envelope_inclusive_limits_tolerate_grid_roundoff(self):
+        mode = narrow_total_energy_mode(nr=201, peak_index=100)
+        radial_grid = np.linspace(0.0, 1.0, mode.shape[1])
+        upper = 26.0 + 30.0 * (radial_grid - 0.48) ** 2
+        result = evaluate_mode(
+            dict(self.base, omega=25.0),
+            mode=mode,
+            low2=np.full(mode.shape[1], 10.0**2),
+            high2=np.square(upper),
+        )
+        features = result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertGreater(features["energy_halfmax_width_grid"], 2.0)
+        self.assertGreater(features["ext_dr"], 0.02)
+        self.assertTrue(features["candidate_found"])
+        self.assertTrue(features["extremum_exception_applied"])
+        self.assertEqual(result.decision, "REVIEW")
+
+    def test_interior_envelope_gate_excludes_high_r_or_resolved_envelopes(self):
+        low2 = np.full(65, 0.5**2)
+        high2 = np.full(65, 1.5**2)
+        high_r = narrow_total_energy_mode(peak_index=33)
+        high_r_result = evaluate_mode(
+            self.base,
+            mode=high_r,
+            low2=low2,
+            high2=high2,
+        )
+        high_r_features = high_r_result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertEqual(high_r_result.decision, "REVIEW")
+        self.assertGreater(high_r_features["energy_peak_r"], 0.5)
+        self.assertAlmostEqual(
+            high_r_features["energy_halfmax_width_grid"], 2.0
+        )
+        self.assertFalse(high_r_features["candidate_found"])
+
+        resolved = np.zeros((4, 65), dtype=float)
+        resolved[1, 30:34] = [np.sqrt(0.5), 1.0, 1.0, np.sqrt(0.5)]
+        resolved_result = evaluate_mode(
+            self.base,
+            mode=resolved,
+            low2=low2,
+            high2=high2,
+        )
+        resolved_features = resolved_result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertEqual(resolved_result.decision, "REVIEW")
+        self.assertLessEqual(resolved_features["energy_peak_r"], 0.5)
+        self.assertAlmostEqual(
+            resolved_features["energy_halfmax_width_grid"], 3.0
+        )
+        self.assertFalse(resolved_features["candidate_found"])
+
+    def test_interior_envelope_extremum_exception_requires_every_bound(self):
+        mode = narrow_total_energy_mode()
+        radial_grid = np.linspace(0.0, 1.0, mode.shape[1])
+        row = dict(self.base, omega=25.0)
+        low2 = np.full(mode.shape[1], 10.0**2)
+        disabled_crossing = ContinuumCrossingConfig(w_cross_threshold=None)
+        disabled_window = ContinuumCrossingWindowConfig(
+            amplitude_min=None,
+            w_min=None,
+        )
+        cases = (
+            (
+                "inclusive upper frequency bound",
+                26.0 + 30.0 * (radial_grid - radial_grid[31]) ** 2,
+                True,
+                True,
+            ),
+            (
+                "inclusive zero frequency bound",
+                25.0 + 30.0 * (radial_grid - radial_grid[31]) ** 2,
+                True,
+                True,
+            ),
+            (
+                "negative frequency clearance",
+                24.75 + 30.0 * (radial_grid - radial_grid[31]) ** 2,
+                True,
+                False,
+            ),
+            (
+                "frequency clearance above limit",
+                26.25 + 30.0 * (radial_grid - radial_grid[31]) ** 2,
+                True,
+                False,
+            ),
+            (
+                "radial mismatch above limit",
+                26.0 + 30.0 * (radial_grid - radial_grid[30]) ** 2,
+                True,
+                False,
+            ),
+            (
+                "no extremum match",
+                np.full(mode.shape[1], 30.0),
+                False,
+                False,
+            ),
+        )
+
+        for name, upper, match_found, exception_applied in cases:
+            with self.subTest(name=name):
+                result = evaluate_mode(
+                    row,
+                    mode=mode,
+                    low2=low2,
+                    high2=np.square(upper),
+                    continuum_crossing_config=disabled_crossing,
+                    continuum_crossing_window_config=disabled_window,
+                )
+                features = result.features["resolution_features"][
+                    "interior_unresolved_envelope"
+                ]
+                self.assertEqual(features["extremum_match_found"], match_found)
+                self.assertEqual(
+                    features["extremum_exception_applied"], exception_applied
+                )
+                if name == "inclusive upper frequency bound":
+                    self.assertAlmostEqual(features["ext_df_gap"], 0.04)
+                elif name == "inclusive zero frequency bound":
+                    self.assertAlmostEqual(features["ext_df_gap"], 0.0)
+                expected_decision = "REVIEW" if exception_applied else "BAD"
+                self.assertEqual(result.decision, expected_decision)
+                if exception_applied:
+                    self.assertEqual(result.primary_reason, NO_GOOD_TEMPLATE)
+                    self.assertFalse(
+                        result.features["extremum_features"]["match_found"]
+                    )
+                else:
+                    self.assertEqual(
+                        result.primary_reason,
+                        BAD_INTERIOR_UNRESOLVED_ENVELOPE,
+                    )
+
+    def test_disabled_interior_envelope_gate_retains_evidence(self):
+        mode = narrow_total_energy_mode()
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=np.full(mode.shape[1], 0.5**2),
+            high2=np.full(mode.shape[1], 1.5**2),
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                width_max_grid=None,
+            ),
+        )
+        features = result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertEqual(result.decision, "REVIEW")
+        self.assertIsNone(features["candidate_found"])
+        self.assertAlmostEqual(features["energy_peak_r"], 0.5)
+        self.assertAlmostEqual(features["energy_halfmax_width_grid"], 2.0)
+        self.assertFalse(features["extremum_match_found"])
+        self.assertFalse(features["extremum_exception_applied"])
+
+    def test_interior_envelope_exception_includes_radial_mismatch_limit(self):
+        mode = narrow_total_energy_mode()
+        radial_grid = np.linspace(0.0, 1.0, mode.shape[1])
+        radial_mismatch = radial_grid[32] - radial_grid[31]
+        upper = 26.0 + 30.0 * (radial_grid - radial_grid[31]) ** 2
+        result = evaluate_mode(
+            dict(self.base, omega=25.0),
+            mode=mode,
+            low2=np.full(mode.shape[1], 10.0**2),
+            high2=np.square(upper),
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                ext_dr_max=radial_mismatch,
+            ),
+        )
+        features = result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertAlmostEqual(features["ext_dr"], radial_mismatch)
+        self.assertEqual(features["ext_dr"], features["ext_dr_max"])
+        self.assertTrue(features["extremum_exception_applied"])
+        self.assertEqual(result.decision, "REVIEW")
+
+    def test_interior_envelope_gate_uses_total_energy_not_one_harmonic(self):
+        mode = np.zeros((4, 65), dtype=float)
+        mode[0, 24:41] = 1.0
+        mode[1, 32] = 1.0
+        result = evaluate_mode(
+            self.base,
+            mode=mode,
+            low2=np.full(mode.shape[1], 0.5**2),
+            high2=np.full(mode.shape[1], 1.5**2),
+            grid_scale_spike_config=GridScaleSpikeConfig(amplitude_min=None),
+        )
+        grid_features = result.features["numerical_structure_features"][
+            "grid_scale_spike"
+        ]
+        envelope_features = result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertEqual(result.decision, "REVIEW")
+        self.assertTrue(grid_features["grid_scale_candidate_found"])
+        self.assertAlmostEqual(grid_features["grid_scale_halfmax_width_grid"], 1.0)
+        self.assertAlmostEqual(envelope_features["energy_peak_r"], 0.5)
+        self.assertGreater(envelope_features["energy_halfmax_width_grid"], 2.0)
+        self.assertFalse(envelope_features["candidate_found"])
+
+    def test_edge_gate_precedes_interior_envelope_exception(self):
+        mode = narrow_total_energy_mode()
+        radial_grid = np.linspace(0.0, 1.0, mode.shape[1])
+        row = dict(self.base, omega=25.0)
+        upper = 26.0 + 30.0 * (radial_grid - radial_grid[31]) ** 2
+        result = evaluate_mode(
+            row,
+            mode=mode,
+            low2=np.full(mode.shape[1], 10.0**2),
+            high2=np.square(upper),
+            edge_artifact_config=EdgeArtifactConfig(
+                r_edge_min=0.5,
+                edge_width_max_grid=2.0,
+            ),
+        )
+        features = result.features["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+
+        self.assertTrue(features["candidate_found"])
+        self.assertTrue(features["extremum_exception_applied"])
+        self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
+        self.assertEqual(result.triggered_rules, (BAD_EDGE_SPIKE,))
+
     def test_null_thresholds_disable_axis_gate_but_keep_measurements(self):
         mode = np.zeros_like(self.mode)
         mode[1, 0] = 1.0
@@ -1472,6 +1786,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             grid_scale_spike_config=GridScaleSpikeConfig(
                 amplitude_min=None,
                 width_max_grid=1.0,
+            ),
+            interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+                width_max_grid=None,
             ),
         )
         row = result.as_output_row(self.base)
@@ -2058,12 +2375,19 @@ class MixedSorterMethodIntegrationTests(unittest.TestCase):
 class WorkflowOutputTests(unittest.TestCase):
     def test_named_production_configuration_is_frozen_and_audited(self):
         configuration = load_rule_run_configuration(PRODUCTION_RULE_CONFIG_NAME)
-        self.assertEqual(configuration.name, "tae_rules_production_v1")
+        historical_v1 = (
+            REPO_ROOT / "configs" / "rules" / "tae_rules_production_v1.yaml"
+        )
+        self.assertEqual(
+            sha256_file(historical_v1),
+            "a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39",
+        )
+        self.assertEqual(configuration.name, "tae_rules_production_v2")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39",
+            "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -2090,6 +2414,13 @@ class WorkflowOutputTests(unittest.TestCase):
                 "cross_window_w_min": 0.05,
                 "edge_r_min": 0.97,
                 "edge_width_max_grid": 10.0,
+                "interior_envelope_peak_r_max": 0.5,
+                "interior_envelope_width_max_grid": 2.0,
+                "interior_envelope_extremum_r_min": 0.03,
+                "interior_envelope_extremum_r_max": 0.5,
+                "interior_envelope_ext_dr_max": 0.02,
+                "interior_envelope_ext_df_gap_min": 0.0,
+                "interior_envelope_ext_df_gap_max": 0.04,
             },
         )
 
@@ -2124,6 +2455,14 @@ class WorkflowOutputTests(unittest.TestCase):
             result.summary["continuum_crossing_window_gate_enabled"]
         )
         self.assertTrue(result.summary["edge_artifact_gate_enabled"])
+        self.assertTrue(result.summary["interior_envelope_gate_enabled"])
+        self.assertEqual(result.summary["interior_envelope_peak_r_max"], 0.5)
+        self.assertEqual(result.summary["interior_envelope_width_max_grid"], 2.0)
+        self.assertEqual(result.summary["interior_envelope_extremum_r_min"], 0.03)
+        self.assertEqual(result.summary["interior_envelope_extremum_r_max"], 0.5)
+        self.assertEqual(result.summary["interior_envelope_ext_dr_max"], 0.02)
+        self.assertEqual(result.summary["interior_envelope_ext_df_gap_min"], 0.0)
+        self.assertEqual(result.summary["interior_envelope_ext_df_gap_max"], 0.04)
 
         with tempfile.TemporaryDirectory() as temporary:
             modified = Path(temporary) / "modified.yaml"
@@ -2146,6 +2485,42 @@ class WorkflowOutputTests(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()):
             with self.assertRaises(SystemExit):
                 parse_args([*common, "--cross_window_w_min", "0.1"])
+            with self.assertRaises(SystemExit):
+                parse_args([*common, "--interior_envelope_width_max_grid", "3"])
+
+    def test_calibration_cli_accepts_interior_envelope_thresholds_and_disable(self):
+        args = parse_args(
+            [
+                "--shot_dir",
+                "/tmp/shot",
+                "--out_dir",
+                "/tmp/out",
+                "--interior_envelope_peak_r_max",
+                "0.45",
+                "--interior_envelope_width_max_grid",
+                "1.5",
+                "--interior_envelope_extremum_r_min",
+                "0.04",
+                "--interior_envelope_extremum_r_max",
+                "0.48",
+                "--interior_envelope_ext_dr_max",
+                "0.015",
+                "--interior_envelope_ext_df_gap_min",
+                "0.005",
+                "--interior_envelope_ext_df_gap_max",
+                "0.035",
+                "--disable_interior_unresolved_envelope",
+            ]
+        )
+
+        self.assertEqual(args.interior_envelope_peak_r_max, 0.45)
+        self.assertEqual(args.interior_envelope_width_max_grid, 1.5)
+        self.assertEqual(args.interior_envelope_extremum_r_min, 0.04)
+        self.assertEqual(args.interior_envelope_extremum_r_max, 0.48)
+        self.assertEqual(args.interior_envelope_ext_dr_max, 0.015)
+        self.assertEqual(args.interior_envelope_ext_df_gap_min, 0.005)
+        self.assertEqual(args.interior_envelope_ext_df_gap_max, 0.035)
+        self.assertTrue(args.disable_interior_unresolved_envelope)
 
     def test_complete_output_contract_summary_counts_and_idempotence(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -2213,6 +2588,22 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertTrue(first.summary["edge_artifact_gate_enabled"])
             self.assertEqual(first.summary["edge_artifact_r_min"], 0.97)
             self.assertEqual(first.summary["edge_artifact_width_max_grid"], 10.0)
+            self.assertTrue(first.summary["interior_envelope_gate_enabled"])
+            self.assertEqual(first.summary["interior_envelope_peak_r_max"], 0.5)
+            self.assertEqual(first.summary["interior_envelope_width_max_grid"], 2.0)
+            self.assertEqual(
+                first.summary["interior_envelope_extremum_r_min"], 0.03
+            )
+            self.assertEqual(
+                first.summary["interior_envelope_extremum_r_max"], 0.5
+            )
+            self.assertEqual(first.summary["interior_envelope_ext_dr_max"], 0.02)
+            self.assertEqual(
+                first.summary["interior_envelope_ext_df_gap_min"], 0.0
+            )
+            self.assertEqual(
+                first.summary["interior_envelope_ext_df_gap_max"], 0.04
+            )
             self.assertEqual(
                 json.loads(first.summary["primary_reason_counts_json"]),
                 {NO_GOOD_TEMPLATE: 1},
@@ -2238,6 +2629,15 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertAlmostEqual(
                 rule_features["rf_standard_features"]["rad_width"],
                 float(result_rows[0]["rad_width"]),
+            )
+            _fields, summary_by_n = read_dict_csv(out_dir / "shot_summary_by_n.csv")
+            self.assertEqual(len(summary_by_n), 1)
+            self.assertEqual(
+                summary_by_n[0]["interior_envelope_gate_enabled"], "True"
+            )
+            self.assertEqual(
+                float(summary_by_n[0]["interior_envelope_width_max_grid"]),
+                2.0,
             )
 
             before = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
@@ -2475,6 +2875,57 @@ class WorkflowOutputTests(unittest.TestCase):
             result.final_rows[0]["rule_primary_reason"],
             BAD_EDGE_SPIKE,
         )
+
+    def test_run_shot_applies_interior_envelope_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = narrow_total_energy_mode()
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=mode.shape[1],
+                mode=mode,
+            )
+            write_datcon(
+                shot / "N1" / "datcon1",
+                nr=mode.shape[1],
+            )
+            result = run_shot(
+                shot,
+                root / "out",
+                interior_envelope_peak_r_max=0.5,
+                interior_envelope_width_max_grid=2.0,
+                interior_envelope_extremum_r_min=0.03,
+                interior_envelope_extremum_r_max=0.5,
+                interior_envelope_ext_dr_max=0.02,
+                interior_envelope_ext_df_gap_min=0.0,
+                interior_envelope_ext_df_gap_max=0.04,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertEqual(result.summary["n_final_bad"], 1)
+        self.assertTrue(result.summary["interior_envelope_gate_enabled"])
+        self.assertEqual(result.summary["interior_envelope_peak_r_max"], 0.5)
+        self.assertEqual(result.summary["interior_envelope_width_max_grid"], 2.0)
+        self.assertEqual(result.summary["interior_envelope_extremum_r_min"], 0.03)
+        self.assertEqual(result.summary["interior_envelope_extremum_r_max"], 0.5)
+        self.assertEqual(result.summary["interior_envelope_ext_dr_max"], 0.02)
+        self.assertEqual(result.summary["interior_envelope_ext_df_gap_min"], 0.0)
+        self.assertEqual(result.summary["interior_envelope_ext_df_gap_max"], 0.04)
+        self.assertEqual(
+            json.loads(result.summary["primary_reason_counts_json"]),
+            {BAD_INTERIOR_UNRESOLVED_ENVELOPE: 1},
+        )
+        row = result.final_rows[0]
+        self.assertEqual(row["rule_primary_reason"], BAD_INTERIOR_UNRESOLVED_ENVELOPE)
+        features = json.loads(row["rule_features"])["resolution_features"][
+            "interior_unresolved_envelope"
+        ]
+        self.assertTrue(features["candidate_found"])
+        self.assertAlmostEqual(features["energy_peak_r"], 0.5)
+        self.assertAlmostEqual(features["energy_halfmax_width_grid"], 2.0)
 
     def test_valid_override_hash_and_stale_recheck(self):
         with tempfile.TemporaryDirectory() as temporary:

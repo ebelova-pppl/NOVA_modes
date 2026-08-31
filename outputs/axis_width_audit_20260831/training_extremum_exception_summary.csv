@@ -1,0 +1,5 @@
+axis_width_max_grid,axis_extremum_bypassed,bypassed_then_later_bad,total_bad_good,total_bad_bad,total_review_good,total_review_bad
+2.0,41,34,26,1743,550,70
+3.0,55,41,27,1746,549,67
+5.0,63,47,27,1752,549,61
+10.0,68,49,27,1758,549,55

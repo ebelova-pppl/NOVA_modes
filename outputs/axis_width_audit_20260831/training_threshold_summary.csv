@@ -1,0 +1,5 @@
+axis_width_max_grid,axis_bad_good,axis_bad_bad,total_bad_good,total_bad_bad,total_review_good,total_review_bad,primary_reason_changes_from_w10
+2.0,5,466,26,1750,550,63,154
+3.0,7,540,28,1759,548,54,78
+5.0,7,589,28,1767,548,46,29
+10.0,8,617,29,1775,547,38,0

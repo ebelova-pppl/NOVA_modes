@@ -53,6 +53,13 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
     DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
     DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX,
+    DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN,
+    DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX,
+    DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN,
+    DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX,
+    DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
+    DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID,
     DEFAULT_W_CROSS_THRESHOLD,
     NO_GOOD_TEMPLATE,
     RULESET_VERSION,
@@ -62,6 +69,7 @@ from tae_rule_engine import (  # noqa: E402
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
+    InteriorUnresolvedEnvelopeConfig,
     evaluate_mode,
 )
 from tae_rule_config import (  # noqa: E402
@@ -178,6 +186,14 @@ SHOT_SUMMARY_FIELDS = [
     "edge_artifact_gate_enabled",
     "edge_artifact_r_min",
     "edge_artifact_width_max_grid",
+    "interior_envelope_gate_enabled",
+    "interior_envelope_peak_r_max",
+    "interior_envelope_width_max_grid",
+    "interior_envelope_extremum_r_min",
+    "interior_envelope_extremum_r_max",
+    "interior_envelope_ext_dr_max",
+    "interior_envelope_ext_df_gap_min",
+    "interior_envelope_ext_df_gap_max",
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[field for field in SHOT_SUMMARY_FIELDS if field != "shot"]]
@@ -212,6 +228,14 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--edge_r_min",
         "--edge_width_max_grid",
         "--disable_edge_artifact",
+        "--interior_envelope_peak_r_max",
+        "--interior_envelope_width_max_grid",
+        "--interior_envelope_extremum_r_min",
+        "--interior_envelope_extremum_r_max",
+        "--interior_envelope_ext_dr_max",
+        "--interior_envelope_ext_df_gap_min",
+        "--interior_envelope_ext_df_gap_max",
+        "--disable_interior_unresolved_envelope",
     }
 )
 
@@ -826,6 +850,9 @@ def build_summary(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    interior_unresolved_envelope_config: (
+        InteriorUnresolvedEnvelopeConfig | None
+    ) = None,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -839,6 +866,10 @@ def build_summary(
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
     )
     edge_config = edge_artifact_config or EdgeArtifactConfig()
+    interior_config = (
+        interior_unresolved_envelope_config
+        or InteriorUnresolvedEnvelopeConfig()
+    )
     rule_rows = [row for row in rows if row.get("rule_version") == RULESET_VERSION]
     transitions = Counter(
         f"{row['rule_decision']}->{row['final_decision']}"
@@ -928,6 +959,14 @@ def build_summary(
         "edge_artifact_gate_enabled": edge_config.enabled,
         "edge_artifact_r_min": edge_config.r_edge_min,
         "edge_artifact_width_max_grid": edge_config.edge_width_max_grid,
+        "interior_envelope_gate_enabled": interior_config.enabled,
+        "interior_envelope_peak_r_max": interior_config.peak_r_max,
+        "interior_envelope_width_max_grid": interior_config.width_max_grid,
+        "interior_envelope_extremum_r_min": interior_config.extremum_r_min,
+        "interior_envelope_extremum_r_max": interior_config.extremum_r_max,
+        "interior_envelope_ext_dr_max": interior_config.ext_dr_max,
+        "interior_envelope_ext_df_gap_min": interior_config.ext_df_gap_min,
+        "interior_envelope_ext_df_gap_max": interior_config.ext_df_gap_max,
     }
     return summary
 
@@ -949,6 +988,9 @@ def _summary_by_n(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    interior_unresolved_envelope_config: (
+        InteriorUnresolvedEnvelopeConfig | None
+    ) = None,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -1003,6 +1045,9 @@ def _summary_by_n(
             continuum_crossing_config=continuum_crossing_config,
             continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
+            interior_unresolved_envelope_config=(
+                interior_unresolved_envelope_config
+            ),
             rule_survivor_policy=rule_survivor_policy,
             rule_configuration_name=rule_configuration_name,
             rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1108,6 +1153,23 @@ def run_shot(
     cross_window_w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN,
     edge_r_min: float = DEFAULT_EDGE_R_MIN,
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
+    interior_envelope_peak_r_max: float = DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
+    interior_envelope_width_max_grid: float | None = (
+        DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID
+    ),
+    interior_envelope_extremum_r_min: float = (
+        DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN
+    ),
+    interior_envelope_extremum_r_max: float = (
+        DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX
+    ),
+    interior_envelope_ext_dr_max: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX,
+    interior_envelope_ext_df_gap_min: float = (
+        DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN
+    ),
+    interior_envelope_ext_df_gap_max: float = (
+        DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX
+    ),
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -1149,6 +1211,15 @@ def run_shot(
         r_edge_min=edge_r_min,
         edge_width_max_grid=edge_width_max_grid,
     )
+    interior_config = InteriorUnresolvedEnvelopeConfig(
+        peak_r_max=interior_envelope_peak_r_max,
+        width_max_grid=interior_envelope_width_max_grid,
+        extremum_r_min=interior_envelope_extremum_r_min,
+        extremum_r_max=interior_envelope_extremum_r_max,
+        ext_dr_max=interior_envelope_ext_dr_max,
+        ext_df_gap_min=interior_envelope_ext_df_gap_min,
+        ext_df_gap_max=interior_envelope_ext_df_gap_max,
+    )
     output_dir = Path(out_dir).expanduser()
     existing_override_output = output_dir / "manual_overrides.csv"
     if manual_overrides is None and existing_override_output.exists():
@@ -1189,6 +1260,7 @@ def run_shot(
             continuum_crossing_config=crossing_config,
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
+            interior_unresolved_envelope_config=interior_config,
         )
         rule_by_key[key] = result.as_output_row(row)
 
@@ -1234,6 +1306,7 @@ def run_shot(
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
+        interior_unresolved_envelope_config=interior_config,
         rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1255,6 +1328,7 @@ def run_shot(
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
+        interior_unresolved_envelope_config=interior_config,
         rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1578,6 +1652,81 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
             "the BAD_EDGE_SPIKE decision gate"
         ),
     )
+    parser.add_argument(
+        "--interior_envelope_peak_r_max",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
+        help=(
+            "Inclusive maximum total-energy peak radius for "
+            "BAD_INTERIOR_UNRESOLVED_ENVELOPE "
+            f"(default: {DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_envelope_width_max_grid",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID,
+        help=(
+            "Inclusive maximum connected total-energy FWHM in radial-grid "
+            "intervals for BAD_INTERIOR_UNRESOLVED_ENVELOPE "
+            f"(default: {DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_envelope_extremum_r_min",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN,
+        help=(
+            "Inclusive minimum radius for the gate-specific continuum-extremum "
+            f"exception search (default: {DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_envelope_extremum_r_max",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX,
+        help=(
+            "Inclusive maximum radius for the gate-specific continuum-extremum "
+            f"exception search (default: {DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_envelope_ext_dr_max",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX,
+        help=(
+            "Inclusive maximum radial mismatch for the narrow-envelope "
+            f"extremum exception (default: {DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_envelope_ext_df_gap_min",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN,
+        help=(
+            "Inclusive minimum signed gap-side frequency clearance for the "
+            "narrow-envelope extremum exception "
+            f"(default: {DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_envelope_ext_df_gap_max",
+        type=float,
+        default=DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX,
+        help=(
+            "Inclusive maximum signed gap-side frequency clearance for the "
+            "narrow-envelope extremum exception "
+            f"(default: {DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX:g})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_interior_unresolved_envelope",
+        action="store_true",
+        help=(
+            "Calculate interior-envelope and extremum evidence but disable "
+            "the BAD_INTERIOR_UNRESOLVED_ENVELOPE decision gate"
+        ),
+    )
     args = parser.parse_args(raw_args)
     args.rule_configuration_name = ""
     args.rule_configuration_schema_version = ""
@@ -1661,6 +1810,25 @@ def main() -> None:
         edge_width_max_grid=(
             None if args.disable_edge_artifact else args.edge_width_max_grid
         ),
+        interior_envelope_peak_r_max=args.interior_envelope_peak_r_max,
+        interior_envelope_width_max_grid=(
+            None
+            if args.disable_interior_unresolved_envelope
+            else args.interior_envelope_width_max_grid
+        ),
+        interior_envelope_extremum_r_min=(
+            args.interior_envelope_extremum_r_min
+        ),
+        interior_envelope_extremum_r_max=(
+            args.interior_envelope_extremum_r_max
+        ),
+        interior_envelope_ext_dr_max=args.interior_envelope_ext_dr_max,
+        interior_envelope_ext_df_gap_min=(
+            args.interior_envelope_ext_df_gap_min
+        ),
+        interior_envelope_ext_df_gap_max=(
+            args.interior_envelope_ext_df_gap_max
+        ),
         rule_configuration_name=args.rule_configuration_name,
         rule_configuration_schema_version=(
             args.rule_configuration_schema_version
@@ -1733,6 +1901,19 @@ def main() -> None:
         f"enabled={summary['edge_artifact_gate_enabled']} "
         f"r_edge_min={summary['edge_artifact_r_min']} "
         f"width_max_grid={summary['edge_artifact_width_max_grid']}"
+    )
+    print(
+        "Interior unresolved-envelope gate: "
+        f"enabled={summary['interior_envelope_gate_enabled']} "
+        f"peak_r_max={summary['interior_envelope_peak_r_max']} "
+        f"width_max_grid={summary['interior_envelope_width_max_grid']} "
+        "extremum_r_range="
+        f"[{summary['interior_envelope_extremum_r_min']}, "
+        f"{summary['interior_envelope_extremum_r_max']}] "
+        f"ext_dr_max={summary['interior_envelope_ext_dr_max']} "
+        "ext_df_gap_range="
+        f"[{summary['interior_envelope_ext_df_gap_min']}, "
+        f"{summary['interior_envelope_ext_df_gap_max']}]"
     )
     print(f"Duplicate processing: {summary['duplicate_processing_status']}")
     if args.manual_overrides:

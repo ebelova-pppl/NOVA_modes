@@ -892,7 +892,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v1` configuration. A rejection gate produces automatic
+`tae_rules_production_v2` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1131,19 +1131,20 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v1.yaml`, stored as strict
+`configs/rules/tae_rules_production_v2.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v14 ruleset, routing thresholds, relative-frequency tolerance, all
+current v15 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
   (`BAD_GRID_SCALE_PACKET`), 4 (`BAD_CONT_CROSS_WINDOW`), and 5
-  (`BAD_EDGE_SPIKE`);
+  (`BAD_EDGE_SPIKE`), plus the final interior-envelope gate
+  (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`);
 - disabled: gate 3 (`BAD_CONT_CROSS`), while retaining its frozen latent
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v1 identity.
+config-owned threshold or gate override to retain the production-v2 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, and the audited `accept-as-good-v1` survivor
@@ -1163,7 +1164,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v1` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v2` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1174,9 +1175,8 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-v14`
-ruleset
-implements six ordered BAD decisions, treating the packet screen as gate 2b so
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-v15`
+ruleset implements seven ordered BAD decisions, treating the packet screen as gate 2b so
 the established gate-3/4/5 names remain stable. It still has no positive GOOD
 template. Modes that do not fire any
 gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
@@ -1185,7 +1185,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v13`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v14`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1229,7 +1229,12 @@ groups are:
   harmonic index, radial and sample-index bounds, large-step and large-turn
   counts, maximum step, step RMS, total variation, unconstrained direction-
   and sign-change counts, and five signed sample values;
-- a reserved empty `resolution_features` object for later rule development.
+- `resolution_features.interior_unresolved_envelope`: the global total-energy
+  peak and connected FWHM reused from the edge-envelope calculation, the
+  configured interior and exception limits, a separate continuum-extremum
+  match searched through `r=0.50`, and whether that exception was applied.
+  This leaves the established RF25/RF31 extremum search through `r=0.40`
+  unchanged.
 
 This calculates the same quantities used by RF feature experiments but does
 not load an RF checkpoint or use an RF prediction. `signed_delta` and
@@ -1396,7 +1401,39 @@ shear-localized harmonics within a broader total envelope. Override the
 settings with `--edge_r_min` and `--edge_width_max_grid`, or use
 `--disable_edge_artifact` to retain the measurements without applying the
 decision. Shot and per-`n` summaries record enable state and thresholds for all
-six BAD decisions.
+existing BAD decisions.
+
+The final gate reuses that same global total-energy envelope; it never measures
+an individual harmonic:
+
+```yaml
+interior_unresolved_envelope:
+  peak_r_max: 0.5
+  width_max_grid: 2
+  extremum_r_min: 0.03
+  extremum_r_max: 0.50
+  ext_dr_max: 0.02
+  ext_df_gap_min: 0
+  ext_df_gap_max: 0.04
+```
+
+After every earlier BAD gate, a mode with global connected total-energy FWHM
+at most two grid intervals and global energy peak at the inclusive radius
+`r <= 0.5` returns `BAD_INTERIOR_UNRESOLVED_ENVELOPE`, unless a gate-specific
+continuum-extremum match satisfies both `ext_dr <= 0.02` and
+`0 <= ext_df_gap <= 0.04`. Candidate extrema are centered in the inclusive
+interval `0.03 <= r <= 0.50`; this search is separate from the experimental RF
+extremum feature and therefore does not change RF checkpoint semantics. The
+connected FWHM is local to the tallest unsmoothed `W(r)` component, so the
+production gate deliberately remains restricted to interior peaks. Override
+the settings with `--interior_envelope_peak_r_max`,
+`--interior_envelope_width_max_grid`,
+`--interior_envelope_extremum_r_min`,
+`--interior_envelope_extremum_r_max`, `--interior_envelope_ext_dr_max`,
+`--interior_envelope_ext_df_gap_min`, and
+`--interior_envelope_ext_df_gap_max`; use
+`--disable_interior_unresolved_envelope` to retain evidence without applying
+the decision.
 
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:

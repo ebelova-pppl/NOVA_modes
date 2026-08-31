@@ -17,6 +17,7 @@ SRC_DIR = REPO_ROOT / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+from cont_features import continuum_extremum_features
 from mode_features import (
     EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES,
     EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES,
@@ -46,9 +47,17 @@ DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN = 0.25
 DEFAULT_CROSS_WINDOW_W_MIN = 0.05
 DEFAULT_EDGE_R_MIN = 0.97
 DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
+DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX = 0.5
+DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID = 2.0
+DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN = 0.03
+DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX = 0.50
+DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX = 0.02
+DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN = 0.0
+DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX = 0.04
 
 RULESET_VERSION = (
-    "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-v14"
+    "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-"
+    "edge-interior-envelope-v15"
 )
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
@@ -56,12 +65,13 @@ BAD_GRID_SCALE_PACKET = "BAD_GRID_SCALE_PACKET"
 BAD_CONT_CROSS = "BAD_CONT_CROSS"
 BAD_CONT_CROSS_WINDOW = "BAD_CONT_CROSS_WINDOW"
 BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
+BAD_INTERIOR_UNRESOLVED_ENVELOPE = "BAD_INTERIOR_UNRESOLVED_ENVELOPE"
 NO_GOOD_TEMPLATE = "NO_GOOD_TEMPLATE"
 RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v13"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v14"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -298,6 +308,59 @@ class EdgeArtifactConfig:
         return self.edge_width_max_grid is not None
 
 
+@dataclass(frozen=True)
+class InteriorUnresolvedEnvelopeConfig:
+    """Thresholds and extremum exception for an unresolved interior W envelope."""
+
+    peak_r_max: float = DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX
+    width_max_grid: float | None = DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID
+    extremum_r_min: float = DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN
+    extremum_r_max: float = DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX
+    ext_dr_max: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX
+    ext_df_gap_min: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN
+    ext_df_gap_max: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.peak_r_max) or not 0.0 <= self.peak_r_max <= 1.0:
+            raise ValueError(
+                "interior envelope peak_r_max must be finite and in [0, 1]"
+            )
+        if self.width_max_grid is not None and (
+            not math.isfinite(self.width_max_grid) or self.width_max_grid < 0.0
+        ):
+            raise ValueError(
+                "interior envelope width_max_grid must be null or a finite "
+                "nonnegative number"
+            )
+        if not (
+            math.isfinite(self.extremum_r_min)
+            and math.isfinite(self.extremum_r_max)
+            and 0.0 <= self.extremum_r_min < self.extremum_r_max <= 1.0
+        ):
+            raise ValueError(
+                "interior envelope extremum interval must be finite and satisfy "
+                "0 <= extremum_r_min < extremum_r_max <= 1"
+            )
+        if not math.isfinite(self.ext_dr_max) or not 0.0 <= self.ext_dr_max <= 1.0:
+            raise ValueError(
+                "interior envelope ext_dr_max must be finite and in [0, 1]"
+            )
+        if not (
+            math.isfinite(self.ext_df_gap_min)
+            and math.isfinite(self.ext_df_gap_max)
+            and self.ext_df_gap_min <= self.ext_df_gap_max
+        ):
+            raise ValueError(
+                "interior envelope frequency-gap limits must be finite and satisfy "
+                "ext_df_gap_min <= ext_df_gap_max"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether the connected-energy width threshold is configured."""
+        return self.width_max_grid is not None
+
+
 def empty_axis_artifact_features(
     r_ax: float = DEFAULT_AXIS_R_AX,
     amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
@@ -426,6 +489,35 @@ def empty_edge_artifact_features(
     }
 
 
+def empty_interior_unresolved_envelope_features(
+    config: InteriorUnresolvedEnvelopeConfig | None = None,
+) -> dict[str, Any]:
+    """Return the stable unresolved-interior-envelope shape with null evidence."""
+    resolved = config or InteriorUnresolvedEnvelopeConfig()
+    return {
+        "peak_r_max": resolved.peak_r_max,
+        "width_max_grid": resolved.width_max_grid,
+        "extremum_r_min": resolved.extremum_r_min,
+        "extremum_r_max": resolved.extremum_r_max,
+        "ext_dr_max": resolved.ext_dr_max,
+        "ext_df_gap_min": resolved.ext_df_gap_min,
+        "ext_df_gap_max": resolved.ext_df_gap_max,
+        "candidate_found": None,
+        "energy_peak": None,
+        "energy_peak_r": None,
+        "energy_halfmax_width_r": None,
+        "energy_halfmax_width_grid": None,
+        "energy_halfmax_inner_edge_r": None,
+        "energy_halfmax_outer_edge_r": None,
+        "energy_component_touches_boundary": None,
+        "extremum_match_found": None,
+        "ext_dr": None,
+        "ext_df_gap": None,
+        "ext_energy_frac": None,
+        "extremum_exception_applied": None,
+    }
+
+
 def empty_continuum_crossing_window_features(
     half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
     *,
@@ -459,12 +551,18 @@ def empty_rule_features(
     edge_artifact_config: EdgeArtifactConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
+    interior_unresolved_envelope_config: (
+        InteriorUnresolvedEnvelopeConfig | None
+    ) = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
     edge_config = edge_artifact_config or EdgeArtifactConfig()
+    interior_config = (
+        interior_unresolved_envelope_config or InteriorUnresolvedEnvelopeConfig()
+    )
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
     )
@@ -472,7 +570,11 @@ def empty_rule_features(
         "feature_schema_version": RULE_FEATURE_SCHEMA_VERSION,
         "source_feature_schema_version": RULE_FEATURE_SOURCE_SCHEMA_VERSION,
         "rf_standard_features": {name: None for name in RF_FEATURE_NAMES},
-        "resolution_features": {},
+        "resolution_features": {
+            "interior_unresolved_envelope": (
+                empty_interior_unresolved_envelope_features(interior_config)
+            ),
+        },
         "numerical_structure_features": {
             "grid_scale_spike": empty_grid_scale_spike_features(
                 grid_config.width_max_grid,
@@ -519,6 +621,7 @@ def grouped_rule_features(
     grid_scale_packet_features: Mapping[str, Any],
     edge_artifact_features: Mapping[str, Any],
     continuum_crossing_window_features: Mapping[str, Any],
+    interior_unresolved_envelope_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -527,7 +630,11 @@ def grouped_rule_features(
         "rf_standard_features": {
             name: named_features[name] for name in RF_FEATURE_NAMES
         },
-        "resolution_features": {},
+        "resolution_features": {
+            "interior_unresolved_envelope": dict(
+                interior_unresolved_envelope_features
+            ),
+        },
         "numerical_structure_features": {
             "grid_scale_spike": dict(grid_scale_spike_features),
             "grid_scale_packet": dict(grid_scale_packet_features),
@@ -1390,6 +1497,113 @@ def extract_edge_artifact_features(
     return result
 
 
+def extract_interior_unresolved_envelope_features(
+    mode: np.ndarray,
+    omega: float,
+    low2: np.ndarray,
+    high2: np.ndarray,
+    *,
+    total_energy_features: Mapping[str, Any],
+    config: InteriorUnresolvedEnvelopeConfig | None = None,
+) -> dict[str, Any]:
+    """Combine shared total-W evidence with a gate-specific extremum match.
+
+    The total-energy peak and connected FWHM are copied from the edge extractor,
+    which already measures the global ``sum_h |mode_h(r)|^2`` envelope.  Only
+    the continuum-extremum search is recomputed here: its wider rule-specific
+    radial interval must not alter the established RF feature calculations.
+    """
+    resolved = config or InteriorUnresolvedEnvelopeConfig()
+    result = empty_interior_unresolved_envelope_features(resolved)
+    inner_edge = total_energy_features["edge_energy_halfmax_inner_edge_r"]
+    outer_edge = total_energy_features["edge_energy_halfmax_outer_edge_r"]
+    result.update(
+        {
+            "energy_peak": total_energy_features["edge_energy_peak"],
+            "energy_peak_r": total_energy_features["edge_energy_peak_r"],
+            "energy_halfmax_width_r": total_energy_features[
+                "edge_energy_halfmax_width_r"
+            ],
+            "energy_halfmax_width_grid": total_energy_features[
+                "edge_energy_halfmax_width_grid"
+            ],
+            "energy_halfmax_inner_edge_r": inner_edge,
+            "energy_halfmax_outer_edge_r": outer_edge,
+            "energy_component_touches_boundary": (
+                None
+                if inner_edge is None or outer_edge is None
+                else bool(inner_edge <= 0.0 or outer_edge >= 1.0)
+            ),
+        }
+    )
+
+    extremum, match_found = continuum_extremum_features(
+        mode,
+        omega,
+        low2,
+        high2,
+        r_min=resolved.extremum_r_min,
+        r_max=resolved.extremum_r_max,
+        return_match_status=True,
+        filter_candidates_after_detection=True,
+    )
+    result["extremum_match_found"] = bool(match_found)
+    if match_found:
+        result.update(
+            {
+                "ext_dr": float(extremum["ext_dr"]),
+                "ext_df_gap": float(extremum["ext_df_gap"]),
+                "ext_energy_frac": float(extremum["ext_energy_frac"]),
+            }
+        )
+
+    width_grid = result["energy_halfmax_width_grid"]
+    peak_r = result["energy_peak_r"]
+    energy_peak = result["energy_peak"]
+    if resolved.width_max_grid is None:
+        candidate_found: bool | None = None
+    else:
+        radial_tolerance = 64.0 * np.finfo(float).eps * max(
+            1.0, abs(resolved.peak_r_max)
+        )
+        width_tolerance = 64.0 * np.finfo(float).eps * max(
+            1.0, abs(resolved.width_max_grid)
+        )
+        candidate_found = bool(
+            energy_peak is not None
+            and energy_peak > 0.0
+            and peak_r is not None
+            and peak_r <= resolved.peak_r_max + radial_tolerance
+            and width_grid is not None
+            and width_grid <= resolved.width_max_grid + width_tolerance
+        )
+    result["candidate_found"] = candidate_found
+
+    ext_dr = result["ext_dr"]
+    ext_df_gap = result["ext_df_gap"]
+    ext_dr_tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0, abs(resolved.ext_dr_max)
+    )
+    ext_df_tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0,
+        abs(resolved.ext_df_gap_min),
+        abs(resolved.ext_df_gap_max),
+    )
+    exception_qualified = bool(
+        match_found
+        and ext_dr is not None
+        and ext_dr <= resolved.ext_dr_max + ext_dr_tolerance
+        and ext_df_gap is not None
+        and resolved.ext_df_gap_min - ext_df_tolerance
+        <= ext_df_gap
+        <= resolved.ext_df_gap_max + ext_df_tolerance
+    )
+    result["extremum_exception_applied"] = bool(
+        candidate_found is True and exception_qualified
+    )
+    return result
+
+
 @dataclass(frozen=True)
 class RuleResult:
     """Stable, auditable result returned for one preprocessed TAE-side mode."""
@@ -1449,6 +1663,9 @@ def evaluate_mode(
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
+    interior_unresolved_envelope_config: (
+        InteriorUnresolvedEnvelopeConfig | None
+    ) = None,
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -1459,6 +1676,9 @@ def evaluate_mode(
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
     )
     edge_config = edge_artifact_config or EdgeArtifactConfig()
+    interior_config = (
+        interior_unresolved_envelope_config or InteriorUnresolvedEnvelopeConfig()
+    )
     path = str(preprocessed_row.get("path", ""))
     mode_key = str(preprocessed_row.get("mode_key", ""))
     shot = str(preprocessed_row.get("shot", ""))
@@ -1493,6 +1713,7 @@ def evaluate_mode(
                 edge_config,
                 cross_window_config,
                 packet_config,
+                interior_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -1562,6 +1783,16 @@ def evaluate_mode(
             feature_status["crossing_records"],
             half_width_grid=cross_window_config.half_width_grid,
         )
+        interior_envelope_features = (
+            extract_interior_unresolved_envelope_features(
+                mode,
+                frequency,
+                low2,
+                high2,
+                total_energy_features=edge_features,
+                config=interior_config,
+            )
+        )
         features = grouped_rule_features(
             named_features,
             feature_status,
@@ -1570,6 +1801,7 @@ def evaluate_mode(
             grid_scale_packet_features,
             edge_features,
             cross_window_features,
+            interior_envelope_features,
         )
     except Exception as exc:
         return RuleResult(
@@ -1589,6 +1821,7 @@ def evaluate_mode(
                 edge_config,
                 cross_window_config,
                 packet_config,
+                interior_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -1733,6 +1966,25 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_EDGE_SPIKE,
             triggered_rules=(BAD_EDGE_SPIKE,),
+            features=features,
+        )
+
+    if (
+        interior_config.enabled
+        and interior_envelope_features["candidate_found"]
+        and not interior_envelope_features["extremum_exception_applied"]
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_INTERIOR_UNRESOLVED_ENVELOPE,
+            triggered_rules=(BAD_INTERIOR_UNRESOLVED_ENVELOPE,),
             features=features,
         )
 

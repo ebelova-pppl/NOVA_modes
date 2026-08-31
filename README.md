@@ -124,7 +124,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v1`
+  `--method rules` path loads the immutable `tae_rules_production_v2`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -143,7 +143,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v1` configuration automatically:
+`tae_rules_production_v2` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -297,10 +297,12 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v1.yaml` pins the routing values, ruleset,
-gate enable states, and thresholds validated on the 14 active shots. Gates 1,
-2, 2b, 4, and 5 are enabled; exact-point continuum gate 3 is explicitly
-disabled. The sorter records the configuration name, schema, and SHA-256 in
+`configs/rules/tae_rules_production_v2.yaml` pins the routing values, ruleset,
+gate enable states, and thresholds calibrated and audited non-blindly on the
+14 active shots. Gates 1,
+2, 2b, 4, 5, and the final interior-envelope gate are enabled; exact-point
+continuum gate 3 is explicitly disabled. The sorter records the configuration
+name, schema, and SHA-256 in
 all shot and per-`n` summaries and rejects threshold/gate overrides when the
 named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
@@ -317,16 +319,23 @@ python scripts/sort_shot_rules.py \
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. Six ordered BAD decisions currently reject a calibrated
-narrow local maximum at `r <= 0.03` (`BAD_AXIS_SPIKE`), a large unresolved
+routing conventions. The shared engine implements seven ordered BAD decisions;
+production-v2 enables six of them and disables exact-point continuum gate 3.
+The decisions reject a calibrated narrow local maximum at `r <= 0.03`
+(`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), a short packet containing repeated large
 grid-scale turning points (`BAD_GRID_SCALE_PACKET`), or a true continuum crossing
 with `W_star_max > 0.03` (`BAD_CONT_CROSS`). A second crossing gate rejects when an
 inclusive ±2-grid neighborhood of any true crossing has individual-harmonic
 absolute amplitude at least `0.25` or peak-normalized radial energy at least
-`0.05` (`BAD_CONT_CROSS_WINDOW`). The final gate rejects a global total-energy
+`0.05` (`BAD_CONT_CROSS_WINDOW`). The fifth gate rejects a global total-energy
 peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
-(`BAD_EDGE_SPIKE`). The axis gate checks every absolute-harmonic local maximum
+(`BAD_EDGE_SPIKE`). The final gate rejects a global total-energy envelope with
+connected FWHM no greater than two grid intervals and peak at `r <= 0.5`, unless
+the peak is aligned with a gate-specific inner continuum extremum within
+`ext_dr <= 0.02` and `0 <= ext_df_gap <= 0.04`
+(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). The axis gate checks every
+absolute-harmonic local maximum
 centered at `r <= 0.03`; the active defaults require normalized amplitude at
 least `0.2` and full width at half maximum no greater than `10` radial-grid
 intervals. The grid-scale defaults require amplitude at
@@ -345,7 +354,10 @@ and valid EAE-like modes are routed without a fabricated rule decision.
 Each valid TAE-side result includes a grouped, deterministic `rule_features`
 object containing the active RF 22-feature calculations, six crossing
 summaries, crossing-window amplitude and energy evidence, raw crossing records,
-three continuum-extremum measurements, and axis/edge boundary measurements.
+three continuum-extremum measurements, axis/edge boundary measurements, and
+separate unresolved-interior-envelope evidence. The latter searches extrema
+through `r=0.50` without changing the experimental RF feature definition,
+which retains its established `r<=0.40` search.
 Half-maximum boundary widths use the complete radial grid, not only their
 search windows. The edge decision uses the global normalized total-energy
 envelope; the strongest individual edge harmonic is recorded for audit but
@@ -366,9 +378,16 @@ with `--axis_amplitude_min VALUE`,
 `--grid_scale_packet_peak_r_max VALUE`, `--w_cross_threshold VALUE`,
 `--cross_window_half_width_grid VALUE`,
 `--cross_window_amplitude_min VALUE`, `--cross_window_w_min VALUE`,
-`--edge_r_min VALUE`, and `--edge_width_max_grid VALUE`. The matching disable
-switches retain measurements while disabling each decision gate. The run
-summary records every gate's enable state and exact thresholds.
+`--edge_r_min VALUE`, `--edge_width_max_grid VALUE`,
+`--interior_envelope_peak_r_max VALUE`,
+`--interior_envelope_width_max_grid VALUE`,
+`--interior_envelope_extremum_r_min VALUE`,
+`--interior_envelope_extremum_r_max VALUE`,
+`--interior_envelope_ext_dr_max VALUE`,
+`--interior_envelope_ext_df_gap_min VALUE`, and
+`--interior_envelope_ext_df_gap_max VALUE`. The matching disable switches
+retain measurements while disabling each decision gate. The run summary
+records every gate's enable state and exact thresholds.
 
 Optional production adjudication writes fingerprinted overrides separately.
 Use `--adjudication review`; it selects the preserved preliminary rule verdict,

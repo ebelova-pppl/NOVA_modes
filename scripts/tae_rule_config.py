@@ -17,16 +17,17 @@ from tae_rule_engine import (
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
+    InteriorUnresolvedEnvelopeConfig,
 )
 from tae_rule_io import sha256_file
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v1"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v1"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v2"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v2"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39"
+    "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f"
 )
 
 
@@ -179,6 +180,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "continuum_crossing",
         "continuum_crossing_window",
         "edge_artifact",
+        "interior_unresolved_envelope",
     }
     _require_exact_keys(gates, gate_names, context="gates")
 
@@ -314,6 +316,58 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         edge_width_max_grid=edge_width,
     )
 
+    interior = _mapping(
+        gates["interior_unresolved_envelope"],
+        context="gates.interior_unresolved_envelope",
+    )
+    _require_exact_keys(
+        interior,
+        {
+            "enabled",
+            "peak_r_max",
+            "width_max_grid",
+            "extremum_r_min",
+            "extremum_r_max",
+            "ext_dr_max",
+            "ext_df_gap_min",
+            "ext_df_gap_max",
+        },
+        context="gates.interior_unresolved_envelope",
+    )
+    interior_enabled = _bool(
+        interior, "enabled", context="gates.interior_unresolved_envelope"
+    )
+    interior_peak_r = _float(
+        interior, "peak_r_max", context="gates.interior_unresolved_envelope"
+    )
+    interior_width = _float(
+        interior, "width_max_grid", context="gates.interior_unresolved_envelope"
+    )
+    interior_extremum_r_min = _float(
+        interior, "extremum_r_min", context="gates.interior_unresolved_envelope"
+    )
+    interior_extremum_r_max = _float(
+        interior, "extremum_r_max", context="gates.interior_unresolved_envelope"
+    )
+    interior_ext_dr = _float(
+        interior, "ext_dr_max", context="gates.interior_unresolved_envelope"
+    )
+    interior_ext_df_min = _float(
+        interior, "ext_df_gap_min", context="gates.interior_unresolved_envelope"
+    )
+    interior_ext_df_max = _float(
+        interior, "ext_df_gap_max", context="gates.interior_unresolved_envelope"
+    )
+    InteriorUnresolvedEnvelopeConfig(
+        peak_r_max=interior_peak_r,
+        width_max_grid=interior_width,
+        extremum_r_min=interior_extremum_r_min,
+        extremum_r_max=interior_extremum_r_max,
+        ext_dr_max=interior_ext_dr,
+        ext_df_gap_min=interior_ext_df_min,
+        ext_df_gap_max=interior_ext_df_max,
+    )
+
     run_kwargs = {
         "fraction_tae_threshold": fraction_tae_threshold,
         "fraction_eae_threshold": fraction_eae_threshold,
@@ -341,6 +395,15 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "cross_window_w_min": window_w if window_enabled else None,
         "edge_r_min": edge_r,
         "edge_width_max_grid": edge_width if edge_enabled else None,
+        "interior_envelope_peak_r_max": interior_peak_r,
+        "interior_envelope_width_max_grid": (
+            interior_width if interior_enabled else None
+        ),
+        "interior_envelope_extremum_r_min": interior_extremum_r_min,
+        "interior_envelope_extremum_r_max": interior_extremum_r_max,
+        "interior_envelope_ext_dr_max": interior_ext_dr,
+        "interior_envelope_ext_df_gap_min": interior_ext_df_min,
+        "interior_envelope_ext_df_gap_max": interior_ext_df_max,
     }
     digest = sha256_file(path)
     if (

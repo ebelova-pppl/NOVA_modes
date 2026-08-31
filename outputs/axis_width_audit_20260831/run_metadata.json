@@ -1,0 +1,22 @@
+{
+  "audit_kind": "non-blind-axis-width-counterfactual-v1",
+  "axis_amplitude_min": 0.2,
+  "axis_r_ax": 0.03,
+  "axis_width_limits": [
+    2.0,
+    3.0,
+    5.0,
+    10.0
+  ],
+  "extra_rules_csv": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K70/all_modes_rules.csv",
+  "n_baseline_axis_rejections": 625,
+  "n_extra_baseline_axis_rejections": 31,
+  "n_training_rows": 2390,
+  "rule_configuration_name": "tae_rules_production_v2",
+  "rule_configuration_schema_version": "tae-rule-run-config-v2",
+  "rule_configuration_sha256": "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f",
+  "rule_set_version": "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-v15",
+  "training_csv": "/p/hym/ebelova/NOVA/NOVA_modes/training_labels/tae_like_train.csv",
+  "training_csv_sha256": "ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d",
+  "training_data_root": "/p/hym/ebelova/NOVA/data_mixed"
+}
