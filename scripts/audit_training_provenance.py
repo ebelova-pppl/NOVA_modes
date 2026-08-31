@@ -22,7 +22,6 @@ import hashlib
 import json
 import os
 import re
-import sys
 import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -31,10 +30,10 @@ from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = REPO_ROOT / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+REPO_ROOT = ensure_repo_src_on_path()
 
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
 

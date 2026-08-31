@@ -15,6 +15,11 @@ import torch.nn as nn
 from sklearn.metrics import classification_report, confusion_matrix
 from torch.utils.data import DataLoader, Dataset
 
+from _repo_bootstrap import default_training_csv, ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
 from cnn_infer_common import (
     CHECKPOINT_VERSION,
     CONTINUUM_CHANNEL_CLIP_DEFAULT,
@@ -23,8 +28,8 @@ from cnn_infer_common import (
     build_raw_image_array,
     build_raw_preprocess_metadata,
 )
-from mode_csv import read_mode_csv_entries
-from nova_mode_loader import load_mode_from_nova
+from mode_csv import read_mode_csv_entries  # noqa: E402
+from nova_mode_loader import load_mode_from_nova  # noqa: E402
 from torch_runtime import print_torch_device_report, select_torch_device
 
 
@@ -34,11 +39,7 @@ COLLAPSE_PROB_STD = 1e-3
 
 
 def default_train_csv() -> str:
-    env_value = os.environ.get("NOVA_TRAIN_CSV")
-    if env_value:
-        return env_value
-    repo_root = Path(__file__).resolve().parents[1]
-    return str(repo_root / "training_labels" / "tae_like_train.csv")
+    return str(default_training_csv())
 
 
 def read_train_csv(csv_path: str, data_root: str | None = None) -> list[dict[str, Any]]:

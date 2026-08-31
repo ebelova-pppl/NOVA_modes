@@ -10,18 +10,16 @@ from __future__ import annotations
 
 import argparse
 import math
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
+from _repo_bootstrap import ensure_repo_src_on_path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = REPO_ROOT / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+
+ensure_repo_src_on_path()
 
 from cont_features import load_datcon_for_mode  # noqa: E402
 from mode_features import radial_centroid, radial_width  # noqa: E402

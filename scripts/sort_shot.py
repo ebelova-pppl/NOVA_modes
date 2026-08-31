@@ -41,9 +41,14 @@ from typing import Any, Dict, Iterable, List, Sequence, Tuple
 import joblib
 import numpy as np
 
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
 from cnn_infer_common import load_cnn_classifier
-from nova_mode_loader import load_mode_from_nova
-from mode_features import compute_features_for_mode
+from nova_mode_loader import load_mode_from_nova  # noqa: E402
+from mode_features import compute_features_for_mode  # noqa: E402
 
 
 # -----------------------------------------------------------------------------

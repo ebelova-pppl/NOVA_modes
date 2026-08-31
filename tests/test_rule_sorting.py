@@ -2054,6 +2054,29 @@ class MixedSorterMethodIntegrationTests(unittest.TestCase):
             "/tmp/synthetic_out",
         ]
 
+    def test_direct_mixed_sorter_bootstraps_src_without_pythonpath(self):
+        environment = os.environ.copy()
+        environment.pop("PYTHONPATH", None)
+        with tempfile.TemporaryDirectory() as temporary:
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS_DIR / "sort_shot_mixed.py"),
+                    "--help",
+                ],
+                cwd=temporary,
+                env=environment,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+        self.assertEqual(
+            completed.returncode,
+            0,
+            completed.stdout + completed.stderr,
+        )
+        self.assertIn("--method", completed.stdout)
+
     def test_rules_is_default_and_accepts_optional_rf_for_dedup_only(self):
         args = parse_mixed_args(self._common_args())
         self.assertEqual(DEFAULT_METHOD, RULES_METHOD)

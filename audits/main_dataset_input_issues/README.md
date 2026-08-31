@@ -25,6 +25,10 @@ live DiTw tree.
 - `nstx_135388/N8` was rechecked for empty files. Three of its 112 live
   `egn*` paths are zero-byte files; their exact names are in
   `affected_files.csv`.
+- `nstxuE202806A02t025` was checked by both canonical workflows across all 700
+  discovered `egn*` files. All ten required `datcon#` files are present,
+  nonempty, and usable; both workflows report zero failed, NaN, or otherwise
+  invalid inputs.
 
 Legacy continuum values greater than 999 are intentional missing-value
 sentinels handled by the shared continuum loader. They are not entered here as

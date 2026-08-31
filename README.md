@@ -238,6 +238,13 @@ with `egn*` mode files and matching `datcon<N>` continuum files. The sorter
 does not move or modify the input modes; it writes CSV outputs and reports into
 `$NOVA_SORT_OUT/$SHOT_NAME`.
 
+The current `scripts/` command-line entry points locate this checkout's
+`src/` directory relative to their own files. They do not require an inherited
+`PYTHONPATH` merely to start. Continue sourcing the platform path config for
+data/model environment variables and convenience helpers; `PYTHONPATH` remains
+useful for interactive imports and test discovery but is no longer a hidden
+precondition for direct CLI commands.
+
 Most useful outputs for the default rules method:
 
 - `good_tae_final.csv` — final GOOD TAE-like representatives after RF-ranked

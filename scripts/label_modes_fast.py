@@ -3,7 +3,6 @@ import os
 import glob
 import csv
 import argparse
-import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,19 +11,19 @@ from typing import Any, Dict, List, Tuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = REPO_ROOT / "src"
-if SRC_DIR.is_dir() and str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+from _repo_bootstrap import ensure_repo_src_on_path
 
-from mode_csv import read_mode_csv_entries
-from cont_features import (
+
+ensure_repo_src_on_path()
+
+from mode_csv import read_mode_csv_entries  # noqa: E402
+from cont_features import (  # noqa: E402
     continuum_crossing_features,
     continuum_scalars,
     load_datcon_for_mode,
 )
-from sort_shot_rules import load_manual_overrides
-from tae_rule_io import (
+from sort_shot_rules import load_manual_overrides  # noqa: E402
+from tae_rule_io import (  # noqa: E402
     MANUAL_OVERRIDE_FIELDS,
     datcon_path_for_mode,
     input_fingerprint,

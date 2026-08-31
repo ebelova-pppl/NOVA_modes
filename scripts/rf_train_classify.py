@@ -9,12 +9,18 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import classification_report, confusion_matrix
 import joblib
-from mode_features import (
+
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
+from mode_features import (  # noqa: E402
     compute_features_for_mode,
     get_feature_names,
     get_feature_schema_version,
 )
-from mode_csv import read_mode_csv_entries
+from mode_csv import read_mode_csv_entries  # noqa: E402
 
 
 # ========================

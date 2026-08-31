@@ -3,6 +3,31 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-08-31 repository-relative src bootstrap for direct CLIs
+
+- Fixed the recurring `ModuleNotFoundError` for `cont_features`,
+  `mode_features`, and other shared modules when a script was launched without
+  first inheriting the path config's `PYTHONPATH`. The canonical
+  `sort_shot_mixed.py` failure happened before argument parsing and was a CLI
+  bootstrap problem, not a shot-data or model problem.
+- Added one shared `scripts/_repo_bootstrap.py` helper. Current preprocessing,
+  RF, CNN, sorting, labeling, rule, and provenance entry points now prepend
+  the checkout-relative `src/` directory before importing project modules;
+  existing duplicated setup in the deterministic scripts was consolidated
+  into the same helper. No absolute Flux or Perlmutter repository path is
+  embedded.
+- Consolidated the CNN training-list fallback alongside that bootstrap. The
+  trainers still honor `$NOVA_TRAIN_CSV` when set and otherwise use the
+  canonical `training_labels/tae_like_train.csv` from their own checkout, so
+  even `--help` no longer requires `$NOVA_REPO` or `$NOVA_TRAIN_CSV`.
+- Verified 13 current pipeline CLIs from `/tmp` with `PYTHONPATH`,
+  `NOVA_REPO`, and `NOVA_TRAIN_CSV` removed; every direct `--help` launch
+  succeeds. Added a subprocess regression test for `sort_shot_mixed.py` under
+  those conditions. All 115 non-validator tests pass in the production conda
+  environment, and both skill validators pass separately. This changes import
+  startup only; no rules, features, models, labels, or sorter decisions
+  changed.
+
 ## 2026-08-31 interior unresolved-envelope gate and production v2
 
 - Added the final ordered rejection
@@ -111,6 +136,37 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   `52773d57e189efc83fad52c03b26a19a89d90a3e9a21864b4683017de230975d`.
   No code, configuration, label, or model artifact was changed.
 
+## 2026-08-31 E202806A02t025 rules versus RF-CNN run
+
+- Ran the first post-training E case, `$NOVA_DITW_ROOT/nstxuE202806A02t025`,
+  through production-v2 rules with RF duplicate ranking and through legacy
+  RF-CNN with the active raw-CNN checkpoint on CPU. Outputs are under the
+  matching shot directories in `/p/hym/ebelova/NOVA/sort_outputs` and
+  `/p/hym/ebelova/NOVA/sort_outputs_ai`.
+- Both workflows discovered the same 700 nonempty inputs, reported zero
+  invalid modes, and produced identical routing: 198 TAE-like, six mixed, and
+  496 EAE-like, leaving 204 TAE-side decisions. All RF, CNN, and combined
+  scores are finite.
+- Rules reject 126 modes and promote 78 survivors before clustering; RF
+  duplicate ranking removes `N6/egn06w.1296E+02`, leaving 77 final GOOD.
+  Primary rule reasons are 36 `BAD_AXIS_SPIKE`, 15
+  `BAD_GRID_SCALE_SPIKE`, and 75 `BAD_CONT_CROSS_WINDOW`.
+- RF-CNN produces 119 BAD and 85 GOOD before clustering, then removes the same
+  N6/1296 duplicate and retains 84 final GOOD. It flags 43 modes, and the RF
+  and CNN binary opinions agree for 81.86% of the 204 scored modes.
+- The pre-clustering decisions agree on 187/204 modes (91.67%). Of 17
+  disagreements, 12 are rules BAD / RF-CNN GOOD: seven grid-scale spikes,
+  four crossing-window rejections, and one axis spike. RF-CNN assigns nine of
+  these to `flagged_rf_only_good`, two to `gold_good`, and one to
+  `flagged_cnn_rescue`. The other five are rules GOOD / RF-CNN BAD: three
+  `silver_bad` and two `flagged_borderline_or_disagreement`. The selected
+  final lists share 72 modes, with five rules-only and 12 RF-CNN-only modes;
+  the difference is entirely classificatory rather than duplicate handling.
+  The full audit table is
+  `outputs/e202806a02t025_rules_vs_rf_cnn_disagreements.csv`, SHA-256
+  `9b648818b350e6e33070314aace99f6dc7169b0ee9fea19f548ae8a3f2bd0f41`.
+  No rule, configuration, label, or model artifact was changed.
+
 ## 2026-08-31 non-blind K70 N7/2651 axis-gate audit
 
 - Investigated why rules reject `nstxuG121123K70/N7/egn07w.2651E+02` as
@@ -200,6 +256,16 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   non-finite mode-array, or invalid-weight problem. Expected continuum
   missing-value sentinels handled by the shared loader are excluded from the
   defect registry. No rule, label, model, or sorter output was changed.
+- Added `audits/main_dataset_shots/shot_status.csv` with all 200 unique
+  physical shot directories under `$NOVA_DITW_ROOT`, plus the filtered
+  41-row `g_shot_status.csv`. The inventory derives its 14 training-shot
+  marks and per-shot label counts from the active 2,390-row
+  `training_labels/tae_like_train.csv`. The inventory now marks three
+  post-training cases compared with both workflows: E202806A02t025, K34, and
+  K70. Q62 is separately marked as suspended from active training. Three
+  symlink aliases to legacy NSTX directories and non-shot work/derived
+  directories are excluded; the empty canonical `nstxu_202806` directory
+  remains listed.
 
 ## 2026-08-28 deterministic rules integrated into the canonical sorter
 

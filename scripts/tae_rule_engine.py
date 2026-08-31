@@ -4,21 +4,18 @@
 from __future__ import annotations
 
 import math
-import sys
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any, Mapping
 
 import numpy as np
 
+from _repo_bootstrap import ensure_repo_src_on_path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = REPO_ROOT / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
 
-from cont_features import continuum_extremum_features
-from mode_features import (
+ensure_repo_src_on_path()
+
+from cont_features import continuum_extremum_features  # noqa: E402
+from mode_features import (  # noqa: E402
     EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES,
     EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES,
     RF_FEATURE_NAMES,
@@ -26,7 +23,7 @@ from mode_features import (
     get_feature_names,
     get_feature_schema_version,
 )
-from tae_rule_io import empty_rule_row, stable_json
+from tae_rule_io import empty_rule_row, stable_json  # noqa: E402
 
 
 DEFAULT_AXIS_R_AX = 0.03

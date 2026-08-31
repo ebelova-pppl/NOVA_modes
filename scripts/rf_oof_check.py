@@ -9,9 +9,14 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, classification_report
 import joblib
 
-from mode_csv import read_mode_csv_entries
-from nova_mode_loader import load_mode_from_nova      # returns (mode, omega, gamma_d, ntor)
-from mode_features import (
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
+from mode_csv import read_mode_csv_entries  # noqa: E402
+from nova_mode_loader import load_mode_from_nova  # noqa: E402
+from mode_features import (  # noqa: E402
     compute_features_for_mode,
     get_feature_names,
     get_feature_schema_version,

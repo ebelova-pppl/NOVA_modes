@@ -6,9 +6,14 @@ import csv
 from collections import Counter
 from pathlib import Path
 
-from cont_features import warn_once_per_dir
-from path_utils import resolve_mode_csv_path
-from tae_eae_features import load_upper2_scalars_for_mode
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
+from cont_features import warn_once_per_dir  # noqa: E402
+from path_utils import resolve_mode_csv_path  # noqa: E402
+from tae_eae_features import load_upper2_scalars_for_mode  # noqa: E402
 
 PATH_HEADER_NAMES = {"path", "filepath", "mode_path"}
 SUMMARY_COLUMNS = ("label", "validity", "family")

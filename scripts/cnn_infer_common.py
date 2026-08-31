@@ -9,10 +9,15 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from cont_features import load_datcon_for_mode, continuum_scalars
-from mode_csv import read_mode_paths_csv as read_mode_paths_csv_shared
-from mode_transform import resample_r, straighten_mode_window
-from nova_mode_loader import load_mode_from_nova
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
+from cont_features import continuum_scalars, load_datcon_for_mode  # noqa: E402
+from mode_csv import read_mode_paths_csv as read_mode_paths_csv_shared  # noqa: E402
+from mode_transform import resample_r, straighten_mode_window  # noqa: E402
+from nova_mode_loader import load_mode_from_nova  # noqa: E402
 
 
 LEGACY_PREPROCESS_DEFAULTS = {

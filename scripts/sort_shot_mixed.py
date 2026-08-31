@@ -36,12 +36,17 @@ from typing import Any, Iterable, Sequence
 
 import numpy as np
 
-from cont_features import load_datcon_for_mode
-from mode_features import radial_centroid, radial_width
-from mode_csv import read_mode_csv_entries
-from nova_mode_loader import load_mode_from_nova
-from tae_eae_features import upper2_scalars
-from tae_rule_config import PRODUCTION_RULE_CONFIG_NAME
+from _repo_bootstrap import ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
+from cont_features import load_datcon_for_mode  # noqa: E402
+from mode_features import radial_centroid, radial_width  # noqa: E402
+from mode_csv import read_mode_csv_entries  # noqa: E402
+from nova_mode_loader import load_mode_from_nova  # noqa: E402
+from tae_eae_features import upper2_scalars  # noqa: E402
+from tae_rule_config import PRODUCTION_RULE_CONFIG_NAME  # noqa: E402
 
 
 DEFAULT_METHOD = "rules"

@@ -7,6 +7,14 @@ an optional header row. Recognized path headers are `path`, `filepath`, and
 `mode_path`; recognized label headers are `label`, `validity`, `class`, `target`,
 `manual_label`, and `rf_label`. Blank lines and `#` comment lines are ignored.
 
+Direct `scripts/*.py` entry points use the shared `_repo_bootstrap.py` helper
+to prepend the current checkout's `src/` directory before project imports.
+They therefore work from outside the repository and with `PYTHONPATH` unset.
+Platform path configs are still recommended for `NOVA_DATA`,
+`NOVA_DITW_ROOT`, model paths, runtime defaults, and interactive Python use.
+The CNN trainers use `$NOVA_TRAIN_CSV` when set and otherwise fall back to the
+canonical `training_labels/tae_like_train.csv` in the same checkout.
+
 ## CNN model scripts
 
 - `cnn_hybrid.py`

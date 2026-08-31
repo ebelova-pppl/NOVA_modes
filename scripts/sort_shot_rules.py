@@ -22,11 +22,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
+from _repo_bootstrap import ensure_repo_src_on_path
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-SRC_DIR = REPO_ROOT / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+
+ensure_repo_src_on_path()
 
 from make_tae_like_list import (  # noqa: E402
     DEFAULT_FRACTION_EAE_THRESHOLD,

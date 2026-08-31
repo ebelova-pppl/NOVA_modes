@@ -11,16 +11,23 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from sklearn.metrics import confusion_matrix, classification_report
 
-from mode_csv import read_mode_csv_entries
-from nova_mode_loader import load_mode_from_nova
-from mode_transform import resample_r, straighten_mode_window
-from paths import NOVA_TRAIN_CSV
+from _repo_bootstrap import default_training_csv, ensure_repo_src_on_path
+
+
+ensure_repo_src_on_path()
+
+from mode_csv import read_mode_csv_entries  # noqa: E402
+from nova_mode_loader import load_mode_from_nova  # noqa: E402
+from mode_transform import resample_r, straighten_mode_window  # noqa: E402
 from cnn_infer_common import (
     CHECKPOINT_VERSION,
     build_hybrid_scalar_vector,
     build_preprocess_metadata,
 )
 from torch_runtime import print_torch_device_report, select_torch_device
+
+
+NOVA_TRAIN_CSV = default_training_csv()
 
 
 # =========================
