@@ -900,7 +900,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v2` configuration. A rejection gate produces automatic
+`tae_rules_production_v3` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1139,20 +1139,21 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v2.yaml`, stored as strict
+`configs/rules/tae_rules_production_v3.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v15 ruleset, routing thresholds, relative-frequency tolerance, all
+current v16 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
   (`BAD_GRID_SCALE_PACKET`), 4 (`BAD_CONT_CROSS_WINDOW`), and 5
-  (`BAD_EDGE_SPIKE`), plus the final interior-envelope gate
-  (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`);
+  (`BAD_EDGE_SPIKE`), plus the interior-envelope gate
+  (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`), followed by the calibrated interior
+  harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`);
 - disabled: gate 3 (`BAD_CONT_CROSS`), while retaining its frozen latent
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v2 identity.
+config-owned threshold or gate override to retain the production-v3 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, and the audited `accept-as-good-v1` survivor
@@ -1172,7 +1173,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v2` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v3` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1183,8 +1184,8 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-v15`
-ruleset implements seven ordered BAD decisions, treating the packet screen as gate 2b so
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-harmonic-incoherence-v16`
+ruleset implements eight ordered BAD decisions, treating the packet screen as gate 2b so
 the established gate-3/4/5 names remain stable. It still has no positive GOOD
 template. Modes that do not fire any
 gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
@@ -1193,7 +1194,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v14`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v16`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1237,6 +1238,14 @@ groups are:
   harmonic index, radial and sample-index bounds, large-step and large-turn
   counts, maximum step, step RMS, total variation, unconstrained direction-
   and sign-change counts, and five signed sample values;
+- `numerical_structure_features.interior_harmonic_incoherence`: the inclusive
+  core-energy fraction, base-2 adjacent-radius Jensen--Shannon divergence,
+  radial-energy-weighted mean of the pointwise effective harmonic count,
+  adjacent active stored-harmonic signed-profile coherence, active counts,
+  resolution eligibility, and their combined incoherence score. It also
+  retains audit-only whole-radius `W`-weighted effective count, whole-radius
+  `G_3`, core-conditional `G_3`, and `B_3,core`; these do not participate in a
+  decision;
 - `resolution_features.interior_unresolved_envelope`: the global total-energy
   peak and connected FWHM reused from the edge-envelope calculation, the
   configured interior and exception limits, a separate continuum-extremum
@@ -1425,7 +1434,8 @@ interior_unresolved_envelope:
   ext_df_gap_max: 0.04
 ```
 
-After every earlier BAD gate, a mode with global connected total-energy FWHM
+After the axis, signed-spike, packet, crossing, crossing-window, and edge
+gates, a mode with global connected total-energy FWHM
 at most two grid intervals and global energy peak at the inclusive radius
 `r <= 0.5` returns `BAD_INTERIOR_UNRESOLVED_ENVELOPE`, unless a gate-specific
 continuum-extremum match satisfies both `ext_dr <= 0.02` and
@@ -1442,6 +1452,69 @@ the settings with `--interior_envelope_peak_r_max`,
 `--interior_envelope_ext_df_gap_max`; use
 `--disable_interior_unresolved_envelope` to retain evidence without applying
 the decision.
+
+The last gate measures incoherent harmonic activity in the interior without
+claiming that its physical cause is random noise:
+
+```yaml
+interior_harmonic_incoherence:
+  core_r_max: 0.5
+  active_core_energy_fraction_min: 0.005
+  max_lag_grid: 5
+  score_threshold: 0.1
+  calibrated_n_radial: 201
+```
+
+At each radial sample, let `W_i = sum_h A_hi^2` and
+`p_hi = A_hi^2 / W_i`. The pointwise effective harmonic count is
+`N_eff(i) = 1 / sum_h p_hi^2`; therefore it measures simultaneous harmonic
+participation at one radius, not the total number of rows used by a coherent
+ridge across all radii. Over the inclusive core `r <= 0.5`, the gate records
+the `W_i`-weighted mean `N_eff_core` and the base-2 Jensen--Shannon divergence
+`J_core` between consecutive `p(:,i)` distributions, weighted by
+`sqrt(W_i W_(i+1))`.
+
+The grouped audit also records the following participation summaries using
+only samples with `W_i > 0` and the fixed strict reference `N_eff(i) > 3`:
+
+```text
+N_eff_global = sum_i W_i N_eff(i) / sum_i W_i
+G_3_global   = sum_i W_i I[N_eff(i) > 3] / sum_i W_i
+G_3_core     = sum_{r_i<=0.5} W_i I[N_eff(i) > 3]
+               / sum_{r_i<=0.5} W_i
+B_3_core     = sum_{r_i<=0.5} W_i I[N_eff(i) > 3] / sum_i W_i
+```
+
+The JSON keys spell out these definitions rather than relying on the short
+symbols. `G_3_core` is null when the core has zero energy; `B_3_core` is zero
+when total energy is positive but core energy is zero. All four derived values
+are null for a zero-energy mode. No unweighted radial maximum or hard
+`W/W_max` support cutoff is used. These are audit features only: the fixed
+reference is not a gate threshold, has no CLI/config override, and cannot
+change `candidate_found`.
+
+For the coherence term, a stored harmonic row is active when its integrated
+core energy fraction is at least `0.005`. Only adjacent stored-index pairs
+with both rows active are compared; inactive gaps are never bridged. For each
+pair, `C_adj` uses the maximum absolute uncentered cosine of the two signed
+core profiles over integer radial lags from `-5` through `+5`, recomputing
+both norms on the overlap. Pair values are weighted by the geometric mean of
+the two integrated core energies. The stored row order is used directly; no
+physical poloidal-`m` offset is inferred.
+
+The combined score is
+`S_inc = f_core * J_core * N_eff_core * (1 - C_adj)`. After all earlier BAD
+decisions, a mode returns `BAD_INTERIOR_HARMONIC_INCOHERENCE` only when
+`S_inc > 0.10`; equality passes. Zero core energy, no usable adjacent radial
+pair, or no adjacent active harmonic pair leaves the undefined terms as JSON
+`null` and never rejects. Because adjacency and lag are native-grid
+measurements, the frozen threshold applies only at `n_radial=201`; other
+resolutions retain the measurements with `resolution_eligible=false` and fail
+open. Override the settings with the five
+`--interior_harmonic_*` options, or use
+`--disable_interior_harmonic_incoherence` to retain the full evidence without
+applying the decision. Shot and per-`n` summaries record all five settings plus
+the counts of resolution-eligible and resolution-ineligible evaluated modes.
 
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:

@@ -100,3 +100,4 @@ DITW-002,nstxuG121123K34,4,nstxuG121123K34/N4/egn04w.8005E+02,nonfinite_scalar,g
 DITW-003,nstx_135388,8,nstx_135388/N8/egn08w.2197E+02,zero_byte_mode_file,file_size,0,MODE_LOAD_FAILED,2026-08-31
 DITW-003,nstx_135388,8,nstx_135388/N8/egn08w.2861E+02,zero_byte_mode_file,file_size,0,MODE_LOAD_FAILED,2026-08-31
 DITW-003,nstx_135388,8,nstx_135388/N8/egn08w.3062E+02,zero_byte_mode_file,file_size,0,MODE_LOAD_FAILED,2026-08-31
+DITW-004,nstxuG142301D46,7,nstxuG142301D46/N7/egn07w.1593E+02,nonfinite_scalar,gamma_d,NaN,INVALID_METADATA,2026-09-05

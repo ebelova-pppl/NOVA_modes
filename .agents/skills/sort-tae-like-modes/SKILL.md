@@ -22,9 +22,10 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v2.yaml`. It pins the v15
-ruleset and routing values, enables gates 1, 2, 2b, 4, 5, and the final
-interior-envelope gate, and explicitly disables exact-point continuum gate 3.
+The preset is `configs/rules/tae_rules_production_v3.yaml`. It pins the v16
+ruleset and routing values, enables gates 1, 2, 2b, 4, 5, the interior-envelope
+gate, and the final interior harmonic-incoherence gate, and explicitly disables
+exact-point continuum gate 3.
 Do not combine a named configuration
 with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and
@@ -67,13 +68,13 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. Seven ordered BAD decisions detect narrow near-axis
+TAE/EAE/mixed split. Eight ordered BAD decisions detect narrow near-axis
 spikes, unresolved signed-harmonic spikes and short large-turn packets whose
 strongest window sample is at `r <= 0.5`, continuum crossings carrying
 appreciable exact-point or nearby amplitude and normalized radial energy, a
 narrow globally dominant energy envelope at the outer radial boundary, and a
 few-grid-interval interior total-energy envelope without a qualifying nearby
-continuum extremum.
+continuum extremum, and incoherent harmonic activity in the calibrated core.
 Their calibrated defaults are `r_ax=0.03` inclusive,
 `axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
 `grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`,
@@ -93,7 +94,7 @@ defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v14 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v16 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -103,10 +104,17 @@ the axis measurements under
 audit measurements under `boundary_features.edge_artifact`, the unresolved
 signed-lobe measurements under `numerical_structure_features.grid_scale_spike`,
 and short-window repeated-turn evidence under
-`numerical_structure_features.grid_scale_packet`; store the final
+`numerical_structure_features.grid_scale_packet`; store the penultimate
 total-energy-width gate and its separate extended extremum match under
-`resolution_features.interior_unresolved_envelope`. These are named deterministic
-measurements; no RF checkpoint or prediction is used to produce them. Keep
+`resolution_features.interior_unresolved_envelope`; store the combined core
+incoherence score and every component under
+`numerical_structure_features.interior_harmonic_incoherence`. In the same
+object, keep the audit-only whole-radius `W`-weighted effective harmonic count,
+whole-radius and core-conditional energy fractions at strict `N_eff(r)>3`, and
+the corresponding total-energy fraction located in the core. Never use those
+participation summaries by themselves to change a decision. These are named
+deterministic measurements; no RF checkpoint or prediction is used to produce
+them. Keep
 `signed_delta` and
 `fraction_below_upper2` as routing audit columns rather than rule features.
 When no inner extremum is matched, require
@@ -285,8 +293,8 @@ retain both envelope and harmonic audit measurements without applying the
 decision. The edge threshold is inclusive. Shot and per-`n` summaries record
 the enable state and exact threshold for every BAD decision.
 
-The final gate reuses the same global total-energy evidence; it never measures
-the width of one harmonic. Its calibrated decision is:
+The penultimate gate reuses the same global total-energy evidence; it never
+measures the width of one harmonic. Its calibrated decision is:
 
 ```text
 IF energy_peak_r <= 0.5
@@ -318,6 +326,51 @@ settings with `--interior_envelope_peak_r_max`,
 `--interior_envelope_ext_df_gap_max`; use
 `--disable_interior_unresolved_envelope` to retain evidence without applying
 the decision.
+
+The final gate measures interior harmonic incoherence on the stored array
+without inferring physical poloidal-mode numbers. For `r_i <= 0.5`, define
+`W_i=sum_h A_hi^2` and `p_hi=A_hi^2/W_i`. Record:
+
+- `f_core`, the fraction of total mode energy in the inclusive core;
+- `J_core`, the base-2 Jensen--Shannon divergence between consecutive
+  `p(:,i)` distributions, weighted by `sqrt(W_i W_(i+1))`;
+- `N_eff_core`, the `W_i`-weighted mean of pointwise
+  `1/sum_h p_hi^2` (simultaneous participation at one radius, not the union of
+  rows used by a ridge across radius);
+- `C_adj`, the coherence of adjacent active stored harmonic rows. A row is
+  active at integrated core-energy fraction `>=0.005`. For each adjacent
+  active pair, maximize the absolute uncentered cosine of the signed profiles
+  over integer lags `-5..+5`, recomputing norms on each overlap and never
+  bridging an inactive stored-index gap; average pair values with weight
+  `sqrt(E_h^core E_(h+1)^core)`.
+
+Also record audit-only participation summaries at the fixed strict reference
+`N_eff(i)>3`: the whole-radius `W_i`-weighted mean `N_eff`, the whole-radius
+energy fraction `G_3`, the core-conditional energy fraction `G_3,core`, and
+`B_3,core=f_core*G_3,core`. Ignore samples with zero `W_i`; do not expose an
+unweighted pointwise maximum or invent a hard `W/W_max` cutoff. These values
+remain evidence only and must not alter `candidate_found`, including when the
+incoherence gate is disabled or resolution-ineligible.
+
+Then apply the strict calibrated decision:
+
+```text
+S_inc = f_core * J_core * N_eff_core * (1 - C_adj)
+IF n_radial == 201
+AND S_inc > 0.10
+THEN BAD_INTERIOR_HARMONIC_INCOHERENCE
+```
+
+Run it only after every earlier BAD gate so existing primary reasons keep
+precedence. Equality at `0.10` passes. Zero core energy, no positive-weight
+adjacent radial pair, or no adjacent active harmonic pair leaves undefined
+components as JSON `null` and cannot reject. The native-grid divergence and
+lag calibration is not portable across radial resolution: retain all audit
+measurements but set `resolution_eligible=false` and fail open whenever
+`n_radial != 201`. Use `--disable_interior_harmonic_incoherence` only for a
+feature-only run. Confirm the eligible and ineligible mode counts in shot and
+per-`n` summaries; an enabled gate with only ineligible inputs did not screen
+those inputs.
 
 Use `scripts/make_tae_like_list.py` directly only when preprocessing outputs
 without final rule results are needed. For deterministic production, run

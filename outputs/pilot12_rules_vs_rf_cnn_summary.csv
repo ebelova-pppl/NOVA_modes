@@ -1,0 +1,13 @@
+selection_seed,shot,shot_family,size_bin,input_modes,n_tae_side,n_agree,n_disagree,rules_bad_rf_cnn_good,rules_good_rf_cnn_bad,rules_good_precluster,rules_good_final,rf_cnn_good_precluster,rf_cnn_good_final
+20260905,nstxuE205035A01t020,NSTX-U E,low,235,52,52,0,0,0,7,7,7,7
+20260905,nstxuE203609A01t020,NSTX-U E,low,247,85,76,9,7,2,37,37,42,42
+20260905,nstxuE205054A01t037,NSTX-U E,medium,639,227,224,3,3,0,35,35,38,38
+20260905,nstxuE204954A01t022,NSTX-U E,medium,503,117,116,1,1,0,28,28,29,29
+20260905,nstxuE203963A01t025,NSTX-U E,medium,693,97,85,12,6,6,31,31,31,31
+20260905,nstxuE205045A01t022,NSTX-U E,high,1127,313,299,14,0,14,24,24,10,10
+20260905,nstxuE204707A04t030,NSTX-U E,high,1134,239,223,16,13,3,62,62,72,69
+20260905,nstxuE205057A01t020,NSTX-U E,high,967,233,220,13,1,12,34,34,23,23
+20260905,nstxuG121123N80,NSTX-U G,low,186,160,157,3,1,2,10,10,9,9
+20260905,nstxuG142301E72,NSTX-U G,medium,648,62,62,0,0,0,0,0,0,0
+20260905,nstxuG142301H56,NSTX-U G,high,913,209,205,4,0,4,4,4,0,0
+20260905,nstxuG142301V21,NSTX-U G,high,951,131,128,3,1,2,9,9,8,8

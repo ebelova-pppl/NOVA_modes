@@ -1,0 +1,5 @@
+population,n_modes,n_score_candidates,provenance
+active_training_BAD_labels,1814,101,non-blind post-hoc calibration
+active_training_GOOD_labels,576,0,non-blind post-hoc calibration
+active_training_production_v2_survivors,585,0,non-blind post-hoc calibration
+pilot12_production_v2_survivors,281,2,non-blind post-hoc pilot review

@@ -124,7 +124,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v2`
+  `--method rules` path loads the immutable `tae_rules_production_v3`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -143,7 +143,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v2` configuration automatically:
+`tae_rules_production_v3` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -304,12 +304,12 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v2.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v3.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
-14 active shots. Gates 1,
-2, 2b, 4, 5, and the final interior-envelope gate are enabled; exact-point
-continuum gate 3 is explicitly disabled. The sorter records the configuration
-name, schema, and SHA-256 in
+14 active shots and the H56 pilot review. Gates 1, 2, 2b, 4, 5, the
+interior-envelope gate, and the final interior harmonic-incoherence gate are
+enabled; exact-point continuum gate 3 is explicitly disabled. The sorter
+records the configuration name, schema, and SHA-256 in
 all shot and per-`n` summaries and rejects threshold/gate overrides when the
 named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
@@ -326,8 +326,8 @@ python scripts/sort_shot_rules.py \
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The shared engine implements seven ordered BAD decisions;
-production-v2 enables six of them and disables exact-point continuum gate 3.
+routing conventions. The shared engine implements eight ordered BAD decisions;
+production-v3 enables seven of them and disables exact-point continuum gate 3.
 The decisions reject a calibrated narrow local maximum at `r <= 0.03`
 (`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), a short packet containing repeated large
@@ -341,7 +341,20 @@ peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
 connected FWHM no greater than two grid intervals and peak at `r <= 0.5`, unless
 the peak is aligned with a gate-specific inner continuum extremum within
 `ext_dr <= 0.02` and `0 <= ext_df_gap <= 0.04`
-(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). The axis gate checks every
+(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). Last, a calibrated 201-point mode is
+rejected as `BAD_INTERIOR_HARMONIC_INCOHERENCE` when
+`f_core * J_core * N_eff_core * (1 - C_adj) > 0.10`. This score combines the
+energy fraction at `r <= 0.5`, base-2 adjacent-radius harmonic-distribution
+roughness, the energy-weighted mean pointwise effective harmonic count, and
+low signed-profile coherence between adjacent active stored harmonic rows.
+The gate fails open at other radial resolutions or when coherence evidence is
+undefined. The same extractor retains audit-only harmonic-participation
+summaries with a fixed strict reference `N_eff(r) > 3`: the whole-radius
+`W(r)`-weighted mean effective count, the whole-radius energy fraction above
+that reference (`G_3`), its core-conditional counterpart, and the fraction of
+total mode energy in the core above that reference (`B_3,core`). These
+measurements do not affect `candidate_found` or any classification. The axis
+gate checks every
 absolute-harmonic local maximum
 centered at `r <= 0.03`; the active defaults require normalized amplitude at
 least `0.2` and full width at half maximum no greater than `10` radial-grid
@@ -361,8 +374,12 @@ and valid EAE-like modes are routed without a fabricated rule decision.
 Each valid TAE-side result includes a grouped, deterministic `rule_features`
 object containing the active RF 22-feature calculations, six crossing
 summaries, crossing-window amplitude and energy evidence, raw crossing records,
-three continuum-extremum measurements, axis/edge boundary measurements, and
-separate unresolved-interior-envelope evidence. The latter searches extrema
+three continuum-extremum measurements, axis/edge boundary measurements,
+separate unresolved-interior-envelope evidence, and the components of the
+interior harmonic-incoherence score. Its grouped audit schema is
+`tae-rule-features-grouped-v16`; the added participation summaries are scalar
+energy-weighted evidence rather than an unweighted pointwise maximum. The
+interior-envelope search uses extrema
 through `r=0.50` without changing the experimental RF feature definition,
 which retains its established `r<=0.40` search.
 Half-maximum boundary widths use the complete radial grid, not only their

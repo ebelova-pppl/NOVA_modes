@@ -64,6 +64,7 @@ from tae_rule_engine import (  # noqa: E402
     BAD_EDGE_SPIKE,
     BAD_GRID_SCALE_PACKET,
     BAD_GRID_SCALE_SPIKE,
+    BAD_INTERIOR_HARMONIC_INCOHERENCE,
     BAD_INTERIOR_UNRESOLVED_ENVELOPE,
     NO_GOOD_TEMPLATE,
     RULE_FEATURE_EXTRACTION_FAILED,
@@ -79,6 +80,7 @@ from tae_rule_engine import (  # noqa: E402
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
+    InteriorHarmonicIncoherenceConfig,
     InteriorUnresolvedEnvelopeConfig,
     evaluate_mode,
     extract_axis_artifact_features,
@@ -86,6 +88,7 @@ from tae_rule_engine import (  # noqa: E402
     extract_edge_artifact_features,
     extract_grid_scale_packet_features,
     extract_grid_scale_spike_features,
+    extract_interior_harmonic_incoherence_features,
 )
 from tae_rule_io import (  # noqa: E402
     MANUAL_OVERRIDE_FIELDS,
@@ -136,6 +139,31 @@ CROSS_WINDOW_FEATURE_NAMES = {
     "cross_window_W_crossing_boundary",
     "cross_window_W_crossing_r",
     "cross_window_W_distance_grid",
+}
+
+INTERIOR_HARMONIC_INCOHERENCE_FEATURE_NAMES = {
+    "core_r_max",
+    "active_core_energy_fraction_min",
+    "max_lag_grid",
+    "score_threshold",
+    "calibrated_n_radial",
+    "resolution_eligible",
+    "candidate_found",
+    "core_radial_sample_count",
+    "core_positive_energy_sample_count",
+    "core_adjacent_radial_pair_count",
+    "active_core_harmonic_count",
+    "active_adjacent_harmonic_pair_count",
+    "core_energy_fraction",
+    "core_js_divergence",
+    "core_effective_harmonic_count_wmean",
+    "effective_harmonic_count_threshold",
+    "global_effective_harmonic_count_wmean",
+    "global_energy_fraction_above_effective_harmonic_count_threshold",
+    "core_energy_fraction_above_effective_harmonic_count_threshold",
+    "total_energy_fraction_in_core_above_effective_harmonic_count_threshold",
+    "core_adjacent_harmonic_coherence",
+    "incoherence_score",
 }
 
 
@@ -211,6 +239,55 @@ def narrow_total_energy_mode(
     mode = np.zeros((4, nr), dtype=float)
     mode[1, peak_index - 1 : peak_index + 2] = [np.sqrt(0.5), 1.0, np.sqrt(0.5)]
     return mode
+
+
+def broadband_incoherent_mode(*, nr: int = 201, n_harmonics: int = 8) -> np.ndarray:
+    """Return deterministic simultaneous broadband activity inside r <= 0.5."""
+    radial_grid = np.linspace(0.0, 1.0, nr)
+    n_core = int(np.count_nonzero(radial_grid <= 0.5))
+    generator = np.random.default_rng(1234)
+    mode = np.zeros((n_harmonics, nr), dtype=float)
+    mode[:, :n_core] = generator.normal(size=(n_harmonics, n_core))
+    mode /= np.max(np.abs(mode))
+    return mode
+
+
+def evaluate_incoherence_only(
+    row: dict,
+    mode: np.ndarray,
+    *,
+    incoherence_config: InteriorHarmonicIncoherenceConfig | None = None,
+    interior_config: InteriorUnresolvedEnvelopeConfig | None = None,
+):
+    """Evaluate a synthetic mode with every earlier rejection gate disabled."""
+    n_radial = mode.shape[1]
+    return evaluate_mode(
+        row,
+        mode=mode,
+        low2=np.full(n_radial, 0.5**2),
+        high2=np.full(n_radial, 1.5**2),
+        axis_artifact_config=AxisArtifactConfig(
+            axis_amplitude_min=None,
+            axis_width_max_grid=None,
+        ),
+        grid_scale_spike_config=GridScaleSpikeConfig(
+            amplitude_min=None,
+            width_max_grid=None,
+        ),
+        grid_scale_packet_config=GridScalePacketConfig(amplitude_min=None),
+        continuum_crossing_config=ContinuumCrossingConfig(
+            w_cross_threshold=None
+        ),
+        continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+            amplitude_min=None,
+            w_min=None,
+        ),
+        edge_artifact_config=EdgeArtifactConfig(edge_width_max_grid=None),
+        interior_unresolved_envelope_config=(
+            interior_config or InteriorUnresolvedEnvelopeConfig(width_max_grid=None)
+        ),
+        interior_harmonic_incoherence_config=incoherence_config,
+    )
 
 
 def override_row(result_row: dict[str, str], decision: str = "GOOD") -> dict[str, str]:
@@ -340,6 +417,9 @@ class RuleAndOverrideTests(unittest.TestCase):
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
         self.assertEqual(
+            RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v16"
+        )
+        self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
         )
@@ -410,6 +490,21 @@ class RuleAndOverrideTests(unittest.TestCase):
             ],
             0,
         )
+        incoherence_features = features["numerical_structure_features"][
+            "interior_harmonic_incoherence"
+        ]
+        self.assertEqual(
+            set(incoherence_features),
+            INTERIOR_HARMONIC_INCOHERENCE_FEATURE_NAMES,
+        )
+        self.assertEqual(incoherence_features["core_r_max"], 0.5)
+        self.assertEqual(
+            incoherence_features["active_core_energy_fraction_min"], 0.005
+        )
+        self.assertEqual(incoherence_features["max_lag_grid"], 5)
+        self.assertEqual(incoherence_features["score_threshold"], 0.1)
+        self.assertEqual(incoherence_features["calibrated_n_radial"], 201)
+        self.assertTrue(incoherence_features["resolution_eligible"])
         axis_features = features["boundary_features"]["axis_artifact"]
         self.assertEqual(axis_features["r_ax"], 0.03)
         self.assertFalse(axis_features["axis_candidate_found"])
@@ -530,6 +625,27 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertIsNone(interior_features["energy_peak_r"])
         self.assertIsNone(interior_features["extremum_match_found"])
         self.assertIsNone(interior_features["extremum_exception_applied"])
+        incoherence_features = features["numerical_structure_features"][
+            "interior_harmonic_incoherence"
+        ]
+        self.assertEqual(
+            set(incoherence_features),
+            INTERIOR_HARMONIC_INCOHERENCE_FEATURE_NAMES,
+        )
+        self.assertIsNone(incoherence_features["resolution_eligible"])
+        self.assertIsNone(incoherence_features["candidate_found"])
+        self.assertIsNone(incoherence_features["incoherence_score"])
+        self.assertEqual(
+            incoherence_features["effective_harmonic_count_threshold"], 3.0
+        )
+        self.assertIsNone(
+            incoherence_features["global_effective_harmonic_count_wmean"]
+        )
+        self.assertIsNone(
+            incoherence_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ]
+        )
 
     def test_narrow_axis_spike_fires_first_bad_gate(self):
         mode = np.zeros_like(self.mode)
@@ -1771,6 +1887,395 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
         self.assertEqual(result.triggered_rules, (BAD_EDGE_SPIKE,))
 
+    def test_interior_harmonic_effective_count_is_simultaneous(self):
+        simultaneous = np.zeros((6, 201), dtype=float)
+        simultaneous[:, :101] = np.array([1, -1, 1, -1, 1, -1])[:, None]
+        simultaneous_features = extract_interior_harmonic_incoherence_features(
+            simultaneous
+        )
+
+        self.assertAlmostEqual(
+            simultaneous_features["core_effective_harmonic_count_wmean"],
+            6.0,
+        )
+        self.assertEqual(
+            simultaneous_features["effective_harmonic_count_threshold"], 3.0
+        )
+        self.assertAlmostEqual(
+            simultaneous_features["global_effective_harmonic_count_wmean"],
+            6.0,
+        )
+        self.assertAlmostEqual(
+            simultaneous_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            1.0,
+        )
+        self.assertAlmostEqual(
+            simultaneous_features[
+                "core_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            1.0,
+        )
+        self.assertAlmostEqual(
+            simultaneous_features[
+                "total_energy_fraction_in_core_above_effective_harmonic_count_threshold"
+            ],
+            1.0,
+        )
+        self.assertEqual(simultaneous_features["active_core_harmonic_count"], 6)
+        self.assertAlmostEqual(simultaneous_features["core_js_divergence"], 0.0)
+        self.assertAlmostEqual(
+            simultaneous_features["core_adjacent_harmonic_coherence"], 1.0
+        )
+        self.assertFalse(simultaneous_features["candidate_found"])
+
+        sequential = np.zeros((6, 201), dtype=float)
+        for radial_index in range(101):
+            sequential[min(radial_index // 17, 5), radial_index] = 1.0
+        sequential_features = extract_interior_harmonic_incoherence_features(
+            sequential
+        )
+
+        self.assertEqual(sequential_features["active_core_harmonic_count"], 6)
+        self.assertAlmostEqual(
+            sequential_features["core_effective_harmonic_count_wmean"],
+            1.0,
+        )
+        self.assertAlmostEqual(
+            sequential_features["global_effective_harmonic_count_wmean"],
+            1.0,
+        )
+        self.assertAlmostEqual(
+            sequential_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            0.0,
+        )
+        self.assertAlmostEqual(
+            sequential_features[
+                "core_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            0.0,
+        )
+        self.assertAlmostEqual(
+            sequential_features[
+                "total_energy_fraction_in_core_above_effective_harmonic_count_threshold"
+            ],
+            0.0,
+        )
+        self.assertLess(sequential_features["incoherence_score"], 0.1)
+        self.assertFalse(sequential_features["candidate_found"])
+
+    def test_harmonic_participation_audit_weighting_and_null_semantics(self):
+        split_energy = np.zeros((4, 201), dtype=float)
+        split_energy[:, 0] = 1.0
+        split_energy[0, -1] = 2.0
+        split_features = extract_interior_harmonic_incoherence_features(
+            split_energy
+        )
+
+        self.assertAlmostEqual(split_features["core_energy_fraction"], 0.5)
+        self.assertAlmostEqual(
+            split_features["global_effective_harmonic_count_wmean"], 2.5
+        )
+        self.assertAlmostEqual(
+            split_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            0.5,
+        )
+        self.assertAlmostEqual(
+            split_features[
+                "core_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            1.0,
+        )
+        self.assertAlmostEqual(
+            split_features[
+                "total_energy_fraction_in_core_above_effective_harmonic_count_threshold"
+            ],
+            0.5,
+        )
+        self.assertAlmostEqual(
+            split_features[
+                "total_energy_fraction_in_core_above_effective_harmonic_count_threshold"
+            ],
+            split_features["core_energy_fraction"]
+            * split_features[
+                "core_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+        )
+
+        exactly_three = np.zeros((3, 201), dtype=float)
+        exactly_three[:, 0] = 1.0
+        equality_features = extract_interior_harmonic_incoherence_features(
+            exactly_three
+        )
+        self.assertAlmostEqual(
+            equality_features["global_effective_harmonic_count_wmean"], 3.0
+        )
+        self.assertAlmostEqual(
+            equality_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            0.0,
+        )
+
+        low_energy_tail = np.zeros((6, 201), dtype=float)
+        low_energy_tail[0, 0] = 1.0
+        low_energy_tail[:, -1] = np.sqrt(0.01 / 6.0)
+        tail_features = extract_interior_harmonic_incoherence_features(
+            low_energy_tail
+        )
+        self.assertAlmostEqual(
+            tail_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            0.01 / 1.01,
+        )
+
+        no_core = np.zeros((4, 201), dtype=float)
+        no_core[:, -1] = 1.0
+        no_core_features = extract_interior_harmonic_incoherence_features(no_core)
+        self.assertAlmostEqual(no_core_features["core_energy_fraction"], 0.0)
+        self.assertAlmostEqual(
+            no_core_features["global_effective_harmonic_count_wmean"], 4.0
+        )
+        self.assertAlmostEqual(
+            no_core_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ],
+            1.0,
+        )
+        self.assertIsNone(
+            no_core_features[
+                "core_energy_fraction_above_effective_harmonic_count_threshold"
+            ]
+        )
+        self.assertAlmostEqual(
+            no_core_features[
+                "total_energy_fraction_in_core_above_effective_harmonic_count_threshold"
+            ],
+            0.0,
+        )
+
+        zero_features = extract_interior_harmonic_incoherence_features(
+            np.zeros((4, 201), dtype=float)
+        )
+        for name in (
+            "global_effective_harmonic_count_wmean",
+            "global_energy_fraction_above_effective_harmonic_count_threshold",
+            "core_energy_fraction_above_effective_harmonic_count_threshold",
+            "total_energy_fraction_in_core_above_effective_harmonic_count_threshold",
+        ):
+            self.assertIsNone(zero_features[name])
+
+    def test_interior_harmonic_base2_js_and_undefined_pair_are_explicit(self):
+        alternating = np.zeros((2, 201), dtype=float)
+        alternating[0, :101:2] = 1.0
+        alternating[1, 1:101:2] = 1.0
+        alternating_features = extract_interior_harmonic_incoherence_features(
+            alternating,
+            config=InteriorHarmonicIncoherenceConfig(max_lag_grid=0),
+        )
+
+        self.assertAlmostEqual(alternating_features["core_js_divergence"], 1.0)
+        self.assertAlmostEqual(
+            alternating_features["core_effective_harmonic_count_wmean"], 1.0
+        )
+        self.assertAlmostEqual(
+            alternating_features["core_adjacent_harmonic_coherence"], 0.0
+        )
+        self.assertAlmostEqual(alternating_features["incoherence_score"], 1.0)
+        self.assertTrue(alternating_features["candidate_found"])
+
+        one_harmonic = np.zeros((1, 201), dtype=float)
+        one_harmonic[0, :101] = 1.0
+        one_harmonic_features = extract_interior_harmonic_incoherence_features(
+            one_harmonic
+        )
+        self.assertEqual(one_harmonic_features["active_core_harmonic_count"], 1)
+        self.assertEqual(
+            one_harmonic_features["active_adjacent_harmonic_pair_count"], 0
+        )
+        self.assertIsNone(
+            one_harmonic_features["core_adjacent_harmonic_coherence"]
+        )
+        self.assertIsNone(one_harmonic_features["incoherence_score"])
+        self.assertFalse(one_harmonic_features["candidate_found"])
+
+    def test_interior_harmonic_core_and_active_boundaries_are_inclusive(self):
+        boundary_mode = np.zeros((1, 201), dtype=float)
+        boundary_mode[0, 100:102] = 1.0
+        boundary_features = extract_interior_harmonic_incoherence_features(
+            boundary_mode
+        )
+        self.assertEqual(boundary_features["core_radial_sample_count"], 101)
+        self.assertAlmostEqual(boundary_features["core_energy_fraction"], 0.5)
+        self.assertAlmostEqual(
+            boundary_features["core_effective_harmonic_count_wmean"], 1.0
+        )
+
+        cutoff_mode = np.zeros((2, 201), dtype=float)
+        cutoff_mode[0, :101] = 1.0
+        cutoff_mode[1, :101] = np.sqrt(0.005 / 0.995)
+        cutoff_features = extract_interior_harmonic_incoherence_features(
+            cutoff_mode
+        )
+        self.assertEqual(cutoff_features["active_core_harmonic_count"], 2)
+        self.assertEqual(cutoff_features["active_adjacent_harmonic_pair_count"], 1)
+
+    def test_interior_harmonic_lag_limit_is_inclusive(self):
+        mode = np.zeros((3, 201), dtype=float)
+        mode[0, 30] = 1.0
+        mode[1, 35] = 1.0
+        mode[2, :101] = 0.001
+
+        lag_four = extract_interior_harmonic_incoherence_features(
+            mode,
+            config=InteriorHarmonicIncoherenceConfig(max_lag_grid=4),
+        )
+        lag_five = extract_interior_harmonic_incoherence_features(
+            mode,
+            config=InteriorHarmonicIncoherenceConfig(max_lag_grid=5),
+        )
+
+        self.assertAlmostEqual(
+            lag_four["core_adjacent_harmonic_coherence"], 0.0
+        )
+        self.assertGreater(lag_four["incoherence_score"], 0.1)
+        self.assertAlmostEqual(
+            lag_five["core_adjacent_harmonic_coherence"], 1.0
+        )
+        self.assertAlmostEqual(lag_five["incoherence_score"], 0.0)
+
+    def test_interior_harmonic_score_is_scale_stable_and_strict(self):
+        mode = broadband_incoherent_mode()
+        baseline = extract_interior_harmonic_incoherence_features(mode)
+        scaled = extract_interior_harmonic_incoherence_features(7.0 * mode)
+        score = baseline["incoherence_score"]
+
+        self.assertGreater(score, 0.1)
+        for name in (
+            "core_energy_fraction",
+            "core_js_divergence",
+            "core_effective_harmonic_count_wmean",
+            "global_effective_harmonic_count_wmean",
+            "global_energy_fraction_above_effective_harmonic_count_threshold",
+            "core_energy_fraction_above_effective_harmonic_count_threshold",
+            "total_energy_fraction_in_core_above_effective_harmonic_count_threshold",
+            "core_adjacent_harmonic_coherence",
+            "incoherence_score",
+        ):
+            self.assertAlmostEqual(baseline[name], scaled[name])
+
+        exact = extract_interior_harmonic_incoherence_features(
+            mode,
+            config=InteriorHarmonicIncoherenceConfig(score_threshold=score),
+        )
+        just_below = extract_interior_harmonic_incoherence_features(
+            mode,
+            config=InteriorHarmonicIncoherenceConfig(
+                score_threshold=np.nextafter(score, 0.0)
+            ),
+        )
+        self.assertFalse(exact["candidate_found"])
+        self.assertTrue(just_below["candidate_found"])
+
+    def test_interior_harmonic_gate_and_resolution_guard(self):
+        mode = broadband_incoherent_mode()
+        result = evaluate_incoherence_only(self.base, mode)
+        features = result.features["numerical_structure_features"][
+            "interior_harmonic_incoherence"
+        ]
+
+        self.assertEqual(result.decision, "BAD")
+        self.assertEqual(
+            result.primary_reason, BAD_INTERIOR_HARMONIC_INCOHERENCE
+        )
+        self.assertEqual(
+            result.triggered_rules,
+            (BAD_INTERIOR_HARMONIC_INCOHERENCE,),
+        )
+        self.assertTrue(features["resolution_eligible"])
+        self.assertTrue(features["candidate_found"])
+
+        other_resolution = broadband_incoherent_mode(nr=200)
+        guarded = evaluate_incoherence_only(self.base, other_resolution)
+        guarded_features = guarded.features["numerical_structure_features"][
+            "interior_harmonic_incoherence"
+        ]
+        self.assertEqual(guarded.decision, "REVIEW")
+        self.assertFalse(guarded_features["resolution_eligible"])
+        self.assertFalse(guarded_features["candidate_found"])
+        self.assertGreater(guarded_features["incoherence_score"], 0.1)
+        self.assertIsNotNone(
+            guarded_features["global_effective_harmonic_count_wmean"]
+        )
+        self.assertIsNotNone(
+            guarded_features[
+                "global_energy_fraction_above_effective_harmonic_count_threshold"
+            ]
+        )
+
+        disabled = evaluate_incoherence_only(
+            self.base,
+            mode,
+            incoherence_config=InteriorHarmonicIncoherenceConfig(
+                score_threshold=None
+            ),
+        )
+        disabled_features = disabled.features["numerical_structure_features"][
+            "interior_harmonic_incoherence"
+        ]
+        self.assertEqual(disabled.decision, "REVIEW")
+        self.assertIsNone(disabled_features["candidate_found"])
+        self.assertAlmostEqual(
+            disabled_features["incoherence_score"],
+            features["incoherence_score"],
+        )
+        for name in (
+            "global_effective_harmonic_count_wmean",
+            "global_energy_fraction_above_effective_harmonic_count_threshold",
+            "core_energy_fraction_above_effective_harmonic_count_threshold",
+            "total_energy_fraction_in_core_above_effective_harmonic_count_threshold",
+        ):
+            self.assertAlmostEqual(disabled_features[name], features[name])
+
+    def test_interior_harmonic_configuration_rejects_invalid_values(self):
+        invalid_cases = (
+            {"core_r_max": 1.01},
+            {"active_core_energy_fraction_min": 0.0},
+            {"max_lag_grid": -1},
+            {"score_threshold": float("nan")},
+            {"calibrated_n_radial": 1},
+        )
+        for kwargs in invalid_cases:
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                InteriorHarmonicIncoherenceConfig(**kwargs)
+
+    def test_interior_envelope_gate_precedes_harmonic_incoherence(self):
+        mode = broadband_incoherent_mode()
+        result = evaluate_incoherence_only(
+            self.base,
+            mode,
+            interior_config=InteriorUnresolvedEnvelopeConfig(
+                peak_r_max=1.0,
+                width_max_grid=1000.0,
+            ),
+        )
+        incoherence_features = result.features["numerical_structure_features"][
+            "interior_harmonic_incoherence"
+        ]
+
+        self.assertTrue(incoherence_features["candidate_found"])
+        self.assertEqual(result.primary_reason, BAD_INTERIOR_UNRESOLVED_ENVELOPE)
+        self.assertEqual(
+            result.triggered_rules,
+            (BAD_INTERIOR_UNRESOLVED_ENVELOPE,),
+        )
+
     def test_null_thresholds_disable_axis_gate_but_keep_measurements(self):
         mode = np.zeros_like(self.mode)
         mode[1, 0] = 1.0
@@ -2401,16 +2906,23 @@ class WorkflowOutputTests(unittest.TestCase):
         historical_v1 = (
             REPO_ROOT / "configs" / "rules" / "tae_rules_production_v1.yaml"
         )
+        historical_v2 = (
+            REPO_ROOT / "configs" / "rules" / "tae_rules_production_v2.yaml"
+        )
         self.assertEqual(
             sha256_file(historical_v1),
             "a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v2")
+        self.assertEqual(
+            sha256_file(historical_v2),
+            "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f",
+        )
+        self.assertEqual(configuration.name, "tae_rules_production_v3")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f",
+            "fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -2444,6 +2956,11 @@ class WorkflowOutputTests(unittest.TestCase):
                 "interior_envelope_ext_dr_max": 0.02,
                 "interior_envelope_ext_df_gap_min": 0.0,
                 "interior_envelope_ext_df_gap_max": 0.04,
+                "interior_harmonic_core_r_max": 0.5,
+                "interior_harmonic_active_core_energy_fraction_min": 0.005,
+                "interior_harmonic_max_lag_grid": 5,
+                "interior_harmonic_incoherence_score_threshold": 0.1,
+                "interior_harmonic_calibrated_n_radial": 201,
             },
         )
 
@@ -2486,6 +3003,30 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertEqual(result.summary["interior_envelope_ext_dr_max"], 0.02)
         self.assertEqual(result.summary["interior_envelope_ext_df_gap_min"], 0.0)
         self.assertEqual(result.summary["interior_envelope_ext_df_gap_max"], 0.04)
+        self.assertTrue(
+            result.summary["interior_harmonic_incoherence_gate_enabled"]
+        )
+        self.assertEqual(result.summary["interior_harmonic_core_r_max"], 0.5)
+        self.assertEqual(
+            result.summary[
+                "interior_harmonic_active_core_energy_fraction_min"
+            ],
+            0.005,
+        )
+        self.assertEqual(result.summary["interior_harmonic_max_lag_grid"], 5)
+        self.assertEqual(
+            result.summary["interior_harmonic_incoherence_score_threshold"],
+            0.1,
+        )
+        self.assertEqual(
+            result.summary["interior_harmonic_calibrated_n_radial"], 201
+        )
+        self.assertEqual(
+            result.summary["n_interior_harmonic_resolution_eligible"], 0
+        )
+        self.assertEqual(
+            result.summary["n_interior_harmonic_resolution_ineligible"], 1
+        )
 
         with tempfile.TemporaryDirectory() as temporary:
             modified = Path(temporary) / "modified.yaml"
@@ -2510,6 +3051,16 @@ class WorkflowOutputTests(unittest.TestCase):
                 parse_args([*common, "--cross_window_w_min", "0.1"])
             with self.assertRaises(SystemExit):
                 parse_args([*common, "--interior_envelope_width_max_grid", "3"])
+            with self.assertRaises(SystemExit):
+                parse_args(
+                    [
+                        *common,
+                        "--interior_harmonic_incoherence_score_threshold",
+                        "0.2",
+                    ]
+                )
+            with self.assertRaises(SystemExit):
+                parse_args([*common, "--disable_interior_harmonic_incoherence"])
 
     def test_calibration_cli_accepts_interior_envelope_thresholds_and_disable(self):
         args = parse_args(
@@ -2544,6 +3095,38 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertEqual(args.interior_envelope_ext_df_gap_min, 0.005)
         self.assertEqual(args.interior_envelope_ext_df_gap_max, 0.035)
         self.assertTrue(args.disable_interior_unresolved_envelope)
+
+    def test_calibration_cli_accepts_harmonic_incoherence_settings(self):
+        args = parse_args(
+            [
+                "--shot_dir",
+                "/tmp/shot",
+                "--out_dir",
+                "/tmp/out",
+                "--interior_harmonic_core_r_max",
+                "0.45",
+                "--interior_harmonic_active_core_energy_fraction_min",
+                "0.01",
+                "--interior_harmonic_max_lag_grid",
+                "3",
+                "--interior_harmonic_incoherence_score_threshold",
+                "0.2",
+                "--interior_harmonic_calibrated_n_radial",
+                "301",
+                "--disable_interior_harmonic_incoherence",
+            ]
+        )
+
+        self.assertEqual(args.interior_harmonic_core_r_max, 0.45)
+        self.assertEqual(
+            args.interior_harmonic_active_core_energy_fraction_min, 0.01
+        )
+        self.assertEqual(args.interior_harmonic_max_lag_grid, 3)
+        self.assertEqual(
+            args.interior_harmonic_incoherence_score_threshold, 0.2
+        )
+        self.assertEqual(args.interior_harmonic_calibrated_n_radial, 301)
+        self.assertTrue(args.disable_interior_harmonic_incoherence)
 
     def test_complete_output_contract_summary_counts_and_idempotence(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -2627,6 +3210,32 @@ class WorkflowOutputTests(unittest.TestCase):
             self.assertEqual(
                 first.summary["interior_envelope_ext_df_gap_max"], 0.04
             )
+            self.assertTrue(
+                first.summary["interior_harmonic_incoherence_gate_enabled"]
+            )
+            self.assertEqual(first.summary["interior_harmonic_core_r_max"], 0.5)
+            self.assertEqual(
+                first.summary[
+                    "interior_harmonic_active_core_energy_fraction_min"
+                ],
+                0.005,
+            )
+            self.assertEqual(first.summary["interior_harmonic_max_lag_grid"], 5)
+            self.assertEqual(
+                first.summary[
+                    "interior_harmonic_incoherence_score_threshold"
+                ],
+                0.1,
+            )
+            self.assertEqual(
+                first.summary["interior_harmonic_calibrated_n_radial"], 201
+            )
+            self.assertEqual(
+                first.summary["n_interior_harmonic_resolution_eligible"], 0
+            )
+            self.assertEqual(
+                first.summary["n_interior_harmonic_resolution_ineligible"], 1
+            )
             self.assertEqual(
                 json.loads(first.summary["primary_reason_counts_json"]),
                 {NO_GOOD_TEMPLATE: 1},
@@ -2662,6 +3271,22 @@ class WorkflowOutputTests(unittest.TestCase):
                 float(summary_by_n[0]["interior_envelope_width_max_grid"]),
                 2.0,
             )
+            self.assertEqual(
+                summary_by_n[0]["interior_harmonic_incoherence_gate_enabled"],
+                "True",
+            )
+            self.assertEqual(
+                int(summary_by_n[0]["interior_harmonic_calibrated_n_radial"]),
+                201,
+            )
+            self.assertEqual(
+                int(summary_by_n[0]["n_interior_harmonic_resolution_eligible"]),
+                0,
+            )
+            self.assertEqual(
+                int(summary_by_n[0]["n_interior_harmonic_resolution_ineligible"]),
+                1,
+            )
 
             before = {path.name: path.read_bytes() for path in sorted(out_dir.iterdir())}
             run_shot(
@@ -2696,6 +3321,12 @@ class WorkflowOutputTests(unittest.TestCase):
 
         self.assertEqual(result.summary["n_preliminary_bad"], 1)
         self.assertEqual(result.summary["n_final_bad"], 1)
+        self.assertEqual(
+            result.summary["n_interior_harmonic_resolution_eligible"], 0
+        )
+        self.assertEqual(
+            result.summary["n_interior_harmonic_resolution_ineligible"], 1
+        )
         self.assertTrue(result.summary["axis_artifact_gate_enabled"])
         self.assertEqual(result.summary["axis_artifact_amplitude_min"], 0.8)
         self.assertEqual(result.summary["axis_artifact_width_max_grid"], 2.0)
@@ -2949,6 +3580,60 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertTrue(features["candidate_found"])
         self.assertAlmostEqual(features["energy_peak_r"], 0.5)
         self.assertAlmostEqual(features["energy_halfmax_width_grid"], 2.0)
+
+    def test_run_shot_applies_interior_harmonic_incoherence_gate(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = broadband_incoherent_mode(n_harmonics=4)
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=mode.shape[1],
+                mode=mode,
+            )
+            write_datcon(
+                shot / "N1" / "datcon1",
+                nr=mode.shape[1],
+            )
+            result = run_shot(
+                shot,
+                root / "out",
+                axis_amplitude_min=None,
+                axis_width_max_grid=None,
+                grid_scale_amplitude_min=None,
+                grid_scale_width_max_grid=None,
+                grid_scale_packet_amplitude_min=None,
+                w_cross_threshold=None,
+                cross_window_amplitude_min=None,
+                cross_window_w_min=None,
+                edge_width_max_grid=None,
+                interior_envelope_width_max_grid=None,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertEqual(result.summary["n_final_bad"], 1)
+        self.assertEqual(
+            result.summary["n_interior_harmonic_resolution_eligible"], 1
+        )
+        self.assertEqual(
+            result.summary["n_interior_harmonic_resolution_ineligible"], 0
+        )
+        self.assertEqual(
+            json.loads(result.summary["primary_reason_counts_json"]),
+            {BAD_INTERIOR_HARMONIC_INCOHERENCE: 1},
+        )
+        row = result.final_rows[0]
+        self.assertEqual(
+            row["rule_primary_reason"], BAD_INTERIOR_HARMONIC_INCOHERENCE
+        )
+        features = json.loads(row["rule_features"])[
+            "numerical_structure_features"
+        ]["interior_harmonic_incoherence"]
+        self.assertTrue(features["resolution_eligible"])
+        self.assertTrue(features["candidate_found"])
+        self.assertGreater(features["incoherence_score"], 0.1)
 
     def test_valid_override_hash_and_stale_recheck(self):
         with tempfile.TemporaryDirectory() as temporary:

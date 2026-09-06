@@ -7,13 +7,17 @@ post-training cases for rules-versus-RF-CNN comparison.
 - `shot_status.csv` contains all 200 physical shot directories: 3 NSTX, 2
   legacy NSTX-U, 154 NSTX-U E, and 41 NSTX-U G cases.
 - `g_shot_status.csv` is the 41-row G-shot subset for convenient filtering.
+- `pilot12_selection.csv` records the reproducible 2026-09-05
+  stratified-random draw, seed `20260905`, size strata, completed replacement
+  sample, and the preflight exclusion that occurred before either sorter ran.
 - `active_training_shot=yes` means the shot occurs in the canonical
   `training_labels/tae_like_train.csv` list. The three label-count columns
   are derived from that file.
 - `post_training_checked=yes` is intentionally narrower: it marks only new
   cases already run and compared with both `rules` and `rf-cnn`. The complete
-  inventory currently marks `nstxuE202806A02t025`, `nstxuG121123K34`, and
-  `nstxuG121123K70`; the G-only subset contains the latter two.
+  inventory currently marks 15 post-training cases: the original E case and
+  two original G cases plus the 12-shot pilot recorded in
+  `pilot12_selection.csv`.
 
 The active list contains 14 training shots and 2,390 labels. Q62 is marked
 `suspended_training_q62`, not as an active training shot: its 249 reviewed
@@ -27,3 +31,6 @@ twice. Derived split directories, temporary/work directories, `badQ*`
 quarantines, and chatgpt continuum clones are also excluded. The canonical
 directory `nstxu_202806` is retained but marked `empty_no_egn` because it
 currently has no populated `N#` directory containing `egn*` files.
+`nstxuG142301D46` is marked `input_issue`: it was the pilot's initial
+medium-size G draw, but its sole N7 mode has `gamma_d=NaN`, so it was replaced
+before sorting by the next seeded candidate, `nstxuG142301E72`.

@@ -1,7 +1,160 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-08-31)
+### Project state (current snapshot, updated 2026-09-06)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-06 audit-only harmonic-participation features
+
+- Kept the production-v3 `BAD_INTERIOR_HARMONIC_INCOHERENCE` decision and its
+  strict `S_inc>0.10` threshold unchanged. Added no gate, CLI threshold,
+  configuration key, or summary candidate count.
+- Extended `numerical_structure_features.interior_harmonic_incoherence` with
+  audit-only scalar participation evidence. At samples with `W(r)>0`, the
+  extractor computes pointwise `N_eff=1/sum_h p_h^2`, then records the global
+  `W`-weighted mean `N_eff`, the global energy fraction at strict `N_eff>3`
+  (`G_3_global`), the corresponding conditional core fraction
+  (`G_3_core`), and the fraction of total energy located at `r<=0.5` with
+  `N_eff>3` (`B_3_core=f_core*G_3_core`). No unweighted radial maximum or hard
+  `W/W_max` support cutoff is stored.
+- Advanced only the grouped audit-feature schema from
+  `tae-rule-features-grouped-v15` to `tae-rule-features-grouped-v16`.
+  Ruleset v16, RF feature schemas, production-v3 configuration bytes and
+  SHA-256, routing, gate order, survivor policy, and model artifacts are
+  unchanged. Existing v15 output files remain valid historical results; a
+  rerun is required only when the new audit fields are wanted.
+- The two H56 targets have
+  `(N_eff_global,G_3_global,G_3_core,B_3_core)` values
+  `(3.989579,0.431056,0.919828,0.172436)` and
+  `(3.582449,0.350701,0.993291,0.126595)`. The illustrative
+  `B_3_core>0.10` slice contains 72/1,814 active labeled BAD and 0/576 GOOD
+  modes and selects exactly those two modes among the 281 pilot-v2 rule
+  survivors. It remains audit evidence, not a proposed decision.
+- Whole-radius measures remain morphology-ambiguous. `G_3_global>0.10`
+  includes 12 labeled GOOD edge modes. A global weighted `N_eff>3` slice
+  contains zero labeled GOOD modes but also selects E203609 N6/6239 and
+  N7/9477 among pilot survivors because outer common-mode tails contain many
+  simultaneous, strongly correlated stored rows. N6/6239 is absent from the
+  disagreement list because both rules and RF-CNN classify it GOOD. N7/9477
+  is a rules-GOOD/RF-CNN-BAD disagreement; the user's non-blind visual review
+  considers it BAD for a near-axis spike and near-continuum spiky structure,
+  rather than for the H56 incoherence morphology.
+- Added analytic tests for exact weighting, strict `N_eff>3` equality,
+  coherent simultaneous versus sequential participation, low-energy tails,
+  zero-total and zero-core semantics, scale invariance, and audit retention
+  when the decision is resolution-ineligible.
+- Validation passes all 126 non-validator repository tests in the production
+  conda environment; its expected full-suite failure remains only the skill
+  validator subprocess because PyYAML is absent there. Both skill-structure
+  tests pass with the system Python that provides PyYAML. A bounded canonical
+  H56 N1 smoke run retains the frozen production-v3 configuration SHA-256 and
+  has zero routing or classification differences from the pre-schema-change
+  v3 smoke: N1/4477 and N1/4499 remain BAD, and N1/4501 remains final GOOD.
+  Re-extraction of all 2,390 active training modes reproduces every existing
+  `f_core`, `J_core`, `N_eff_core`, `C_adj`, and `S_inc` value within
+  `1e-12`, confirming that the shared probability calculation is numerically
+  decision-preserving.
+
+## 2026-09-05 interior harmonic-incoherence gate and production v3
+
+- Added the last-ordered deterministic rejection
+  `BAD_INTERIOR_HARMONIC_INCOHERENCE`. The name describes the measured
+  morphology: it does not claim a statistically random cause, equate stored
+  harmonic rows with known physical poloidal-`m` values, or imply that a large
+  effective harmonic count alone is sufficient.
+- For the inclusive core `r<=0.5`, the gate computes
+  `S_inc=f_core*J_core*N_eff_core*(1-C_adj)`. `J_core` is the base-2
+  Jensen--Shannon divergence between consecutive squared-amplitude harmonic
+  distributions, weighted by the geometric mean of their radial energies.
+  `N_eff_core` is the radial-energy-weighted mean of the pointwise inverse
+  participation ratio, so it measures simultaneous harmonic participation at
+  each radius rather than the total number of harmonics used by a coherent
+  radial ridge. `C_adj` averages the maximum absolute signed-profile cosine
+  over radial lags `-5..+5` for adjacent active stored rows, with each pair
+  weighted by `sqrt(E_h^core E_(h+1)^core)`; active means at least `0.005` of
+  integrated core energy.
+- The calibrated decision is strict `S_inc>0.10`; equality passes. Zero core
+  energy, no positive-weight adjacent radial pair, or no adjacent active
+  harmonic pair leaves undefined evidence as JSON `null` and fails open. The
+  adjacency and lag are native-grid quantities, and every calibration row has
+  201 radial samples, so the production gate also fails open with
+  `resolution_eligible=false` when `n_radial!=201`. Shot summaries separately
+  count eligible and ineligible evaluated modes.
+- The exact extractor reproduces the motivating H56 modes:
+  `N1/egn01w.4477E+02` has
+  `(f_core,J_core,N_eff_core,C_adj,S_inc)=(0.187466,0.222286,5.877795,0.366783,0.155096)`;
+  `N1/egn01w.4499E+02` has
+  `(0.127451,0.244669,5.979867,0.363836,0.118627)`. Both have all 24 stored
+  harmonics active in the core and 23 eligible adjacent pairs.
+- This was a non-blind, post-hoc calibration, not an independent validation.
+  On the 2,390 active labels, `S_inc>0.10` identifies 101/1,814 labeled BAD
+  and 0/576 labeled GOOD modes. Every one of those training candidates was
+  already rejected by an earlier production-v2 gate, so none of the 585
+  active-training v2 survivors changes. Among the 281 production-v2 survivors
+  in the held-out 12-shot pilot, exactly the two visually identified H56 modes
+  are newly rejected. Compact provenance tables are in
+  `audits/interior_harmonic_incoherence/`.
+- Advanced the deterministic identities to ruleset
+  `tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-harmonic-incoherence-v16`,
+  grouped audit schema `tae-rule-features-grouped-v15`, and run-config schema
+  `tae-rule-run-config-v3`. Added the immutable current preset
+  `configs/rules/tae_rules_production_v3.yaml`, SHA-256
+  `fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3`.
+  Historical production-v1 and v2 files remain byte-for-byte unchanged. RF31,
+  its source feature schema, training labels, and RF/CNN checkpoints are
+  unchanged; RF remains only the final-GOOD duplicate representative ranker in
+  production rules runs.
+- Added analytic and workflow regression coverage for simultaneous versus
+  sequential harmonic participation, base-2 divergence, signed lag coherence,
+  inclusive radius/active/lag boundaries, strict score equality, null and
+  disabled behavior, the 201-point resolution guard and summary counts, gate
+  precedence, strict v3 config loading, historical hashes, CLI conflicts, and
+  the final output reason. All 125 non-validator repository tests pass in the
+  production conda environment. Its only full-suite failure is the validator
+  subprocess because that environment lacks PyYAML; both skill validators pass
+  separately with the system Python that provides PyYAML.
+- Bounded conservative and canonical-production v3 smoke runs on H56 N1 each
+  discovered 294 inputs and evaluated 78 TAE-side modes, all resolution-
+  eligible. Both assign the two targets the new BAD reason. The engine leaves
+  neighboring `N1/egn01w.4501E+02` as REVIEW with `S_inc=0.003404`; the
+  canonical `sort_shot_mixed.py --method rules` path promotes only that mode to
+  final GOOD and completes RF duplicate handling. This confirms both automatic
+  production-v3 selection and selectivity within the frequency cluster.
+
+## 2026-09-05 stratified 12-shot post-training pilot
+
+- Selected a reproducible held-out comparison sample with random seed
+  `20260905`, after excluding active training shots, already checked cases,
+  suspended Q62, and the empty legacy shot. The design uses eight E and four G
+  shots, distinct E series, and low (`<=400`), medium (`401--800`), and high
+  (`>800`) input-mode strata. The sealed selection and replacement history are
+  in `audits/main_dataset_shots/pilot12_selection.csv`.
+- The initial medium-size G draw, `nstxuG142301D46`, failed preflight because
+  its sole N7 mode, `egn07w.1593E+02`, has `gamma_d=NaN`. Added source issue
+  `DITW-004` and advanced deterministically to the next shuffled candidate,
+  `nstxuG142301E72`, before running either method.
+- Ran all 12 final shots sequentially through production-v2 rules with the
+  active RF checkpoint used only for duplicate ranking, and through the
+  explicit legacy RF-CNN workflow with the active raw CNN on CPU. The 24 runs
+  discovered 8,243 input files, reported zero invalid inputs, and agreed
+  exactly on routing. Outputs are under the matching shot directories in
+  `/p/hym/ebelova/NOVA/sort_outputs` and
+  `/p/hym/ebelova/NOVA/sort_outputs_ai`.
+- Across 1,925 paired TAE-side decisions, the methods agree on 1,847 and
+  disagree on 78 (4.05%). Rules reject 33 modes accepted by RF-CNN: 21
+  `BAD_AXIS_SPIKE`, eight `BAD_CONT_CROSS_WINDOW`, three
+  `BAD_GRID_SCALE_SPIKE`, and one `BAD_INTERIOR_UNRESOLVED_ENVELOPE`. RF-CNN
+  rejects 45 rule survivors. Before clustering, rules retain 281 GOOD modes
+  and RF-CNN retains 269; final lists contain 281 and 266, respectively.
+- Disagreement is shot-dependent: the eight E shots contribute 68/1,363
+  disagreements and the four G shots 10/562. Two shots agree on every
+  decision; the largest individual disagreement counts are 16, 14, and 13.
+  These are comparison results, not visual adjudications; morphology review of
+  the disagreements remains the next scientific step.
+- Added `outputs/pilot12_rules_vs_rf_cnn_summary.csv` (SHA-256
+  `5b9944a4cdecb4acf882899a5613bd30451a037f6c4d55bca0d95662c2866b30`)
+  and `outputs/pilot12_rules_vs_rf_cnn_disagreements.csv` (SHA-256
+  `d4153efbf4b959d1116db1936ed423077e9ae270d7374acee0b41397ceba7330`).
+  No rule, configuration, training label, or model artifact was changed.
 
 ## 2026-08-31 repository-relative src bootstrap for direct CLIs
 

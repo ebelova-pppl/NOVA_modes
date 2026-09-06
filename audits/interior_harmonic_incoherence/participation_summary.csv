@@ -1,0 +1,13 @@
+population,n_modes,audit_measure,illustrative_condition,n_candidates,provenance
+active_training_BAD_labels,1814,global_effective_harmonic_count_wmean,>3.0,77,non-blind post-hoc audit
+active_training_GOOD_labels,576,global_effective_harmonic_count_wmean,>3.0,0,non-blind post-hoc audit
+active_training_production_v2_survivors,585,global_effective_harmonic_count_wmean,>3.0,1,non-blind post-hoc audit
+pilot12_production_v2_survivors,281,global_effective_harmonic_count_wmean,>3.0,4,non-blind post-hoc pilot audit
+active_training_BAD_labels,1814,global_energy_fraction_above_effective_harmonic_count_threshold,>0.10,260,non-blind post-hoc audit
+active_training_GOOD_labels,576,global_energy_fraction_above_effective_harmonic_count_threshold,>0.10,12,non-blind post-hoc audit
+active_training_production_v2_survivors,585,global_energy_fraction_above_effective_harmonic_count_threshold,>0.10,16,non-blind post-hoc audit
+pilot12_production_v2_survivors,281,global_energy_fraction_above_effective_harmonic_count_threshold,>0.10,15,non-blind post-hoc pilot audit
+active_training_BAD_labels,1814,total_energy_fraction_in_core_above_effective_harmonic_count_threshold,>0.10,72,non-blind post-hoc audit
+active_training_GOOD_labels,576,total_energy_fraction_in_core_above_effective_harmonic_count_threshold,>0.10,0,non-blind post-hoc audit
+active_training_production_v2_survivors,585,total_energy_fraction_in_core_above_effective_harmonic_count_threshold,>0.10,0,non-blind post-hoc audit
+pilot12_production_v2_survivors,281,total_energy_fraction_in_core_above_effective_harmonic_count_threshold,>0.10,2,non-blind post-hoc pilot audit

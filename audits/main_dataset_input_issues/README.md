@@ -29,6 +29,10 @@ live DiTw tree.
   discovered `egn*` files. All ten required `datcon#` files are present,
   nonempty, and usable; both workflows report zero failed, NaN, or otherwise
   invalid inputs.
+- `nstxuG142301D46/N7` was discovered during the 2026-09-05 stratified pilot
+  preflight. N7 contains one mode, `egn07w.1593E+02`, whose stored
+  `gamma_d` is `NaN`; it was excluded from the comparison sample before either
+  sorter ran and replaced by the next seeded candidate.
 
 Legacy continuum values greater than 999 are intentional missing-value
 sentinels handled by the shared continuum loader. They are not entered here as

@@ -17,6 +17,7 @@ from tae_rule_engine import (
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
+    InteriorHarmonicIncoherenceConfig,
     InteriorUnresolvedEnvelopeConfig,
 )
 from tae_rule_io import sha256_file
@@ -24,10 +25,10 @@ from tae_rule_io import sha256_file
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v2"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v2"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v3"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v3"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f"
+    "fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3"
 )
 
 
@@ -181,6 +182,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "continuum_crossing_window",
         "edge_artifact",
         "interior_unresolved_envelope",
+        "interior_harmonic_incoherence",
     }
     _require_exact_keys(gates, gate_names, context="gates")
 
@@ -368,6 +370,60 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         ext_df_gap_max=interior_ext_df_max,
     )
 
+    incoherence = _mapping(
+        gates["interior_harmonic_incoherence"],
+        context="gates.interior_harmonic_incoherence",
+    )
+    _require_exact_keys(
+        incoherence,
+        {
+            "enabled",
+            "core_r_max",
+            "active_core_energy_fraction_min",
+            "max_lag_grid",
+            "score_threshold",
+            "calibrated_n_radial",
+        },
+        context="gates.interior_harmonic_incoherence",
+    )
+    incoherence_enabled = _bool(
+        incoherence,
+        "enabled",
+        context="gates.interior_harmonic_incoherence",
+    )
+    incoherence_core_r_max = _float(
+        incoherence,
+        "core_r_max",
+        context="gates.interior_harmonic_incoherence",
+    )
+    incoherence_active_fraction = _float(
+        incoherence,
+        "active_core_energy_fraction_min",
+        context="gates.interior_harmonic_incoherence",
+    )
+    incoherence_max_lag = _int(
+        incoherence,
+        "max_lag_grid",
+        context="gates.interior_harmonic_incoherence",
+    )
+    incoherence_score_threshold = _float(
+        incoherence,
+        "score_threshold",
+        context="gates.interior_harmonic_incoherence",
+    )
+    incoherence_calibrated_n_radial = _int(
+        incoherence,
+        "calibrated_n_radial",
+        context="gates.interior_harmonic_incoherence",
+    )
+    InteriorHarmonicIncoherenceConfig(
+        core_r_max=incoherence_core_r_max,
+        active_core_energy_fraction_min=incoherence_active_fraction,
+        max_lag_grid=incoherence_max_lag,
+        score_threshold=incoherence_score_threshold,
+        calibrated_n_radial=incoherence_calibrated_n_radial,
+    )
+
     run_kwargs = {
         "fraction_tae_threshold": fraction_tae_threshold,
         "fraction_eae_threshold": fraction_eae_threshold,
@@ -404,6 +460,17 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "interior_envelope_ext_dr_max": interior_ext_dr,
         "interior_envelope_ext_df_gap_min": interior_ext_df_min,
         "interior_envelope_ext_df_gap_max": interior_ext_df_max,
+        "interior_harmonic_core_r_max": incoherence_core_r_max,
+        "interior_harmonic_active_core_energy_fraction_min": (
+            incoherence_active_fraction
+        ),
+        "interior_harmonic_max_lag_grid": incoherence_max_lag,
+        "interior_harmonic_incoherence_score_threshold": (
+            incoherence_score_threshold if incoherence_enabled else None
+        ),
+        "interior_harmonic_calibrated_n_radial": (
+            incoherence_calibrated_n_radial
+        ),
     }
     digest = sha256_file(path)
     if (

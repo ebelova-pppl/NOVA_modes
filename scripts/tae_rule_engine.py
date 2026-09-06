@@ -51,10 +51,16 @@ DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX = 0.50
 DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX = 0.02
 DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN = 0.0
 DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX = 0.04
+DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX = 0.5
+DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN = 0.005
+DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID = 5
+DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD = 0.10
+DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL = 201
+HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD = 3.0
 
 RULESET_VERSION = (
     "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-"
-    "edge-interior-envelope-v15"
+    "edge-interior-envelope-harmonic-incoherence-v16"
 )
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
@@ -63,12 +69,13 @@ BAD_CONT_CROSS = "BAD_CONT_CROSS"
 BAD_CONT_CROSS_WINDOW = "BAD_CONT_CROSS_WINDOW"
 BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
 BAD_INTERIOR_UNRESOLVED_ENVELOPE = "BAD_INTERIOR_UNRESOLVED_ENVELOPE"
+BAD_INTERIOR_HARMONIC_INCOHERENCE = "BAD_INTERIOR_HARMONIC_INCOHERENCE"
 NO_GOOD_TEMPLATE = "NO_GOOD_TEMPLATE"
 RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v14"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v16"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -358,6 +365,67 @@ class InteriorUnresolvedEnvelopeConfig:
         return self.width_max_grid is not None
 
 
+@dataclass(frozen=True)
+class InteriorHarmonicIncoherenceConfig:
+    """Thresholds for incoherent harmonic activity in the core."""
+
+    core_r_max: float = DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX
+    active_core_energy_fraction_min: float = (
+        DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN
+    )
+    max_lag_grid: int = DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID
+    score_threshold: float | None = (
+        DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD
+    )
+    calibrated_n_radial: int = DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.core_r_max) or not 0.0 <= self.core_r_max <= 1.0:
+            raise ValueError(
+                "interior harmonic incoherence core_r_max must be finite and in [0, 1]"
+            )
+        if (
+            not math.isfinite(self.active_core_energy_fraction_min)
+            or not 0.0 < self.active_core_energy_fraction_min <= 1.0
+        ):
+            raise ValueError(
+                "interior harmonic incoherence active_core_energy_fraction_min "
+                "must be finite and in (0, 1]"
+            )
+        if isinstance(self.max_lag_grid, bool) or not isinstance(
+            self.max_lag_grid, int
+        ):
+            raise ValueError(
+                "interior harmonic incoherence max_lag_grid must be an integer"
+            )
+        if self.max_lag_grid < 0:
+            raise ValueError(
+                "interior harmonic incoherence max_lag_grid must be nonnegative"
+            )
+        if self.score_threshold is not None and (
+            not math.isfinite(self.score_threshold) or self.score_threshold < 0.0
+        ):
+            raise ValueError(
+                "interior harmonic incoherence score_threshold must be null or a "
+                "finite nonnegative number"
+            )
+        if isinstance(self.calibrated_n_radial, bool) or not isinstance(
+            self.calibrated_n_radial, int
+        ):
+            raise ValueError(
+                "interior harmonic incoherence calibrated_n_radial must be an integer"
+            )
+        if self.calibrated_n_radial < 2:
+            raise ValueError(
+                "interior harmonic incoherence calibrated_n_radial must be at least 2"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether the combined-score decision threshold is configured."""
+        return self.score_threshold is not None
+
+
 def empty_axis_artifact_features(
     r_ax: float = DEFAULT_AXIS_R_AX,
     amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
@@ -515,6 +583,45 @@ def empty_interior_unresolved_envelope_features(
     }
 
 
+def empty_interior_harmonic_incoherence_features(
+    config: InteriorHarmonicIncoherenceConfig | None = None,
+    *,
+    candidate_found: bool | None = None,
+) -> dict[str, Any]:
+    """Return the stable interior harmonic-incoherence audit shape."""
+    resolved = config or InteriorHarmonicIncoherenceConfig()
+    return {
+        "core_r_max": resolved.core_r_max,
+        "active_core_energy_fraction_min": (
+            resolved.active_core_energy_fraction_min
+        ),
+        "max_lag_grid": resolved.max_lag_grid,
+        "score_threshold": resolved.score_threshold,
+        "calibrated_n_radial": resolved.calibrated_n_radial,
+        "resolution_eligible": None,
+        "candidate_found": candidate_found,
+        "core_radial_sample_count": None,
+        "core_positive_energy_sample_count": None,
+        "core_adjacent_radial_pair_count": None,
+        "active_core_harmonic_count": None,
+        "active_adjacent_harmonic_pair_count": None,
+        "core_energy_fraction": None,
+        "core_js_divergence": None,
+        "core_effective_harmonic_count_wmean": None,
+        "effective_harmonic_count_threshold": (
+            HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD
+        ),
+        "global_effective_harmonic_count_wmean": None,
+        "global_energy_fraction_above_effective_harmonic_count_threshold": None,
+        "core_energy_fraction_above_effective_harmonic_count_threshold": None,
+        "total_energy_fraction_in_core_above_effective_harmonic_count_threshold": (
+            None
+        ),
+        "core_adjacent_harmonic_coherence": None,
+        "incoherence_score": None,
+    }
+
+
 def empty_continuum_crossing_window_features(
     half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
     *,
@@ -551,6 +658,9 @@ def empty_rule_features(
     interior_unresolved_envelope_config: (
         InteriorUnresolvedEnvelopeConfig | None
     ) = None,
+    interior_harmonic_incoherence_config: (
+        InteriorHarmonicIncoherenceConfig | None
+    ) = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -559,6 +669,10 @@ def empty_rule_features(
     edge_config = edge_artifact_config or EdgeArtifactConfig()
     interior_config = (
         interior_unresolved_envelope_config or InteriorUnresolvedEnvelopeConfig()
+    )
+    incoherence_config = (
+        interior_harmonic_incoherence_config
+        or InteriorHarmonicIncoherenceConfig()
     )
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
@@ -584,6 +698,11 @@ def empty_rule_features(
                 packet_config.min_large_turns,
                 packet_config.window_span_grid,
                 packet_config.peak_r_max,
+            ),
+            "interior_harmonic_incoherence": (
+                empty_interior_harmonic_incoherence_features(
+                    incoherence_config
+                )
             ),
         },
         "crossing_features": {
@@ -619,6 +738,7 @@ def grouped_rule_features(
     edge_artifact_features: Mapping[str, Any],
     continuum_crossing_window_features: Mapping[str, Any],
     interior_unresolved_envelope_features: Mapping[str, Any],
+    interior_harmonic_incoherence_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -635,6 +755,9 @@ def grouped_rule_features(
         "numerical_structure_features": {
             "grid_scale_spike": dict(grid_scale_spike_features),
             "grid_scale_packet": dict(grid_scale_packet_features),
+            "interior_harmonic_incoherence": dict(
+                interior_harmonic_incoherence_features
+            ),
         },
         "crossing_features": {
             **{
@@ -1601,6 +1724,243 @@ def extract_interior_unresolved_envelope_features(
     return result
 
 
+def extract_interior_harmonic_incoherence_features(
+    mode: np.ndarray,
+    *,
+    config: InteriorHarmonicIncoherenceConfig | None = None,
+) -> dict[str, Any]:
+    """Measure incoherent harmonic participation in the inclusive core.
+
+    The combined score is
+
+    ``f_core * J_core * N_eff_core * (1 - C_adj)``.
+
+    Here ``J_core`` is the base-2 Jensen--Shannon divergence of adjacent
+    squared-amplitude harmonic distributions, ``N_eff_core`` is their
+    energy-weighted inverse participation ratio, and ``C_adj`` is the
+    energy-weighted signed-profile coherence of adjacent stored harmonic
+    rows after allowing a bounded radial lag.  Whole-radius ``N_eff`` and
+    energy fractions above ``N_eff > 3`` are retained only as audit evidence.
+    No physical poloidal-mode offset is inferred from the stored row index.
+    """
+    resolved = config or InteriorHarmonicIncoherenceConfig()
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+
+    radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
+    radial_tolerance = 64.0 * np.finfo(float).eps * max(
+        1.0, abs(resolved.core_r_max)
+    )
+    core_mask = radial_grid <= resolved.core_r_max + radial_tolerance
+    amplitude_scale = float(np.max(np.abs(mode_array)))
+    scaled_mode = (
+        mode_array if amplitude_scale == 0.0 else mode_array / amplitude_scale
+    )
+    core_mode = scaled_mode[:, core_mask]
+    squared_mode = np.square(scaled_mode)
+    radial_energy = np.sum(squared_mode, axis=0)
+    core_radial_energy = radial_energy[core_mask]
+    total_energy = float(np.sum(radial_energy))
+    core_energy = float(np.sum(core_radial_energy))
+
+    result = empty_interior_harmonic_incoherence_features(resolved)
+    result.update(
+        {
+            "core_radial_sample_count": int(core_mode.shape[1]),
+            "core_positive_energy_sample_count": int(
+                np.count_nonzero(core_radial_energy > 0.0)
+            ),
+            "core_adjacent_radial_pair_count": 0,
+            "active_core_harmonic_count": 0,
+            "active_adjacent_harmonic_pair_count": 0,
+            "resolution_eligible": bool(
+                mode_array.shape[1] == resolved.calibrated_n_radial
+            ),
+            "candidate_found": None if not resolved.enabled else False,
+        }
+    )
+    if total_energy <= 0.0:
+        return result
+
+    core_energy_fraction = min(1.0, max(0.0, core_energy / total_energy))
+    result["core_energy_fraction"] = float(core_energy_fraction)
+
+    positive_energy = radial_energy > 0.0
+    probabilities = np.zeros_like(scaled_mode, dtype=float)
+    probabilities[:, positive_energy] = (
+        squared_mode[:, positive_energy] / radial_energy[positive_energy]
+    )
+    inverse_participation = np.sum(
+        np.square(probabilities[:, positive_energy]), axis=0
+    )
+    effective_harmonic_count = np.zeros_like(radial_energy, dtype=float)
+    effective_harmonic_count[positive_energy] = 1.0 / inverse_participation
+    result["global_effective_harmonic_count_wmean"] = float(
+        np.sum(radial_energy * effective_harmonic_count) / total_energy
+    )
+
+    above_threshold = (
+        effective_harmonic_count
+        > HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD
+    )
+    global_high_participation_energy = float(
+        np.sum(radial_energy[above_threshold])
+    )
+    core_high_participation_energy = float(
+        np.sum(radial_energy[core_mask & above_threshold])
+    )
+    result[
+        "global_energy_fraction_above_effective_harmonic_count_threshold"
+    ] = float(
+        min(1.0, max(0.0, global_high_participation_energy / total_energy))
+    )
+    result[
+        "total_energy_fraction_in_core_above_effective_harmonic_count_threshold"
+    ] = float(
+        min(1.0, max(0.0, core_high_participation_energy / total_energy))
+    )
+    if core_energy <= 0.0:
+        return result
+
+    result[
+        "core_energy_fraction_above_effective_harmonic_count_threshold"
+    ] = float(
+        min(1.0, max(0.0, core_high_participation_energy / core_energy))
+    )
+    core_probabilities = probabilities[:, core_mask]
+    core_effective_harmonic_count = float(
+        np.sum(core_radial_energy * effective_harmonic_count[core_mask])
+        / core_energy
+    )
+    result["core_effective_harmonic_count_wmean"] = (
+        core_effective_harmonic_count
+    )
+
+    harmonic_core_energy = np.sum(np.square(core_mode), axis=1)
+    harmonic_core_fraction = harmonic_core_energy / core_energy
+    active_fraction_tolerance = 64.0 * np.finfo(float).eps
+    active_harmonics = (harmonic_core_energy > 0.0) & (
+        harmonic_core_fraction
+        >= resolved.active_core_energy_fraction_min - active_fraction_tolerance
+    )
+    result["active_core_harmonic_count"] = int(
+        np.count_nonzero(active_harmonics)
+    )
+
+    js_weight_sum = 0.0
+    js_weighted_total = 0.0
+    js_pair_count = 0
+    for radial_index in range(core_mode.shape[1] - 1):
+        left_energy = float(core_radial_energy[radial_index])
+        right_energy = float(core_radial_energy[radial_index + 1])
+        pair_weight = math.sqrt(left_energy * right_energy)
+        if pair_weight <= 0.0:
+            continue
+        left = core_probabilities[:, radial_index]
+        right = core_probabilities[:, radial_index + 1]
+        midpoint = 0.5 * (left + right)
+        left_nonzero = left > 0.0
+        right_nonzero = right > 0.0
+        divergence = 0.5 * (
+            float(
+                np.sum(
+                    left[left_nonzero]
+                    * np.log2(left[left_nonzero] / midpoint[left_nonzero])
+                )
+            )
+            + float(
+                np.sum(
+                    right[right_nonzero]
+                    * np.log2(right[right_nonzero] / midpoint[right_nonzero])
+                )
+            )
+        )
+        divergence = min(1.0, max(0.0, divergence))
+        js_weighted_total += pair_weight * divergence
+        js_weight_sum += pair_weight
+        js_pair_count += 1
+    result["core_adjacent_radial_pair_count"] = js_pair_count
+    core_js_divergence: float | None = None
+    if js_weight_sum > 0.0:
+        core_js_divergence = min(
+            1.0, max(0.0, js_weighted_total / js_weight_sum)
+        )
+        result["core_js_divergence"] = float(core_js_divergence)
+
+    coherence_weight_sum = 0.0
+    coherence_weighted_total = 0.0
+    active_pair_count = 0
+    n_core = core_mode.shape[1]
+    for harmonic_index in range(core_mode.shape[0] - 1):
+        if not (
+            active_harmonics[harmonic_index]
+            and active_harmonics[harmonic_index + 1]
+        ):
+            continue
+        left_profile = core_mode[harmonic_index]
+        right_profile = core_mode[harmonic_index + 1]
+        pair_coherence: float | None = None
+        for lag in range(-resolved.max_lag_grid, resolved.max_lag_grid + 1):
+            if n_core - abs(lag) < 2:
+                continue
+            if lag < 0:
+                left_overlap = left_profile[-lag:]
+                right_overlap = right_profile[: n_core + lag]
+            else:
+                left_overlap = left_profile[: n_core - lag]
+                right_overlap = right_profile[lag:]
+            left_norm = float(np.linalg.norm(left_overlap))
+            right_norm = float(np.linalg.norm(right_overlap))
+            if left_norm <= 0.0 or right_norm <= 0.0:
+                continue
+            coherence = abs(
+                float(np.dot(left_overlap, right_overlap))
+                / (left_norm * right_norm)
+            )
+            coherence = min(1.0, max(0.0, coherence))
+            if pair_coherence is None or coherence > pair_coherence:
+                pair_coherence = coherence
+        if pair_coherence is None:
+            continue
+        pair_weight = math.sqrt(
+            float(harmonic_core_energy[harmonic_index])
+            * float(harmonic_core_energy[harmonic_index + 1])
+        )
+        if pair_weight <= 0.0:
+            continue
+        coherence_weighted_total += pair_weight * pair_coherence
+        coherence_weight_sum += pair_weight
+        active_pair_count += 1
+
+    result["active_adjacent_harmonic_pair_count"] = active_pair_count
+    if coherence_weight_sum <= 0.0 or core_js_divergence is None:
+        return result
+    adjacent_coherence = min(
+        1.0, max(0.0, coherence_weighted_total / coherence_weight_sum)
+    )
+    result["core_adjacent_harmonic_coherence"] = float(adjacent_coherence)
+
+    incoherence_score = max(
+        0.0,
+        core_energy_fraction
+        * core_js_divergence
+        * core_effective_harmonic_count
+        * (1.0 - adjacent_coherence),
+    )
+    result["incoherence_score"] = float(incoherence_score)
+    if resolved.enabled and result["resolution_eligible"]:
+        # The calibrated boundary is deliberately strict: equality passes.
+        result["candidate_found"] = bool(
+            incoherence_score > resolved.score_threshold
+        )
+    return result
+
+
 @dataclass(frozen=True)
 class RuleResult:
     """Stable, auditable result returned for one preprocessed TAE-side mode."""
@@ -1663,6 +2023,9 @@ def evaluate_mode(
     interior_unresolved_envelope_config: (
         InteriorUnresolvedEnvelopeConfig | None
     ) = None,
+    interior_harmonic_incoherence_config: (
+        InteriorHarmonicIncoherenceConfig | None
+    ) = None,
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -1675,6 +2038,10 @@ def evaluate_mode(
     edge_config = edge_artifact_config or EdgeArtifactConfig()
     interior_config = (
         interior_unresolved_envelope_config or InteriorUnresolvedEnvelopeConfig()
+    )
+    incoherence_config = (
+        interior_harmonic_incoherence_config
+        or InteriorHarmonicIncoherenceConfig()
     )
     path = str(preprocessed_row.get("path", ""))
     mode_key = str(preprocessed_row.get("mode_key", ""))
@@ -1711,6 +2078,7 @@ def evaluate_mode(
                 cross_window_config,
                 packet_config,
                 interior_config,
+                incoherence_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -1790,6 +2158,12 @@ def evaluate_mode(
                 config=interior_config,
             )
         )
+        interior_incoherence_features = (
+            extract_interior_harmonic_incoherence_features(
+                mode,
+                config=incoherence_config,
+            )
+        )
         features = grouped_rule_features(
             named_features,
             feature_status,
@@ -1799,6 +2173,7 @@ def evaluate_mode(
             edge_features,
             cross_window_features,
             interior_envelope_features,
+            interior_incoherence_features,
         )
     except Exception as exc:
         return RuleResult(
@@ -1819,6 +2194,7 @@ def evaluate_mode(
                 cross_window_config,
                 packet_config,
                 interior_config,
+                incoherence_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -1982,6 +2358,24 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_INTERIOR_UNRESOLVED_ENVELOPE,
             triggered_rules=(BAD_INTERIOR_UNRESOLVED_ENVELOPE,),
+            features=features,
+        )
+
+    if (
+        incoherence_config.enabled
+        and interior_incoherence_features["candidate_found"]
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_INTERIOR_HARMONIC_INCOHERENCE,
+            triggered_rules=(BAD_INTERIOR_HARMONIC_INCOHERENCE,),
             features=features,
         )
 

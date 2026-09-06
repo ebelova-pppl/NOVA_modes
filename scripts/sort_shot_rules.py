@@ -14,6 +14,7 @@ close-frequency modes. This workflow never loads or runs a CNN model.
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import shutil
 import sys
@@ -59,6 +60,11 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX,
     DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
     DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID,
+    DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN,
+    DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL,
+    DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX,
+    DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD,
+    DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID,
     DEFAULT_W_CROSS_THRESHOLD,
     NO_GOOD_TEMPLATE,
     RULESET_VERSION,
@@ -68,6 +74,7 @@ from tae_rule_engine import (  # noqa: E402
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
+    InteriorHarmonicIncoherenceConfig,
     InteriorUnresolvedEnvelopeConfig,
     evaluate_mode,
 )
@@ -125,6 +132,8 @@ SHOT_SUMMARY_FIELDS = [
     "n_mixed",
     "n_eae_like",
     "n_rule_evaluated",
+    "n_interior_harmonic_resolution_eligible",
+    "n_interior_harmonic_resolution_ineligible",
     "n_preliminary_bad",
     "n_preliminary_review",
     "n_preliminary_good",
@@ -193,6 +202,12 @@ SHOT_SUMMARY_FIELDS = [
     "interior_envelope_ext_dr_max",
     "interior_envelope_ext_df_gap_min",
     "interior_envelope_ext_df_gap_max",
+    "interior_harmonic_incoherence_gate_enabled",
+    "interior_harmonic_core_r_max",
+    "interior_harmonic_active_core_energy_fraction_min",
+    "interior_harmonic_max_lag_grid",
+    "interior_harmonic_incoherence_score_threshold",
+    "interior_harmonic_calibrated_n_radial",
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[field for field in SHOT_SUMMARY_FIELDS if field != "shot"]]
@@ -235,6 +250,12 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--interior_envelope_ext_df_gap_min",
         "--interior_envelope_ext_df_gap_max",
         "--disable_interior_unresolved_envelope",
+        "--interior_harmonic_core_r_max",
+        "--interior_harmonic_active_core_energy_fraction_min",
+        "--interior_harmonic_max_lag_grid",
+        "--interior_harmonic_incoherence_score_threshold",
+        "--interior_harmonic_calibrated_n_radial",
+        "--disable_interior_harmonic_incoherence",
     }
 )
 
@@ -852,6 +873,9 @@ def build_summary(
     interior_unresolved_envelope_config: (
         InteriorUnresolvedEnvelopeConfig | None
     ) = None,
+    interior_harmonic_incoherence_config: (
+        InteriorHarmonicIncoherenceConfig | None
+    ) = None,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -869,7 +893,30 @@ def build_summary(
         interior_unresolved_envelope_config
         or InteriorUnresolvedEnvelopeConfig()
     )
+    incoherence_config = (
+        interior_harmonic_incoherence_config
+        or InteriorHarmonicIncoherenceConfig()
+    )
     rule_rows = [row for row in rows if row.get("rule_version") == RULESET_VERSION]
+    resolution_eligible_count = 0
+    resolution_ineligible_count = 0
+    for row in rule_rows:
+        raw_features = row.get("rule_features")
+        try:
+            parsed_features = (
+                raw_features
+                if isinstance(raw_features, Mapping)
+                else json.loads(str(raw_features))
+            )
+            eligible = parsed_features["numerical_structure_features"][
+                "interior_harmonic_incoherence"
+            ]["resolution_eligible"]
+        except (KeyError, TypeError, ValueError):
+            continue
+        if eligible is True:
+            resolution_eligible_count += 1
+        elif eligible is False:
+            resolution_ineligible_count += 1
     transitions = Counter(
         f"{row['rule_decision']}->{row['final_decision']}"
         for row in rows
@@ -886,6 +933,12 @@ def build_summary(
         "n_mixed": sum(row.get("gap_region") == "mixed" for row in rows),
         "n_eae_like": sum(row.get("gap_region") == "eae_like" for row in rows),
         "n_rule_evaluated": len(rule_rows),
+        "n_interior_harmonic_resolution_eligible": (
+            resolution_eligible_count
+        ),
+        "n_interior_harmonic_resolution_ineligible": (
+            resolution_ineligible_count
+        ),
         "n_preliminary_bad": sum(row.get("rule_decision") == "BAD" for row in rule_rows),
         "n_preliminary_review": sum(
             row.get("rule_decision") == "REVIEW" for row in rule_rows
@@ -966,6 +1019,20 @@ def build_summary(
         "interior_envelope_ext_dr_max": interior_config.ext_dr_max,
         "interior_envelope_ext_df_gap_min": interior_config.ext_df_gap_min,
         "interior_envelope_ext_df_gap_max": interior_config.ext_df_gap_max,
+        "interior_harmonic_incoherence_gate_enabled": (
+            incoherence_config.enabled
+        ),
+        "interior_harmonic_core_r_max": incoherence_config.core_r_max,
+        "interior_harmonic_active_core_energy_fraction_min": (
+            incoherence_config.active_core_energy_fraction_min
+        ),
+        "interior_harmonic_max_lag_grid": incoherence_config.max_lag_grid,
+        "interior_harmonic_incoherence_score_threshold": (
+            incoherence_config.score_threshold
+        ),
+        "interior_harmonic_calibrated_n_radial": (
+            incoherence_config.calibrated_n_radial
+        ),
     }
     return summary
 
@@ -989,6 +1056,9 @@ def _summary_by_n(
     edge_artifact_config: EdgeArtifactConfig | None = None,
     interior_unresolved_envelope_config: (
         InteriorUnresolvedEnvelopeConfig | None
+    ) = None,
+    interior_harmonic_incoherence_config: (
+        InteriorHarmonicIncoherenceConfig | None
     ) = None,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
@@ -1046,6 +1116,9 @@ def _summary_by_n(
             edge_artifact_config=edge_artifact_config,
             interior_unresolved_envelope_config=(
                 interior_unresolved_envelope_config
+            ),
+            interior_harmonic_incoherence_config=(
+                interior_harmonic_incoherence_config
             ),
             rule_survivor_policy=rule_survivor_policy,
             rule_configuration_name=rule_configuration_name,
@@ -1169,6 +1242,21 @@ def run_shot(
     interior_envelope_ext_df_gap_max: float = (
         DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX
     ),
+    interior_harmonic_core_r_max: float = (
+        DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX
+    ),
+    interior_harmonic_active_core_energy_fraction_min: float = (
+        DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN
+    ),
+    interior_harmonic_max_lag_grid: int = (
+        DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID
+    ),
+    interior_harmonic_incoherence_score_threshold: float | None = (
+        DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD
+    ),
+    interior_harmonic_calibrated_n_radial: int = (
+        DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL
+    ),
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -1219,6 +1307,15 @@ def run_shot(
         ext_df_gap_min=interior_envelope_ext_df_gap_min,
         ext_df_gap_max=interior_envelope_ext_df_gap_max,
     )
+    incoherence_config = InteriorHarmonicIncoherenceConfig(
+        core_r_max=interior_harmonic_core_r_max,
+        active_core_energy_fraction_min=(
+            interior_harmonic_active_core_energy_fraction_min
+        ),
+        max_lag_grid=interior_harmonic_max_lag_grid,
+        score_threshold=interior_harmonic_incoherence_score_threshold,
+        calibrated_n_radial=interior_harmonic_calibrated_n_radial,
+    )
     output_dir = Path(out_dir).expanduser()
     existing_override_output = output_dir / "manual_overrides.csv"
     if manual_overrides is None and existing_override_output.exists():
@@ -1260,6 +1357,7 @@ def run_shot(
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
             interior_unresolved_envelope_config=interior_config,
+            interior_harmonic_incoherence_config=incoherence_config,
         )
         rule_by_key[key] = result.as_output_row(row)
 
@@ -1306,6 +1404,7 @@ def run_shot(
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
         interior_unresolved_envelope_config=interior_config,
+        interior_harmonic_incoherence_config=incoherence_config,
         rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1328,6 +1427,7 @@ def run_shot(
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
         interior_unresolved_envelope_config=interior_config,
+        interior_harmonic_incoherence_config=incoherence_config,
         rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1726,6 +1826,62 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
             "the BAD_INTERIOR_UNRESOLVED_ENVELOPE decision gate"
         ),
     )
+    parser.add_argument(
+        "--interior_harmonic_core_r_max",
+        type=float,
+        default=DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX,
+        help=(
+            "Inclusive core radius for BAD_INTERIOR_HARMONIC_INCOHERENCE "
+            f"(default: {DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_harmonic_active_core_energy_fraction_min",
+        type=float,
+        default=DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN,
+        help=(
+            "Inclusive minimum fraction of integrated core energy for a "
+            "stored harmonic to enter adjacent-pair coherence "
+            f"(default: {DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_harmonic_max_lag_grid",
+        type=int,
+        default=DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID,
+        help=(
+            "Maximum absolute radial-grid lag used for adjacent stored-harmonic "
+            f"coherence (default: {DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_harmonic_incoherence_score_threshold",
+        type=float,
+        default=DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD,
+        help=(
+            "Strict lower decision boundary for the combined interior harmonic "
+            "incoherence score "
+            f"(default: {DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD:g})"
+        ),
+    )
+    parser.add_argument(
+        "--interior_harmonic_calibrated_n_radial",
+        type=int,
+        default=DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL,
+        help=(
+            "Required radial sample count for applying the calibrated "
+            "incoherence threshold; other resolutions are measured but not rejected "
+            f"(default: {DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_interior_harmonic_incoherence",
+        action="store_true",
+        help=(
+            "Calculate all interior harmonic-incoherence evidence but disable "
+            "the BAD_INTERIOR_HARMONIC_INCOHERENCE decision gate"
+        ),
+    )
     args = parser.parse_args(raw_args)
     args.rule_configuration_name = ""
     args.rule_configuration_schema_version = ""
@@ -1828,6 +1984,21 @@ def main() -> None:
         interior_envelope_ext_df_gap_max=(
             args.interior_envelope_ext_df_gap_max
         ),
+        interior_harmonic_core_r_max=args.interior_harmonic_core_r_max,
+        interior_harmonic_active_core_energy_fraction_min=(
+            args.interior_harmonic_active_core_energy_fraction_min
+        ),
+        interior_harmonic_max_lag_grid=(
+            args.interior_harmonic_max_lag_grid
+        ),
+        interior_harmonic_incoherence_score_threshold=(
+            None
+            if args.disable_interior_harmonic_incoherence
+            else args.interior_harmonic_incoherence_score_threshold
+        ),
+        interior_harmonic_calibrated_n_radial=(
+            args.interior_harmonic_calibrated_n_radial
+        ),
         rule_configuration_name=args.rule_configuration_name,
         rule_configuration_schema_version=(
             args.rule_configuration_schema_version
@@ -1913,6 +2084,23 @@ def main() -> None:
         "ext_df_gap_range="
         f"[{summary['interior_envelope_ext_df_gap_min']}, "
         f"{summary['interior_envelope_ext_df_gap_max']}]"
+    )
+    print(
+        "Interior harmonic-incoherence gate: "
+        f"enabled={summary['interior_harmonic_incoherence_gate_enabled']} "
+        f"core_r_max={summary['interior_harmonic_core_r_max']} "
+        "active_core_energy_fraction_min="
+        f"{summary['interior_harmonic_active_core_energy_fraction_min']} "
+        f"max_lag_grid={summary['interior_harmonic_max_lag_grid']} "
+        "score_threshold="
+        f"{summary['interior_harmonic_incoherence_score_threshold']} "
+        "calibrated_n_radial="
+        f"{summary['interior_harmonic_calibrated_n_radial']}"
+    )
+    print(
+        "Interior harmonic-incoherence resolution eligibility: "
+        f"eligible={summary['n_interior_harmonic_resolution_eligible']} "
+        f"ineligible={summary['n_interior_harmonic_resolution_ineligible']}"
     )
     print(f"Duplicate processing: {summary['duplicate_processing_status']}")
     if args.manual_overrides:
