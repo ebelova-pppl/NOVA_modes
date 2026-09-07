@@ -900,7 +900,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v3` configuration. A rejection gate produces automatic
+`tae_rules_production_v4` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1139,13 +1139,14 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v3.yaml`, stored as strict
+`configs/rules/tae_rules_production_v4.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v16 ruleset, routing thresholds, relative-frequency tolerance, all
+current v17 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
-  (`BAD_GRID_SCALE_PACKET`), 4 (`BAD_CONT_CROSS_WINDOW`), and 5
+  (`BAD_GRID_SCALE_PACKET`), 2c (`BAD_NEAR_AXIS_GRID_OSCILLATION`), 4
+  (`BAD_CONT_CROSS_WINDOW`), and 5
   (`BAD_EDGE_SPIKE`), plus the interior-envelope gate
   (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`), followed by the calibrated interior
   harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`);
@@ -1153,7 +1154,7 @@ gate thresholds, and these gate states:
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v3 identity.
+config-owned threshold or gate override to retain the production-v4 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, and the audited `accept-as-good-v1` survivor
@@ -1173,7 +1174,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v3` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v4` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1184,9 +1185,10 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-edge-interior-envelope-harmonic-incoherence-v16`
-ruleset implements eight ordered BAD decisions, treating the packet screen as gate 2b so
-the established gate-3/4/5 names remain stable. It still has no positive GOOD
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-v17`
+ruleset implements nine ordered BAD decisions, treating the short-window packet
+and near-axis oscillation screens as gates 2b and 2c so the established
+gate-3/4/5 names remain stable. It still has no positive GOOD
 template. Modes that do not fire any
 gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
 reasons and structured features are stored as deterministic JSON; missing
@@ -1194,7 +1196,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v16`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v17`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1238,6 +1240,12 @@ groups are:
   harmonic index, radial and sample-index bounds, large-step and large-turn
   counts, maximum step, step RMS, total variation, unconstrained direction-
   and sign-change counts, and five signed sample values;
+- `numerical_structure_features.near_axis_grid_oscillation`: the independent
+  mode-level maximum amplitude over all harmonics at strict `r < 0.1`, every
+  configured threshold, qualifying-run counts, and the strongest eligible
+  single-harmonic strictly consecutive sign-flip run, including its stored
+  harmonic, sample/radial bounds, peak, sign-flip count, `Q_s`, total
+  variation, and step summaries;
 - `numerical_structure_features.interior_harmonic_incoherence`: the inclusive
   core-energy fraction, base-2 adjacent-radius Jensen--Shannon divergence,
   radial-energy-weighted mean of the pointwise effective harmonic count,
@@ -1350,6 +1358,33 @@ Override the settings with `--grid_scale_packet_amplitude_min`,
 `--grid_scale_packet_window_span_grid`, and
 `--grid_scale_packet_peak_r_max`; use `--disable_grid_scale_packet` to retain
 measurements without applying the decision.
+
+Gate 2c targets relatively large grid-scale
+oscillations near the magnetic axis:
+
+```yaml
+near_axis_grid_oscillation:
+  peak_r_max: 0.1
+  amplitude_min: 0.1
+  min_consecutive_sign_flips: 4
+  step_l2_min: 0.3
+```
+
+For each stored harmonic, split adjacent radial intervals into maximal runs
+where every pair of nonzero samples changes sign. Do not bridge a zero sample
+or one missing sign flip. Keep runs with at least four consecutive flips only
+when the run's own largest absolute sample is at the strict radius `r < 0.1`.
+For each such run define
+`Q_s=sqrt(sum_i (A[i+1]-A[i])^2)` and select the largest single-run value;
+never add runs or harmonics. Independently define
+`A_peak=max_{h,r<0.1}|A_h(r)|`. The gate returns `BAD` with
+`BAD_NEAR_AXIS_GRID_OSCILLATION` when `A_peak >= 0.10` and `Q_s >= 0.30`.
+Both magnitude thresholds and the four-flip count are inclusive; both radius
+tests are strict. The amplitude maximum and selected run may come from
+different harmonics, which is recorded explicitly. Override the four settings
+with the corresponding `--near_axis_grid_oscillation_*` options, or use
+`--disable_near_axis_grid_oscillation` to retain evidence without applying the
+decision.
 
 The third gate uses the existing true lower/upper continuum crossings and
 their pointwise radial energy. `W_star_max` is the maximum over crossing records

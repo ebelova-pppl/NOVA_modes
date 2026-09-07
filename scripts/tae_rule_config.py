@@ -19,16 +19,17 @@ from tae_rule_engine import (
     GridScaleSpikeConfig,
     InteriorHarmonicIncoherenceConfig,
     InteriorUnresolvedEnvelopeConfig,
+    NearAxisGridOscillationConfig,
 )
 from tae_rule_io import sha256_file
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v3"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v3"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v4"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v4"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3"
+    "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b"
 )
 
 
@@ -178,6 +179,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "axis_artifact",
         "grid_scale_spike",
         "grid_scale_packet",
+        "near_axis_grid_oscillation",
         "continuum_crossing",
         "continuum_crossing_window",
         "edge_artifact",
@@ -261,6 +263,53 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         min_large_turns=packet_turns,
         window_span_grid=packet_span,
         peak_r_max=packet_peak_r,
+    )
+
+    near_axis_oscillation = _mapping(
+        gates["near_axis_grid_oscillation"],
+        context="gates.near_axis_grid_oscillation",
+    )
+    _require_exact_keys(
+        near_axis_oscillation,
+        {
+            "enabled",
+            "peak_r_max",
+            "amplitude_min",
+            "min_consecutive_sign_flips",
+            "step_l2_min",
+        },
+        context="gates.near_axis_grid_oscillation",
+    )
+    near_axis_oscillation_enabled = _bool(
+        near_axis_oscillation,
+        "enabled",
+        context="gates.near_axis_grid_oscillation",
+    )
+    near_axis_oscillation_peak_r = _float(
+        near_axis_oscillation,
+        "peak_r_max",
+        context="gates.near_axis_grid_oscillation",
+    )
+    near_axis_oscillation_amplitude = _float(
+        near_axis_oscillation,
+        "amplitude_min",
+        context="gates.near_axis_grid_oscillation",
+    )
+    near_axis_oscillation_min_flips = _int(
+        near_axis_oscillation,
+        "min_consecutive_sign_flips",
+        context="gates.near_axis_grid_oscillation",
+    )
+    near_axis_oscillation_step_l2 = _float(
+        near_axis_oscillation,
+        "step_l2_min",
+        context="gates.near_axis_grid_oscillation",
+    )
+    NearAxisGridOscillationConfig(
+        peak_r_max=near_axis_oscillation_peak_r,
+        amplitude_min=near_axis_oscillation_amplitude,
+        min_consecutive_sign_flips=near_axis_oscillation_min_flips,
+        step_l2_min=near_axis_oscillation_step_l2,
     )
 
     crossing = _mapping(
@@ -443,6 +492,20 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "grid_scale_packet_min_large_turns": packet_turns,
         "grid_scale_packet_window_span_grid": packet_span,
         "grid_scale_packet_peak_r_max": packet_peak_r,
+        "near_axis_grid_oscillation_peak_r_max": (
+            near_axis_oscillation_peak_r
+        ),
+        "near_axis_grid_oscillation_amplitude_min": (
+            near_axis_oscillation_amplitude
+            if near_axis_oscillation_enabled
+            else None
+        ),
+        "near_axis_grid_oscillation_min_consecutive_sign_flips": (
+            near_axis_oscillation_min_flips
+        ),
+        "near_axis_grid_oscillation_step_l2_min": (
+            near_axis_oscillation_step_l2
+        ),
         "w_cross_threshold": crossing_threshold if crossing_enabled else None,
         "cross_window_half_width_grid": window_half_width,
         "cross_window_amplitude_min": (

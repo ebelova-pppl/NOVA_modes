@@ -66,6 +66,7 @@ from tae_rule_engine import (  # noqa: E402
     BAD_GRID_SCALE_SPIKE,
     BAD_INTERIOR_HARMONIC_INCOHERENCE,
     BAD_INTERIOR_UNRESOLVED_ENVELOPE,
+    BAD_NEAR_AXIS_GRID_OSCILLATION,
     NO_GOOD_TEMPLATE,
     RULE_FEATURE_EXTRACTION_FAILED,
     RULE_FEATURE_GROUP_NAMES,
@@ -82,6 +83,7 @@ from tae_rule_engine import (  # noqa: E402
     GridScaleSpikeConfig,
     InteriorHarmonicIncoherenceConfig,
     InteriorUnresolvedEnvelopeConfig,
+    NearAxisGridOscillationConfig,
     evaluate_mode,
     extract_axis_artifact_features,
     extract_continuum_crossing_window_features,
@@ -89,6 +91,7 @@ from tae_rule_engine import (  # noqa: E402
     extract_grid_scale_packet_features,
     extract_grid_scale_spike_features,
     extract_interior_harmonic_incoherence_features,
+    extract_near_axis_grid_oscillation_features,
 )
 from tae_rule_io import (  # noqa: E402
     MANUAL_OVERRIDE_FIELDS,
@@ -164,6 +167,35 @@ INTERIOR_HARMONIC_INCOHERENCE_FEATURE_NAMES = {
     "total_energy_fraction_in_core_above_effective_harmonic_count_threshold",
     "core_adjacent_harmonic_coherence",
     "incoherence_score",
+}
+
+NEAR_AXIS_GRID_OSCILLATION_FEATURE_NAMES = {
+    "candidate_found",
+    "peak_r_max_exclusive",
+    "amplitude_min",
+    "min_consecutive_sign_flips",
+    "step_l2_min",
+    "qualifying_run_count",
+    "step_l2_qualified_run_count",
+    "near_axis_peak",
+    "near_axis_peak_signed_amplitude",
+    "near_axis_peak_harmonic_index",
+    "near_axis_peak_r",
+    "near_axis_peak_amplitude_qualified",
+    "selected_run_harmonic_index",
+    "selected_run_start_index",
+    "selected_run_end_index",
+    "selected_run_start_r",
+    "selected_run_end_r",
+    "selected_run_peak",
+    "selected_run_peak_signed_amplitude",
+    "selected_run_peak_r",
+    "selected_run_consecutive_sign_flip_count",
+    "selected_run_step_l2",
+    "selected_run_total_variation",
+    "selected_run_max_step",
+    "selected_run_mean_abs_step",
+    "near_axis_peak_and_run_same_harmonic",
 }
 
 
@@ -275,6 +307,9 @@ def evaluate_incoherence_only(
             width_max_grid=None,
         ),
         grid_scale_packet_config=GridScalePacketConfig(amplitude_min=None),
+        near_axis_grid_oscillation_config=NearAxisGridOscillationConfig(
+            amplitude_min=None
+        ),
         continuum_crossing_config=ContinuumCrossingConfig(
             w_cross_threshold=None
         ),
@@ -287,6 +322,46 @@ def evaluate_incoherence_only(
             interior_config or InteriorUnresolvedEnvelopeConfig(width_max_grid=None)
         ),
         interior_harmonic_incoherence_config=incoherence_config,
+    )
+
+
+def evaluate_near_axis_oscillation_only(
+    row: dict,
+    mode: np.ndarray,
+    *,
+    oscillation_config: NearAxisGridOscillationConfig | None = None,
+):
+    """Evaluate one mode with only the near-axis oscillation gate enabled."""
+    n_radial = mode.shape[1]
+    return evaluate_mode(
+        row,
+        mode=mode,
+        low2=np.full(n_radial, 0.5**2),
+        high2=np.full(n_radial, 1.5**2),
+        axis_artifact_config=AxisArtifactConfig(
+            axis_amplitude_min=None,
+            axis_width_max_grid=None,
+        ),
+        grid_scale_spike_config=GridScaleSpikeConfig(
+            amplitude_min=None,
+            width_max_grid=None,
+        ),
+        grid_scale_packet_config=GridScalePacketConfig(amplitude_min=None),
+        near_axis_grid_oscillation_config=oscillation_config,
+        continuum_crossing_config=ContinuumCrossingConfig(
+            w_cross_threshold=None
+        ),
+        continuum_crossing_window_config=ContinuumCrossingWindowConfig(
+            amplitude_min=None,
+            w_min=None,
+        ),
+        edge_artifact_config=EdgeArtifactConfig(edge_width_max_grid=None),
+        interior_unresolved_envelope_config=InteriorUnresolvedEnvelopeConfig(
+            width_max_grid=None
+        ),
+        interior_harmonic_incoherence_config=InteriorHarmonicIncoherenceConfig(
+            score_threshold=None
+        ),
     )
 
 
@@ -387,6 +462,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         axis_config=None,
         grid_config=None,
         packet_config=None,
+        near_axis_oscillation_config=None,
         crossing_config=None,
         cross_window_config=None,
         edge_config=None,
@@ -400,6 +476,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             axis_artifact_config=axis_config,
             grid_scale_spike_config=grid_config,
             grid_scale_packet_config=packet_config,
+            near_axis_grid_oscillation_config=near_axis_oscillation_config,
             continuum_crossing_config=crossing_config,
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
@@ -417,7 +494,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
         self.assertEqual(
-            RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v16"
+            RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v17"
         )
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
@@ -490,6 +567,21 @@ class RuleAndOverrideTests(unittest.TestCase):
             ],
             0,
         )
+        oscillation_features = features["numerical_structure_features"][
+            "near_axis_grid_oscillation"
+        ]
+        self.assertEqual(
+            set(oscillation_features),
+            NEAR_AXIS_GRID_OSCILLATION_FEATURE_NAMES,
+        )
+        self.assertFalse(oscillation_features["candidate_found"])
+        self.assertEqual(oscillation_features["peak_r_max_exclusive"], 0.1)
+        self.assertEqual(oscillation_features["amplitude_min"], 0.1)
+        self.assertEqual(
+            oscillation_features["min_consecutive_sign_flips"], 4
+        )
+        self.assertEqual(oscillation_features["step_l2_min"], 0.3)
+        self.assertEqual(oscillation_features["qualifying_run_count"], 0)
         incoherence_features = features["numerical_structure_features"][
             "interior_harmonic_incoherence"
         ]
@@ -1036,6 +1128,101 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertAlmostEqual(
             unrestricted["grid_scale_packet_window_end_r"], 1.0
         )
+
+    def test_near_axis_grid_oscillation_uses_mode_peak_and_strongest_single_run(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 19] = 0.2
+        mode[2, 2:7] = [0.075, -0.075, 0.075, -0.075, 0.075]
+        result = evaluate_near_axis_oscillation_only(self.base, mode)
+        features = result.features["numerical_structure_features"][
+            "near_axis_grid_oscillation"
+        ]
+
+        self.assertEqual(result.primary_reason, BAD_NEAR_AXIS_GRID_OSCILLATION)
+        self.assertEqual(
+            result.triggered_rules, (BAD_NEAR_AXIS_GRID_OSCILLATION,)
+        )
+        self.assertTrue(features["candidate_found"])
+        self.assertAlmostEqual(features["near_axis_peak"], 0.2)
+        self.assertEqual(features["near_axis_peak_harmonic_index"], 0)
+        self.assertAlmostEqual(features["near_axis_peak_r"], 0.095)
+        self.assertEqual(features["selected_run_harmonic_index"], 2)
+        self.assertEqual(
+            features["selected_run_consecutive_sign_flip_count"], 4
+        )
+        self.assertAlmostEqual(features["selected_run_step_l2"], 0.3)
+        self.assertFalse(features["near_axis_peak_and_run_same_harmonic"])
+
+    def test_near_axis_grid_oscillation_does_not_bridge_one_missing_flip(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 5] = 0.2
+        mode[1, 2:8] = [0.11, -0.10, 0.09, 0.08, -0.08, 0.07]
+        features = extract_near_axis_grid_oscillation_features(mode)
+
+        self.assertFalse(features["candidate_found"])
+        self.assertEqual(features["qualifying_run_count"], 0)
+        self.assertIsNone(features["selected_run_step_l2"])
+
+    def test_near_axis_grid_oscillation_does_not_sum_harmonic_runs(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 19] = 0.2
+        values = [0.0625, -0.0625, 0.0625, -0.0625, 0.0625]
+        mode[1, 2:7] = values
+        mode[2, 8:13] = values
+        features = extract_near_axis_grid_oscillation_features(mode)
+
+        self.assertFalse(features["candidate_found"])
+        self.assertEqual(features["qualifying_run_count"], 2)
+        self.assertEqual(features["step_l2_qualified_run_count"], 0)
+        self.assertAlmostEqual(features["selected_run_step_l2"], 0.25)
+
+    def test_near_axis_grid_oscillation_radius_cutoff_is_strict(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 20] = 0.2
+        mode[1, 2:7] = [0.075, -0.075, 0.075, -0.075, 0.075]
+        features = extract_near_axis_grid_oscillation_features(mode)
+
+        self.assertFalse(features["candidate_found"])
+        self.assertAlmostEqual(features["near_axis_peak"], 0.075)
+        self.assertAlmostEqual(features["near_axis_peak_r"], 0.01)
+        self.assertFalse(features["near_axis_peak_amplitude_qualified"])
+
+        run_boundary_mode = np.zeros_like(self.mode)
+        run_boundary_mode[0, 10] = 0.2
+        run_boundary_mode[1, 16:21] = [0.06, -0.07, 0.08, -0.09, 0.10]
+        run_boundary_features = extract_near_axis_grid_oscillation_features(
+            run_boundary_mode
+        )
+        self.assertFalse(run_boundary_features["candidate_found"])
+        self.assertEqual(run_boundary_features["qualifying_run_count"], 0)
+
+    def test_near_axis_grid_oscillation_disabled_keeps_evidence(self):
+        mode = np.zeros_like(self.mode)
+        mode[0, 4] = 0.2
+        mode[1, 2:7] = [0.075, -0.075, 0.075, -0.075, 0.075]
+        result = evaluate_near_axis_oscillation_only(
+            self.base,
+            mode,
+            oscillation_config=NearAxisGridOscillationConfig(
+                amplitude_min=None
+            ),
+        )
+        features = result.features["numerical_structure_features"][
+            "near_axis_grid_oscillation"
+        ]
+
+        self.assertEqual(result.decision, "REVIEW")
+        self.assertFalse(features["candidate_found"])
+        self.assertIsNone(features["near_axis_peak_amplitude_qualified"])
+        self.assertAlmostEqual(features["selected_run_step_l2"], 0.3)
+
+    def test_near_axis_grid_oscillation_validates_configuration(self):
+        with self.assertRaisesRegex(ValueError, "peak_r_max"):
+            NearAxisGridOscillationConfig(peak_r_max=0.0)
+        with self.assertRaisesRegex(ValueError, "min_consecutive_sign_flips"):
+            NearAxisGridOscillationConfig(min_consecutive_sign_flips=0)
+        with self.assertRaisesRegex(ValueError, "step_l2_min"):
+            NearAxisGridOscillationConfig(step_l2_min=-0.1)
 
     def test_null_grid_scale_amplitude_disables_gate_but_keeps_measurement(self):
         mode = np.zeros_like(self.mode)
@@ -2909,6 +3096,9 @@ class WorkflowOutputTests(unittest.TestCase):
         historical_v2 = (
             REPO_ROOT / "configs" / "rules" / "tae_rules_production_v2.yaml"
         )
+        historical_v3 = (
+            REPO_ROOT / "configs" / "rules" / "tae_rules_production_v3.yaml"
+        )
         self.assertEqual(
             sha256_file(historical_v1),
             "a2c85d958eeebe4396a9ce0d2f52c3dbf157f1630d344279801c00bb826e6f39",
@@ -2917,12 +3107,16 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(historical_v2),
             "7d31bd84466486f0c374372b489f04816c4f745503ef0328cb514c6ef3d7516f",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v3")
+        self.assertEqual(
+            sha256_file(historical_v3),
+            "fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3",
+        )
+        self.assertEqual(configuration.name, "tae_rules_production_v4")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3",
+            "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -2943,6 +3137,10 @@ class WorkflowOutputTests(unittest.TestCase):
                 "grid_scale_packet_min_large_turns": 3,
                 "grid_scale_packet_window_span_grid": 4,
                 "grid_scale_packet_peak_r_max": 0.5,
+                "near_axis_grid_oscillation_peak_r_max": 0.1,
+                "near_axis_grid_oscillation_amplitude_min": 0.1,
+                "near_axis_grid_oscillation_min_consecutive_sign_flips": 4,
+                "near_axis_grid_oscillation_step_l2_min": 0.3,
                 "w_cross_threshold": None,
                 "cross_window_half_width_grid": 2,
                 "cross_window_amplitude_min": 0.25,
@@ -2989,6 +3187,24 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertTrue(result.summary["axis_artifact_gate_enabled"])
         self.assertTrue(result.summary["grid_scale_spike_gate_enabled"])
         self.assertTrue(result.summary["grid_scale_packet_gate_enabled"])
+        self.assertTrue(
+            result.summary["near_axis_grid_oscillation_gate_enabled"]
+        )
+        self.assertEqual(
+            result.summary["near_axis_grid_oscillation_peak_r_max"], 0.1
+        )
+        self.assertEqual(
+            result.summary["near_axis_grid_oscillation_amplitude_min"], 0.1
+        )
+        self.assertEqual(
+            result.summary[
+                "near_axis_grid_oscillation_min_consecutive_sign_flips"
+            ],
+            4,
+        )
+        self.assertEqual(
+            result.summary["near_axis_grid_oscillation_step_l2_min"], 0.3
+        )
         self.assertFalse(result.summary["continuum_crossing_gate_enabled"])
         self.assertIsNone(result.summary["continuum_crossing_w_threshold"])
         self.assertTrue(
@@ -3051,6 +3267,14 @@ class WorkflowOutputTests(unittest.TestCase):
                 parse_args([*common, "--cross_window_w_min", "0.1"])
             with self.assertRaises(SystemExit):
                 parse_args([*common, "--interior_envelope_width_max_grid", "3"])
+            with self.assertRaises(SystemExit):
+                parse_args(
+                    [
+                        *common,
+                        "--near_axis_grid_oscillation_step_l2_min",
+                        "0.4",
+                    ]
+                )
             with self.assertRaises(SystemExit):
                 parse_args(
                     [
@@ -3413,6 +3637,57 @@ class WorkflowOutputTests(unittest.TestCase):
             BAD_GRID_SCALE_PACKET,
         )
 
+    def test_run_shot_applies_near_axis_oscillation_gate_and_reports_thresholds(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            mode = np.zeros((4, 201), dtype=float)
+            mode[0, 19] = 0.2
+            mode[2, 2:7] = [0.075, -0.075, 0.075, -0.075, 0.075]
+            write_mode(
+                shot / "N1" / "egn01w.one",
+                omega=1.0,
+                ntor=1,
+                nr=201,
+                mode=mode,
+            )
+            write_datcon(shot / "N1" / "datcon1", nr=201)
+            result = run_shot(
+                shot,
+                root / "out",
+                axis_amplitude_min=None,
+                grid_scale_amplitude_min=None,
+                grid_scale_packet_amplitude_min=None,
+                near_axis_grid_oscillation_peak_r_max=0.1,
+                near_axis_grid_oscillation_amplitude_min=0.15,
+                near_axis_grid_oscillation_min_consecutive_sign_flips=4,
+                near_axis_grid_oscillation_step_l2_min=0.3,
+            )
+
+        self.assertEqual(result.summary["n_preliminary_bad"], 1)
+        self.assertTrue(
+            result.summary["near_axis_grid_oscillation_gate_enabled"]
+        )
+        self.assertEqual(
+            result.summary["near_axis_grid_oscillation_peak_r_max"], 0.1
+        )
+        self.assertEqual(
+            result.summary["near_axis_grid_oscillation_amplitude_min"], 0.15
+        )
+        self.assertEqual(
+            result.summary[
+                "near_axis_grid_oscillation_min_consecutive_sign_flips"
+            ],
+            4,
+        )
+        self.assertEqual(
+            result.summary["near_axis_grid_oscillation_step_l2_min"], 0.3
+        )
+        self.assertEqual(
+            result.final_rows[0]["rule_primary_reason"],
+            BAD_NEAR_AXIS_GRID_OSCILLATION,
+        )
+
     def test_run_shot_applies_cont_cross_gate_and_reports_threshold(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -3605,6 +3880,7 @@ class WorkflowOutputTests(unittest.TestCase):
                 grid_scale_amplitude_min=None,
                 grid_scale_width_max_grid=None,
                 grid_scale_packet_amplitude_min=None,
+                near_axis_grid_oscillation_amplitude_min=None,
                 w_cross_threshold=None,
                 cross_window_amplitude_min=None,
                 cross_window_w_min=None,

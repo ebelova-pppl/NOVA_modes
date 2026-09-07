@@ -38,6 +38,10 @@ DEFAULT_GRID_SCALE_PACKET_STEP_MIN = 0.2
 DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS = 3
 DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID = 4
 DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX = 0.5
+DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX = 0.1
+DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN = 0.10
+DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS = 4
+DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN = 0.30
 DEFAULT_W_CROSS_THRESHOLD = 0.03
 DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID = 2
 DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN = 0.25
@@ -59,12 +63,13 @@ DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL = 201
 HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD = 3.0
 
 RULESET_VERSION = (
-    "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-cont-window-"
-    "edge-interior-envelope-harmonic-incoherence-v16"
+    "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-"
+    "grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-v17"
 )
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
 BAD_GRID_SCALE_PACKET = "BAD_GRID_SCALE_PACKET"
+BAD_NEAR_AXIS_GRID_OSCILLATION = "BAD_NEAR_AXIS_GRID_OSCILLATION"
 BAD_CONT_CROSS = "BAD_CONT_CROSS"
 BAD_CONT_CROSS_WINDOW = "BAD_CONT_CROSS_WINDOW"
 BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
@@ -75,7 +80,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v16"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v17"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -234,6 +239,53 @@ class GridScalePacketConfig:
     def enabled(self) -> bool:
         """Return whether the packet amplitude threshold is configured."""
         return self.amplitude_min is not None
+
+
+@dataclass(frozen=True)
+class NearAxisGridOscillationConfig:
+    """Thresholds for consecutive sign-flip oscillations near the axis."""
+
+    peak_r_max: float = DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX
+    amplitude_min: float | None = DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN
+    min_consecutive_sign_flips: int = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS
+    )
+    step_l2_min: float | None = DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN
+
+    def __post_init__(self) -> None:
+        if not math.isfinite(self.peak_r_max) or not 0.0 < self.peak_r_max <= 1.0:
+            raise ValueError(
+                "near_axis_grid_oscillation peak_r_max must be finite and in (0, 1]"
+            )
+        if self.amplitude_min is not None and (
+            not math.isfinite(self.amplitude_min)
+            or not 0.0 <= self.amplitude_min <= 1.0
+        ):
+            raise ValueError(
+                "near_axis_grid_oscillation amplitude_min must be null or "
+                "finite and in [0, 1]"
+            )
+        if (
+            isinstance(self.min_consecutive_sign_flips, bool)
+            or not isinstance(self.min_consecutive_sign_flips, int)
+            or self.min_consecutive_sign_flips < 1
+        ):
+            raise ValueError(
+                "near_axis_grid_oscillation min_consecutive_sign_flips must "
+                "be a positive integer"
+            )
+        if self.step_l2_min is not None and (
+            not math.isfinite(self.step_l2_min) or self.step_l2_min < 0.0
+        ):
+            raise ValueError(
+                "near_axis_grid_oscillation step_l2_min must be null or a "
+                "finite nonnegative number"
+            )
+
+    @property
+    def enabled(self) -> bool:
+        """Return whether both magnitude thresholds are configured."""
+        return self.amplitude_min is not None and self.step_l2_min is not None
 
 
 @dataclass(frozen=True)
@@ -528,6 +580,45 @@ def empty_grid_scale_packet_features(
     }
 
 
+def empty_near_axis_grid_oscillation_features(
+    config: NearAxisGridOscillationConfig | None = None,
+    *,
+    candidate_found: bool | None = None,
+    qualifying_run_count: int | None = None,
+    step_l2_qualified_run_count: int | None = None,
+) -> dict[str, Any]:
+    """Return the stable near-axis sign-flip evidence shape."""
+    resolved = config or NearAxisGridOscillationConfig()
+    return {
+        "candidate_found": candidate_found,
+        "peak_r_max_exclusive": resolved.peak_r_max,
+        "amplitude_min": resolved.amplitude_min,
+        "min_consecutive_sign_flips": resolved.min_consecutive_sign_flips,
+        "step_l2_min": resolved.step_l2_min,
+        "qualifying_run_count": qualifying_run_count,
+        "step_l2_qualified_run_count": step_l2_qualified_run_count,
+        "near_axis_peak": None,
+        "near_axis_peak_signed_amplitude": None,
+        "near_axis_peak_harmonic_index": None,
+        "near_axis_peak_r": None,
+        "near_axis_peak_amplitude_qualified": None,
+        "selected_run_harmonic_index": None,
+        "selected_run_start_index": None,
+        "selected_run_end_index": None,
+        "selected_run_start_r": None,
+        "selected_run_end_r": None,
+        "selected_run_peak": None,
+        "selected_run_peak_signed_amplitude": None,
+        "selected_run_peak_r": None,
+        "selected_run_consecutive_sign_flip_count": None,
+        "selected_run_step_l2": None,
+        "selected_run_total_variation": None,
+        "selected_run_max_step": None,
+        "selected_run_mean_abs_step": None,
+        "near_axis_peak_and_run_same_harmonic": None,
+    }
+
+
 def empty_edge_artifact_features(
     r_edge_min: float = DEFAULT_EDGE_R_MIN,
 ) -> dict[str, Any]:
@@ -655,6 +746,9 @@ def empty_rule_features(
     edge_artifact_config: EdgeArtifactConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
+    near_axis_grid_oscillation_config: (
+        NearAxisGridOscillationConfig | None
+    ) = None,
     interior_unresolved_envelope_config: (
         InteriorUnresolvedEnvelopeConfig | None
     ) = None,
@@ -666,6 +760,9 @@ def empty_rule_features(
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
+    near_axis_oscillation_config = (
+        near_axis_grid_oscillation_config or NearAxisGridOscillationConfig()
+    )
     edge_config = edge_artifact_config or EdgeArtifactConfig()
     interior_config = (
         interior_unresolved_envelope_config or InteriorUnresolvedEnvelopeConfig()
@@ -698,6 +795,11 @@ def empty_rule_features(
                 packet_config.min_large_turns,
                 packet_config.window_span_grid,
                 packet_config.peak_r_max,
+            ),
+            "near_axis_grid_oscillation": (
+                empty_near_axis_grid_oscillation_features(
+                    near_axis_oscillation_config
+                )
             ),
             "interior_harmonic_incoherence": (
                 empty_interior_harmonic_incoherence_features(
@@ -735,6 +837,7 @@ def grouped_rule_features(
     axis_artifact_features: Mapping[str, Any],
     grid_scale_spike_features: Mapping[str, Any],
     grid_scale_packet_features: Mapping[str, Any],
+    near_axis_grid_oscillation_features: Mapping[str, Any],
     edge_artifact_features: Mapping[str, Any],
     continuum_crossing_window_features: Mapping[str, Any],
     interior_unresolved_envelope_features: Mapping[str, Any],
@@ -755,6 +858,9 @@ def grouped_rule_features(
         "numerical_structure_features": {
             "grid_scale_spike": dict(grid_scale_spike_features),
             "grid_scale_packet": dict(grid_scale_packet_features),
+            "near_axis_grid_oscillation": dict(
+                near_axis_grid_oscillation_features
+            ),
             "interior_harmonic_incoherence": dict(
                 interior_harmonic_incoherence_features
             ),
@@ -1220,6 +1326,192 @@ def extract_grid_scale_packet_features(
         None if config.amplitude_min is None else amplitude_qualified_count
     )
     return selected
+
+
+def extract_near_axis_grid_oscillation_features(
+    mode: np.ndarray,
+    *,
+    peak_r_max: float = DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX,
+    amplitude_min: float | None = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN
+    ),
+    min_consecutive_sign_flips: int = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS
+    ),
+    step_l2_min: float | None = DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN,
+) -> dict[str, Any]:
+    """Measure strict consecutive sign-flip runs whose peak is near the axis.
+
+    ``near_axis_peak`` is the largest absolute sample from any harmonic at
+    strictly ``r < peak_r_max``. Separately, each harmonic is divided into
+    maximal runs of strictly consecutive nonzero sign changes. Runs with at
+    least ``min_consecutive_sign_flips`` are eligible only when their own
+    largest absolute sample is also at strictly ``r < peak_r_max``. The
+    selected run has the largest
+    ``sqrt(sum((A[i+1] - A[i])**2))`` and is never combined with another
+    harmonic or across a missing sign flip.
+    """
+    config = NearAxisGridOscillationConfig(
+        peak_r_max=peak_r_max,
+        amplitude_min=amplitude_min,
+        min_consecutive_sign_flips=min_consecutive_sign_flips,
+        step_l2_min=step_l2_min,
+    )
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+
+    radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
+    near_axis_indices = np.flatnonzero(radial_grid < config.peak_r_max)
+    if near_axis_indices.size == 0:
+        return empty_near_axis_grid_oscillation_features(
+            config,
+            candidate_found=False,
+            qualifying_run_count=0,
+            step_l2_qualified_run_count=(
+                None if config.step_l2_min is None else 0
+            ),
+        )
+
+    near_axis_values = np.abs(mode_array[:, near_axis_indices])
+    flat_peak_index = int(np.argmax(near_axis_values))
+    peak_harmonic_index, peak_offset = np.unravel_index(
+        flat_peak_index, near_axis_values.shape
+    )
+    near_axis_peak_index = int(near_axis_indices[peak_offset])
+    near_axis_peak_signed_amplitude = float(
+        mode_array[peak_harmonic_index, near_axis_peak_index]
+    )
+    near_axis_peak = abs(near_axis_peak_signed_amplitude)
+    amplitude_tolerance = (
+        None
+        if config.amplitude_min is None
+        else 64.0
+        * np.finfo(float).eps
+        * max(1.0, config.amplitude_min)
+    )
+    near_axis_peak_amplitude_qualified = (
+        None
+        if config.amplitude_min is None or amplitude_tolerance is None
+        else bool(
+            near_axis_peak >= config.amplitude_min - amplitude_tolerance
+        )
+    )
+
+    runs: list[dict[str, Any]] = []
+    for harmonic_index, profile in enumerate(mode_array):
+        left = profile[:-1]
+        right = profile[1:]
+        sign_flips = (
+            (left != 0.0)
+            & (right != 0.0)
+            & (np.signbit(left) != np.signbit(right))
+        )
+        padded = np.concatenate(([False], sign_flips, [False]))
+        starts = np.flatnonzero(~padded[:-1] & padded[1:])
+        ends_exclusive = np.flatnonzero(padded[:-1] & ~padded[1:])
+        for raw_start, raw_end_exclusive in zip(starts, ends_exclusive):
+            start_index = int(raw_start)
+            end_index = int(raw_end_exclusive)
+            sign_flip_count = end_index - start_index
+            if sign_flip_count < config.min_consecutive_sign_flips:
+                continue
+            values = profile[start_index : end_index + 1]
+            run_peak_offset = int(np.argmax(np.abs(values)))
+            run_peak_index = start_index + run_peak_offset
+            run_peak_r = float(radial_grid[run_peak_index])
+            if run_peak_r >= config.peak_r_max:
+                continue
+            signed_steps = np.diff(values)
+            step_magnitudes = np.abs(signed_steps)
+            run_peak_signed_amplitude = float(values[run_peak_offset])
+            runs.append(
+                {
+                    "selected_run_harmonic_index": int(harmonic_index),
+                    "selected_run_start_index": start_index,
+                    "selected_run_end_index": end_index,
+                    "selected_run_start_r": float(radial_grid[start_index]),
+                    "selected_run_end_r": float(radial_grid[end_index]),
+                    "selected_run_peak": abs(run_peak_signed_amplitude),
+                    "selected_run_peak_signed_amplitude": (
+                        run_peak_signed_amplitude
+                    ),
+                    "selected_run_peak_r": run_peak_r,
+                    "selected_run_consecutive_sign_flip_count": (
+                        sign_flip_count
+                    ),
+                    "selected_run_step_l2": float(np.linalg.norm(signed_steps)),
+                    "selected_run_total_variation": float(
+                        np.sum(step_magnitudes)
+                    ),
+                    "selected_run_max_step": float(np.max(step_magnitudes)),
+                    "selected_run_mean_abs_step": float(
+                        np.mean(step_magnitudes)
+                    ),
+                }
+            )
+
+    step_l2_tolerance = (
+        None
+        if config.step_l2_min is None
+        else 64.0
+        * np.finfo(float).eps
+        * max(1.0, config.step_l2_min)
+    )
+    step_l2_qualified_run_count = (
+        None
+        if config.step_l2_min is None or step_l2_tolerance is None
+        else sum(
+            run["selected_run_step_l2"]
+            >= config.step_l2_min - step_l2_tolerance
+            for run in runs
+        )
+    )
+    base = empty_near_axis_grid_oscillation_features(
+        config,
+        candidate_found=False,
+        qualifying_run_count=len(runs),
+        step_l2_qualified_run_count=step_l2_qualified_run_count,
+    )
+    base.update(
+        {
+            "near_axis_peak": near_axis_peak,
+            "near_axis_peak_signed_amplitude": near_axis_peak_signed_amplitude,
+            "near_axis_peak_harmonic_index": int(peak_harmonic_index),
+            "near_axis_peak_r": float(radial_grid[near_axis_peak_index]),
+            "near_axis_peak_amplitude_qualified": (
+                near_axis_peak_amplitude_qualified
+            ),
+        }
+    )
+    if not runs:
+        return base
+
+    selected = min(
+        runs,
+        key=lambda run: (
+            -run["selected_run_step_l2"],
+            -run["selected_run_consecutive_sign_flip_count"],
+            -run["selected_run_peak"],
+            run["selected_run_harmonic_index"],
+            run["selected_run_start_index"],
+        ),
+    )
+    base.update(selected)
+    base["near_axis_peak_and_run_same_harmonic"] = bool(
+        peak_harmonic_index == selected["selected_run_harmonic_index"]
+    )
+    if config.enabled and step_l2_tolerance is not None:
+        base["candidate_found"] = bool(
+            near_axis_peak_amplitude_qualified
+            and selected["selected_run_step_l2"]
+            >= config.step_l2_min - step_l2_tolerance
+        )
+    return base
 
 
 def extract_axis_artifact_features(
@@ -2017,6 +2309,9 @@ def evaluate_mode(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
+    near_axis_grid_oscillation_config: (
+        NearAxisGridOscillationConfig | None
+    ) = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
@@ -2031,6 +2326,9 @@ def evaluate_mode(
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
+    near_axis_oscillation_config = (
+        near_axis_grid_oscillation_config or NearAxisGridOscillationConfig()
+    )
     crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
@@ -2077,6 +2375,7 @@ def evaluate_mode(
                 edge_config,
                 cross_window_config,
                 packet_config,
+                near_axis_oscillation_config,
                 interior_config,
                 incoherence_config,
             ),
@@ -2106,6 +2405,17 @@ def evaluate_mode(
             min_large_turns=packet_config.min_large_turns,
             window_span_grid=packet_config.window_span_grid,
             peak_r_max=packet_config.peak_r_max,
+        )
+        near_axis_grid_oscillation_features = (
+            extract_near_axis_grid_oscillation_features(
+                mode,
+                peak_r_max=near_axis_oscillation_config.peak_r_max,
+                amplitude_min=near_axis_oscillation_config.amplitude_min,
+                min_consecutive_sign_flips=(
+                    near_axis_oscillation_config.min_consecutive_sign_flips
+                ),
+                step_l2_min=near_axis_oscillation_config.step_l2_min,
+            )
         )
         edge_features = extract_edge_artifact_features(
             mode,
@@ -2170,6 +2480,7 @@ def evaluate_mode(
             axis_features,
             grid_scale_features,
             grid_scale_packet_features,
+            near_axis_grid_oscillation_features,
             edge_features,
             cross_window_features,
             interior_envelope_features,
@@ -2193,6 +2504,7 @@ def evaluate_mode(
                 edge_config,
                 cross_window_config,
                 packet_config,
+                near_axis_oscillation_config,
                 interior_config,
                 incoherence_config,
             ),
@@ -2260,6 +2572,24 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_GRID_SCALE_PACKET,
             triggered_rules=(BAD_GRID_SCALE_PACKET,),
+            features=features,
+        )
+
+    if (
+        near_axis_oscillation_config.enabled
+        and near_axis_grid_oscillation_features["candidate_found"]
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_NEAR_AXIS_GRID_OSCILLATION,
+            triggered_rules=(BAD_NEAR_AXIS_GRID_OSCILLATION,),
             features=features,
         )
 

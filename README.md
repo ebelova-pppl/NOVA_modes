@@ -124,7 +124,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v3`
+  `--method rules` path loads the immutable `tae_rules_production_v4`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -143,7 +143,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v3` configuration automatically:
+`tae_rules_production_v4` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -304,11 +304,12 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v3.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v4.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
-14 active shots and the H56 pilot review. Gates 1, 2, 2b, 4, 5, the
-interior-envelope gate, and the final interior harmonic-incoherence gate are
-enabled; exact-point continuum gate 3 is explicitly disabled. The sorter
+14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
+grid-oscillation gate, 4, 5, the interior-envelope gate, and the final
+interior harmonic-incoherence gate are enabled; exact-point continuum gate 3
+is explicitly disabled. The sorter
 records the configuration name, schema, and SHA-256 in
 all shot and per-`n` summaries and rejects threshold/gate overrides when the
 named configuration is selected. It also records the `accept-as-good-v1`
@@ -326,22 +327,26 @@ python scripts/sort_shot_rules.py \
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The shared engine implements eight ordered BAD decisions;
-production-v3 enables seven of them and disables exact-point continuum gate 3.
+routing conventions. The shared engine implements nine ordered BAD decisions;
+production-v4 enables eight of them and disables exact-point continuum gate 3.
 The decisions reject a calibrated narrow local maximum at `r <= 0.03`
 (`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), a short packet containing repeated large
-grid-scale turning points (`BAD_GRID_SCALE_PACKET`), or a true continuum crossing
+grid-scale turning points (`BAD_GRID_SCALE_PACKET`), a near-axis run of at
+least four strictly consecutive sign flips with mode-level
+`max_{h,r<0.1}|A_h| >= 0.10` and strongest single-run
+`Q_s=sqrt(sum(delta_A^2)) >= 0.30`
+(`BAD_NEAR_AXIS_GRID_OSCILLATION`), or a true continuum crossing
 with `W_star_max > 0.03` (`BAD_CONT_CROSS`). A second crossing gate rejects when an
 inclusive ±2-grid neighborhood of any true crossing has individual-harmonic
 absolute amplitude at least `0.25` or peak-normalized radial energy at least
-`0.05` (`BAD_CONT_CROSS_WINDOW`). The fifth gate rejects a global total-energy
+`0.05` (`BAD_CONT_CROSS_WINDOW`). The edge gate rejects a global total-energy
 peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
-(`BAD_EDGE_SPIKE`). The final gate rejects a global total-energy envelope with
+(`BAD_EDGE_SPIKE`). The following gate rejects a global total-energy envelope with
 connected FWHM no greater than two grid intervals and peak at `r <= 0.5`, unless
 the peak is aligned with a gate-specific inner continuum extremum within
 `ext_dr <= 0.02` and `0 <= ext_df_gap <= 0.04`
-(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). Last, a calibrated 201-point mode is
+(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). Finally, a calibrated 201-point mode is
 rejected as `BAD_INTERIOR_HARMONIC_INCOHERENCE` when
 `f_core * J_core * N_eff_core * (1 - C_adj) > 0.10`. This score combines the
 energy fraction at `r <= 0.5`, base-2 adjacent-radius harmonic-distribution
@@ -365,7 +370,13 @@ The packet gate scans every five-sample window of every stored harmonic. A
 sharp turn requires two adjacent signed-amplitude steps of magnitude at least
 `0.2` whose signs oppose. The gate rejects when the window's absolute peak is
 at least `0.3`, its peak is centered at the inclusive radius `r <= 0.5`, and
-all three possible interior samples are sharp turns. Other valid TAE-side
+all three possible interior samples are sharp turns.
+The near-axis grid-oscillation gate instead uses maximal strictly consecutive
+nonzero sign-flip runs and never bridges a missing flip. It selects the one
+single-harmonic run with largest `Q_s`; runs and harmonics are not summed. Both
+the run peak and the independent all-harmonic amplitude search use strict
+`r < 0.1`, while the amplitude and `Q_s` thresholds are inclusive. Other
+valid TAE-side
 modes receive the engine verdict `REVIEW`, not `GOOD`, with primary reason
 `NO_GOOD_TEMPLATE`. The production orchestrator then promotes those survivors;
 the calibration CLI leaves them as REVIEW. Invalid inputs remain `INVALID`,
@@ -377,7 +388,9 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v16`; the added participation summaries are scalar
+`tae-rule-features-grouped-v17`; the near-axis group records the independent
+mode-level amplitude maximum and complete strongest single-harmonic sign-flip
+run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The
 interior-envelope search uses extrema
 through `r=0.50` without changing the experimental RF feature definition,
@@ -399,7 +412,12 @@ with `--axis_amplitude_min VALUE`,
 `--grid_scale_packet_step_min VALUE`,
 `--grid_scale_packet_min_large_turns VALUE`,
 `--grid_scale_packet_window_span_grid VALUE`,
-`--grid_scale_packet_peak_r_max VALUE`, `--w_cross_threshold VALUE`,
+`--grid_scale_packet_peak_r_max VALUE`,
+`--near_axis_grid_oscillation_peak_r_max VALUE`,
+`--near_axis_grid_oscillation_amplitude_min VALUE`,
+`--near_axis_grid_oscillation_min_consecutive_sign_flips VALUE`,
+`--near_axis_grid_oscillation_step_l2_min VALUE`,
+`--w_cross_threshold VALUE`,
 `--cross_window_half_width_grid VALUE`,
 `--cross_window_amplitude_min VALUE`, `--cross_window_w_min VALUE`,
 `--edge_r_min VALUE`, `--edge_width_max_grid VALUE`,

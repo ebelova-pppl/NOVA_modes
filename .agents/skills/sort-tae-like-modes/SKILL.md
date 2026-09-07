@@ -22,10 +22,11 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v3.yaml`. It pins the v16
-ruleset and routing values, enables gates 1, 2, 2b, 4, 5, the interior-envelope
-gate, and the final interior harmonic-incoherence gate, and explicitly disables
-exact-point continuum gate 3.
+The preset is `configs/rules/tae_rules_production_v4.yaml`. It pins the v17
+ruleset and routing values, enables gates 1, 2, 2b, the near-axis
+grid-oscillation gate, 4, 5, the interior-envelope gate, and the final interior
+harmonic-incoherence gate, and explicitly disables exact-point continuum gate
+3.
 Do not combine a named configuration
 with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and
@@ -68,9 +69,10 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. Eight ordered BAD decisions detect narrow near-axis
+TAE/EAE/mixed split. Nine ordered BAD decisions detect narrow near-axis
 spikes, unresolved signed-harmonic spikes and short large-turn packets whose
-strongest window sample is at `r <= 0.5`, continuum crossings carrying
+strongest window sample is at `r <= 0.5`, relatively large consecutive
+sign-flip oscillations at strict `r < 0.1`, continuum crossings carrying
 appreciable exact-point or nearby amplitude and normalized radial energy, a
 narrow globally dominant energy envelope at the outer radial boundary, and a
 few-grid-interval interior total-energy envelope without a qualifying nearby
@@ -84,7 +86,10 @@ Their calibrated defaults are `r_ax=0.03` inclusive,
 `grid_scale_packet_step_min=0.2`,
 `grid_scale_packet_min_large_turns=3`, and
 `grid_scale_packet_window_span_grid=4`, with inclusive
-`grid_scale_packet_peak_r_max=0.5`; continuum defaults begin with
+`grid_scale_packet_peak_r_max=0.5`; near-axis oscillation defaults are strict
+`peak_r_max=0.1`, `amplitude_min=0.10`,
+`min_consecutive_sign_flips=4`, and `step_l2_min=0.30`; continuum defaults
+begin with
 `w_cross_threshold=0.03`, crossing-window defaults
 `cross_window_half_width_grid=2`, `cross_window_amplitude_min=0.25`, and
 `cross_window_w_min=0.05`, with provisional edge defaults
@@ -94,7 +99,7 @@ defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v16 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v17 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -106,7 +111,9 @@ signed-lobe measurements under `numerical_structure_features.grid_scale_spike`,
 and short-window repeated-turn evidence under
 `numerical_structure_features.grid_scale_packet`; store the penultimate
 total-energy-width gate and its separate extended extremum match under
-`resolution_features.interior_unresolved_envelope`; store the combined core
+`resolution_features.interior_unresolved_envelope`; store the near-axis
+mode-level amplitude and strongest strict single-harmonic sign-flip run under
+`numerical_structure_features.near_axis_grid_oscillation`; store the combined core
 incoherence score and every component under
 `numerical_structure_features.interior_harmonic_incoherence`. In the same
 object, keep the audit-only whole-radius `W`-weighted effective harmonic count,
@@ -218,6 +225,42 @@ Override the provisional settings with
 `--grid_scale_packet_window_span_grid`, and
 `--grid_scale_packet_peak_r_max`; use `--disable_grid_scale_packet` to retain
 evidence without applying the decision.
+
+Gate 2c detects relatively large grid-scale oscillations near
+the axis. On each stored harmonic, form maximal runs for which every adjacent
+pair is nonzero and changes sign. A zero sample or one interval without a sign
+change ends the run; never bridge a missing flip. Keep only runs with at least
+four consecutive sign changes and whose largest absolute run sample is at the
+strict radius `r < 0.1`. For each kept run define:
+
+```text
+Q_s = sqrt(sum_i (A[i+1] - A[i])^2)
+```
+
+Select the largest `Q_s` from one run on one harmonic; never sum runs or
+harmonics. Independently define
+`A_peak=max_{h,r<0.1}|A_h(r)|`, which may come from a different harmonic. The
+calibrated decision is:
+
+```text
+IF N_s >= 4 consecutive sign flips on one harmonic
+AND that run's peak is at r < 0.1
+AND A_peak >= 0.10
+AND max_single_run(Q_s) >= 0.30
+THEN BAD_NEAR_AXIS_GRID_OSCILLATION
+AND stop evaluating later decision gates
+```
+
+The count, amplitude, and `Q_s` comparisons are inclusive; both radius uses
+are strict. Store the mode-level peak and its harmonic/radius, the complete
+selected run bounds and harmonic, `N_s`, `Q_s`, step summaries, qualifying-run
+counts, and whether the two winning harmonics match. Override the settings
+with `--near_axis_grid_oscillation_peak_r_max`,
+`--near_axis_grid_oscillation_amplitude_min`,
+`--near_axis_grid_oscillation_min_consecutive_sign_flips`, and
+`--near_axis_grid_oscillation_step_l2_min`; use
+`--disable_near_axis_grid_oscillation` to retain evidence without applying the
+decision.
 
 The third gate uses the existing deterministic true-crossing measurements. A
 crossing is a lower/upper continuum boundary intersection recorded by the

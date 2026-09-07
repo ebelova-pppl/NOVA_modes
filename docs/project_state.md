@@ -3,6 +3,59 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-06 near-axis grid-oscillation gate and production v4
+
+- Added the ordered deterministic rejection
+  `BAD_NEAR_AXIS_GRID_OSCILLATION` after the established axis, signed-lobe,
+  and short-window packet gates and before the continuum gates. It targets the
+  reviewed failure morphology: relatively large grid-scale oscillations near
+  `r=0`, without claiming a physical cause.
+- On each stored harmonic, the extractor finds maximal runs of strictly
+  consecutive nonzero sign changes. A zero sample or one missing flip ends a
+  run. A run is eligible at `N_s>=4` only when its own largest absolute sample
+  is at strict `r<0.1`; `Q_s=sqrt(sum_i (A[i+1]-A[i])^2)` is calculated for
+  each eligible run and the largest single-run value is selected. Runs and
+  harmonics are never summed. Independently,
+  `A_peak=max_{h,r<0.1}|A_h(r)|` is measured over every stored harmonic. The
+  gate fires when `A_peak>=0.10` and `Q_s>=0.30`; count and magnitude
+  thresholds are inclusive and both radius uses are strict. The two winners
+  may come from different harmonics, which is explicitly audited.
+- The accepted thresholds select 10/281 production-v2 pilot survivors and
+  5/572 accessible active-training GOOD labels. They add no modes outside the
+  original 20-row exploratory list. Relative to the exploratory
+  run-associated-amplitude `0.08`/`Q_s=0.25` screen, the new definition
+  releases four pilot modes (E203963 N6/4648, E205035 N7/2822 and N7/2973,
+  E205057 N8/1767) and one training mode (204202 N7/8631). The motivating
+  E205045 N10/3150 remains selected with
+  `(A_peak,Q_s,N_s)=(0.188554,0.318858,4)`.
+- This is a non-blind, post-hoc calibration rather than independent
+  validation. The source table now records mode-level amplitude, strongest
+  run, and accepted-v4 outcome in
+  `outputs/near_axis_sign_flip_pilot14_plus_training6.csv`; methodology and
+  limitations are in `audits/near_axis_grid_oscillation/`.
+- Advanced the deterministic identities to ruleset
+  `tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-v17`,
+  grouped audit schema `tae-rule-features-grouped-v17`, and run-config schema
+  `tae-rule-run-config-v4`. Added immutable current preset
+  `configs/rules/tae_rules_production_v4.yaml`, SHA-256
+  `ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b`.
+  Historical v1-v3 files remain byte-for-byte unchanged. Routing, all earlier
+  thresholds, survivor policy, RF feature schemas, training labels, and
+  RF/CNN model artifacts are unchanged.
+- Added analytic coverage for exact inclusive magnitude/count boundaries,
+  strict radius boundaries, zero/missing-flip breaks, single-harmonic `Q_s`
+  selection without summation, independent amplitude evidence, disabled-gate
+  audit retention, gate reason, CLI/config freezing, and workflow summaries.
+  All 133 non-validator repository tests pass in the production conda
+  environment. Its expected full-suite failure remains only the skill
+  validator subprocess because PyYAML is absent there; both local skill
+  validators pass with the system Python that provides PyYAML.
+- A bounded v4 N10 smoke run on E205045 discovered 142 inputs and evaluated
+  44 TAE-side modes with no invalid input. Relative to an otherwise identical
+  run with only this gate disabled, BAD/REVIEW changed from `39/5` to `41/3`:
+  exactly N10/3150 and N10/3699 receive the new primary reason. The run records
+  the expected v4 schema and SHA-256.
+
 ## 2026-09-06 audit-only harmonic-participation features
 
 - Kept the production-v3 `BAD_INTERIOR_HARMONIC_INCOHERENCE` decision and its

@@ -53,6 +53,10 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_GRID_SCALE_PACKET_STEP_MIN,
     DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
     DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
+    DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN,
+    DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS,
+    DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX,
+    DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN,
     DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX,
     DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN,
     DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX,
@@ -76,6 +80,7 @@ from tae_rule_engine import (  # noqa: E402
     GridScaleSpikeConfig,
     InteriorHarmonicIncoherenceConfig,
     InteriorUnresolvedEnvelopeConfig,
+    NearAxisGridOscillationConfig,
     evaluate_mode,
 )
 from tae_rule_config import (  # noqa: E402
@@ -185,6 +190,11 @@ SHOT_SUMMARY_FIELDS = [
     "grid_scale_packet_min_large_turns",
     "grid_scale_packet_window_span_grid",
     "grid_scale_packet_peak_r_max",
+    "near_axis_grid_oscillation_gate_enabled",
+    "near_axis_grid_oscillation_peak_r_max",
+    "near_axis_grid_oscillation_amplitude_min",
+    "near_axis_grid_oscillation_min_consecutive_sign_flips",
+    "near_axis_grid_oscillation_step_l2_min",
     "continuum_crossing_gate_enabled",
     "continuum_crossing_w_threshold",
     "continuum_crossing_window_gate_enabled",
@@ -233,6 +243,11 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--grid_scale_packet_window_span_grid",
         "--grid_scale_packet_peak_r_max",
         "--disable_grid_scale_packet",
+        "--near_axis_grid_oscillation_peak_r_max",
+        "--near_axis_grid_oscillation_amplitude_min",
+        "--near_axis_grid_oscillation_min_consecutive_sign_flips",
+        "--near_axis_grid_oscillation_step_l2_min",
+        "--disable_near_axis_grid_oscillation",
         "--w_cross_threshold",
         "--disable_cont_cross",
         "--cross_window_half_width_grid",
@@ -867,6 +882,9 @@ def build_summary(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
+    near_axis_grid_oscillation_config: (
+        NearAxisGridOscillationConfig | None
+    ) = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
@@ -884,6 +902,9 @@ def build_summary(
     axis_config = axis_artifact_config or AxisArtifactConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
+    near_axis_oscillation_config = (
+        near_axis_grid_oscillation_config or NearAxisGridOscillationConfig()
+    )
     crossing_config = continuum_crossing_config or ContinuumCrossingConfig()
     cross_window_config = (
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
@@ -998,6 +1019,21 @@ def build_summary(
         "grid_scale_packet_min_large_turns": packet_config.min_large_turns,
         "grid_scale_packet_window_span_grid": packet_config.window_span_grid,
         "grid_scale_packet_peak_r_max": packet_config.peak_r_max,
+        "near_axis_grid_oscillation_gate_enabled": (
+            near_axis_oscillation_config.enabled
+        ),
+        "near_axis_grid_oscillation_peak_r_max": (
+            near_axis_oscillation_config.peak_r_max
+        ),
+        "near_axis_grid_oscillation_amplitude_min": (
+            near_axis_oscillation_config.amplitude_min
+        ),
+        "near_axis_grid_oscillation_min_consecutive_sign_flips": (
+            near_axis_oscillation_config.min_consecutive_sign_flips
+        ),
+        "near_axis_grid_oscillation_step_l2_min": (
+            near_axis_oscillation_config.step_l2_min
+        ),
         "continuum_crossing_gate_enabled": crossing_config.enabled,
         "continuum_crossing_w_threshold": crossing_config.w_cross_threshold,
         "continuum_crossing_window_gate_enabled": cross_window_config.enabled,
@@ -1051,6 +1087,9 @@ def _summary_by_n(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
+    near_axis_grid_oscillation_config: (
+        NearAxisGridOscillationConfig | None
+    ) = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
@@ -1111,6 +1150,9 @@ def _summary_by_n(
             axis_artifact_config=axis_artifact_config,
             grid_scale_spike_config=grid_scale_spike_config,
             grid_scale_packet_config=grid_scale_packet_config,
+            near_axis_grid_oscillation_config=(
+                near_axis_grid_oscillation_config
+            ),
             continuum_crossing_config=continuum_crossing_config,
             continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
@@ -1219,6 +1261,18 @@ def run_shot(
     grid_scale_packet_peak_r_max: float | None = (
         DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX
     ),
+    near_axis_grid_oscillation_peak_r_max: float = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX
+    ),
+    near_axis_grid_oscillation_amplitude_min: float | None = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN
+    ),
+    near_axis_grid_oscillation_min_consecutive_sign_flips: int = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS
+    ),
+    near_axis_grid_oscillation_step_l2_min: float | None = (
+        DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN
+    ),
     w_cross_threshold: float | None = DEFAULT_W_CROSS_THRESHOLD,
     cross_window_half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
     cross_window_amplitude_min: float | None = DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
@@ -1285,6 +1339,14 @@ def run_shot(
         min_large_turns=grid_scale_packet_min_large_turns,
         window_span_grid=grid_scale_packet_window_span_grid,
         peak_r_max=grid_scale_packet_peak_r_max,
+    )
+    near_axis_oscillation_config = NearAxisGridOscillationConfig(
+        peak_r_max=near_axis_grid_oscillation_peak_r_max,
+        amplitude_min=near_axis_grid_oscillation_amplitude_min,
+        min_consecutive_sign_flips=(
+            near_axis_grid_oscillation_min_consecutive_sign_flips
+        ),
+        step_l2_min=near_axis_grid_oscillation_step_l2_min,
     )
     crossing_config = ContinuumCrossingConfig(
         w_cross_threshold=w_cross_threshold,
@@ -1353,6 +1415,7 @@ def run_shot(
             axis_artifact_config=axis_config,
             grid_scale_spike_config=grid_config,
             grid_scale_packet_config=packet_config,
+            near_axis_grid_oscillation_config=near_axis_oscillation_config,
             continuum_crossing_config=crossing_config,
             continuum_crossing_window_config=cross_window_config,
             edge_artifact_config=edge_config,
@@ -1400,6 +1463,7 @@ def run_shot(
         axis_artifact_config=axis_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
+        near_axis_grid_oscillation_config=near_axis_oscillation_config,
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
@@ -1423,6 +1487,7 @@ def run_shot(
         axis_artifact_config=axis_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
+        near_axis_grid_oscillation_config=near_axis_oscillation_config,
         continuum_crossing_config=crossing_config,
         continuum_crossing_window_config=cross_window_config,
         edge_artifact_config=edge_config,
@@ -1667,6 +1732,58 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help=(
             "Calculate short-window packet features but disable the "
             "BAD_GRID_SCALE_PACKET decision gate"
+        ),
+    )
+    parser.add_argument(
+        "--near_axis_grid_oscillation_peak_r_max",
+        type=float,
+        default=DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX,
+        help=(
+            "Exclusive maximum radius used both for the mode-level amplitude "
+            "maximum and for the selected sign-flip run peak in "
+            "BAD_NEAR_AXIS_GRID_OSCILLATION "
+            f"(default: {DEFAULT_NEAR_AXIS_GRID_OSCILLATION_PEAK_R_MAX:g})"
+        ),
+    )
+    parser.add_argument(
+        "--near_axis_grid_oscillation_amplitude_min",
+        type=float,
+        default=DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN,
+        help=(
+            "Inclusive minimum mode-level max(abs(A)) over all harmonics at "
+            "r below the near-axis cutoff "
+            f"(default: {DEFAULT_NEAR_AXIS_GRID_OSCILLATION_AMPLITUDE_MIN:g})"
+        ),
+    )
+    parser.add_argument(
+        "--near_axis_grid_oscillation_min_consecutive_sign_flips",
+        type=int,
+        default=(
+            DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS
+        ),
+        help=(
+            "Inclusive minimum number of strictly consecutive nonzero sign "
+            "changes on one harmonic; missing flips are not bridged "
+            "(default: "
+            f"{DEFAULT_NEAR_AXIS_GRID_OSCILLATION_MIN_CONSECUTIVE_SIGN_FLIPS})"
+        ),
+    )
+    parser.add_argument(
+        "--near_axis_grid_oscillation_step_l2_min",
+        type=float,
+        default=DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN,
+        help=(
+            "Inclusive minimum sqrt(sum(delta_A**2)) for the strongest "
+            "qualifying single-harmonic sign-flip run "
+            f"(default: {DEFAULT_NEAR_AXIS_GRID_OSCILLATION_STEP_L2_MIN:g})"
+        ),
+    )
+    parser.add_argument(
+        "--disable_near_axis_grid_oscillation",
+        action="store_true",
+        help=(
+            "Calculate near-axis sign-flip evidence but disable the "
+            "BAD_NEAR_AXIS_GRID_OSCILLATION decision gate"
         ),
     )
     parser.add_argument(
@@ -1949,6 +2066,20 @@ def main() -> None:
             args.grid_scale_packet_window_span_grid
         ),
         grid_scale_packet_peak_r_max=args.grid_scale_packet_peak_r_max,
+        near_axis_grid_oscillation_peak_r_max=(
+            args.near_axis_grid_oscillation_peak_r_max
+        ),
+        near_axis_grid_oscillation_amplitude_min=(
+            None
+            if args.disable_near_axis_grid_oscillation
+            else args.near_axis_grid_oscillation_amplitude_min
+        ),
+        near_axis_grid_oscillation_min_consecutive_sign_flips=(
+            args.near_axis_grid_oscillation_min_consecutive_sign_flips
+        ),
+        near_axis_grid_oscillation_step_l2_min=(
+            args.near_axis_grid_oscillation_step_l2_min
+        ),
         w_cross_threshold=(
             None if args.disable_cont_cross else args.w_cross_threshold
         ),
@@ -2051,6 +2182,17 @@ def main() -> None:
         "window_span_grid="
         f"{summary['grid_scale_packet_window_span_grid']} "
         f"peak_r_max={summary['grid_scale_packet_peak_r_max']}"
+    )
+    print(
+        "Near-axis grid-oscillation gate: "
+        f"enabled={summary['near_axis_grid_oscillation_gate_enabled']} "
+        "peak_r_max_exclusive="
+        f"{summary['near_axis_grid_oscillation_peak_r_max']} "
+        "amplitude_min="
+        f"{summary['near_axis_grid_oscillation_amplitude_min']} "
+        "min_consecutive_sign_flips="
+        f"{summary['near_axis_grid_oscillation_min_consecutive_sign_flips']} "
+        f"step_l2_min={summary['near_axis_grid_oscillation_step_l2_min']}"
     )
     print(
         "Continuum-crossing gate: "
