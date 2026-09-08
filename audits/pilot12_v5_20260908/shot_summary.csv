@@ -1,0 +1,13 @@
+shot,shot_family,size_bin,input_modes,tae_side,rules_good,ai_good,rules_final,ai_final,disagreements,rules_bad_ai_good,rules_good_ai_bad
+nstxuE205040A01t016,NSTX-U E,low,297,160,78,72,78,72,16,5,11
+nstxuE204944A01t017,NSTX-U E,low,388,82,26,39,26,39,15,14,1
+nstxuE204708F03t017,NSTX-U E,medium,623,164,92,87,92,87,9,2,7
+nstxuE204645A16t015,NSTX-U E,medium,535,179,63,62,59,58,13,6,7
+nstxuE203262A04t018,NSTX-U E,medium,573,228,144,137,144,137,19,6,13
+nstxuE204621A03t030,NSTX-U E,high,1050,163,16,16,16,16,14,7,7
+nstxuE205017A01t025,NSTX-U E,high,853,222,60,59,60,59,5,2,3
+nstxuE204186A01t020,NSTX-U E,high,1047,213,54,48,54,48,18,6,12
+nstxuG133964R06,NSTX-U G,medium,610,83,1,5,1,5,6,5,1
+nstxuG142301C50,NSTX-U G,medium,611,208,2,1,2,1,3,1,2
+nstxuG142301L94,NSTX-U G,high,958,116,6,6,6,6,4,2,2
+nstxuG142301U84,NSTX-U G,high,1101,173,16,8,16,8,10,1,9

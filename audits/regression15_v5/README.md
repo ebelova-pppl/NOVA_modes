@@ -1,8 +1,10 @@
 # Fifteen-shot production-v5 regression
 
-Selection is exactly `post_training_checked=yes` in
+Selection was exactly `post_training_checked=yes` in the 2026-09-07
 `audits/main_dataset_shots/shot_status.csv`: the three pre-pilot cases and
-twelve pilot shots. This is regression evidence on previously examined data,
+twelve pilot shots. The runner now reads those fifteen identities from this
+audit's frozen `shot_summary.csv` as the live inventory gains new checks.
+This is regression evidence on previously examined data,
 not an independent validation sample. Thresholds and labels are unchanged.
 
 The canonical `sort_shot_mixed.py --method rules` workflow reruns each shot
@@ -33,6 +35,12 @@ E205045 N4/3243 and E205054 N8/4715. These two are useful follow-up morphology
 checks. Increased model agreement is not evidence of physical correctness.
 The known E205045 seven crossing-tail targets and five smooth controls retain
 their expected outcomes, and both H56 incoherence targets are rejected.
+
+On 2026-09-08 the user inspected all 24 newly rejected modes and confirmed
+that every rejection looks correct. `user_review.csv` records those BAD
+adjudications against the exact input fingerprints. No threshold, training
+label, or manual override was changed; this completes the requested review
+of the new rejections in this regression set.
 
 ## Reproduction
 

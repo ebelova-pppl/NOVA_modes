@@ -1,7 +1,49 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-07)
+### Project state (current snapshot, updated 2026-09-08)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-08 user-confirmed regression and fresh twelve-shot pilot
+
+- The user inspected all 24 new rejections from the fifteen-shot v5
+  regression and confirmed that all look correct. Exact BAD adjudications
+  and input fingerprints are in `audits/regression15_v5/user_review.csv`.
+  No rule threshold, training label, or model artifact was changed.
+- At the user's request, selected a new twelve-shot paired rules/RF-CNN
+  pilot with seed 20260908. Excluded active training, all previously checked
+  cases, known input issues/suspensions, and existing output directories.
+  The eight E cases have distinct discharge numbers absent from previous
+  checks/training. Quotas are E: 2 low/3 medium/3 high; G: 2 medium/2 high
+  because no eligible low-size G cases remain (low <=400, medium <=800).
+- Selection, ranked candidate pools, exclusions, and preflight evidence are
+  in `audits/pilot12_v5_20260908/`. Shared preprocessing validates all selected
+  inputs before either sorter runs, with deterministic same-stratum
+  replacements for invalid or unsupported-resolution cases. Paired runs use
+  frozen v5 and the active RF/raw-CNN checkpoints on CPU. Requested output
+  roots are `/p/hym/ebelova/NOVA/sort_outputs/` and
+  `/p/hym/ebelova/NOVA/sort_outputs_ai/`, with one subdirectory per shot.
+  Final preflight passed 8,646 nr=201 inputs. The initial large-G draw M21
+  was excluded for 197 N4 gamma_d=NaN inputs (DITW-005) and replaced by U84
+  before inference. The affected files are registered centrally; no source
+  file was modified.
+- All 24 canonical runs and consistency checks completed. The two methods
+  have identical coverage, input fingerprints, nr, and routing across 8,646
+  valid inputs (1,991 TAE-side / 6,655 EAE-side). No invalid inputs,
+  resolution exclusions, or rule-workflow RF-ranking fallback occurred.
+  Rules/RF-CNN retain 558/540 GOOD before deduplication and 554/536 in final
+  lists. Disagreements are 132 (6.63%): 57 rules-BAD/RF-CNN-GOOD and 75 in
+  the reverse direction. The 57 rule rejections are axis spike 19, crossing
+  window 17, grid-scale spike 15, near-axis oscillation 5, and interior
+  unresolved envelope 1. These remain unadjudicated review candidates.
+- Main and G-only inventories now mark 27 checked cases and flag M21 as an
+  input issue. Active training counts also reflect the earlier N9/3737 label
+  correction. The historical fifteen-shot regression runner now uses its
+  own frozen shot-summary identities, so expanding the live checked set does
+  not change that regression sample. Compact results and the portable driver
+  are versioned under the new pilot audit; full exports stay in the requested
+  external roots and preflight tables/logs remain locally ignored.
+  Next: inspect the new disagreements and a sample of agreeing modes before
+  extending production sorting to the remaining database.
 
 ## 2026-09-07 production-v5 regression on all fifteen checked shots
 

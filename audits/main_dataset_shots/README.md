@@ -10,14 +10,18 @@ post-training cases for rules-versus-RF-CNN comparison.
 - `pilot12_selection.csv` records the reproducible 2026-09-05
   stratified-random draw, seed `20260905`, size strata, completed replacement
   sample, and the preflight exclusion that occurred before either sorter ran.
+- `../pilot12_v5_20260908/selection.csv` records the next twelve fresh cases,
+  sampled with seed 20260908 and compared using frozen v5 plus the active
+  RF/raw-CNN models. Its candidate pools, one preflight replacement, input
+  provenance, and comparison results are stored in that compact audit.
 - `active_training_shot=yes` means the shot occurs in the canonical
   `training_labels/tae_like_train.csv` list. The three label-count columns
   are derived from that file.
 - `post_training_checked=yes` is intentionally narrower: it marks only new
   cases already run and compared with both `rules` and `rf-cnn`. The complete
-  inventory currently marks 15 post-training cases: the original E case and
-  two original G cases plus the 12-shot pilot recorded in
-  `pilot12_selection.csv`.
+  inventory currently marks 27 post-training cases: the original E case and
+  two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
+  and the twelve fresh v5 cases completed on 2026-09-08.
 
 The active list contains 14 training shots and 2,390 labels. Q62 is marked
 `suspended_training_q62`, not as an active training shot: its 249 reviewed
@@ -34,3 +38,7 @@ currently has no populated `N#` directory containing `egn*` files.
 `nstxuG142301D46` is marked `input_issue`: it was the pilot's initial
 medium-size G draw, but its sole N7 mode has `gamma_d=NaN`, so it was replaced
 before sorting by the next seeded candidate, `nstxuG142301E72`.
+`nstxuG142301M21` is also marked `input_issue`: its 197 N4 modes with
+`gamma_d=NaN` were found during the second pilot preflight, before inference;
+the next large-G candidate, `nstxuG142301U84`, replaced it. Active training
+counts include the previously requested N9/3737 label correction.

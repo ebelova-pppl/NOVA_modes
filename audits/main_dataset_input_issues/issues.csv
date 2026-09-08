@@ -3,3 +3,4 @@ DITW-001,nstxuG121123K51,4,nonfinite_scalar,gamma_d,1,$NOVA_DITW_ROOT,INVALID_ME
 DITW-002,nstxuG121123K34,4,nonfinite_scalar,gamma_d,97,$NOVA_DITW_ROOT,INVALID_METADATA,open_source_data_issue,2026-08-31,The 97 paths exactly match the canonical rules sorter's rejected set for K34.
 DITW-003,nstx_135388,8,zero_byte_mode_file,file_size,3,$NOVA_DITW_ROOT,MODE_LOAD_FAILED,open_source_data_issue,2026-08-31,All three listed live-source mode files have size zero.
 DITW-004,nstxuG142301D46,7,nonfinite_scalar,gamma_d,1,$NOVA_DITW_ROOT,INVALID_METADATA,open_source_data_issue,2026-09-05,Found during the stratified-random pilot preflight; N7 contains one mode file and its stored gamma_d is NaN.
+DITW-005,nstxuG142301M21,4,nonfinite_scalar,gamma_d,197,$NOVA_DITW_ROOT,INVALID_METADATA,open_source_data_issue,2026-09-08,All 1173 shot inputs preflighted; 197 N4 files have gamma_d=NaN as their only non-finite binary value. Excluded before either sorter; replaced by nstxuG142301U84.

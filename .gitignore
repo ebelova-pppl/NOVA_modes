@@ -54,3 +54,4 @@ outputs/v3_relabels_gate3_off_packet_turns3_rle05/
 outputs/continuum_tail_*/
 # Complete regression sorter exports and logs; compact evidence is in audits/.
 outputs/regression15_v5_*/
+outputs/pilot12_v5_*/

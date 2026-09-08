@@ -1,0 +1,56 @@
+{
+  "seed": 20260908,
+  "inventory_sha256": "f30be787e5f69c0c482aee73b27fe93732882b4ba330f610b4a8712d3c7fe33f",
+  "quotas": [
+    [
+      "NSTX-U E",
+      "low",
+      2
+    ],
+    [
+      "NSTX-U E",
+      "medium",
+      3
+    ],
+    [
+      "NSTX-U E",
+      "high",
+      3
+    ],
+    [
+      "NSTX-U G",
+      "medium",
+      2
+    ],
+    [
+      "NSTX-U G",
+      "high",
+      2
+    ]
+  ],
+  "selection_method": "Sorted candidate strata shuffled with random.Random(seed), in quota order; unique E discharge numbers, excluding previously checked/training E series; no eligible small G cases.",
+  "configuration_sha256": "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f",
+  "rf_model_sha256": "b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c",
+  "cnn_model_sha256": "872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e",
+  "source_commit": "1a5be5faca7f2c42df240f25159edf77653bdfe6",
+  "training_labels_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+  "totals": {
+    "input_modes": 8646,
+    "tae_side": 1991,
+    "rules_good": 558,
+    "ai_good": 540,
+    "rules_final": 554,
+    "ai_final": 536,
+    "disagreements": 132,
+    "rules_bad_ai_good": 57,
+    "rules_good_ai_bad": 75
+  },
+  "disagreement_reasons": {
+    "rules_good_ai_bad:NO_GOOD_TEMPLATE": 75,
+    "rules_bad_ai_good:BAD_GRID_SCALE_SPIKE": 15,
+    "rules_bad_ai_good:BAD_CONT_CROSS_WINDOW": 17,
+    "rules_bad_ai_good:BAD_AXIS_SPIKE": 19,
+    "rules_bad_ai_good:BAD_NEAR_AXIS_GRID_OSCILLATION": 5,
+    "rules_bad_ai_good:BAD_INTERIOR_UNRESOLVED_ENVELOPE": 1
+  }
+}

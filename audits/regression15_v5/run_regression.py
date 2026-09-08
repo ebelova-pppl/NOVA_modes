@@ -77,7 +77,12 @@ def main():
     args.out_dir.mkdir(parents=True, exist_ok=False)
     args.audit_dir.mkdir(parents=True, exist_ok=True)
     inventory = read_csv(args.inventory)
-    checked = [row for row in inventory if row["post_training_checked"] == "yes"]
+    # Preserve this historical sample as the live inventory gains new checks.
+    frozen_shots = {
+        row["shot"]
+        for row in read_csv(Path(__file__).resolve().parent / "shot_summary.csv")
+    }
+    checked = [row for row in inventory if row["shot"] in frozen_shots]
     assert len(checked) == 15 and len(inventory) == 200
     config = REPO / "configs/rules/tae_rules_production_v5.yaml"
     load_rule_run_configuration(config)

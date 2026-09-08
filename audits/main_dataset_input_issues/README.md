@@ -33,6 +33,12 @@ live DiTw tree.
   preflight. N7 contains one mode, `egn07w.1593E+02`, whose stored
   `gamma_d` is `NaN`; it was excluded from the comparison sample before either
   sorter ran and replaced by the next seeded candidate.
+- `nstxuG142301M21` was preflighted across all 1,173 mode files during the
+  2026-09-08 follow-up pilot. Exactly 197 N4 files fail metadata validation;
+  each has `gamma_d=NaN` as its only non-finite binary value. Their nr is 201
+  and ntor is 4. The remaining 976 files pass shared mode/continuum validation
+  with nr=201. The case was excluded before either sorter ran and replaced
+  by the next large-G candidate, `nstxuG142301U84` (issue `DITW-005`).
 
 Legacy continuum values greater than 999 are intentional missing-value
 sentinels handled by the shared continuum loader. They are not entered here as
