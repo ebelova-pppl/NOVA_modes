@@ -3,6 +3,36 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-07 production-v5 regression on all fifteen checked shots
+
+- Selected all fifteen `post_training_checked=yes` rows from the shot-status
+  inventory: the three pre-pilot cases plus twelve pilot shots. Reran the
+  canonical production-v5 rules workflow with RF duplicate ranking in fresh
+  local output directories, preserving the earlier production-v2 results.
+  Saved RF/CNN predictions are a historical reference; no CNN was rerun.
+- All 10,679 input files in these shots declare nr=201 with consistent
+  payload dimensions. Every input fingerprint and routing result matches
+  the baseline; no resolution warning or RF-ranking fallback occurred.
+  K34's 97 known INVALID metadata inputs retain their status and reason.
+  There are no new INVALID inputs.
+- Across 2,377 evaluated TAE-side modes, GOOD changes from 367 to 343 before
+  representative selection and 366 to 342 in final lists. Exactly 24 new
+  rejections comprise eleven near-axis oscillation, eleven crossing-tail,
+  and two harmonic-incoherence cases. No BAD mode is released. Another 27
+  already-BAD modes change primary reason to the earlier near-axis gate.
+- Historical RF/CNN disagreements change from 103 to 93 (17 resolved,
+  seven added). Among newly rejected modes, the two crossing-tail cases
+  previously accepted by RF/CNN are E205045 N4/3243 and E205054 N8/4715;
+  the other five new disagreements use the near-axis gate. These are review
+  candidates, not independently established classification errors.
+- Compact results, exact baseline/config/model hashes, and a portable runner
+  are in `audits/regression15_v5/`; full exports and logs are ignored under
+  `outputs/regression15_v5_20260907/`. The broader 200-shot footer scan was
+  interrupted on slow source I/O at E203653A02t030 N7/1382, so nr is verified
+  only for the fifteen regression shots. This is not evidence of a defect
+  in that source file. Next: review new rejections and complete fresh-shot
+  validation plus remaining-database preflight before scaling up.
+
 ## 2026-09-07 production-v5 crossing-tail gate, labels, and cleanup
 
 - Published `configs/rules/tae_rules_production_v5.yaml` as the canonical
