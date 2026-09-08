@@ -1,7 +1,64 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-06)
+### Project state (current snapshot, updated 2026-09-07)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-07 production-v5 crossing-tail gate, labels, and cleanup
+
+- Published `configs/rules/tae_rules_production_v5.yaml` as the canonical
+  default (configuration schema v5, ruleset/grouped feature schema v18).
+  SHA-256: `982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f`.
+  Presets v1–v4 remain unchanged; reproduce them in their historical checkout.
+- Added final gate `continuum_crossing_tail`, with reason
+  `BAD_CONTINUUM_CROSSING_TAIL`: strict `K_c>0.4 AND T_2>0.035` at the same
+  actual lower/upper crossing on a native 201-point radial grid. K retains
+  the signed, unscaled second-difference/local-amplitude norm within an
+  inclusive ±4-grid center window. T_2 divides all-harmonic cumulative tail
+  energy by full-domain energy of the strongest two individual harmonics,
+  without adjacency constraints. The tail lies opposite the global W peak.
+  Undefined ratios and unsupported resolutions retain evidence without
+  rejection. Complete per-crossing evidence and a qualifying witness are in
+  `crossing_features.continuum_crossing_tail`; earlier primary reasons,
+  production survivor policy, RF schema, and representative selection remain
+  unchanged. Named configurations prohibit threshold overrides.
+- Non-blind calibration on all 2,390 training inputs and twelve E205045
+  examples matched all fingerprints and 6,282 prior crossing measurements.
+  Exactly eleven rejections were added; the other 2,379 decisions and primary
+  reasons were unchanged. Both protected modes, H47 N6/2005 and 204202
+  N6/7914, remain rule REVIEW/production GOOD. Seven intended E205045 modes
+  are rejected, while five smooth controls survive.
+- At the user's request, corrected only `nstxu_204202/N9/egn09w.3737E+02`
+  in the main list from `good,tae` to `bad,none`. All eleven new rejections
+  are now labeled BAD. The 2,390-row/14-shot list has 575 GOOD and 1,815 BAD
+  labels; SHA-256 is
+  `0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a`.
+  Corrected-label v5 counts: 1,789 BAD-label rejections, 25 BAD-label
+  survivors, 541 GOOD-label survivors, 34 GOOD-label rejections, and one
+  known INVALID input. Existing checkpoints were not retrained.
+- For nr != 201, enabled interior harmonic-incoherence and crossing-tail
+  gates fail open; other enabled gates still run. Added prominent shared
+  stderr reporting, `resolution_warnings.txt`, and exact per-mode/gate rows
+  in `resolution_warnings.csv` for both sorters. Warnings name excluded
+  gates, required/observed nr, affected counts, and production GOOD counts.
+  Each run clears stale reports; disabled gates do not warn. This exposes
+  the existing warn-and-continue policy without changing sorting decisions.
+- Retained compact versioned evidence in `audits/continuum_crossing_tail/`:
+  complete fingerprinted v4/v5 training comparison, eleven additions,
+  twelve example decisions, 53 selected crossing records, summary hashes,
+  and exact label correction. Historical labels remain explicit in the audit;
+  the preceding full training list is recoverable from Git history.
+- Consolidated the superseded experiment notes here and in the compact audit.
+  The original 1% total-energy fraction rejected protected modes; 2% missed
+  N4/3005 and N5/3216. The global-amplitude curvature floor R was declined
+  for narrow separation, and its discarded experiment directory was removed.
+  Remaining local experiments and generated outputs are ignored via
+  `outputs/continuum_tail_*/`; no production workflow depends on those folders.
+- All 144 repository unit tests pass, including strict threshold boundaries,
+  same-crossing witnesses, scale/padding invariance, energy integrals,
+  precedence, immutable configuration, and real mixed-resolution CLI checks.
+  The scientific environment lacks PyYAML; validation used a temporary copy
+  of the installed system package, without modifying installed environments.
+  Next: broader shot-level evaluation before applying rules to ~200 shots.
 
 ## 2026-09-06 near-axis grid-oscillation gate and production v4
 
@@ -748,8 +805,8 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 - Active version-controlled training list:
     - canonical active list: `training_labels/tae_like_train.csv`
     - derived from the preserved `training_labels/tae_like_v3.csv` snapshot
-      by excluding all 249 Q62 rows
-    - 2390 labeled TAE-like modes: 576 `good`, 1814 `bad`
+      by excluding all 249 Q62 rows and applying the N9/3737 correction above
+    - 2390 labeled TAE-like modes: 575 `good`, 1815 `bad`
     - 14 active training shots; Q62 is suspended pending correction of its
       upper continuum boundary
     - `configs/paths/nova_paths.nersc.sh`,

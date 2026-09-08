@@ -31,7 +31,7 @@ For portability, paths in training CSVs should be stored relative to
 
 The current canonical/default good/bad training list is
 `training_labels/tae_like_train.csv`. It contains 2,390 rows from 14 shots,
-with 576 GOOD and 1,814 BAD labels. Q62 is suspended pending correction of its
+with 575 GOOD and 1,815 BAD labels. Q62 is suspended pending correction of its
 suspect upper continuum boundary; its 249 reviewed rows remain preserved in
 the complete 15-shot `training_labels/tae_like_v3.csv` snapshot. Older
 four-shot TAE-only and mixed TAE/EAE lists are archived under
@@ -900,7 +900,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v4` configuration. A rejection gate produces automatic
+`tae_rules_production_v5` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1139,9 +1139,9 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v4.yaml`, stored as strict
+`configs/rules/tae_rules_production_v5.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v17 ruleset, routing thresholds, relative-frequency tolerance, all
+current v18 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
@@ -1149,12 +1149,13 @@ gate thresholds, and these gate states:
   (`BAD_CONT_CROSS_WINDOW`), and 5
   (`BAD_EDGE_SPIKE`), plus the interior-envelope gate
   (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`), followed by the calibrated interior
-  harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`);
+  harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`) and final
+  crossing-tail gate (`BAD_CONTINUUM_CROSSING_TAIL`);
 - disabled: gate 3 (`BAD_CONT_CROSS`), while retaining its frozen latent
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v4 identity.
+config-owned threshold or gate override to retain the production-v5 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, and the audited `accept-as-good-v1` survivor
@@ -1174,7 +1175,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v4` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v5` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1185,8 +1186,8 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-v17`
-ruleset implements nine ordered BAD decisions, treating the short-window packet
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-v18`
+ruleset implements ten ordered BAD decisions, treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
 template. Modes that do not fire any
@@ -1196,7 +1197,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v17`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v18`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1455,7 +1456,7 @@ settings with `--edge_r_min` and `--edge_width_max_grid`, or use
 decision. Shot and per-`n` summaries record enable state and thresholds for all
 existing BAD decisions.
 
-The final gate reuses that same global total-energy envelope; it never measures
+The interior-envelope gate reuses that same global total-energy envelope; it never measures
 an individual harmonic:
 
 ```yaml
@@ -1550,6 +1551,62 @@ open. Override the settings with the five
 `--disable_interior_harmonic_incoherence` to retain the full evidence without
 applying the decision. Shot and per-`n` summaries record all five settings plus
 the counts of resolution-eligible and resolution-ineligible evaluated modes.
+
+The final gate, `continuum_crossing_tail`, applies:
+
+```text
+E_h = integral_0^1 A_h(r)^2 dr
+E_total = sum_h E_h
+T_2 = E_tail / (E_h1 + E_h2)
+K_c = sqrt(sum_(h,i in I_c) (A[h,i+1]-2*A[h,i]+A[h,i-1])^2
+           / sum_(h,i in I_c) A[h,i]^2)
+IF n_radial == 201 AND K_c > 0.4 AND T_2 > 0.035 at the SAME crossing
+THEN BAD_CONTINUUM_CROSSING_TAIL
+```
+
+The reference harmonics h1 and h2 have the largest full-domain integrated
+energies; no adjacency constraint or physical-m offset is imposed. All tail
+harmonics remain in the numerator. T_2 can exceed one; it is a ratio to a
+reference pair, not a total-energy fraction. The tail side is inner when the
+crossing lies strictly inside the global W peak, and outer otherwise.
+Integrate piecewise-linear W with the crossing inserted as an endpoint.
+Overlapping cumulative tails at different crossings are never added.
+The K window includes complete stencil centers satisfying
+`abs(r_i-r_cross) <= 4*delta_r`; the signed stencil can extend one interval
+beyond that window. There is no smoothing or division by delta_r squared.
+Undefined K or energy ratios cannot reject. All lower/upper crossings are
+retained under `crossing_features.continuum_crossing_tail.records`, alongside
+the total/reference energies, strongest harmonic indices, resolution status,
+qualifying count, and a witness selected from crossings satisfying both cuts.
+The unchanged six shared crossing scalars and original `crossing_records`
+keep their schemas; RF features and model inputs are unchanged.
+
+The native-grid calibration applies only at 201 radial samples. Other
+resolutions retain evidence with `resolution_eligible=false` and cannot fire
+this gate. Both cutoffs are strict; equality passes. It runs after all earlier
+BAD decisions. Calibration options are `--continuum_crossing_tail_k_min`,
+`--continuum_crossing_tail_top2_ratio_min`,
+`--continuum_crossing_tail_half_width_grid`, and
+`--continuum_crossing_tail_calibrated_n_radial`; use
+`--disable_continuum_crossing_tail` for evidence without this decision.
+Shot and per-n summaries include the enable state, all four settings, and
+eligible/ineligible counts. Named configurations prohibit these overrides.
+The frozen production-v5 preset enables this gate; v4 remains a historical
+preset requiring its corresponding checkout.
+
+Unsupported native grids are reported prominently by the shared workflow,
+including `sort_shot_mixed.py --method rules`. If either enabled
+resolution-dependent gate excludes an evaluated TAE-side mode, stderr names
+the gate, required and observed `nr`, and affected counts. The same message
+is saved to `resolution_warnings.txt`; `resolution_warnings.csv` lists exact
+mode keys, paths, fingerprints, resolutions, gates, and rule/final decisions.
+Both reports are replaced on every run, clearing stale warnings when no
+inputs are affected. Intentionally disabled gates do not produce these
+warnings. Other enabled gates still run, and sorting continues on native
+mode profiles. Under `accept-as-good-v1`, surviving affected modes can still
+become GOOD despite partial screening; the warning explicitly states that
+policy and counts affected GOOD modes. This reporting does not alter any
+frozen gate or survivor decision.
 
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:

@@ -14,6 +14,7 @@ from tae_rule_engine import (
     AxisArtifactConfig,
     ContinuumCrossingConfig,
     ContinuumCrossingWindowConfig,
+    ContinuumCrossingTailConfig,
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
@@ -26,10 +27,10 @@ from tae_rule_io import sha256_file
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v4"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v4"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v5"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v5"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b"
+    "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f"
 )
 
 
@@ -185,6 +186,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "edge_artifact",
         "interior_unresolved_envelope",
         "interior_harmonic_incoherence",
+        "continuum_crossing_tail",
     }
     _require_exact_keys(gates, gate_names, context="gates")
 
@@ -473,7 +475,32 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         calibrated_n_radial=incoherence_calibrated_n_radial,
     )
 
+    tail_context = "gates.continuum_crossing_tail"
+    tail = _mapping(gates["continuum_crossing_tail"], context=tail_context)
+    _require_exact_keys(
+        tail,
+        {
+            "enabled",
+            "k_min",
+            "top2_ratio_min",
+            "half_width_grid",
+            "calibrated_n_radial",
+        },
+        context=tail_context,
+    )
+    tail_enabled = _bool(tail, "enabled", context=tail_context)
+    tail_config = ContinuumCrossingTailConfig(
+        k_min=_float(tail, "k_min", context=tail_context),
+        top2_ratio_min=_float(tail, "top2_ratio_min", context=tail_context),
+        half_width_grid=_int(tail, "half_width_grid", context=tail_context),
+        calibrated_n_radial=_int(tail, "calibrated_n_radial", context=tail_context),
+    )
+
     run_kwargs = {
+        "continuum_crossing_tail_k_min": tail_config.k_min if tail_enabled else None,
+        "continuum_crossing_tail_top2_ratio_min": tail_config.top2_ratio_min,
+        "continuum_crossing_tail_half_width_grid": tail_config.half_width_grid,
+        "continuum_crossing_tail_calibrated_n_radial": tail_config.calibrated_n_radial,
         "fraction_tae_threshold": fraction_tae_threshold,
         "fraction_eae_threshold": fraction_eae_threshold,
         "signed_delta_eae_threshold": signed_delta_eae_threshold,

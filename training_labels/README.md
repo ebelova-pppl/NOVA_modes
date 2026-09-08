@@ -136,16 +136,26 @@ and must not be restored to the active training set.
 
 Canonical/default TAE-like good/bad training list for RF and CNN training. It
 is derived from `tae_like_v3.csv` by excluding all 249
-`nstxuG121123Q62` rows. It has 2,390 rows across 14 shots: 576 `good` and
-1,814 `bad`. NERSC and Flux path configs set both `NOVA_TRAIN_CSV` and
+`nstxuG121123Q62` rows, with the subsequent correction below. It has 2,390
+rows across 14 shots: 575 `good` and 1,815 `bad`. NERSC and Flux path configs set both `NOVA_TRAIN_CSV` and
 `NOVA_TRAIN_CSV_TAE` to this file. Its SHA-256 is
+`0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a`.
+
+On 2026-09-07 the user corrected `nstxu_204202/N9/egn09w.3737E+02` from
+`good,tae` to `bad,none` after the continuum-crossing-tail review. Paths,
+ordering, and split scalars are unchanged. The previous 576-GOOD/1,814-BAD
+list is recoverable from Git history. The compact versioned audit at
+`audits/continuum_crossing_tail/` preserves the historical comparison labels,
+input fingerprints, and exact correction in `training_label_correction.json`.
+The previous list's SHA-256 is
 `ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d`.
 
 The complete reviewed v3 snapshot is unchanged at 2,639 rows and retains the
 16 GOOD / 233 BAD Q62 labels. Do not restore those rows to the active list
 until the upper continuum-boundary calculation is corrected and the shot is
-rechecked. Existing RF and CNN checkpoints predate this suspension and are not
-Q62-free models.
+rechecked. The active RF and raw-CNN checkpoints were refit on the Q62-free
+list on 2026-08-28, before the N9/3737 label correction; they have not been
+retrained for that correction.
 
 The pre-promotion 2,903-row contents of this filename remain recoverable from
 Git history; they were replaced intentionally when the completed v3 audit was

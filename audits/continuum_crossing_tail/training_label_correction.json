@@ -1,0 +1,12 @@
+{
+  "mode_key": "nstxu_204202/N9/egn09w.3737E+02",
+  "input_fingerprint": "a5943ed015a38f0d03dbd83265253ce2e34d54d80e139ad26f06b6c26ffbc0fb",
+  "training_list": "training_labels/tae_like_train.csv",
+  "old_validity": "good",
+  "old_family": "tae",
+  "new_validity": "bad",
+  "new_family": "none",
+  "reason": "Explicit user correction after non-blind continuum-crossing-tail review.",
+  "old_list_sha256": "ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d",
+  "new_list_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a"
+}

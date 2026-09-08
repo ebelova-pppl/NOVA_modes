@@ -122,6 +122,8 @@ REQUIRED_OUTPUTS = {
     "shot_summary_by_n.csv",
     "frequency_cluster_report.txt",
     "frequency_clusters.csv",
+    "resolution_warnings.csv",
+    "resolution_warnings.txt",
 }
 
 CROSS_WINDOW_FEATURE_NAMES = {
@@ -493,9 +495,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(
-            RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v17"
-        )
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v18")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -511,7 +511,8 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             set(features["crossing_features"]),
             set(EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES)
-            | CROSS_WINDOW_FEATURE_NAMES,
+            | CROSS_WINDOW_FEATURE_NAMES
+            | {"continuum_crossing_tail"},
         )
         self.assertEqual(
             set(features["extremum_features"]),
@@ -3111,12 +3112,16 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(historical_v3),
             "fdaf5775a9908266ae0e539dcc5aa910ab8d16d4593cf4b2b87327a36c19ece3",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v4")
+        self.assertEqual(
+            sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
+            "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
+        )
+        self.assertEqual(configuration.name, "tae_rules_production_v5")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
+            "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3159,6 +3164,10 @@ class WorkflowOutputTests(unittest.TestCase):
                 "interior_harmonic_max_lag_grid": 5,
                 "interior_harmonic_incoherence_score_threshold": 0.1,
                 "interior_harmonic_calibrated_n_radial": 201,
+                "continuum_crossing_tail_k_min": 0.4,
+                "continuum_crossing_tail_top2_ratio_min": 0.035,
+                "continuum_crossing_tail_half_width_grid": 4,
+                "continuum_crossing_tail_calibrated_n_radial": 201,
             },
         )
 

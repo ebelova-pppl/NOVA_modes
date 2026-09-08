@@ -1,0 +1,31 @@
+{
+  "configuration": "tae_rules_production_v5",
+  "configuration_sha256": "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f",
+  "labels_sha256": "ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d",
+  "training_modes": 2390,
+  "training_crossings_verified": 6262,
+  "example_modes": 12,
+  "example_crossings_verified": 20,
+  "incremental_rejections_by_existing_label": {
+    "bad": 10,
+    "good": 1
+  },
+  "v5_matrix": {
+    "bad:BAD": 1788,
+    "good:REVIEW": 541,
+    "good:BAD": 35,
+    "bad:REVIEW": 25,
+    "bad:INVALID": 1
+  },
+  "unchanged_primary_reasons_verified": 2379,
+  "user_adjudicated_bad_among_good_label_conflicts": 1,
+  "labels_note": "Comparison CSV labels are the pre-correction baseline; see training_label_correction.json.",
+  "corrected_labels_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+  "v5_matrix_corrected_labels": {
+    "bad:BAD": 1789,
+    "good:REVIEW": 541,
+    "good:BAD": 34,
+    "bad:REVIEW": 25,
+    "bad:INVALID": 1
+  }
+}

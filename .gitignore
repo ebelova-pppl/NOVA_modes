@@ -49,3 +49,6 @@ outputs/v3_relabels_gate3_off_axis_all_peaks/
 outputs/v3_relabels_gate3_off_packet_steps3_allr/
 outputs/v3_relabels_gate3_off_packet_turns3_allr/
 outputs/v3_relabels_gate3_off_packet_turns3_rle05/
+
+# Local crossing-tail experiments; curated evidence lives under audits/.
+outputs/continuum_tail_*/

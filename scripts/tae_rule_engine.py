@@ -60,11 +60,16 @@ DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN = 0.005
 DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID = 5
 DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD = 0.10
 DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL = 201
+DEFAULT_CONTINUUM_CROSSING_TAIL_K_MIN = 0.4
+DEFAULT_CONTINUUM_CROSSING_TAIL_TOP2_RATIO_MIN = 0.035
+DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID = 4
+DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL = 201
 HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD = 3.0
 
 RULESET_VERSION = (
     "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-"
-    "grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-v17"
+    "grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-"
+    "continuum-crossing-tail-v18"
 )
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
@@ -75,12 +80,13 @@ BAD_CONT_CROSS_WINDOW = "BAD_CONT_CROSS_WINDOW"
 BAD_EDGE_SPIKE = "BAD_EDGE_SPIKE"
 BAD_INTERIOR_UNRESOLVED_ENVELOPE = "BAD_INTERIOR_UNRESOLVED_ENVELOPE"
 BAD_INTERIOR_HARMONIC_INCOHERENCE = "BAD_INTERIOR_HARMONIC_INCOHERENCE"
+BAD_CONTINUUM_CROSSING_TAIL = "BAD_CONTINUUM_CROSSING_TAIL"
 NO_GOOD_TEMPLATE = "NO_GOOD_TEMPLATE"
 RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v17"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v18"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -478,6 +484,171 @@ class InteriorHarmonicIncoherenceConfig:
         return self.score_threshold is not None
 
 
+@dataclass(frozen=True)
+class ContinuumCrossingTailConfig:
+    """Same-crossing signed roughness and strongest-two-harmonic tail ratio."""
+
+    k_min: float | None = DEFAULT_CONTINUUM_CROSSING_TAIL_K_MIN
+    top2_ratio_min: float = DEFAULT_CONTINUUM_CROSSING_TAIL_TOP2_RATIO_MIN
+    half_width_grid: int = DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID
+    calibrated_n_radial: int = DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL
+
+    def __post_init__(self) -> None:
+        for name in ("k_min", "top2_ratio_min"):
+            value = getattr(self, name)
+            if name == "k_min" and value is None:
+                continue
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or value < 0
+            ):
+                raise ValueError(
+                    f"continuum crossing tail {name} must be finite and nonnegative"
+                )
+        for name, minimum in (("half_width_grid", 0), ("calibrated_n_radial", 3)):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ValueError(
+                    f"continuum crossing tail {name} must be an integer >= {minimum}"
+                )
+
+    @property
+    def enabled(self) -> bool:
+        return self.k_min is not None
+
+
+def empty_continuum_crossing_tail_features(
+    config: ContinuumCrossingTailConfig | None = None,
+) -> dict[str, Any]:
+    resolved = config or ContinuumCrossingTailConfig()
+    return {
+        "k_min": resolved.k_min,
+        "top2_ratio_min": resolved.top2_ratio_min,
+        "half_width_grid": resolved.half_width_grid,
+        "calibrated_n_radial": resolved.calibrated_n_radial,
+        "n_radial": None,
+        "resolution_eligible": None,
+        "candidate_found": None,
+        "n_qualifying_crossings": 0,
+        "energy_peak_r": None,
+        "total_energy": None,
+        "top2_energy": None,
+        "top2_energy_share": None,
+        "top2_harmonic_indices": [],
+        "records": [],
+        "witness": None,
+    }
+
+
+def extract_continuum_crossing_tail_features(
+    mode: np.ndarray,
+    crossing_records: list[Mapping[str, Any]],
+    *,
+    config: ContinuumCrossingTailConfig | None = None,
+) -> dict[str, Any]:
+    """Measure cumulative tail energy and native-grid roughness at each crossing.
+
+    Energy is trapezoidal integral(sum_h A_h**2, dr), with global peak
+    amplitude normalized to one. The reference denominator is the full-domain
+    energy of the two strongest individual harmonics (no adjacency constraint).
+    The tail is the side opposite the global W peak. K uses unscaled signed
+    second differences at complete stencil centers within +/-4 native intervals;
+    its stencil can extend one interval beyond that window. Both strict cuts
+    must hold at one crossing. Other resolutions retain evidence and fail open.
+    """
+    resolved = config or ContinuumCrossingTailConfig()
+    A = np.asarray(mode, dtype=float)
+    if A.ndim != 2 or A.shape[0] < 1 or A.shape[1] < 2:
+        raise ValueError(
+            "mode must have shape (n_harmonics, n_radial) with n_radial >= 2"
+        )
+    if not np.isfinite(A).all():
+        raise ValueError("mode contains non-finite values")
+    peak = float(np.max(np.abs(A)))
+    A = A if peak == 0 else A / peak
+    r = np.linspace(0.0, 1.0, A.shape[1])
+    W = np.sum(A**2, axis=0)
+    total = float(np.trapezoid(W, r))
+    harmonic_energy = np.trapezoid(A**2, r, axis=1)
+    # Stable ties choose the lower stored index; adding zero rows has no effect.
+    top2_indices = np.argsort(-harmonic_energy, kind="stable")[:2]
+    top2 = float(np.sum(harmonic_energy[top2_indices]))
+    r_peak = float(r[np.argmax(W)]) if total > 0 else None
+    result = empty_continuum_crossing_tail_features(resolved)
+    result.update(
+        {
+            "n_radial": len(r),
+            "resolution_eligible": len(r) == resolved.calibrated_n_radial,
+            "candidate_found": False if resolved.enabled else None,
+            "energy_peak_r": r_peak,
+            "total_energy": total,
+            "top2_energy": top2,
+            "top2_energy_share": top2 / total if total > 0 else None,
+            "top2_harmonic_indices": (
+                [int(h) for h in top2_indices] if total > 0 else []
+            ),
+        }
+    )
+    d2 = A[:, 2:] - 2 * A[:, 1:-1] + A[:, :-2]
+    for crossing in sorted(
+        crossing_records, key=lambda row: (row["r_cross"], row["boundary"])
+    ):
+        rc = float(crossing["r_cross"])
+        boundary = crossing["boundary"]
+        if boundary not in {"low", "high"} or not math.isfinite(rc) or not 0 <= rc <= 1:
+            raise ValueError(
+                "continuum crossing tail requires a finite lower/upper crossing in [0, 1]"
+            )
+        centers = np.abs(r[1:-1] - rc) <= resolved.half_width_grid * (r[1] - r[0])
+        denominator = float(np.sum(A[:, 1:-1][:, centers] ** 2))
+        numerator = float(np.sum(d2[:, centers] ** 2))
+        k = math.sqrt(numerator / denominator) if denominator > 0 else None
+        inner, outer, fraction, ratio, side = None, None, None, None, None
+        if total > 0:
+            samples = np.r_[0.0, r[(r > 0) & (r < rc)], rc]
+            inner = float(np.trapezoid(np.interp(samples, r, W), samples)) / total
+            outer = 1.0 - inner
+            side = "inner" if rc < r_peak else "outer"
+            fraction = inner if side == "inner" else outer
+            ratio = fraction * total / top2
+        thresholds_pass = (
+            resolved.enabled
+            and k is not None
+            and ratio is not None
+            and k > resolved.k_min
+            and ratio > resolved.top2_ratio_min
+        )
+        result["records"].append(
+            {
+                "boundary": boundary,
+                "r_cross": rc,
+                "tail_side": side,
+                "energy_fraction_inner": inner,
+                "energy_fraction_outer": outer,
+                "tail_fraction": fraction,
+                "tail_energy": fraction * total if fraction is not None else None,
+                "tail_over_top2": ratio,
+                "K_cross": k,
+                "n_centers": int(np.count_nonzero(centers)),
+                "second_difference_energy": numerator,
+                "local_amplitude_energy": denominator,
+                "thresholds_pass": bool(thresholds_pass) if resolved.enabled else None,
+                "candidate_found": bool(
+                    thresholds_pass and result["resolution_eligible"]
+                ),
+            }
+        )
+    qualified = [row for row in result["records"] if row["candidate_found"]]
+    result["n_qualifying_crossings"] = len(qualified)
+    if qualified:
+        result["candidate_found"] = True
+        # Select from crossings satisfying BOTH cuts, never independent maxima.
+        result["witness"] = dict(max(qualified, key=lambda row: row["K_cross"]))
+    return result
+
+
 def empty_axis_artifact_features(
     r_ax: float = DEFAULT_AXIS_R_AX,
     amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
@@ -746,15 +917,12 @@ def empty_rule_features(
     edge_artifact_config: EdgeArtifactConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
-    near_axis_grid_oscillation_config: (
-        NearAxisGridOscillationConfig | None
-    ) = None,
-    interior_unresolved_envelope_config: (
-        InteriorUnresolvedEnvelopeConfig | None
-    ) = None,
+    near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
+    interior_unresolved_envelope_config: InteriorUnresolvedEnvelopeConfig | None = None,
     interior_harmonic_incoherence_config: (
         InteriorHarmonicIncoherenceConfig | None
     ) = None,
+    continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -809,6 +977,9 @@ def empty_rule_features(
         },
         "crossing_features": {
             **{name: None for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES},
+            "continuum_crossing_tail": empty_continuum_crossing_tail_features(
+                continuum_crossing_tail_config
+            ),
             **empty_continuum_crossing_window_features(
                 cross_window_config.half_width_grid
             ),
@@ -842,6 +1013,7 @@ def grouped_rule_features(
     continuum_crossing_window_features: Mapping[str, Any],
     interior_unresolved_envelope_features: Mapping[str, Any],
     interior_harmonic_incoherence_features: Mapping[str, Any],
+    continuum_crossing_tail_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -871,6 +1043,7 @@ def grouped_rule_features(
                 for name in EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES
             },
             **dict(continuum_crossing_window_features),
+            "continuum_crossing_tail": dict(continuum_crossing_tail_features),
         },
         "crossing_records": list(feature_status["crossing_records"]),
         "extremum_features": {
@@ -2309,18 +2482,15 @@ def evaluate_mode(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
-    near_axis_grid_oscillation_config: (
-        NearAxisGridOscillationConfig | None
-    ) = None,
+    near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
-    interior_unresolved_envelope_config: (
-        InteriorUnresolvedEnvelopeConfig | None
-    ) = None,
+    interior_unresolved_envelope_config: InteriorUnresolvedEnvelopeConfig | None = None,
     interior_harmonic_incoherence_config: (
         InteriorHarmonicIncoherenceConfig | None
     ) = None,
+    continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -2342,6 +2512,7 @@ def evaluate_mode(
         or InteriorHarmonicIncoherenceConfig()
     )
     path = str(preprocessed_row.get("path", ""))
+    tail_config = continuum_crossing_tail_config or ContinuumCrossingTailConfig()
     mode_key = str(preprocessed_row.get("mode_key", ""))
     shot = str(preprocessed_row.get("shot", ""))
     fingerprint = str(preprocessed_row.get("input_fingerprint", ""))
@@ -2378,6 +2549,7 @@ def evaluate_mode(
                 near_axis_oscillation_config,
                 interior_config,
                 incoherence_config,
+                tail_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -2485,6 +2657,9 @@ def evaluate_mode(
             cross_window_features,
             interior_envelope_features,
             interior_incoherence_features,
+            extract_continuum_crossing_tail_features(
+                mode, feature_status["crossing_records"], config=tail_config
+            ),
         )
     except Exception as exc:
         return RuleResult(
@@ -2507,6 +2682,7 @@ def evaluate_mode(
                 near_axis_oscillation_config,
                 interior_config,
                 incoherence_config,
+                tail_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -2706,6 +2882,24 @@ def evaluate_mode(
             decision="BAD",
             primary_reason=BAD_INTERIOR_HARMONIC_INCOHERENCE,
             triggered_rules=(BAD_INTERIOR_HARMONIC_INCOHERENCE,),
+            features=features,
+        )
+
+    if (
+        tail_config.enabled
+        and features["crossing_features"]["continuum_crossing_tail"]["candidate_found"]
+    ):
+        return RuleResult(
+            path=path,
+            mode_key=mode_key,
+            shot=shot,
+            ntor=ntor,
+            frequency=frequency,
+            input_fingerprint=fingerprint,
+            gap_region=gap_region,
+            decision="BAD",
+            primary_reason=BAD_CONTINUUM_CROSSING_TAIL,
+            triggered_rules=(BAD_CONTINUUM_CROSSING_TAIL,),
             features=features,
         )
 

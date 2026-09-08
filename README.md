@@ -64,7 +64,7 @@ Data format summary
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current canonical/default
   good/bad training list is `training_labels/tae_like_train.csv`. It contains
-  2,390 modes from 14 shots, with 576 GOOD and 1,814 BAD labels. Q62 is
+  2,390 modes from 14 shots, with 575 GOOD and 1,815 BAD labels. Q62 is
   suspended because a whole-shot visual audit indicates that its upper
   continuum boundary may be incorrect. The complete 2,639-row reviewed
   15-shot snapshot, including the preserved 249 Q62 labels, remains in
@@ -89,7 +89,7 @@ Model families
 
 Current best models
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
-  `models/nova_cnn_raw.pt`. The 2026-08-28 refresh used the current canonical
+  `models/nova_cnn_raw.pt`. The 2026-08-28 refresh used the then-current canonical
   `training_labels/tae_like_train.csv`: 2,390 rows from 14 shots, with 576
   GOOD and 1,814 BAD labels and Q62 excluded. Both saved checkpoints are
   full-list refits; the RF uses the production 22-feature schema and the raw
@@ -124,7 +124,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v4`
+  `--method rules` path loads the immutable `tae_rules_production_v5`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -143,7 +143,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v4` configuration automatically:
+`tae_rules_production_v5` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -304,11 +304,12 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v4.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v5.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
-grid-oscillation gate, 4, 5, the interior-envelope gate, and the final
-interior harmonic-incoherence gate are enabled; exact-point continuum gate 3
+grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
+harmonic-incoherence gate, and the final
+continuum crossing-tail gate are enabled; exact-point continuum gate 3
 is explicitly disabled. The sorter
 records the configuration name, schema, and SHA-256 in
 all shot and per-`n` summaries and rejects threshold/gate overrides when the
@@ -327,8 +328,8 @@ python scripts/sort_shot_rules.py \
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The shared engine implements nine ordered BAD decisions;
-production-v4 enables eight of them and disables exact-point continuum gate 3.
+routing conventions. The shared engine implements ten ordered BAD decisions;
+production-v5 enables nine of them and disables exact-point continuum gate 3.
 The decisions reject a calibrated narrow local maximum at `r <= 0.03`
 (`BAD_AXIS_SPIKE`), a large unresolved
 signed lobe (`BAD_GRID_SCALE_SPIKE`), a short packet containing repeated large
@@ -346,7 +347,7 @@ peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
 connected FWHM no greater than two grid intervals and peak at `r <= 0.5`, unless
 the peak is aligned with a gate-specific inner continuum extremum within
 `ext_dr <= 0.02` and `0 <= ext_df_gap <= 0.04`
-(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). Finally, a calibrated 201-point mode is
+(`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). Next, a calibrated 201-point mode is
 rejected as `BAD_INTERIOR_HARMONIC_INCOHERENCE` when
 `f_core * J_core * N_eff_core * (1 - C_adj) > 0.10`. This score combines the
 energy fraction at `r <= 0.5`, base-2 adjacent-radius harmonic-distribution
@@ -382,13 +383,34 @@ modes receive the engine verdict `REVIEW`, not `GOOD`, with primary reason
 the calibration CLI leaves them as REVIEW. Invalid inputs remain `INVALID`,
 and valid EAE-like modes are routed without a fabricated rule decision.
 
+The final `continuum_crossing_tail` gate returns
+`BAD_CONTINUUM_CROSSING_TAIL` when the **same** actual lower/upper crossing
+has strict `K_c > 0.4` and `T_2 > 0.035` on a 201-point radial grid.
+`T_2=E_tail/(E_h1+E_h2)` uses the two strongest individual harmonics by
+full-domain integrated squared amplitude; the tail numerator includes all
+harmonics on the side opposite the global energy peak. K is the unscaled
+signed second-difference norm divided by the local amplitude norm, over
+complete stencil centers within ±4 native intervals of that crossing.
+Other resolutions retain measurements but do not fire this gate. The gate
+runs last to preserve every earlier primary reason. Details and calibration
+controls are in `scripts/README.md`; older frozen presets remain unchanged.
+
+If an evaluated TAE-side mode has `nr != 201`, the interior harmonic-incoherence
+and continuum crossing-tail gates do not apply their rejection thresholds.
+Other enabled gates still run on the native mode grid. Both sorter entry
+points print a prominent stderr warning naming affected gates and counts,
+and write `resolution_warnings.txt` plus a per-mode/per-gate
+`resolution_warnings.csv`. Sorting continues: the production survivor policy
+can still mark affected survivors GOOD, which the warning states explicitly.
+This reports partial screening; it does not abort or resample mode profiles.
+
 Each valid TAE-side result includes a grouped, deterministic `rule_features`
 object containing the active RF 22-feature calculations, six crossing
 summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v17`; the near-axis group records the independent
+`tae-rule-features-grouped-v18`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The

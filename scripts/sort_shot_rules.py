@@ -69,12 +69,17 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX,
     DEFAULT_INTERIOR_HARMONIC_INCOHERENCE_SCORE_THRESHOLD,
     DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID,
+    DEFAULT_CONTINUUM_CROSSING_TAIL_K_MIN,
+    DEFAULT_CONTINUUM_CROSSING_TAIL_TOP2_RATIO_MIN,
+    DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID,
+    DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL,
     DEFAULT_W_CROSS_THRESHOLD,
     NO_GOOD_TEMPLATE,
     RULESET_VERSION,
     AxisArtifactConfig,
     ContinuumCrossingConfig,
     ContinuumCrossingWindowConfig,
+    ContinuumCrossingTailConfig,
     EdgeArtifactConfig,
     GridScalePacketConfig,
     GridScaleSpikeConfig,
@@ -218,6 +223,13 @@ SHOT_SUMMARY_FIELDS = [
     "interior_harmonic_max_lag_grid",
     "interior_harmonic_incoherence_score_threshold",
     "interior_harmonic_calibrated_n_radial",
+    "continuum_crossing_tail_gate_enabled",
+    "continuum_crossing_tail_k_min",
+    "continuum_crossing_tail_top2_ratio_min",
+    "continuum_crossing_tail_half_width_grid",
+    "continuum_crossing_tail_calibrated_n_radial",
+    "n_continuum_crossing_tail_resolution_eligible",
+    "n_continuum_crossing_tail_resolution_ineligible",
 ]
 
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[field for field in SHOT_SUMMARY_FIELDS if field != "shot"]]
@@ -271,6 +283,11 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--interior_harmonic_incoherence_score_threshold",
         "--interior_harmonic_calibrated_n_radial",
         "--disable_interior_harmonic_incoherence",
+        "--continuum_crossing_tail_k_min",
+        "--continuum_crossing_tail_top2_ratio_min",
+        "--continuum_crossing_tail_half_width_grid",
+        "--continuum_crossing_tail_calibrated_n_radial",
+        "--disable_continuum_crossing_tail",
     }
 )
 
@@ -882,18 +899,15 @@ def build_summary(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
-    near_axis_grid_oscillation_config: (
-        NearAxisGridOscillationConfig | None
-    ) = None,
+    near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
-    interior_unresolved_envelope_config: (
-        InteriorUnresolvedEnvelopeConfig | None
-    ) = None,
+    interior_unresolved_envelope_config: InteriorUnresolvedEnvelopeConfig | None = None,
     interior_harmonic_incoherence_config: (
         InteriorHarmonicIncoherenceConfig | None
     ) = None,
+    continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -918,9 +932,9 @@ def build_summary(
         interior_harmonic_incoherence_config
         or InteriorHarmonicIncoherenceConfig()
     )
+    tail_config = continuum_crossing_tail_config or ContinuumCrossingTailConfig()
     rule_rows = [row for row in rows if row.get("rule_version") == RULESET_VERSION]
-    resolution_eligible_count = 0
-    resolution_ineligible_count = 0
+    resolution_counts = Counter()
     for row in rule_rows:
         raw_features = row.get("rule_features")
         try:
@@ -929,15 +943,24 @@ def build_summary(
                 if isinstance(raw_features, Mapping)
                 else json.loads(str(raw_features))
             )
-            eligible = parsed_features["numerical_structure_features"][
-                "interior_harmonic_incoherence"
-            ]["resolution_eligible"]
-        except (KeyError, TypeError, ValueError):
+        except (TypeError, ValueError):
             continue
-        if eligible is True:
-            resolution_eligible_count += 1
-        elif eligible is False:
-            resolution_ineligible_count += 1
+        for name, group, feature in (
+            (
+                "interior_harmonic",
+                "numerical_structure_features",
+                "interior_harmonic_incoherence",
+            ),
+            ("continuum_crossing_tail", "crossing_features", "continuum_crossing_tail"),
+        ):
+            try:
+                eligible = parsed_features[group][feature]["resolution_eligible"]
+            except (KeyError, TypeError):
+                continue
+            if eligible is True:
+                resolution_counts[f"{name}_eligible"] += 1
+            elif eligible is False:
+                resolution_counts[f"{name}_ineligible"] += 1
     transitions = Counter(
         f"{row['rule_decision']}->{row['final_decision']}"
         for row in rows
@@ -955,10 +978,10 @@ def build_summary(
         "n_eae_like": sum(row.get("gap_region") == "eae_like" for row in rows),
         "n_rule_evaluated": len(rule_rows),
         "n_interior_harmonic_resolution_eligible": (
-            resolution_eligible_count
+            resolution_counts["interior_harmonic_eligible"]
         ),
         "n_interior_harmonic_resolution_ineligible": (
-            resolution_ineligible_count
+            resolution_counts["interior_harmonic_ineligible"]
         ),
         "n_preliminary_bad": sum(row.get("rule_decision") == "BAD" for row in rule_rows),
         "n_preliminary_review": sum(
@@ -1069,6 +1092,17 @@ def build_summary(
         "interior_harmonic_calibrated_n_radial": (
             incoherence_config.calibrated_n_radial
         ),
+        "continuum_crossing_tail_gate_enabled": tail_config.enabled,
+        "continuum_crossing_tail_k_min": tail_config.k_min,
+        "continuum_crossing_tail_top2_ratio_min": tail_config.top2_ratio_min,
+        "continuum_crossing_tail_half_width_grid": tail_config.half_width_grid,
+        "continuum_crossing_tail_calibrated_n_radial": tail_config.calibrated_n_radial,
+        "n_continuum_crossing_tail_resolution_eligible": resolution_counts[
+            "continuum_crossing_tail_eligible"
+        ],
+        "n_continuum_crossing_tail_resolution_ineligible": resolution_counts[
+            "continuum_crossing_tail_ineligible"
+        ],
     }
     return summary
 
@@ -1087,18 +1121,15 @@ def _summary_by_n(
     axis_artifact_config: AxisArtifactConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
-    near_axis_grid_oscillation_config: (
-        NearAxisGridOscillationConfig | None
-    ) = None,
+    near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
     continuum_crossing_config: ContinuumCrossingConfig | None = None,
     continuum_crossing_window_config: ContinuumCrossingWindowConfig | None = None,
     edge_artifact_config: EdgeArtifactConfig | None = None,
-    interior_unresolved_envelope_config: (
-        InteriorUnresolvedEnvelopeConfig | None
-    ) = None,
+    interior_unresolved_envelope_config: InteriorUnresolvedEnvelopeConfig | None = None,
     interior_harmonic_incoherence_config: (
         InteriorHarmonicIncoherenceConfig | None
     ) = None,
+    continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -1156,12 +1187,9 @@ def _summary_by_n(
             continuum_crossing_config=continuum_crossing_config,
             continuum_crossing_window_config=continuum_crossing_window_config,
             edge_artifact_config=edge_artifact_config,
-            interior_unresolved_envelope_config=(
-                interior_unresolved_envelope_config
-            ),
-            interior_harmonic_incoherence_config=(
-                interior_harmonic_incoherence_config
-            ),
+            interior_unresolved_envelope_config=(interior_unresolved_envelope_config),
+            interior_harmonic_incoherence_config=(interior_harmonic_incoherence_config),
+            continuum_crossing_tail_config=continuum_crossing_tail_config,
             rule_survivor_policy=rule_survivor_policy,
             rule_configuration_name=rule_configuration_name,
             rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1169,6 +1197,77 @@ def _summary_by_n(
         )
         summaries.append({"shot": shot, "n": ntor, **summary})
     return summaries
+
+
+RESOLUTION_WARNING_FIELDS = [
+    "mode_key", "path", "input_fingerprint", "nr", "gate", "required_nr",
+    "rule_decision", "final_decision",
+]
+
+
+def resolution_warning_records(
+    rows: Sequence[Mapping[str, Any]], summary: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """List enabled gates whose native-grid calibration excludes a mode.
+
+    Use the extractor's eligibility, including modes already rejected by an
+    earlier gate. Disabled gates are intentional and do not warn. This shared
+    report is used by both the production and conservative workflows.
+    """
+    warnings = []
+    for row in sorted(rows, key=rule_row_sort_key):
+        if row.get("processing_status") != "RULE_EVALUATED":
+            continue
+        raw = row.get("rule_features")
+        features = raw if isinstance(raw, Mapping) else json.loads(str(raw))
+        for gate, group in (
+            ("interior_harmonic_incoherence", "numerical_structure_features"),
+            ("continuum_crossing_tail", "crossing_features"),
+        ):
+            evidence = features.get(group, {}).get(gate, {})
+            if (
+                summary.get(f"{gate}_gate_enabled")
+                and evidence.get("resolution_eligible") is False
+            ):
+                warnings.append({
+                    **{field: row.get(field, "") for field in
+                       ("mode_key", "path", "input_fingerprint", "nr", "rule_decision", "final_decision")},
+                    "gate": gate, "required_nr": evidence["calibrated_n_radial"],
+                })
+    return warnings
+
+
+def resolution_warning_text(
+    records: Sequence[Mapping[str, Any]], summary: Mapping[str, Any],
+) -> str:
+    """Explain partial rule coverage without changing classification policy."""
+    if not records:
+        return "No enabled rejection gates were skipped for radial resolution in evaluated TAE-side modes.\n"
+    keys = {row["mode_key"] for row in records}
+    lines = [
+        f"WARNING [{summary['shot']}]: {len(keys)} TAE-side mode(s) were not fully screened "
+        "because of unsupported radial resolution."
+    ]
+    grouped = defaultdict(list)
+    for row in records:
+        grouped[(row["gate"], row["required_nr"])].append(row)
+    for (gate, required), rows in sorted(grouped.items()):
+        counts = Counter(str(row["nr"]) for row in rows)
+        observed = ", ".join(f"nr={nr}: {count}" for nr, count in sorted(counts.items()))
+        lines.append(
+            f"  {gate}: NOT APPLIED to {len(rows)} mode(s); requires nr={required}; {observed}."
+        )
+    lines.append("Other enabled gates still run; sorting continues without resampling mode profiles.")
+    if summary["rule_survivor_policy"] == RULE_SURVIVOR_POLICY_ACCEPT:
+        good = {row["mode_key"] for row in records if row["final_decision"] == "GOOD"}
+        lines.append(
+            f"The production survivor policy can still assign GOOD despite these skipped gates; "
+            f"{len(good)} affected mode(s) are final GOOD before duplicate removal."
+        )
+    else:
+        lines.append("The conservative workflow keeps automatic gate survivors REVIEW.")
+    lines.append("Affected modes and decisions are listed in resolution_warnings.csv.")
+    return "\n".join(lines) + "\n"
 
 
 def write_outputs(
@@ -1218,6 +1317,14 @@ def write_outputs(
         out_dir / "shot_summary_by_n.csv", SUMMARY_BY_N_FIELDS, summary_by_n
     )
     write_cluster_outputs(out_dir, duplicate_result, rel_freq_tol)
+
+    resolution_records = resolution_warning_records(final_sorted, summary)
+    warning_text = resolution_warning_text(resolution_records, summary)
+    # Always replace these reports so a later supported-grid run clears stale warnings.
+    write_dict_csv(out_dir / "resolution_warnings.csv", RESOLUTION_WARNING_FIELDS, resolution_records)
+    write_text(out_dir / "resolution_warnings.txt", warning_text)
+    if resolution_records:
+        print(warning_text, file=sys.stderr, end="")
 
     override_output = out_dir / "manual_overrides.csv"
     if override_source is None:
@@ -1311,6 +1418,10 @@ def run_shot(
     interior_harmonic_calibrated_n_radial: int = (
         DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL
     ),
+    continuum_crossing_tail_k_min: float | None = DEFAULT_CONTINUUM_CROSSING_TAIL_K_MIN,
+    continuum_crossing_tail_top2_ratio_min: float = DEFAULT_CONTINUUM_CROSSING_TAIL_TOP2_RATIO_MIN,
+    continuum_crossing_tail_half_width_grid: int = DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID,
+    continuum_crossing_tail_calibrated_n_radial: int = DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL,
     rule_survivor_policy: str = RULE_SURVIVOR_POLICY_REVIEW,
     rule_configuration_name: str = "",
     rule_configuration_schema_version: str = "",
@@ -1378,6 +1489,12 @@ def run_shot(
         score_threshold=interior_harmonic_incoherence_score_threshold,
         calibrated_n_radial=interior_harmonic_calibrated_n_radial,
     )
+    tail_config = ContinuumCrossingTailConfig(
+        k_min=continuum_crossing_tail_k_min,
+        top2_ratio_min=continuum_crossing_tail_top2_ratio_min,
+        half_width_grid=continuum_crossing_tail_half_width_grid,
+        calibrated_n_radial=continuum_crossing_tail_calibrated_n_radial,
+    )
     output_dir = Path(out_dir).expanduser()
     existing_override_output = output_dir / "manual_overrides.csv"
     if manual_overrides is None and existing_override_output.exists():
@@ -1421,6 +1538,7 @@ def run_shot(
             edge_artifact_config=edge_config,
             interior_unresolved_envelope_config=interior_config,
             interior_harmonic_incoherence_config=incoherence_config,
+            continuum_crossing_tail_config=tail_config,
         )
         rule_by_key[key] = result.as_output_row(row)
 
@@ -1469,6 +1587,7 @@ def run_shot(
         edge_artifact_config=edge_config,
         interior_unresolved_envelope_config=interior_config,
         interior_harmonic_incoherence_config=incoherence_config,
+        continuum_crossing_tail_config=tail_config,
         rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1493,6 +1612,7 @@ def run_shot(
         edge_artifact_config=edge_config,
         interior_unresolved_envelope_config=interior_config,
         interior_harmonic_incoherence_config=incoherence_config,
+        continuum_crossing_tail_config=tail_config,
         rule_survivor_policy=rule_survivor_policy,
         rule_configuration_name=rule_configuration_name,
         rule_configuration_schema_version=rule_configuration_schema_version,
@@ -1999,6 +2119,35 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
             "the BAD_INTERIOR_HARMONIC_INCOHERENCE decision gate"
         ),
     )
+    parser.add_argument(
+        "--continuum_crossing_tail_k_min",
+        type=float,
+        default=DEFAULT_CONTINUUM_CROSSING_TAIL_K_MIN,
+        help="Strict minimum native-grid K at the same crossing as the tail ratio (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--continuum_crossing_tail_top2_ratio_min",
+        type=float,
+        default=DEFAULT_CONTINUUM_CROSSING_TAIL_TOP2_RATIO_MIN,
+        help="Strict minimum E_tail / energy of the two strongest harmonics (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--continuum_crossing_tail_half_width_grid",
+        type=int,
+        default=DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID,
+        help="Inclusive K window half-width in native radial intervals (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--continuum_crossing_tail_calibrated_n_radial",
+        type=int,
+        default=DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL,
+        help="Calibrated radial sample count; other resolutions retain evidence without tail rejection (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--disable_continuum_crossing_tail",
+        action="store_true",
+        help="Retain crossing-tail evidence without applying BAD_CONTINUUM_CROSSING_TAIL",
+    )
     args = parser.parse_args(raw_args)
     args.rule_configuration_name = ""
     args.rule_configuration_schema_version = ""
@@ -2130,6 +2279,14 @@ def main() -> None:
         interior_harmonic_calibrated_n_radial=(
             args.interior_harmonic_calibrated_n_radial
         ),
+        continuum_crossing_tail_k_min=(
+            None
+            if args.disable_continuum_crossing_tail
+            else args.continuum_crossing_tail_k_min
+        ),
+        continuum_crossing_tail_top2_ratio_min=args.continuum_crossing_tail_top2_ratio_min,
+        continuum_crossing_tail_half_width_grid=args.continuum_crossing_tail_half_width_grid,
+        continuum_crossing_tail_calibrated_n_radial=args.continuum_crossing_tail_calibrated_n_radial,
         rule_configuration_name=args.rule_configuration_name,
         rule_configuration_schema_version=(
             args.rule_configuration_schema_version
@@ -2243,6 +2400,16 @@ def main() -> None:
         "Interior harmonic-incoherence resolution eligibility: "
         f"eligible={summary['n_interior_harmonic_resolution_eligible']} "
         f"ineligible={summary['n_interior_harmonic_resolution_ineligible']}"
+    )
+    print(
+        "Continuum crossing-tail gate: "
+        f"enabled={summary['continuum_crossing_tail_gate_enabled']} "
+        f"K>{summary['continuum_crossing_tail_k_min']} "
+        f"T2>{summary['continuum_crossing_tail_top2_ratio_min']} "
+        f"half_width_grid={summary['continuum_crossing_tail_half_width_grid']} "
+        f"calibrated_n_radial={summary['continuum_crossing_tail_calibrated_n_radial']} "
+        f"eligible={summary['n_continuum_crossing_tail_resolution_eligible']} "
+        f"ineligible={summary['n_continuum_crossing_tail_resolution_ineligible']}"
     )
     print(f"Duplicate processing: {summary['duplicate_processing_status']}")
     if args.manual_overrides:

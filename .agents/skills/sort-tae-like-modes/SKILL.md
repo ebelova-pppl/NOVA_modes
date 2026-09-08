@@ -22,11 +22,11 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v4.yaml`. It pins the v17
+The preset is `configs/rules/tae_rules_production_v5.yaml`. It pins the v18
 ruleset and routing values, enables gates 1, 2, 2b, the near-axis
-grid-oscillation gate, 4, 5, the interior-envelope gate, and the final interior
-harmonic-incoherence gate, and explicitly disables exact-point continuum gate
-3.
+grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
+gates, and the final continuum crossing-tail gate. It explicitly disables
+exact-point continuum gate 3.
 Do not combine a named configuration
 with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and
@@ -69,14 +69,15 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. Nine ordered BAD decisions detect narrow near-axis
+TAE/EAE/mixed split. Ten ordered BAD decisions detect narrow near-axis
 spikes, unresolved signed-harmonic spikes and short large-turn packets whose
 strongest window sample is at `r <= 0.5`, relatively large consecutive
 sign-flip oscillations at strict `r < 0.1`, continuum crossings carrying
 appreciable exact-point or nearby amplitude and normalized radial energy, a
 narrow globally dominant energy envelope at the outer radial boundary, and a
 few-grid-interval interior total-energy envelope without a qualifying nearby
-continuum extremum, and incoherent harmonic activity in the calibrated core.
+continuum extremum, incoherent harmonic activity in the calibrated core, and
+rough continuum-crossing tails carrying appreciable reference-harmonic energy.
 Their calibrated defaults are `r_ax=0.03` inclusive,
 `axis_amplitude_min=0.2`, `axis_width_max_grid=10`,
 `grid_scale_amplitude_min=0.3`, `grid_scale_width_max_grid=1`,
@@ -93,13 +94,13 @@ begin with
 `w_cross_threshold=0.03`, crossing-window defaults
 `cross_window_half_width_grid=2`, `cross_window_amplitude_min=0.25`, and
 `cross_window_w_min=0.05`, with provisional edge defaults
-`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; the final interior
+`r_edge_min=0.97` inclusive and `edge_width_max_grid=10`; the interior-envelope
 defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `0<=ext_df_gap<=0.04`; the engine returns
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v17 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v18 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -109,7 +110,7 @@ the axis measurements under
 audit measurements under `boundary_features.edge_artifact`, the unresolved
 signed-lobe measurements under `numerical_structure_features.grid_scale_spike`,
 and short-window repeated-turn evidence under
-`numerical_structure_features.grid_scale_packet`; store the penultimate
+`numerical_structure_features.grid_scale_packet`; store the interior
 total-energy-width gate and its separate extended extremum match under
 `resolution_features.interior_unresolved_envelope`; store the near-axis
 mode-level amplitude and strongest strict single-harmonic sign-flip run under
@@ -336,7 +337,7 @@ retain both envelope and harmonic audit measurements without applying the
 decision. The edge threshold is inclusive. Shot and per-`n` summaries record
 the enable state and exact threshold for every BAD decision.
 
-The penultimate gate reuses the same global total-energy evidence; it never
+The interior-envelope gate reuses the same global total-energy evidence; it never
 measures the width of one harmonic. Its calibrated decision is:
 
 ```text
@@ -370,7 +371,7 @@ settings with `--interior_envelope_peak_r_max`,
 `--disable_interior_unresolved_envelope` to retain evidence without applying
 the decision.
 
-The final gate measures interior harmonic incoherence on the stored array
+The interior harmonic-incoherence gate measures the stored array
 without inferring physical poloidal-mode numbers. For `r_i <= 0.5`, define
 `W_i=sum_h A_hi^2` and `p_hi=A_hi^2/W_i`. Record:
 
@@ -420,6 +421,48 @@ without final rule results are needed. For deterministic production, run
 `sort_shot_mixed.py --method rules` with the RF checkpoint used only for
 post-decision deduplication; never select `--method rf-cnn` or use an RF or CNN
 prediction to make a rule decision.
+
+## Continuum crossing-tail rejection
+
+The final gate is `continuum_crossing_tail`, with reason
+`BAD_CONTINUUM_CROSSING_TAIL`. Preserve every earlier primary reason.
+At each actual lower/upper crossing, use the side opposite the global W peak
+as the tail (inner if r_cross < r_peak, outer otherwise). Retain all harmonics
+in the tail numerator. Define `E_h=integral A_h(r)^2 dr` and select the two
+individual harmonics with largest full-domain energies; no adjacency
+constraint or physical-m offset is assumed. Use
+`T_2=E_tail/(E_h1+E_h2)`, which may exceed one and is not a total-energy
+fraction. Integrate piecewise-linear W with the crossing as an endpoint.
+Never add overlapping cumulative tails from different crossings.
+
+K is the norm of the unscaled signed second differences divided by the local
+amplitude norm, summing all harmonics and complete stencil centers within
+`abs(r_i-r_cross) <= 4*delta_r`. Do not smooth or divide by delta_r squared.
+Reject only when **the same crossing** has strict `K > 0.4 AND T_2 > 0.035`
+and `n_radial == 201`; equality passes. Undefined denominators or other
+resolutions cannot reject. Preserve the measurements and resolution status
+even when disabled or ineligible. Record the energy denominator, stored
+harmonic indices, every crossing's metrics, and a witness chosen from
+crossings satisfying both cuts under
+`crossing_features.continuum_crossing_tail`.
+
+Calibration options are `--continuum_crossing_tail_k_min`,
+`--continuum_crossing_tail_top2_ratio_min`,
+`--continuum_crossing_tail_half_width_grid`, and
+`--continuum_crossing_tail_calibrated_n_radial`; use
+`--disable_continuum_crossing_tail` to retain evidence without the decision.
+Confirm enable state, thresholds, and eligible/ineligible counts in shot and
+per-n summaries. Production-v5 freezes these settings; v4 remains unchanged
+and requires the corresponding historical checkout.
+
+For evaluated modes excluded by either enabled resolution-dependent gate,
+both sorter entry points print a stderr warning and save
+`resolution_warnings.txt` plus per-mode/per-gate `resolution_warnings.csv`.
+Inspect these before treating output as fully screened. Sorting continues;
+other enabled gates run on the native grid, and production survivors can
+still become GOOD. The warning states that policy and counts affected GOOD
+modes. Intentionally disabled gates do not warn; every run replaces both
+reports to clear stale warnings. No resampling or automatic abort is implied.
 
 ## Add explicit adjudication
 
