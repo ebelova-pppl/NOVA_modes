@@ -3,6 +3,31 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-08 experimental monotonic edge-rise repair
+
+- Tested the user's proposed sustained-rise/onset approach in an isolated
+  prototype under `audits/continuum_monotonic_tail_20260908/`. It confirms a
+  strictly increasing paired tail using a fixed preceding slope reference,
+  then traces back to its first fast step. Trial settings are slope >100
+  in normalized-radius frequency units, five times preceding typical slope,
+  four reference samples, and onset within 0.08 of the final paired point.
+  Compared holding the preceding sample with the preceding four-point mean.
+  The former preserves continuity at the join and is the preferred trial.
+- Onset is r=0.960 for A01t016 N4/3743 and N5/4796 with either fill; both
+  then pass all BAD gates. It also detects the previously missed A01t016 N2
+  and E204645 N7 cases. Examined 135 training and 270 checked-shot continuum
+  files. Last-value/mean treatments change 12/11 training and 48/46 shot
+  profiles; affected training files were already repaired by the old loader.
+- Recomputed both treatments for all 241 training modes in affected
+  directories (77 GOOD, 164 BAD). No GOOD routing or rule decision changes;
+  other training profiles are unchanged. One BAD mode, 135388 N4/1922, routes
+  to EAE-like with either fill. Saved compact profile/mode tables and source
+  hashes; full diagnostics and comparison plot stay locally ignored under
+  `outputs/continuum_tail_monotonic_20260908/`.
+- This is not an adopted shared-loader change. Broad 27-shot results are
+  profile-level only; inspect affected mode decisions across that batch
+  before promoting the detector or changing preprocessing/model inputs.
+
 ## 2026-09-08 adopted production-v6 EAE routing below 20% TAE-side energy
 
 - Follow-up: E205040A01t016 N4/3743 and N5/4796 are both rejected by

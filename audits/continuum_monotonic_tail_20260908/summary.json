@@ -1,0 +1,51 @@
+{
+  "status": "experimental_not_adopted",
+  "baseline_commit": "bec1c7b",
+  "parameters": {
+    "slope_floor": 100.0,
+    "reference_slope_ratio": 5.0,
+    "reference_samples": 4,
+    "min_paired_rising_steps": 2,
+    "max_onset_distance_from_last_paired_point": 0.08
+  },
+  "profiles_scanned": {
+    "training": 135,
+    "shots": 270
+  },
+  "changed_profiles": {
+    "last": {
+      "training": 12,
+      "shots": 48
+    },
+    "mean": {
+      "training": 11,
+      "shots": 46
+    }
+  },
+  "training_modes_recomputed": 241,
+  "affected_training_labels": {
+    "good": 77,
+    "bad": 164
+  },
+  "training_good_decision_or_route_changes": 0,
+  "training_decision_or_route_changes_each_fill": 1,
+  "main_shot_mode_level_audit": "only the two user-questioned modes; broad 27-shot comparison is profile-level",
+  "synthetic_controls_passed": [
+    "gentle edge",
+    "paired sustained rise",
+    "continuous last-value join",
+    "preserved interior",
+    "single-boundary rise excluded",
+    "terminal reversal excluded"
+  ],
+  "source_sha256": {
+    "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+    "src/cont_features.py": "7c00a0bec165a6798d91895b932a09be74a686fc478608108499c0f566736eb8",
+    "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+    "scripts/tae_rule_engine.py": "8167248792fad87502cc3a6644afb5b27fc7d46515c070ffebe339e00a744fd2",
+    "configs/rules/tae_rules_production_v6.yaml": "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398",
+    "audits/regression15_v5/shot_summary.csv": "d201557f56bbb59575363a45575c2d9a740e91e12ca3d088e52fef9811e7925a",
+    "audits/pilot12_v5_20260908/shot_summary.csv": "ccda7ee540f24faeeab370f383901ae37e379aeac95f5daf8438fb5c5d127799",
+    "audits/continuum_monotonic_tail_20260908/candidate.py": "27e16f77c0857eb690fb28de265411bfff5d658a00c1f5269e96c33d0d4b8b4a"
+  }
+}
