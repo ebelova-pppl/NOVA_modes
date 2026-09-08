@@ -5,6 +5,18 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 
 ## 2026-09-08 adopted production-v6 EAE routing below 20% TAE-side energy
 
+- Follow-up: E205040A01t016 N4/3743 and N5/4796 are both rejected by
+  `BAD_CONT_CROSS_WINDOW` at the suspected lower-continuum edge artifact.
+  The shared repair starts at r=0.965 but leaves the raised r=0.960 sample,
+  giving two lower crossings per mode. Their ±0.01 windows reach r=0.950
+  and exceed both amplitude and energy cuts. Masking or holding only the
+  lower boundary from r=0.96 removes those crossings and leaves both modes
+  passing all BAD gates (automatic production GOOD). Baseline reevaluation
+  exactly matches saved v6 features and input hashes. Evidence and diagnostic
+  method are in `audits/pilot12_v5_20260908/edge_crossing_rejections.csv` and
+  its README. No shared cleanup, labels, or production output was changed;
+  this identifies a repair-boundary problem to resolve before broader runs.
+
 - The user approved the audited condition. Production now defaults to
   `configs/rules/tae_rules_production_v6.yaml`, schema v6 and unchanged
   ruleset/grouped-feature schema v18. Its SHA-256 is

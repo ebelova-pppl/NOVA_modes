@@ -98,6 +98,27 @@ to the edge rise; for N10, removing that rise alone does not resolve the
 distance-weighted signed_delta criterion's sensitivity to a weak outer tail.
 No datcon file, production routing rule, model, or sorter output was changed.
 
+### Lower-edge crossing rejections (2026-09-08)
+
+`edge_crossing_rejections.csv` checks E205040A01t016 N4/3743 and N5/4796.
+Both are rejected by `BAD_CONT_CROSS_WINDOW` at lower-boundary crossings
+near r=0.9593/0.9583. The shared paired repair begins at r=0.965, leaving
+the preceding raised point at r=0.960. Falling from that point to the repaired
+tail creates an additional lower crossing near r=0.9608/0.9619. The ±0.01
+crossing windows reach r=0.950, where amplitude/peak-normalized energy are
+0.4553/0.2665 and 0.2585/0.1106; both exceed the gate's 0.25/0.05 cuts.
+
+The diagnostic alternatives modify only the in-memory lower boundary at
+r>=0.96, either masking finite samples or holding them at the squared mean
+frequency of the previous four finite samples. Upper boundaries and modes
+are unchanged. Current-data reevaluation exactly reproduces all saved v6
+rule features, and mode-plus-datcon fingerprints match before and after.
+Both alternatives remove the two lower crossings and produce REVIEW with
+`NO_GOOD_TEMPLATE` (automatic GOOD under production survivor policy).
+Remaining upper-boundary crossings do not reject. These are sensitivity
+results, not adopted repairs or independent GOOD morphology adjudications;
+production outputs and source data remain unchanged.
+
 The runner checks exact discovery coverage, native nr, routing categories and
 scalars, frozen configuration identity, absence of invalid inputs and
 resolution exclusions, and successful RF ranking. Mode-plus-continuum hashes
