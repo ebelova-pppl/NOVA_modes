@@ -41,7 +41,7 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
-from cont_features import load_datcon_for_mode  # noqa: E402
+from cont_features import CONTINUUM_PREPROCESSING_VERSION, load_datcon_for_mode  # noqa: E402
 from mode_features import radial_centroid, radial_width  # noqa: E402
 from mode_csv import read_mode_csv_entries  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
@@ -129,6 +129,7 @@ ALL_OUTPUT_FIELDS = [
 SHOT_SUMMARY_FIELDS = [
     "shot",
     "method",
+    "continuum_preprocessing_version",
     "n_total_files",
     "n_failed_load",
     "n_nan_or_invalid",
@@ -886,6 +887,7 @@ def build_summary_row(
     summary = {
         "shot": shot,
         "method": RF_CNN_METHOD,
+        "continuum_preprocessing_version": CONTINUUM_PREPROCESSING_VERSION,
         "n_total_files": len(rows),
         "n_failed_load": sum(row.get("rejection_reason") == "mode_load_failed" for row in rows),
         "n_nan_or_invalid": sum(row.get("rejection_reason") in INVALID_REASON_NAMES for row in rows),

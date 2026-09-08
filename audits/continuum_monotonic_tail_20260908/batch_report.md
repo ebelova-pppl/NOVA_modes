@@ -1,8 +1,15 @@
 # 27-shot mode-level comparison
 
+**Adoption follow-up (2026-09-08):** the user accepted all 41 recovered modes.
+The shared loader now uses the reviewed `last` treatment, with version
+`datcon-monotonic-tail-v1`. The initial comparison below is historical;
+its source hashes and original tables remain unchanged. See `user_review.csv`
+and `docs/project_state.md` for integration and regenerated-output evidence.
+
 This extends the earlier profile and training audit using the unchanged
-experimental `candidate.py`. Production preprocessing, viewer data, external
-sort outputs, training labels, and model checkpoints are unchanged.
+experimental `candidate.py`. At that stage, production preprocessing, viewer
+data, external sort outputs, training labels, and model checkpoints were
+unchanged.
 
 ## Method
 
@@ -28,8 +35,10 @@ automatic production GOOD before duplicate removal. This audit does not run
 RF ranking or CNN inference, regenerate production lists, or independently
 adjudicate physical GOOD/BAD labels.
 
-Reproduce from the repository root, using the project's scientific Python
-environment (paths below are placeholders):
+Reproduce the historical comparison from checkout `64fc889`, using the
+project's scientific Python environment and the original v5 output tables
+(paths below are placeholders). Current exports use the adopted repair and
+are not a baseline for rerunning this old comparison:
 
 ```tcsh
 python audits/continuum_monotonic_tail_20260908/audit_batch.py \
@@ -87,9 +96,9 @@ python viz/view_modes_csv.py \
   --base_dir /path/to/DiTw
 ```
 
-The viewer still displays the production loader's old cleanup; the isolated
-candidate is illustrated in the saved diagnostic figure. Review morphology
-with that distinction in mind. The earlier training audit retained all 575
+During the comparison, the viewer displayed the old cleanup and the isolated
+candidate was illustrated in the saved diagnostic figure. New viewer
+sessions now use the adopted repair. The earlier training audit retained all 575
 labeled GOOD modes; this batch result adds broader decision-regression
 evidence, not independent GOOD/BAD labels for the newly passing modes.
 
@@ -139,5 +148,5 @@ last-value filling introduces no new crossing locations (compared at radius
 precision 1e-10). The mean has new or shifted locations in eleven modes,
 without changing their classifications relative to last-value filling.
 Together with continuity at the join, this supports preferring `last`.
-The next step is review of the 41 newly passing modes, then adoption through
-the shared continuum loader and regeneration of the paired sorting outputs.
+The user subsequently accepted the 41 newly passing modes and authorized
+shared-loader adoption and regeneration of both sets of 27 shot outputs.

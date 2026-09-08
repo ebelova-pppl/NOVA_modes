@@ -28,6 +28,7 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
+from cont_features import CONTINUUM_PREPROCESSING_VERSION  # noqa: E402
 from make_tae_like_list import (  # noqa: E402
     DEFAULT_FRACTION_EAE_THRESHOLD,
     DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
@@ -137,6 +138,7 @@ CLUSTER_FIELDS = [
 SHOT_SUMMARY_FIELDS = [
     "shot",
     "method",
+    "continuum_preprocessing_version",
     "n_total_files",
     "n_invalid",
     "n_tae_like",
@@ -975,6 +977,7 @@ def build_summary(
     summary = {
         "shot": shot,
         "method": "rules",
+        "continuum_preprocessing_version": CONTINUUM_PREPROCESSING_VERSION,
         "n_total_files": len(rows),
         "n_invalid": sum(row.get("final_decision") == "INVALID" for row in rows),
         "n_tae_like": sum(row.get("gap_region") == "tae_like" for row in rows),

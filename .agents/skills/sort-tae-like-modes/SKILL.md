@@ -37,7 +37,15 @@ v5 preset remains supported with this threshold explicitly set to zero by
 its schema adapter; use it to reproduce pre-v6 routing. Standalone split
 and RF-CNN runs can reproduce the old routing with
 `--fraction_direct_eae_threshold 0`. V6 preserves all v5 morphology gates,
-the v18 feature schema, continuum preprocessing, and model inputs.
+the v18 feature column schema. The subsequently adopted shared continuum
+repair changes continuum feature values: all active workflows now use
+`datcon-monotonic-tail-v1`. Confirm `continuum_preprocessing_version` in shot
+and per-n summaries for rules and RF-CNN. It detects sustained steep paired
+terminal rises, backtracks onset, and holds preceding boundary values while
+preserving NaNs. It uses native radial slopes at every nr; its scientific
+calibration was checked on nr=201. New viewer sessions use it automatically.
+Historical pre-repair outputs require the corresponding source checkout
+(`64fc889` is the last old loader), in addition to v5/v6 thresholds.
 Do not combine a named configuration
 with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and

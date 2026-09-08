@@ -23,6 +23,14 @@ post-training cases for rules-versus-RF-CNN comparison.
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   and the twelve fresh v5 cases completed on 2026-09-08.
 
+All 27 checked cases were subsequently regenerated with v6 routing and the
+adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
+RF-CNN exports are current in the user-selected output roots, with previous
+shot directories retained under `before_continuum_tail_20260908/` in each
+root. The same 27 cases remain checked; their inventory notes record the
+regeneration. Current results and disagreements are in
+`../continuum_monotonic_tail_20260908/`; earlier pilot tables remain historical.
+
 The active list contains 14 training shots and 2,390 labels. Q62 is marked
 `suspended_training_q62`, not as an active training shot: its 249 reviewed
 rows remain in the v3 snapshot, but it is excluded from the active list while

@@ -40,6 +40,27 @@ Plotting:
 - `viz/view_modes_csv.py`
 - `viz/plot_straightened_mode.py`
 
+Shared continuum preprocessing (adopted 2026-09-08):
+
+- `src/cont_features.py` now repairs sustained steep rises of both continuum
+  boundaries through their last jointly defined point. It traces back to the
+  first fast step and holds each boundary at its preceding value, preserving
+  NaNs and retaining the older isolated-spike cleanup as fallback. Raw datcon
+  files are unchanged. Sorting, TAE/EAE splitting, RF/CNN continuum features,
+  and new viewer sessions all use this same loader.
+- New rules and RF-CNN shot/per-n summaries record
+  `continuum_preprocessing_version=datcon-monotonic-tail-v1`. The v6 rejection
+  configuration and feature column schemas are unchanged; continuum feature
+  values can change. Historical output reproduction also requires its source
+  checkout: commit `64fc889` is the last pre-adoption loader. Selecting v5/v6
+  thresholds alone does not restore the old continuum arrays.
+- The 27-shot audit retained all 899 existing automatic GOOD modes and
+  recovered 41 crossing-window rejections, which the user reviewed and
+  accepted. Five other BAD modes route to EAE-like. See
+  [the repair audit](audits/continuum_monotonic_tail_20260908/batch_report.md)
+  and `docs/project_state.md` for regeneration status. Existing model weights
+  are retained; new feature extraction uses the repaired boundaries.
+
 
 Project goal
 - The goal of this project is to develop machine learning tools to automatically identify physical Alfvén eigenmodes (AEs) from NOVA (ideal MHD linear solver) output and filter out unphysical or numerical solutions. The long-term objective is to enable fast, reliable preprocessing of NOVA mode spectra for use in stability analysis and surrogate modeling (e.g., NOVA/NOVA-C pipelines and digital twin applications).

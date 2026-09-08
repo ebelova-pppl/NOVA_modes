@@ -5,6 +5,7 @@ import warnings
 from scipy.signal import find_peaks
 
 _WARNED_DATCON_DIRS = set()
+CONTINUUM_PREPROCESSING_VERSION = "datcon-monotonic-tail-v1"
 DATCON_INVALID_SENTINEL_MIN = 999.0
 DATCON_TAIL_SPIKE_FACTOR = 3.0
 DATCON_TAIL_SPIKE_ABS_MIN = 50.0
@@ -15,6 +16,10 @@ DATCON_JOINT_TAIL_JUMP_FACTOR = 2.0
 DATCON_JOINT_TAIL_SLOPE_FACTOR = 5.0
 DATCON_JOINT_TAIL_FREQ_ABS_MIN = np.sqrt(DATCON_TAIL_SPIKE_ABS_MIN)
 DATCON_JOINT_TAIL_STEP_ABS_MIN = 1.0
+DATCON_MONOTONIC_TAIL_SLOPE_MIN = 100.0
+DATCON_MONOTONIC_TAIL_SLOPE_FACTOR = 5.0
+DATCON_MONOTONIC_TAIL_REFERENCE_POINTS = 4
+DATCON_MONOTONIC_TAIL_MAX_RADIAL_SPAN = 0.08
 CROSSING_FEATURE_DEFAULTS = {
     "n_cross": 0,
     "r_star_max": 0.0,
@@ -205,9 +210,86 @@ def _repair_joint_trailing_datcon_spikes(
     return low2, high2
 
 
+def _repair_joint_monotonic_datcon_tail(
+    low2_values: np.ndarray,
+    high2_values: np.ndarray,
+    r: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Hold a confirmed steep terminal rise at the preceding boundary values.
+
+    Detect on sentinel-masked raw frequencies, before the legacy spike repair.
+    The reference interval precedes the entire paired increasing run, so the
+    rise cannot inflate its own reference slope. Radial distance is measured
+    from the last jointly defined, ordered point, which may lie inside r=1.
+    See audits/continuum_monotonic_tail_20260908 for the reviewed calibration.
+    """
+    low2 = np.asarray(low2_values, dtype=float).copy()
+    high2 = np.asarray(high2_values, dtype=float).copy()
+    r = np.asarray(r, dtype=float)
+    if low2.ndim != 1 or low2.shape != high2.shape or r.shape != low2.shape:
+        raise ValueError("Continuum boundaries and radius must be matching 1D arrays")
+    if not np.all(np.isfinite(r)) or np.any(np.diff(r) <= 0.0):
+        raise ValueError("Continuum radius must be finite and strictly increasing")
+
+    low = np.sqrt(np.where(low2 >= 0.0, low2, np.nan))
+    high = np.sqrt(np.where(high2 >= 0.0, high2, np.nan))
+    paired = np.isfinite(low) & np.isfinite(high) & (high >= low)
+    indices = np.flatnonzero(paired)
+    reference_steps = DATCON_MONOTONIC_TAIL_REFERENCE_POINTS - 1
+    if indices.size < DATCON_MONOTONIC_TAIL_REFERENCE_POINTS + 2:
+        return low2, high2
+    end = int(indices[-1])
+    start = end
+    while (
+        start > 0
+        and paired[start - 1]
+        and low[start] > low[start - 1]
+        and high[start] > high[start - 1]
+    ):
+        start -= 1
+    if (
+        end - start < 2
+        or start < reference_steps
+        or not np.all(paired[start - reference_steps : start + 1])
+    ):
+        return low2, high2
+
+    slopes = [
+        np.diff(x[start : end + 1]) / np.diff(r[start : end + 1]) for x in (low, high)
+    ]
+    for boundary, slope in zip((low, high), slopes):
+        reference = np.median(
+            np.abs(
+                np.diff(boundary[start - reference_steps : start + 1])
+                / np.diff(r[start - reference_steps : start + 1])
+            )
+        )
+        if np.max(slope) <= max(
+            DATCON_MONOTONIC_TAIL_SLOPE_MIN,
+            DATCON_MONOTONIC_TAIL_SLOPE_FACTOR * reference,
+        ):
+            return low2, high2
+
+    # Confirm both boundaries first, then backtrack to the first fast step.
+    fast = np.flatnonzero(np.maximum(*slopes) > DATCON_MONOTONIC_TAIL_SLOPE_MIN)
+    first = start + 1 + int(fast[0])
+    if r[end] - r[first] > DATCON_MONOTONIC_TAIL_MAX_RADIAL_SPAN:
+        return low2, high2
+    for boundary in (low2, high2):
+        finite_tail = (np.arange(boundary.size) >= first) & np.isfinite(boundary)
+        # Preserve the audited frequency -> squared-frequency arithmetic.
+        boundary[finite_tail] = np.sqrt(boundary[first - 1]) ** 2
+    return low2, high2
+
+
 def load_datcon_for_mode(mode_path: str, n_r: int):
     """
-    Loads datcon from the same N* directory as the mode file.
+    Load and repair datcon from the same N* directory as the mode file.
+
+    Shared by plotting, routing, rule diagnostics, and ML feature extraction.
+    The repair uses native normalized-radius slopes at every resolution;
+    the scientific calibration was checked on nr=201. Source files are not
+    modified, and missing continuum is never extrapolated.
 
     Returns:
         low2_full  (n_r,) float, NaN where undefined
@@ -230,6 +312,11 @@ def load_datcon_for_mode(mode_path: str, n_r: int):
             raise ValueError(f"Bad datcon header in {datcon_path}: {header}")
         i1 = int(header[0])
         i2 = int(header[1])
+        if n_r < 2 or not 1 <= i1 <= i2 <= n_r:
+            raise ValueError(
+                f"Bad datcon radial bounds in {datcon_path}: "
+                f"i1={i1}, i2={i2}, n_r={n_r}; require 1 <= i1 <= i2 <= n_r and n_r >= 2"
+            )
 
         data = np.loadtxt(f)  # remaining lines: 2 columns
         if data.ndim == 1:
@@ -244,6 +331,8 @@ def load_datcon_for_mode(mode_path: str, n_r: int):
 
     low2 = _mask_datcon_invalid(data[:, 0])
     high2 = _mask_datcon_invalid(data[:, 1])
+    r = np.arange(i1 - 1, i2, dtype=float) / (n_r - 1)
+    low2, high2 = _repair_joint_monotonic_datcon_tail(low2, high2, r)
     low2, high2 = _repair_joint_trailing_datcon_spikes(low2, high2)
     low2 = _trim_trailing_datcon_spikes(low2)
     high2 = _trim_trailing_datcon_spikes(high2)

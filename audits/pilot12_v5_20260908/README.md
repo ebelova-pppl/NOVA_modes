@@ -1,5 +1,15 @@
 # Fresh twelve-shot rules versus RF/CNN pilot
 
+This is the historical v5 comparison before direct 20% EAE routing and the
+shared monotonic-tail repair. The later 27-shot regeneration uses v6 routing
+and `datcon-monotonic-tail-v1`; see
+`../continuum_monotonic_tail_20260908/` for current results. Reproducing these
+original numbers requires the historical loader (checkout `64fc889` with
+the explicit v5 preset) and original exports, retained under
+`before_continuum_tail_20260908/` inside the two external output roots after
+publication. The user's `disagreements_elena.csv` remains their original
+review list; it is not overwritten by the new comparison.
+
 This follow-up uses frozen production-v5 rules and the active RF/raw-CNN
 checkpoints after the user confirmed all 24 new rejections in the fifteen-shot
 regression. No thresholds or model artifacts are tuned during this pilot.

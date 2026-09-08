@@ -1,0 +1,82 @@
+{
+  "status": "adopted_and_regenerated_locally",
+  "continuum_preprocessing_version": "datcon-monotonic-tail-v1",
+  "shots": 27,
+  "canonical_runs": 54,
+  "checks": {
+    "paired_valid_mode_matches": 19228,
+    "exact_rule_feature_matches": 4267,
+    "candidate_mode_matches": 4083,
+    "invalid_preserved": 97
+  },
+  "counts": {
+    "rules_BAD": 3327,
+    "ai_bad": 3312,
+    "eae_like": 14961,
+    "rules_GOOD": 940,
+    "ai_good": 955,
+    "rules_selected_good": 934,
+    "rf-cnn_selected_good": 946
+  },
+  "disagreements": 229,
+  "candidate_details_sha256": "2c03101afd9a1b69a0a06b2131d9b02a1c48225a7ce1c137ef5e0c51017ec2aa",
+  "regeneration_provenance": {
+    "continuum_preprocessing_version": "datcon-monotonic-tail-v1",
+    "rule_configuration_sha256": "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398",
+    "source_sha256": {
+      "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+      "src/mode_csv.py": "c6a7955a400d140dcd8569632c1dea7912d26b5bbf64dd925d8f13b95e4e605e",
+      "src/mode_features.py": "b611cdd8f06111c3621d0e3063c804115582f60876fdb60269975918c309404b",
+      "src/mode_transform.py": "42b75fe7a3e3a23a944fab65e92ebd35d20e7d114c8798ba6b629b3a4c257c31",
+      "src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+      "src/path_utils.py": "a641b479d3446c75528157905eeedccc3c8d4a8d4be46e28a9f213129b2d0352",
+      "src/paths.py": "d91b4c55853ec1b919466c72398b146baf675d273302495c523186b929ec1ab0",
+      "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+      "scripts/_repo_bootstrap.py": "c8c2606b13516da822171f0ba0345390ab3848c964476c109ff7206ea87e92f9",
+      "scripts/audit_training_provenance.py": "8f1f68c7f0537965c32b397e84ed07b1a9ca4aaa679bdd0155de130105fc45c0",
+      "scripts/cnn_classify.py": "a84356cd751f6e8a6d9cac434d1d5c470e407754b29f2fe1f623c8bc952cf9b7",
+      "scripts/cnn_hybrid.py": "b834b1bd9ddf58dcca9b0fba71c7e65761c8146d74a61f9064e2447d4ceaa835",
+      "scripts/cnn_infer_common.py": "8f35d26ee8f278367b9e5724b33e15a7c89df083716fd5a33f0ec22454b7a0f0",
+      "scripts/cnn_raw.py": "d634f5a7b29dc0b196f180d40b017d4afd51aa57689c36c863afe888e2b2ce45",
+      "scripts/cnn_raw_classify.py": "748e9ddf39d0f48d075f3f223f4002a0505c6d36c937f0c0c92edcdb7c056775",
+      "scripts/cnn_straightened.py": "2379e2bf354d5683a26dd0312244dfd6a86863be38a2b08e199d4840be5ef1f6",
+      "scripts/label_modes_fast.py": "0755b28de874f26a8f063acdadaa2b6bc317446a6bdc797ed599c70daefd12b1",
+      "scripts/make_tae_like_list.py": "05e04c90976cabab324add474dd4bca941c390b610823eb901dfebd0f39d4828",
+      "scripts/rf_oof_check.py": "c313fa59ddfcc84c96bb57d461ffe43b08608bd1c69897bf1134554255cae745",
+      "scripts/rf_train_classify.py": "0cb9aa0828a7292e6904c24ee943ac54e34e2bbdb0dfc300cfbeed9733c618a7",
+      "scripts/run_loso_10.py": "72f3e7844a1676ad6ad2c673126a1ca215f2a2955e8cb5173fb9e793c7b908df",
+      "scripts/sort_shot.py": "76d3920633b8aa9d3df1d174ab6aa76724163c2a429c7250318f730e73e3f7bf",
+      "scripts/sort_shot_mixed.py": "a1f6b565c8a0ac936a7ef856847814e0dc8544572f7b6cf5236d4838f200959e",
+      "scripts/sort_shot_rules.py": "55f5dd3eba57849227976c5fb4b152c436b72c39ba6a091fdbe7307e0babff41",
+      "scripts/split_tae_eae.py": "3da696bf8d66716f754ff63603c1281a38f2d0c54deca467786db03b3731efff",
+      "scripts/tae_rule_config.py": "a40b0554b9fe3c4da244350341ce42dd8919ef2464b2a85fa4bf0d561a675622",
+      "scripts/tae_rule_engine.py": "8167248792fad87502cc3a6644afb5b27fc7d46515c070ffebe339e00a744fd2",
+      "scripts/tae_rule_io.py": "deba49b4521da3797a6b2ba69302412c42a9374adea790bbee02e17986553ea2",
+      "scripts/torch_runtime.py": "9ff34d5d8007a288b4425bbfb3ee229bf23179c116a6cc6eed00accc9486e093"
+    },
+    "membership_sha256": {
+      "audits/regression15_v5/shot_summary.csv": "d201557f56bbb59575363a45575c2d9a740e91e12ca3d088e52fef9811e7925a",
+      "audits/pilot12_v5_20260908/shot_summary.csv": "ccda7ee540f24faeeab370f383901ae37e379aeac95f5daf8438fb5c5d127799"
+    },
+    "rf_model_sha256": "b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c",
+    "cnn_model_sha256": "872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e",
+    "data_root": "/p/nstxdigtwin/energetic_particles/nova/DiTw"
+  },
+  "integration_checks": {
+    "unit_tests_passed": 153,
+    "exact_candidate_profile_matches": {
+      "training": 135,
+      "shots": 270
+    },
+    "standalone_split_E204645_modes": 535,
+    "standalone_split_routing": "exact; scalars match four-decimal CSV precision",
+    "viewer_shared_arrays": "exact; N10/3001 lower tail flat and missing continuum preserved"
+  },
+  "publication_receipt": "publication.json",
+  "audit_source_sha256": {
+    "audits/continuum_monotonic_tail_20260908/regenerate_batch.py": "99e32abaceb487f9110eb41a3777a8b27beff123200bbb3e55db743ebc5aae00",
+    "audits/continuum_monotonic_tail_20260908/verify_adoption.py": "4ea6e0d644adeeb22f6a61e224a14ed67229707c738a51b74f9d94747e714624",
+    "audits/continuum_monotonic_tail_20260908/publish_regenerated.py": "af03c5bde781a5022a9118332df526bfbe4a55da787342ae72a1a0b8aae4adee",
+    "tests/test_continuum_tail_repair.py": "52e1be33e2578d51f4e5ac27a624295b0bc5a7efe9ded59a79071ea29c87fdc0"
+  }
+}

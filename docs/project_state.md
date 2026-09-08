@@ -3,7 +3,56 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
-## 2026-09-08 experimental monotonic edge-rise repair
+## 2026-09-08 adopted shared monotonic continuum-tail repair
+
+- The user reviewed all 41 BAD-to-GOOD candidates and accepted them, then
+  requested adoption everywhere and regeneration of both 27-shot output sets.
+  Fingerprinted GOOD review evidence is retained in
+  `audits/continuum_monotonic_tail_20260908/user_review.csv`; this is user
+  adjudication of the recovered modes, without editing the main training list.
+- The shared `src/cont_features.py` loader now applies the reviewed last-value
+  repair before the existing spike fallbacks. All active routing, rule,
+  RF/continuum-CNN, and plotting paths use it. It preserves missing values
+  and source datcon bytes and uses native radial slopes for every nr. The
+  scientific calibration is nr=201; synthetic nr=401 coverage confirms the
+  repair also runs there. Restart existing viewers to load the new code.
+- New rules/RF-CNN shot and per-n summaries identify
+  `continuum_preprocessing_version=datcon-monotonic-tail-v1`. Newly trained
+  models record preprocessing provenance; the active checkpoints remain
+  unchanged. Gate/routing configuration v6 and feature column schemas are
+  unchanged; continuum feature values can change. Historical reproduction
+  requires the old source checkout (`64fc889`), not just an old configuration.
+- All 153 tests pass, including five new shared-loader regression controls.
+  Integrated arrays match the audited candidate exactly for 135 training
+  and 270 main-shot profiles. A fresh viewer uses those exact arrays, and
+  standalone splitting agrees with the canonical route for all 535 E204645
+  modes (scalars agree at the splitter's four-decimal export precision).
+- All 54 canonical runs completed and were published to
+  `/p/hym/ebelova/NOVA/sort_outputs/<SHOT>/` and
+  `/p/hym/ebelova/NOVA/sort_outputs_ai/<SHOT>/`. Each root retains all 27
+  previous shot directories under `before_continuum_tail_20260908/`. Every
+  staged/published export and backup was verified by file-content hashes.
+  Local complete results remain in `outputs/continuum_tail_adopted_20260908/`.
+- Paired results match paths, native dimensions, frequency/damping, and
+  full-precision routing scalars for all 19,228 valid inputs; 97 known invalid
+  K34 files remain invalid. All 4,083 affected-mode results match the reviewed
+  candidate exactly; all 4,267 TAE-side grouped rule-feature records match the
+  expected candidate or unchanged baseline. No resolution exclusion or
+  rule-workflow RF-ranking fallback occurred. Source and checkpoint hashes
+  were unchanged during regeneration.
+- Rules retain 940 GOOD before deduplication and 934 selected; RF-CNN retains
+  955 and 946. There are 14,961 EAE-side modes and 229 TAE-side disagreements
+  (122 rules-BAD/AI-GOOD, 107 rules-GOOD/AI-BAD). These are method disagreements,
+  not accuracy estimates. Current compact summaries and review candidates
+  are `regenerated_shot_summary.csv` and `regenerated_disagreements.csv` in
+  the repair audit, with `adoption_verification.json` and `publication.json`
+  recording validation and backups. Original user question lists are
+  untouched. Main/G inventories still mark the same 27 checked shots and
+  now note the completed regeneration. The main training labels and active
+  model weights are unchanged. Next: continue review using the new exports
+  before processing additional shots.
+
+### Pre-adoption experiments and 27-shot audit
 
 - Tested the user's proposed sustained-rise/onset approach in an isolated
   prototype under `audits/continuum_monotonic_tail_20260908/`. It confirms a
@@ -47,9 +96,9 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   locations without changing classifications. The last-value treatment is
   preferred. Its terminal-coverage criterion can start before r=0.9: the
   earliest onset is 0.720 in G133964R06 N10.
-- This is not an adopted shared-loader change. The viewer still uses old
-  cleanup plus its frequency-axis cap. Next: review the 41 newly passing
-  modes, then adopt shared preprocessing and regenerate paired outputs.
+- These were pre-adoption measurements. The user subsequently accepted the
+  41 recovered modes and the shared loader now implements `last`, as described
+  above. Original audit hashes and prototype artifacts remain historical.
 
 ## 2026-09-08 adopted production-v6 EAE routing below 20% TAE-side energy
 

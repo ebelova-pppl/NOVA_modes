@@ -14,7 +14,11 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
-from cont_features import continuum_scalars, load_datcon_for_mode  # noqa: E402
+from cont_features import (  # noqa: E402
+    CONTINUUM_PREPROCESSING_VERSION,
+    continuum_scalars,
+    load_datcon_for_mode,
+)
 from mode_csv import read_mode_paths_csv as read_mode_paths_csv_shared  # noqa: E402
 from mode_transform import resample_r, straighten_mode_window  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
@@ -128,6 +132,7 @@ def build_preprocess_metadata(
     max_step: int,
 ) -> dict[str, Any]:
     return {
+        "continuum_preprocessing_version": CONTINUUM_PREPROCESSING_VERSION,
         "R_target": int(R_target),
         "M": int(M),
         "center_power": float(center_power),
@@ -146,6 +151,10 @@ def build_raw_preprocess_metadata(
     continuum_clip: float = CONTINUUM_CHANNEL_CLIP_DEFAULT,
 ) -> dict[str, Any]:
     return {
+        "continuum_preprocessing_version": (
+            CONTINUUM_PREPROCESSING_VERSION
+            if continuum_channels or continuum_branch else None
+        ),
         "R_target": int(R_target),
         "M_target": int(M_target),
         "continuum_channels": bool(continuum_channels),

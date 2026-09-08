@@ -443,6 +443,38 @@ Legacy `datcon<N>` files sometimes use a tail sentinel value near `1000.000`
 instead of `NaN`. The shared datcon loader now treats values `> 999` as missing
 so those edge points do not contaminate continuum features or TAE/EAE splitting.
 
+The shared cleanup is `datcon-monotonic-tail-v1` (adopted 2026-09-08).
+Before the older spike repair, it finds the final contiguous run where both
+finite, ordered boundaries increase strictly. Require at least two rising
+steps. For each boundary, its maximum `df/dr` must exceed both 100 and five
+times the median absolute slope in the four-sample interval preceding the
+whole run. Then backtrack to the first step where either slope exceeds 100;
+the onset must be within 0.08 of the last jointly defined point. Hold each
+finite boundary from there onward at its own preceding frequency. This
+preserves continuity and does not extrapolate missing continuum. Existing
+paired-spike repair and single-boundary trimming remain fallbacks.
+
+The radial coordinate uses the datcon header and native `nr`; this repair
+runs at every resolution, with calibration verified on nr=201. The last
+defined continuum point may be well inside r=1. For E204645A16t015 N10 the
+first replaced sample is r=0.875, held at the r=0.870 value. The upper
+boundary's earlier rise is partly retained. Source datcon files are never
+edited. Plotting, splitting, rule diagnostics, RF feature extraction, and
+continuum-aware CNN training/inference all use this same implementation.
+Raw CNN mode-only images are unaffected. Dataset caches are created in
+memory per process, so new runs reload the repaired continuum. Saved RF
+feature bundles remain historical data; recompute them for a new experiment.
+
+Rules and RF-CNN shot/per-n summaries record
+`continuum_preprocessing_version`; newly trained RF models and CNN
+preprocessing metadata also record the version when relevant. The active
+2026-08-28 checkpoints are unchanged and predate this repair. Feature column
+names/order are unchanged, while continuum-derived values may differ.
+To reproduce pre-adoption outputs, use their historical source checkout
+(`64fc889` is the last old-loader commit), in addition to the named rule
+configuration. The configuration freezes rejection/routing settings rather
+than the separately versioned shared preprocessing.
+
 #### Continuum-derived features used
 
 When available, the following scalars are appended to the feature vector:
@@ -789,7 +821,9 @@ keeps finite edge rises from compressing the useful part of the plot. The
 title indicates when the cap applies. Press `y` to toggle the full range, or
 start with `--full-continuum-scale` to disable the cap. This changes only the
 display limits; continuum samples and crossing markers retain the shared
-loader's existing treatment.
+loader's treatment, including `datcon-monotonic-tail-v1`. Restart an already
+running viewer after updating the code to load the repaired boundaries; no
+new viewer flag is needed.
 
 For the staged six-shot NSTX-U label list:
 
@@ -1173,7 +1207,7 @@ Rules mode loads this configuration by default and does not permit a
 config-owned threshold or gate override to retain the production-v6 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
-`rule_configuration_sha256`, and the audited `accept-as-good-v1` survivor
+`rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
 policy. The policy changes only the workflow's automatic final decision:
 `rule_decision=REVIEW` and `rule_primary_reason=NO_GOOD_TEMPLATE` remain
 unchanged in the rule audit columns, while the survivor becomes final GOOD

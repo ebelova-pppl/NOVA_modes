@@ -1,5 +1,13 @@
 # Fifteen-shot production-v5 regression
 
+The results below are historical, before the adopted shared continuum-tail
+repair. See `../continuum_monotonic_tail_20260908/` for the subsequent v6
+regeneration of all 27 checked shots. Reproduction of this v5 comparison
+requires the old loader (checkout `64fc889` with the explicit v5 preset).
+Local v5 regression exports remain preserved; the older external production
+exports are backed up under `before_continuum_tail_20260908/` within each
+external output root when the new paired results are published.
+
 Selection was exactly `post_training_checked=yes` in the 2026-09-07
 `audits/main_dataset_shots/shot_status.csv`: the three pre-pilot cases and
 twelve pilot shots. The runner now reads those fifteen identities from this
@@ -9,7 +17,8 @@ not an independent validation sample. Thresholds and labels are unchanged.
 
 The canonical `sort_shot_mixed.py --method rules` workflow reruns each shot
 with frozen production v5 and the active RF checkpoint for duplicate ranking.
-The original production-v2 outputs remain untouched. Saved historical RF/CNN
+In this historical regression the original production-v2 outputs were left
+untouched. Saved historical RF/CNN
 predictions are reused as a comparison reference; the CNN is not rerun.
 Differences from RF/CNN are review candidates, not correctness labels.
 

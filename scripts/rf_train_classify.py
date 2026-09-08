@@ -15,6 +15,7 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
+from cont_features import CONTINUUM_PREPROCESSING_VERSION  # noqa: E402
 from mode_features import (  # noqa: E402
     compute_features_for_mode,
     get_feature_names,
@@ -233,6 +234,7 @@ def attach_feature_metadata(
     r_shear0=0.2,
 ):
     """Attach lightweight schema metadata while keeping a plain sklearn pipeline."""
+    clf.nova_continuum_preprocessing_version_ = CONTINUUM_PREPROCESSING_VERSION
     clf.nova_feature_names_ = list(feature_names)
     clf.nova_feature_schema_version_ = get_feature_schema_version(
         include_crossing_features=include_crossing_features,
@@ -523,6 +525,7 @@ if __name__ == "__main__":
                 "X_train": X,
                 "y_train": y,
                 "feature_names": feature_names,
+                "continuum_preprocessing_version": CONTINUUM_PREPROCESSING_VERSION,
                 "feature_schema_version": get_feature_schema_version(
                     include_crossing_features=args.crossing_features,
                     include_extremum_features=args.extremum_features,

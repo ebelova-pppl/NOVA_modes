@@ -1,9 +1,39 @@
-# Experimental sustained edge-rise repair
+# Sustained edge-rise repair audit and adoption
+
+**Adopted 2026-09-08:** the user reviewed all 41 recovered modes and accepted
+their BAD-to-GOOD changes. `src/cont_features.py` now implements the reviewed
+last-value repair as `datcon-monotonic-tail-v1`, shared by all active consumers.
+The frozen prototype and pre-adoption evidence below are retained as the
+comparison reference. See `user_review.csv`, `batch_report.md`, and the latest
+adoption/regeneration notes in `docs/project_state.md`.
+
+All 54 canonical runs have been regenerated and published. The 27-shot totals
+are 940 rules GOOD / 934 selected, and 955 RF-CNN GOOD / 946 selected, with
+14,961 EAE-like and 97 known invalid inputs. All 19,228 valid paired rows have
+identical metadata and routing; all 4,267 TAE-side rule-feature records match
+the reviewed candidate or unchanged baseline. All 153 tests pass.
+
+- `regenerated_shot_summary.csv`: current per-shot counts.
+- `regenerated_disagreements.csv`: current 229 method disagreements, for
+  continued review; these are not correctness labels.
+- `adoption_verification.json`: checks, source/model hashes, and integration
+  evidence; `publication.json`: hashes and locations of all new and old exports.
+- `regenerate_batch.py`, `verify_adoption.py`, and `publish_regenerated.py`:
+  reproducible generation, verification against the reviewed audit, and
+  publication with backups. Each accepts output/data roots as arguments;
+  see its docstring and `--help`.
+
+Current external roots are `/p/hym/ebelova/NOVA/sort_outputs/` and
+`/p/hym/ebelova/NOVA/sort_outputs_ai/`. Each contains the 27 prior directories
+under `before_continuum_tail_20260908/`, preserving historical comparisons.
+Local full exports are ignored under `outputs/continuum_tail_adopted_20260908/`.
+For `verify_adoption.py` after publication, supply that backup directory as
+`--old-pilot-root`; the original local v5 regression remains its baseline.
 
 The user proposed detecting a steep monotonic rise continuing to the edge,
 tracing back to its onset, and replacing the tail by the last reliable value
-or an average from the preceding interval. This is a diagnostic prototype;
-production `src/cont_features.py` and production-v6 outputs are unchanged.
+or an average from the preceding interval. The following measurements were
+made as an isolated prototype before the shared loader was changed.
 
 ## Candidate tested
 
@@ -72,6 +102,6 @@ only the two specifically questioned shot modes reevaluated. The subsequent
 full affected-mode audit is complete: see [batch_report.md](batch_report.md).
 It retains all 899 existing automatic GOOD modes, recovers 41 former crossing
 window rejections, and routes five other BAD modes to EAE-like. Both fills
-give identical classifications. This remains an isolated candidate;
-detecting these shapes does not independently establish their physical cause
-or validate the replacement continuum.
+give identical classifications. Subsequent user review approved the recovered
+modes and adoption of `last`. Detecting these shapes does not independently
+establish their physical cause or uniquely reconstruct the continuum.
