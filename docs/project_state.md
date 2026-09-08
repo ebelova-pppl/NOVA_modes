@@ -24,9 +24,32 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (â€œgoodâ
   to EAE-like with either fill. Saved compact profile/mode tables and source
   hashes; full diagnostics and comparison plot stay locally ignored under
   `outputs/continuum_tail_monotonic_20260908/`.
-- This is not an adopted shared-loader change. Broad 27-shot results are
-  profile-level only; inspect affected mode decisions across that batch
-  before promoting the detector or changing preprocessing/model inputs.
+- Follow-up completed the mode-level audit across all 27 checked shots:
+  270 profiles, 19,325 saved inputs (19,228 valid nr=201; 97 known invalid).
+  Reloaded all 4,083 modes using changed profiles. Input fingerprints and
+  metadata match; current-v6 scalars/decisions match exactly, as do all 955
+  applicable grouped rule-feature records. Other profiles retain saved
+  decisions with v6 routing. Both fills give identical individual outcomes:
+  all 899 existing automatic GOOD retained; 41 BAD_CONT_CROSS_WINDOW modes
+  become automatic GOOD; five other BAD route to EAE-like. Three BAD modes
+  expose later rejection reasons and one BAD switches TAE-like to mixed.
+  GOOD counts here are before deduplication; RF/CNN were not rerun.
+- E204645A16t015 onset radii are N7 0.985, N8 0.945, N9 0.910, N10 0.875.
+  N10 holds its r=0.870 sample and removes the reported edge rise; missing
+  continuum stays missing. The upper boundary's earlier rise is partly
+  retained. This shot supplies 25 newly passing modes, including N7/6025 and
+  N8/5775. A01t016 supplies 14 and E203262A04t018 two. N10/3001 in E204645
+  remains GOOD with its false r=0.870467 crossing removed.
+- Compact reproducible evidence and a path-only list of the 41 newly passing
+  modes are in `audits/continuum_monotonic_tail_20260908/batch_report.md` and
+  accompanying `batch_*` files. Last-value filling introduces no new crossing
+  locations in the compared TAE-side modes; the mean creates or shifts some
+  locations without changing classifications. The last-value treatment is
+  preferred. Its terminal-coverage criterion can start before r=0.9: the
+  earliest onset is 0.720 in G133964R06 N10.
+- This is not an adopted shared-loader change. The viewer still uses old
+  cleanup plus its frequency-axis cap. Next: review the 41 newly passing
+  modes, then adopt shared preprocessing and regenerate paired outputs.
 
 ## 2026-09-08 adopted production-v6 EAE routing below 20% TAE-side energy
 

@@ -67,8 +67,11 @@ changed modes, including fingerprints. `summary.json` records parameters,
 coverage, labels, and source hashes. Full tables and the inspected comparison
 figure are locally ignored under `outputs/continuum_tail_monotonic_20260908/`.
 
-The 27-shot comparison above is at continuum-profile level. Mode-level
-effects across that whole batch remain to be checked before adopting a shared
-preprocessing change; only the two specifically questioned shot modes were
-reevaluated here. Detecting these shapes does not independently establish
-their physical cause or validate the replacement continuum.
+The initial 27-shot comparison above was at continuum-profile level, with
+only the two specifically questioned shot modes reevaluated. The subsequent
+full affected-mode audit is complete: see [batch_report.md](batch_report.md).
+It retains all 899 existing automatic GOOD modes, recovers 41 former crossing
+window rejections, and routes five other BAD modes to EAE-like. Both fills
+give identical classifications. This remains an isolated candidate;
+detecting these shapes does not independently establish their physical cause
+or validate the replacement continuum.
