@@ -1,7 +1,19 @@
 # Deterministic TAE rule configurations
 
-`tae_rules_production_v5.yaml` is the current frozen deterministic production
-preset. It appends `BAD_CONTINUUM_CROSSING_TAIL` after every v4 gate, retaining
+`tae_rules_production_v6.yaml` is the current frozen deterministic production
+preset (configuration schema v6, unchanged ruleset/features v18). It routes
+`fraction_below_upper2 < 0.2` directly to EAE-like, regardless of signed_delta.
+All previous routing branches and morphology gates remain as in v5. The
+strict 20% threshold is recorded as `fraction_direct_eae_threshold` in both
+the configuration and shot/per-n summaries. The frozen v6 SHA-256 is
+`b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398`.
+
+V5 remains byte-for-byte unchanged and is supported by this checkout: its
+schema maps the absent direct-EAE threshold to zero, preserving old routing.
+For historical RF-CNN or standalone split runs, explicitly pass
+`--fraction_direct_eae_threshold 0`; their current default is 0.2.
+
+The preceding v5 preset appends `BAD_CONTINUUM_CROSSING_TAIL` after every v4 gate, retaining
 all earlier primary reasons. At the same actual lower/upper crossing it
 requires strict `K_c > 0.4` and `T_2 > 0.035`, where
 `T_2=E_tail/(E_h1+E_h2)` references the two individual harmonics with largest
@@ -65,7 +77,7 @@ extremum-feature definition.
 `tae_rules_production_v3.yaml`, and `tae_rules_production_v4.yaml` remain
 byte-for-byte as the historical v14, v15, v16, and v17 presets. Use the
 corresponding historical checkout to execute a pinned older ruleset.
-The canonical sorter loads production-v5 automatically
+The canonical sorter loads production-v6 automatically
 under its default rules method:
 
 ```bash
@@ -92,7 +104,7 @@ For a conservative audit of this exact preset without survivor promotion, run:
 python scripts/sort_shot_rules.py \
   --shot_dir /path/to/SHOT \
   --out_dir /path/to/audit-output \
-  --rule_config tae_rules_production_v5
+  --rule_config tae_rules_production_v6
 ```
 
 Use `sort_shot_rules.py` without `--rule_config` for threshold calibration and

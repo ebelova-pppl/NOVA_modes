@@ -6,6 +6,62 @@ from cont_features import load_datcon_for_mode
 from nova_mode_loader import load_mode_from_nova
 
 
+DEFAULT_FRACTION_TAE_THRESHOLD = 0.5
+DEFAULT_FRACTION_EAE_THRESHOLD = 0.4
+DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD = 0.2
+DEFAULT_SIGNED_DELTA_EAE_THRESHOLD = -0.1
+
+
+def validate_routing_thresholds(
+    *,
+    fraction_tae_threshold: float,
+    fraction_eae_threshold: float,
+    fraction_direct_eae_threshold: float,
+    signed_delta_eae_threshold: float,
+) -> None:
+    if not (
+        0.0
+        <= fraction_direct_eae_threshold
+        <= fraction_eae_threshold
+        <= fraction_tae_threshold
+        <= 1.0
+    ):
+        raise ValueError(
+            "routing thresholds must satisfy 0 <= fraction_direct_eae_threshold "
+            "<= fraction_eae_threshold <= fraction_tae_threshold <= 1"
+        )
+    if not np.isfinite(signed_delta_eae_threshold):
+        raise ValueError("signed_delta_eae_threshold must be finite")
+
+
+def classify_gap_region(
+    signed_delta: float,
+    fraction_below_upper2: float,
+    *,
+    fraction_tae_threshold: float = DEFAULT_FRACTION_TAE_THRESHOLD,
+    fraction_eae_threshold: float = DEFAULT_FRACTION_EAE_THRESHOLD,
+    fraction_direct_eae_threshold: float = DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+    signed_delta_eae_threshold: float = DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
+) -> str:
+    """Route by upper-gap energy; a zero direct threshold reproduces v5."""
+    validate_routing_thresholds(
+        fraction_tae_threshold=fraction_tae_threshold,
+        fraction_eae_threshold=fraction_eae_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
+        signed_delta_eae_threshold=signed_delta_eae_threshold,
+    )
+    if fraction_below_upper2 < fraction_direct_eae_threshold:
+        return "eae_like"
+    if fraction_below_upper2 > fraction_tae_threshold:
+        return "tae_like"
+    if (
+        fraction_below_upper2 < fraction_eae_threshold
+        and signed_delta < signed_delta_eae_threshold
+    ):
+        return "eae_like"
+    return "mixed"
+
+
 def mode_weight_profile(mode: np.ndarray) -> np.ndarray:
     """
     Match the amplitude-squared radial weight used in cont_features.py.

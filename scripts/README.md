@@ -606,6 +606,7 @@ logic. For each mode it computes:
 
 Default rule:
 
+- `fraction_below_upper2 < 0.2` → `above_upper2` (EAE-like), regardless of `signed_delta`
 - `fraction_below_upper2 > 0.5` → `below_upper2` (TAE-like)
 - `fraction_below_upper2 < 0.4` and `signed_delta < -0.1` → `above_upper2` (EAE-like)
 - otherwise → `mixed`
@@ -613,6 +614,12 @@ Default rule:
 By default, `mixed` rows are written into the TAE-like output CSV so marginal
 modes stay on the TAE side, but the full CSV still records `gap_region=mixed`
 for inspection.
+
+The comparison at 0.2 is strict; equality uses the remaining branches.
+`--fraction_direct_eae_threshold` sets this cutoff (default 0.2; zero restores
+the previous split). All split/preprocessing and rules/RF-CNN sorter paths
+use the same decision in `src/tae_eae_features.py`. Fractions and distances
+are still computed from the existing shared continuum data.
 
 ### Usage
 
@@ -776,6 +783,14 @@ the normalized-radius x-axis. The black dashed `r*` closest-approach marker and
 purple dotted `r* max crossing` marker extend through both panels so they can
 be compared directly with mode-amplitude features.
 
+For positive mode frequencies, the continuum frequency axis is capped at
+`2 * omega` when its automatic upper limit would exceed that value. This
+keeps finite edge rises from compressing the useful part of the plot. The
+title indicates when the cap applies. Press `y` to toggle the full range, or
+start with `--full-continuum-scale` to disable the cap. This changes only the
+display limits; continuum samples and crossing markers retain the shared
+loader's existing treatment.
+
 For the staged six-shot NSTX-U label list:
 
 ```bash
@@ -900,7 +915,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v5` configuration. A rejection gate produces automatic
+`tae_rules_production_v6` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1139,7 +1154,7 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v5.yaml`, stored as strict
+`configs/rules/tae_rules_production_v6.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
 current v18 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
@@ -1155,7 +1170,7 @@ gate thresholds, and these gate states:
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v5 identity.
+config-owned threshold or gate override to retain the production-v6 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, and the audited `accept-as-good-v1` survivor
@@ -1175,7 +1190,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v5` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v6` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any

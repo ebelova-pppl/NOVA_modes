@@ -24,7 +24,15 @@ ensure_repo_src_on_path()
 from cont_features import load_datcon_for_mode  # noqa: E402
 from mode_features import radial_centroid, radial_width  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
-from tae_eae_features import upper2_scalars  # noqa: E402
+from tae_eae_features import (  # noqa: E402
+    DEFAULT_FRACTION_TAE_THRESHOLD,
+    DEFAULT_FRACTION_EAE_THRESHOLD,
+    DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+    DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
+    classify_gap_region,
+    upper2_scalars,
+    validate_routing_thresholds,
+)
 from tae_rule_io import (  # noqa: E402
     RULE_OUTPUT_FIELDS,
     datcon_path_for_mode,
@@ -35,11 +43,6 @@ from tae_rule_io import (  # noqa: E402
     stable_json,
     write_dict_csv,
 )
-
-
-DEFAULT_FRACTION_TAE_THRESHOLD = 0.5
-DEFAULT_FRACTION_EAE_THRESHOLD = 0.4
-DEFAULT_SIGNED_DELTA_EAE_THRESHOLD = -0.1
 
 
 @dataclass(frozen=True)
@@ -132,25 +135,6 @@ def preflight_n_dirs(
             ) from exc
         populated.append((n, n_dir, files))
     return populated
-
-
-def classify_gap_region(
-    signed_delta: float,
-    fraction_below_upper2: float,
-    *,
-    fraction_tae_threshold: float = DEFAULT_FRACTION_TAE_THRESHOLD,
-    fraction_eae_threshold: float = DEFAULT_FRACTION_EAE_THRESHOLD,
-    signed_delta_eae_threshold: float = DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
-) -> str:
-    """Apply the canonical ``sort_shot_mixed.py`` TAE/EAE/mixed rule."""
-    if fraction_below_upper2 > fraction_tae_threshold:
-        return "tae_like"
-    if (
-        fraction_below_upper2 < fraction_eae_threshold
-        and signed_delta < signed_delta_eae_threshold
-    ):
-        return "eae_like"
-    return "mixed"
 
 
 def _base_row(path: Path, shot: str, n: int) -> dict[str, Any]:
@@ -269,6 +253,7 @@ def preprocess_shot(
     pattern: str = "egn*",
     fraction_tae_threshold: float = DEFAULT_FRACTION_TAE_THRESHOLD,
     fraction_eae_threshold: float = DEFAULT_FRACTION_EAE_THRESHOLD,
+    fraction_direct_eae_threshold: float = DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
     signed_delta_eae_threshold: float = DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
 ) -> PreprocessResult:
     """Validate, fingerprint, and frequency-route all discovered shot modes."""
@@ -277,13 +262,12 @@ def preprocess_shot(
         raise SystemExit(f"Shot directory not found: {source}")
     if n_min > n_max:
         raise ValueError("n_min must be less than or equal to n_max")
-    if not 0.0 <= fraction_eae_threshold <= fraction_tae_threshold <= 1.0:
-        raise ValueError(
-            "frequency split thresholds must satisfy 0 <= fraction_eae_threshold "
-            "<= fraction_tae_threshold <= 1"
-        )
-    if not math.isfinite(signed_delta_eae_threshold):
-        raise ValueError("signed_delta_eae_threshold must be finite")
+    validate_routing_thresholds(
+        fraction_tae_threshold=fraction_tae_threshold,
+        fraction_eae_threshold=fraction_eae_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
+        signed_delta_eae_threshold=signed_delta_eae_threshold,
+    )
 
     populated = preflight_n_dirs(
         source, n_min=n_min, n_max=n_max, pattern=pattern
@@ -346,6 +330,7 @@ def preprocess_shot(
                 scalars["fraction_below_upper2"],
                 fraction_tae_threshold=fraction_tae_threshold,
                 fraction_eae_threshold=fraction_eae_threshold,
+                fraction_direct_eae_threshold=fraction_direct_eae_threshold,
                 signed_delta_eae_threshold=signed_delta_eae_threshold,
             )
             row.update(
@@ -408,6 +393,11 @@ def parse_args() -> argparse.Namespace:
         "--fraction_eae_threshold", type=float, default=DEFAULT_FRACTION_EAE_THRESHOLD
     )
     parser.add_argument(
+        "--fraction_direct_eae_threshold", type=float,
+        default=DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+        help="Route fractions strictly below this directly to EAE regardless of signed_delta (default: 0.2; 0 restores v5 routing)",
+    )
+    parser.add_argument(
         "--signed_delta_eae_threshold",
         type=float,
         default=DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
@@ -425,6 +415,7 @@ def main() -> None:
         pattern=args.pattern,
         fraction_tae_threshold=args.fraction_tae_threshold,
         fraction_eae_threshold=args.fraction_eae_threshold,
+        fraction_direct_eae_threshold=args.fraction_direct_eae_threshold,
         signed_delta_eae_threshold=args.signed_delta_eae_threshold,
     )
     print(f"Shot: {result.shot}")

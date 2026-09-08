@@ -3,6 +3,102 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-08 adopted production-v6 EAE routing below 20% TAE-side energy
+
+- The user approved the audited condition. Production now defaults to
+  `configs/rules/tae_rules_production_v6.yaml`, schema v6 and unchanged
+  ruleset/grouped-feature schema v18. Its SHA-256 is
+  `b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398`.
+  `fraction_below_upper2 < 0.2` routes directly to EAE-like regardless of
+  signed_delta. Equality retains the previous branches. Morphology gates,
+  continuum arrays, feature extraction, labels, and checkpoints are unchanged.
+- Centralized the decision, threshold defaults, and validation in
+  `src/tae_eae_features.py`; standalone splitting, preprocessing, rule sorting,
+  and RF-CNN sorting share it. `fraction_direct_eae_threshold` is reported in
+  shot/per-n summaries and is config-owned for named rule runs. Zero restores
+  the previous behavior in standalone/RF-CNN workflows. The byte-identical v5
+  preset remains supported through an explicit zero-threshold schema adapter.
+  The historical v5 pilot runner now pins that setting for its preflight and
+  RF-CNN path as well as its existing named v5 rules configuration.
+- All 148 tests pass, including strict boundary tests, schema compatibility,
+  consistent entry points, and a native binary preprocessing example. The
+  implemented predicate reproduces exactly the 121 audited changes across
+  2,390 training and 19,228 valid saved shot rows, preserving every training
+  GOOD. Implementation/source hashes are in the audit's
+  `adoption_verification.json`.
+- Fresh E205040A01t016 runs through rules, RF-CNN, and standalone splitting
+  agree on all 297 inputs: 141 strict TAE-like, 6 mixed, 150 EAE-like. Exactly
+  13 formerly mixed modes leave the TAE side (11 rules-BAD plus N3/1082 and
+  N10/3900). Rules GOOD changes 78 to 76; RF-CNN GOOD stays 72. Input hashes
+  and full-precision scalars match v5; decisions, selected representatives,
+  and rule features of all remaining modes are unchanged. Full verification
+  exports are locally ignored under `outputs/routing_v6_20260908/`.
+  Existing external production lists still retain their prior versions and
+  need explicit regeneration when the review batch is ready.
+
+### Pre-adoption audit
+
+- Audited the user's proposed strict `fraction_below_upper2 < 0.2` sufficient
+  condition for EAE-like routing, independent of signed_delta, while retaining
+  the original branches elsewhere. The original audit tables retain the
+  pre-adoption production-v5 and main-training-list provenance.
+- Recomputed both routing scalars from current mode/datcon inputs for all
+  2,390 active training entries. Exactly 25 switch from mixed to EAE-like;
+  all are labeled BAD. All 575 GOOD entries remain TAE-side, with minimum
+  fraction_below_upper2 0.9385785273544934.
+- Compared full-precision saved v5 scalars across all 27 checked shots.
+  The fifteen-shot regression has 33 mixed-to-EAE changes, all previously BAD;
+  the new twelve-shot pilot has 63: 61 BAD plus the user's two GOOD examples
+  E205040A01t016 N3/1082 and N10/3900. The 97 known INVALID regression inputs
+  remain outside routing. No other current GOOD mode changes family route.
+- Compact affected-mode tables, provenance hashes, exact candidate logic,
+  and methods are in `audits/eae_fraction_override_20260908/`. Routing to EAE
+  is not a GOOD/BAD adjudication. The audit supported the adopted condition.
+  Remaining
+  finite edge rises and their crossing effects still need separate treatment.
+
+## 2026-09-08 continuum viewer scale and reported edge-data issue
+
+- The user's remaining pilot questions are in
+  `audits/pilot12_v5_20260908/disagreements_elena.csv`. They flagged joint
+  continuum edge rises in E204645A16t015 N7–10 and E205040A01t016 N2–3.
+  All six directories retain large finite edge frequencies after the current
+  shared loader cleanup. For E204645A16t015 N10/egn10w.3001E+01, omega is
+  1.7323 while the loaded lower/upper maxima are about 28.48/26.52.
+- `viz/view_modes_csv.py` now caps the displayed frequency upper limit at
+  twice positive mode omega when needed, and identifies capped plots in the
+  title. `y` toggles the full range; `--full-continuum-scale` starts uncapped.
+  Both interactive and standalone continuum panels use the same scale helper.
+  Only axis limits change; loaded samples and crossing diagnostics do not.
+- Headless checks covered one mode in each of the six flagged directories,
+  navigation, the scale toggle, the CLI opt-out, and standalone plotting;
+  plotted samples stayed unchanged. Ordinary frequency ranges and nonpositive
+  or nonfinite omega retain autoscaling. Inspected the regenerated N10/3001
+  plot at a displayed range of 0–3.4646.
+- Existing cleanup lives in `src/cont_features.py`, shared with routing and
+  feature extraction: frequency-squared values >999 become NaN; selected
+  abrupt joint tail spikes are replaced by an interior average, and isolated
+  trailing spikes before missing data are trimmed. These criteria do not
+  remove the reported finite rises. Next: assess their effect on crossings
+  and the questioned classifications before changing shared preprocessing
+  or regenerating sorter results.
+- Follow-up routing audit: the user asked about E205040A01t016 N3/1083
+  (the actual review-list/source file is N3/1082) and N10/3900. Both currently
+  route as mixed, included on the TAE side, with fraction_below_upper2
+  0.180260/0.100012 and signed_delta -0.068812/+0.104894. The upper-gap
+  fraction alone favors EAE; the extra signed_delta < -0.1 requirement fails.
+  With finite upper-boundary samples at r>=0.96 held at the mean frequency
+  of the four previous samples, fractions stay unchanged, while signed_delta
+  becomes -0.491758/+0.082575: N3 becomes EAE-like, N10 remains mixed.
+  Masking the same tail also leaves N10 mixed. The current shared repair
+  already reduces N10's last spike but does not eliminate its remaining rise;
+  its classification also reflects distance weighting of the weak outer tail.
+  Fingerprints and current scalars match saved pilot results. Cut-sensitivity
+  evidence at 0.95, 0.96, and 0.97 is in
+  `audits/pilot12_v5_20260908/edge_continuum_routing.csv`, with methods in that
+  audit's README. These are diagnostic scenarios only. Assess shared cleanup
+  and the signed_delta routing condition separately before changing either.
+
 ## 2026-09-08 user-confirmed regression and fresh twelve-shot pilot
 
 - The user inspected all 24 new rejections from the fifteen-shot v5

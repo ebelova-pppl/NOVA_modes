@@ -55,3 +55,4 @@ outputs/continuum_tail_*/
 # Complete regression sorter exports and logs; compact evidence is in audits/.
 outputs/regression15_v5_*/
 outputs/pilot12_v5_*/
+outputs/routing_v6_*/

@@ -23,15 +23,22 @@ from tae_rule_engine import (
     NearAxisGridOscillationConfig,
 )
 from tae_rule_io import sha256_file
+from tae_eae_features import validate_routing_thresholds
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v5"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v5"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v6"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v6"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f"
+    "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398"
 )
+FROZEN_CONFIGURATION_SHA256 = {
+    "tae_rules_production_v5": (
+        "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f"
+    ),
+    PRODUCTION_RULE_CONFIG_NAME: PRODUCTION_RULE_CONFIG_SHA256,
+}
 
 
 @dataclass(frozen=True)
@@ -126,10 +133,10 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         context="configuration",
     )
     schema_version = _string(document, "schema_version", context="configuration")
-    if schema_version != RULE_CONFIG_SCHEMA_VERSION:
+    if schema_version not in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v5"}:
         raise ValueError(
             f"unsupported rule configuration schema {schema_version!r}; "
-            f"expected {RULE_CONFIG_SCHEMA_VERSION!r}"
+            f"expected {RULE_CONFIG_SCHEMA_VERSION!r} or 'tae-rule-run-config-v5'"
         )
     name = _string(document, "name", context="configuration")
     rule_set_version = _string(document, "rule_set_version", context="configuration")
@@ -147,7 +154,10 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
             "fraction_eae_threshold",
             "signed_delta_eae_threshold",
             "include_mixed_in_tae_like",
-        },
+        } | (
+            {"fraction_direct_eae_threshold"}
+            if schema_version == RULE_CONFIG_SCHEMA_VERSION else set()
+        ),
         context="routing",
     )
     fraction_tae_threshold = _float(
@@ -156,14 +166,20 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     fraction_eae_threshold = _float(
         routing, "fraction_eae_threshold", context="routing"
     )
+    # Frozen v5 predates the unconditional branch; never inherit the new default.
+    fraction_direct_eae_threshold = (
+        _float(routing, "fraction_direct_eae_threshold", context="routing")
+        if schema_version == RULE_CONFIG_SCHEMA_VERSION else 0.0
+    )
     signed_delta_eae_threshold = _float(
         routing, "signed_delta_eae_threshold", context="routing"
     )
-    if not 0.0 <= fraction_eae_threshold <= fraction_tae_threshold <= 1.0:
-        raise ValueError(
-            "routing thresholds must satisfy 0 <= fraction_eae_threshold "
-            "<= fraction_tae_threshold <= 1"
-        )
+    validate_routing_thresholds(
+        fraction_tae_threshold=fraction_tae_threshold,
+        fraction_eae_threshold=fraction_eae_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
+        signed_delta_eae_threshold=signed_delta_eae_threshold,
+    )
     if not _bool(routing, "include_mixed_in_tae_like", context="routing"):
         raise ValueError("include_mixed_in_tae_like must remain true")
 
@@ -503,6 +519,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "continuum_crossing_tail_calibrated_n_radial": tail_config.calibrated_n_radial,
         "fraction_tae_threshold": fraction_tae_threshold,
         "fraction_eae_threshold": fraction_eae_threshold,
+        "fraction_direct_eae_threshold": fraction_direct_eae_threshold,
         "signed_delta_eae_threshold": signed_delta_eae_threshold,
         "rel_freq_tol": rel_freq_tol,
         "axis_r_ax": axis_r_ax,
@@ -563,13 +580,11 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         ),
     }
     digest = sha256_file(path)
-    if (
-        name == PRODUCTION_RULE_CONFIG_NAME
-        and digest != PRODUCTION_RULE_CONFIG_SHA256
-    ):
+    expected_digest = FROZEN_CONFIGURATION_SHA256.get(name)
+    if expected_digest is not None and digest != expected_digest:
         raise ValueError(
             f"frozen configuration {name!r} has SHA-256 {digest}, expected "
-            f"{PRODUCTION_RULE_CONFIG_SHA256}"
+            f"{expected_digest}"
         )
     return RuleRunConfiguration(
         name=name,

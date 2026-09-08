@@ -2611,6 +2611,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             override_sha256="",
             fraction_tae_threshold=0.5,
             fraction_eae_threshold=0.4,
+            fraction_direct_eae_threshold=0.2,
             signed_delta_eae_threshold=-0.1,
             rel_freq_tol=0.02,
         )
@@ -3116,18 +3117,19 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v5")
+        self.assertEqual(configuration.name, "tae_rules_production_v6")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f",
+            "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
             {
                 "fraction_tae_threshold": 0.5,
                 "fraction_eae_threshold": 0.4,
+                "fraction_direct_eae_threshold": 0.2,
                 "signed_delta_eae_threshold": -0.1,
                 "rel_freq_tol": 0.02,
                 "axis_r_ax": 0.03,

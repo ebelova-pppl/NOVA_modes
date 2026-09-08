@@ -1,0 +1,39 @@
+{
+  "status": "adopted",
+  "production_configuration": "tae_rules_production_v6",
+  "configuration_sha256": "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398",
+  "shared_routing_source_sha256": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+  "v5_configuration_sha256": "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f",
+  "valid_rows_checked": {
+    "training": 2390,
+    "regression15": 10582,
+    "pilot12": 8646
+  },
+  "changed_rows": 121,
+  "implementation_matches_candidate": true,
+  "training_good_preserved": 575,
+  "full_test_suite_passed": 148,
+  "fresh_shot_verification": {
+    "shot": "nstxuE205040A01t016",
+    "input_modes": 297,
+    "methods": [
+      "rules",
+      "rf-cnn",
+      "split_tae_eae"
+    ],
+    "routing_counts": {
+      "tae_like": 141,
+      "eae_like": 150,
+      "mixed": 6
+    },
+    "changed_from_v5": 13,
+    "unchanged_remaining_decisions_and_features": true,
+    "input_fingerprints_and_routing_scalars_unchanged": true,
+    "local_output_root": "outputs/routing_v6_20260908",
+    "rules_good_before_and_after": [
+      78,
+      76
+    ],
+    "rf_cnn_good": 72
+  }
+}

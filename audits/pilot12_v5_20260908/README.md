@@ -73,6 +73,31 @@ disagreements. `disagreements.csv` retains relative mode keys, exact input
 fingerprints, rule reasons, RF/CNN decisions, and both model probabilities.
 These are review candidates, not established physical labels.
 
+### Edge-continuum routing check (2026-09-08)
+
+`edge_continuum_routing.csv` records diagnostic sensitivity calculations for
+E205040A01t016 N3/1082 (called 1083 in the user's question) and N10/3900.
+Both mode-plus-datcon fingerprints and both current routing scalars match the
+saved pilot. The existing route is mixed for both, included on the TAE side.
+
+The alternative scenarios modify only in-memory upper-boundary samples at
+`r >= cut_r_inclusive`, with cuts 0.95, 0.96, and 0.97. `mask` replaces finite
+tail samples by NaN; `hold_previous_four_mean_frequency` replaces them by the
+squared mean frequency of the four preceding finite samples. Existing NaNs
+remain NaN. `valid_weight_fraction` is the mode energy with finite upper
+boundary divided by full-domain mode energy. The canonical `upper2_scalars`
+and unchanged production-v5 routing thresholds are then applied. These are
+sensitivity scenarios, not validated continuum repairs or new classifications.
+
+At cut 0.96, holding the tail changes N3 signed_delta from -0.068812 to
+-0.491758, with fraction_below_upper2 unchanged at 0.180260: EAE-like.
+N10 changes from +0.104894 to +0.082575, with fraction unchanged at 0.100012:
+still mixed. Masking that tail gives signed_delta -0.595764 and +0.045082,
+respectively, and the same respective routes. Thus N3 routing is sensitive
+to the edge rise; for N10, removing that rise alone does not resolve the
+distance-weighted signed_delta criterion's sensitivity to a weak outer tail.
+No datcon file, production routing rule, model, or sorter output was changed.
+
 The runner checks exact discovery coverage, native nr, routing categories and
 scalars, frozen configuration identity, absence of invalid inputs and
 resolution exclusions, and successful RF ranking. Mode-plus-continuum hashes

@@ -13,7 +13,15 @@ ensure_repo_src_on_path()
 
 from cont_features import warn_once_per_dir  # noqa: E402
 from path_utils import resolve_mode_csv_path  # noqa: E402
-from tae_eae_features import load_upper2_scalars_for_mode  # noqa: E402
+from tae_eae_features import (  # noqa: E402
+    DEFAULT_FRACTION_TAE_THRESHOLD,
+    DEFAULT_FRACTION_EAE_THRESHOLD,
+    DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+    DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
+    classify_gap_region as shared_classify_gap_region,
+    load_upper2_scalars_for_mode,
+    validate_routing_thresholds,
+)
 
 PATH_HEADER_NAMES = {"path", "filepath", "mode_path"}
 SUMMARY_COLUMNS = ("label", "validity", "family")
@@ -84,22 +92,37 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument(
         "--signed_delta_threshold",
         type=float,
-        default=-0.1,
+        default=DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
         help="Threshold for signed_delta; below this can count as above_upper2 in the low-fraction regime",
     )
     ap.add_argument(
         "--fraction_threshold",
         type=float,
-        default=0.5,
+        default=DEFAULT_FRACTION_TAE_THRESHOLD,
         help="Threshold for fraction_below_upper2; above this counts as below_upper2",
     )
     ap.add_argument(
         "--eae_fraction_threshold",
         type=float,
-        default=0.4,
+        default=DEFAULT_FRACTION_EAE_THRESHOLD,
         help="Threshold for fraction_below_upper2; below this can count as above_upper2",
     )
-    return ap.parse_args()
+    ap.add_argument(
+        "--fraction_direct_eae_threshold", type=float,
+        default=DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+        help="Route fractions strictly below this directly to EAE regardless of signed_delta (default: 0.2; 0 restores v5 routing)",
+    )
+    args = ap.parse_args()
+    try:
+        validate_routing_thresholds(
+            fraction_tae_threshold=args.fraction_threshold,
+            fraction_eae_threshold=args.eae_fraction_threshold,
+            fraction_direct_eae_threshold=args.fraction_direct_eae_threshold,
+            signed_delta_eae_threshold=args.signed_delta_threshold,
+        )
+    except ValueError as exc:
+        ap.error(str(exc))
+    return args
 
 
 def _normalize_header_name(name: str, fallback_idx: int) -> str:
@@ -313,10 +336,18 @@ def classify_gap_region(
     signed_delta_threshold: float,
     fraction_threshold: float,
     eae_fraction_threshold: float,
+    fraction_direct_eae_threshold: float = DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
 ) -> tuple[str, str]:
-    if fraction_below_upper2 > fraction_threshold:
+    region = shared_classify_gap_region(
+        signed_delta, fraction_below_upper2,
+        fraction_tae_threshold=fraction_threshold,
+        fraction_eae_threshold=eae_fraction_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
+        signed_delta_eae_threshold=signed_delta_threshold,
+    )
+    if region == "tae_like":
         return "below_upper2", "below"
-    if fraction_below_upper2 < eae_fraction_threshold and signed_delta < signed_delta_threshold:
+    if region == "eae_like":
         return "above_upper2", "above"
     return "mixed", "below"
 
@@ -451,6 +482,7 @@ def main() -> None:
                 signed_delta_threshold=args.signed_delta_threshold,
                 fraction_threshold=args.fraction_threshold,
                 eae_fraction_threshold=args.eae_fraction_threshold,
+                fraction_direct_eae_threshold=args.fraction_direct_eae_threshold,
             )
             row = build_output_row(
                 input_row,

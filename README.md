@@ -124,7 +124,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v5`
+  `--method rules` path loads the immutable `tae_rules_production_v6`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -143,7 +143,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v5` configuration automatically:
+`tae_rules_production_v6` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -304,7 +304,7 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v5.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v6.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -316,6 +316,15 @@ all shot and per-`n` summaries and rejects threshold/gate overrides when the
 named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
 `GOOD` before manual overrides and duplicate processing.
+
+Production v6 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
+regardless of `signed_delta`. All other routing branches and v18 morphology
+gates are preserved. The fraction counts mode energy where the upper TAE
+boundary is defined. V5 remains available via `--rule_config
+tae_rules_production_v5`, with its original routing; saved v5 output lists
+require regeneration to reflect v6. Standalone split and RF-CNN workflows
+also default to the shared v6 routing and accept
+`--fraction_direct_eae_threshold 0` for the previous condition.
 
 For conservative rule auditing and threshold development, use the separate
 calibration CLI. It does not apply the production survivor policy: pass-all-

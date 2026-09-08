@@ -1,0 +1,84 @@
+{
+  "cohorts": {
+    "pilot12": {
+      "candidate_routing": {
+        "eae_like": 6718,
+        "mixed": 84,
+        "tae_like": 1844
+      },
+      "changed": 63,
+      "changed_decisions": {
+        "BAD": 61,
+        "GOOD": 2
+      },
+      "input_modes": 8646,
+      "invalid": 0
+    },
+    "regression15": {
+      "candidate_routing": {
+        "eae_like": 8238,
+        "mixed": 134,
+        "tae_like": 2210
+      },
+      "changed": 33,
+      "changed_decisions": {
+        "BAD": 33
+      },
+      "input_modes": 10679,
+      "invalid": 97
+    },
+    "training": {
+      "changed": 25,
+      "changed_labels": {
+        "BAD": 25
+      },
+      "input_modes": 2390,
+      "minimum_good_fraction": 0.9385785273544934,
+      "training_labels": {
+        "bad": 1815,
+        "good": 575
+      }
+    }
+  },
+  "comparison": "strict_less_than",
+  "fraction_direct_eae_threshold": 0.2,
+  "pilot_rules_root": "/p/hym/ebelova/NOVA/sort_outputs",
+  "sources_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE202806A02t025/all_modes_rules.csv": "604099832048035e4be85f52a3022c2b59d1a9ea7f02e8abd7610b5039686b3e",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE203609A01t020/all_modes_rules.csv": "0be30ff8b493545948d0d8d27e31f9a62da2ff9a318ce026ba46e5bd2af0c225",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE203963A01t025/all_modes_rules.csv": "a887330aedfb5f1303ac15f75fe7b42eda8e95803de3e83e18f1cfc667bfdef1",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE204707A04t030/all_modes_rules.csv": "69999f0625b42fbdc2f92ed9015c8bb9e4097c63401b9f50523cc58cfe6b1b64",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE204954A01t022/all_modes_rules.csv": "3ae65a4e45f5270858a047290f4fc45d0118a918fc12655bcd041f652730728b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE205035A01t020/all_modes_rules.csv": "38f9d7eb5f9f5fb056ad2a1579e6a1d9b3b7275395ebb7049c9d9503ad313bac",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE205045A01t022/all_modes_rules.csv": "44ccdd5c37420c881c4929cabe01870c9df6753e02b7e0be440bfb881aa5558f",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE205054A01t037/all_modes_rules.csv": "e063d19d516b7850e200f01b9c12d2c559a1b68a59d103774484ac49295b633f",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuE205057A01t020/all_modes_rules.csv": "40f5f57fb32823897462d2b704d3cfb82bc608cff47bbf58ac3cb7eb66a131f2",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuG121123K34/all_modes_rules.csv": "7edb21cce88666fe3d785798f398062775bc16f5c39b007bf86245a0be55ae2b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuG121123K70/all_modes_rules.csv": "7aa9e732bf11a30ef83162f6505c03ad1e872cb7fd1b2bbe5ff9656786c662aa",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuG121123N80/all_modes_rules.csv": "0bfcb4a3cf4b4956420ab066f56e897cebe1dc89b19666ce72152c18bd87181f",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuG142301E72/all_modes_rules.csv": "9246ee750a92aee3bc597977168c166016049c75f0f602e076a1f8ad81e1af16",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuG142301H56/all_modes_rules.csv": "5554c7e2ebf52c512d72b1345584e7ac3c7c65dc8656535bcd71a4d0e9acd642",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/regression15_v5_20260907/nstxuG142301V21/all_modes_rules.csv": "772e1fc3e8dc5a34add2a08d6dbec153a1a0afb8dd60c10f62a4aadc3b496a2d",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203262A04t018/all_modes_rules.csv": "91eeda5000282aced67adc77be7b04f5f5185ced17b6c8ea259da2308465baf8",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204186A01t020/all_modes_rules.csv": "5872f873f1524988bab468579eabd574f474504f4eb1a500844abcce5ac180b2",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204621A03t030/all_modes_rules.csv": "c3b3afed9dbe7f16f28dd5ed61dc386c88476741706bd5b38a411dd77cbf70b9",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204645A16t015/all_modes_rules.csv": "bcd5e3c25bd97b39a442a169cade8becdfec3c5cf990090246760df947ba9dee",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204708F03t017/all_modes_rules.csv": "19598f6ac52d21a830788c0c225da540434b29aa3e5241db726c24ee086ae466",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204944A01t017/all_modes_rules.csv": "d882dd54d4caa32e0c0646d1ab0d25f0abd232e2a8e45d4b6dbbf9b00db920c2",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205017A01t025/all_modes_rules.csv": "70032de82fd9390d0d036c98104eab0a224c627eef6a99fc705e8f350d3103a4",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205040A01t016/all_modes_rules.csv": "561c157743f4cc514fb4d48291837f8b414a9220f1c941db257de7bf6501ddc5",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG133964R06/all_modes_rules.csv": "a6e2c11474c3b2eefcfd312647b11cf31fb77ffc9c33f60a61e33652691872cc",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301C50/all_modes_rules.csv": "b4d7e564adf387531166c55ad9b6736479fc763fb2ada32b6ab995c9e7fad3c9",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301L94/all_modes_rules.csv": "9203efe39991647a903ae536f3f892cf1915cacfd68bf9f53188877a7301f48e",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301U84/all_modes_rules.csv": "a4a66deb262c21953e80c1eb0520574ade2dfc89830638a8f28b0fa90337853c",
+    "audits/pilot12_v5_20260908/shot_summary.csv": "ccda7ee540f24faeeab370f383901ae37e379aeac95f5daf8438fb5c5d127799",
+    "audits/regression15_v5/shot_summary.csv": "d201557f56bbb59575363a45575c2d9a740e91e12ca3d088e52fef9811e7925a",
+    "configs/rules/tae_rules_production_v5.yaml": "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f",
+    "scripts/split_tae_eae.py": "244b6b8bdb52a98b8bd30036265f17c28a0e7d8d545780612361ba0416078bdd",
+    "src/cont_features.py": "7c00a0bec165a6798d91895b932a09be74a686fc478608108499c0f566736eb8",
+    "src/tae_eae_features.py": "7069ca56282399feb86c2be6f78549548978a699be280eb8a1640199b38a2d07",
+    "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a"
+  },
+  "status": "candidate_audit_only",
+  "training_data_root": "/p/hym/ebelova/NOVA/data_mixed"
+}

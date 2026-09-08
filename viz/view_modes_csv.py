@@ -142,7 +142,23 @@ def plot_mode_panel(ax, mode: np.ndarray, r: np.ndarray, kind: str, topk: int, u
     ax.set_title(f"Top-{len(idx)} harmonic radial profiles")
 
 
-def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: float, try_rstar: bool = True):
+def set_continuum_frequency_scale(ax, omega: float, full_scale: bool = False):
+    """Limit only the displayed range; retain continuum samples and diagnostics."""
+    ax.set_autoscaley_on(True)
+    ax.autoscale_view(scalex=False, scaley=True)
+    title = "Continuum band + mode frequency"
+    if not full_scale and np.isfinite(omega) and omega > 0.0:
+        cap = 2.0 * float(omega)
+        if ax.get_ylim()[1] > cap:
+            ax.set_ylim(0.0, cap)
+            title += " (frequency axis capped at 2 × omega)"
+    ax.set_title(title)
+
+
+def plot_continuum_panel(
+    ax, mode_path: str, n_r: int, r: np.ndarray, omega: float,
+    try_rstar: bool = True, full_scale: bool = False,
+):
     ax.clear()
 
     try:
@@ -188,7 +204,7 @@ def plot_continuum_panel(ax, mode_path: str, n_r: int, r: np.ndarray, omega: flo
     ax.set_ylabel("frequency")
     ax.grid(True, alpha=0.3)
     ax.legend(loc="best", fontsize=8)
-    ax.set_title("Continuum band + mode frequency")
+    set_continuum_frequency_scale(ax, omega, full_scale=full_scale)
 
 
 def plot_m_spectrum(ax, mode: np.ndarray):
@@ -211,6 +227,10 @@ def main():
     ap.add_argument("--contour", action="store_true", help="use (m,r) contour panel instead of harmonic lines")
     ap.add_argument("--no_mspec", action="store_true", help="disable m-spectrum panel")
     ap.add_argument("--no_cont", action="store_true", help="disable continuum panel")
+    ap.add_argument(
+        "--full-continuum-scale", action="store_true",
+        help="show the full continuum frequency range (default: cap at 2 × mode omega; toggle with y)",
+    )
     ap.add_argument(
         "--base_dir",
         default=os.environ.get("NOVA_DATA"),
@@ -247,13 +267,14 @@ def main():
 
     help_text = (
         "Keys:  n/→ next | p/← prev | h(ome) first | e(nd) last | "
-        "c toggle contour/lines | a toggle abs | q quit"
+        "c contour/lines | a abs | y full/capped frequency | q quit"
     )
 
     state = {
         "idx": idx,
         "use_abs": bool(args.abs),
         "contour": bool(args.contour),
+        "full_continuum_scale": args.full_continuum_scale,
     }
 
     def update():
@@ -313,7 +334,9 @@ def main():
                 ax_cont.set_ylabel("frequency")
                 ax_cont.grid(True, alpha=0.3)
                 ax_cont.legend(loc="best", fontsize=8)
-                ax_cont.set_title("Continuum band + mode frequency")
+                set_continuum_frequency_scale(
+                    ax_cont, omega, full_scale=state["full_continuum_scale"]
+                )
 
             except Exception as e:
                 ax_cont.text(
@@ -358,6 +381,10 @@ def main():
             return
         if k == "a":
             state["use_abs"] = not state["use_abs"]
+            update()
+            return
+        if k == "y":
+            state["full_continuum_scale"] = not state["full_continuum_scale"]
             update()
             return
 

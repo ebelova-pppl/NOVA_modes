@@ -45,7 +45,15 @@ from cont_features import load_datcon_for_mode  # noqa: E402
 from mode_features import radial_centroid, radial_width  # noqa: E402
 from mode_csv import read_mode_csv_entries  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
-from tae_eae_features import upper2_scalars  # noqa: E402
+from tae_eae_features import (  # noqa: E402
+    DEFAULT_FRACTION_TAE_THRESHOLD,
+    DEFAULT_FRACTION_EAE_THRESHOLD,
+    DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+    DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
+    classify_gap_region,
+    upper2_scalars,
+    validate_routing_thresholds,
+)
 from tae_rule_config import PRODUCTION_RULE_CONFIG_NAME  # noqa: E402
 
 
@@ -82,6 +90,7 @@ RULE_CONFIG_OWNED_OPTIONS = frozenset(
         "--rel_freq_tol",
         "--fraction_tae_threshold",
         "--fraction_eae_threshold",
+        "--fraction_direct_eae_threshold",
         "--signed_delta_eae_threshold",
     }
 )
@@ -143,6 +152,7 @@ SHOT_SUMMARY_FIELDS = [
     "mode_clusters_removed",
     "fraction_tae_threshold",
     "fraction_eae_threshold",
+    "fraction_direct_eae_threshold",
     "signed_delta_eae_threshold",
     "include_mixed_in_tae_like",
     "gold_good_rf_threshold",
@@ -256,9 +266,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     ap.add_argument("--verbose", action="store_true", help="Print per-directory progress")
 
     # Gap routing policy.
-    ap.add_argument("--fraction_tae_threshold", type=float, default=0.5)
-    ap.add_argument("--fraction_eae_threshold", type=float, default=0.4)
-    ap.add_argument("--signed_delta_eae_threshold", type=float, default=-0.1)
+    ap.add_argument("--fraction_tae_threshold", type=float, default=DEFAULT_FRACTION_TAE_THRESHOLD)
+    ap.add_argument("--fraction_eae_threshold", type=float, default=DEFAULT_FRACTION_EAE_THRESHOLD)
+    ap.add_argument(
+        "--fraction_direct_eae_threshold", type=float,
+        default=DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+        help="Route fractions strictly below this directly to EAE regardless of signed_delta (default: 0.2; 0 restores v5 routing)",
+    )
+    ap.add_argument("--signed_delta_eae_threshold", type=float, default=DEFAULT_SIGNED_DELTA_EAE_THRESHOLD)
 
     # RF/CNN fusion policy.
     ap.add_argument("--gold_good_rf_threshold", type=float, default=0.7)
@@ -311,6 +326,15 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
                 "--method rf-cnn does not accept rule-only options: "
                 + ", ".join(conflicts)
             )
+        try:
+            validate_routing_thresholds(
+                fraction_tae_threshold=args.fraction_tae_threshold,
+                fraction_eae_threshold=args.fraction_eae_threshold,
+                fraction_direct_eae_threshold=args.fraction_direct_eae_threshold,
+                signed_delta_eae_threshold=args.signed_delta_eae_threshold,
+            )
+        except ValueError as exc:
+            ap.error(str(exc))
     return args
 
 
@@ -470,24 +494,6 @@ def load_gap_scalars(
         return None, "invalid_upper2_scalars", f"{type(exc).__name__}: {exc}"
 
     return scalars, "", ""
-
-
-def classify_gap_region(
-    signed_delta: float,
-    fraction_below_upper2: float,
-    *,
-    fraction_tae_threshold: float,
-    fraction_eae_threshold: float,
-    signed_delta_eae_threshold: float,
-) -> str:
-    if fraction_below_upper2 > fraction_tae_threshold:
-        return "tae_like"
-    if (
-        fraction_below_upper2 < fraction_eae_threshold
-        and signed_delta < signed_delta_eae_threshold
-    ):
-        return "eae_like"
-    return "mixed"
 
 
 def fuse_scores(
@@ -1269,6 +1275,7 @@ def run_rf_cnn_method(args: argparse.Namespace) -> None:
                 scalars["fraction_below_upper2"],
                 fraction_tae_threshold=args.fraction_tae_threshold,
                 fraction_eae_threshold=args.fraction_eae_threshold,
+                fraction_direct_eae_threshold=args.fraction_direct_eae_threshold,
                 signed_delta_eae_threshold=args.signed_delta_eae_threshold,
             )
             row["gap_region"] = gap_region
@@ -1344,6 +1351,7 @@ def run_rf_cnn_method(args: argparse.Namespace) -> None:
     thresholds = {
         "fraction_tae_threshold": args.fraction_tae_threshold,
         "fraction_eae_threshold": args.fraction_eae_threshold,
+        "fraction_direct_eae_threshold": args.fraction_direct_eae_threshold,
         "signed_delta_eae_threshold": args.signed_delta_eae_threshold,
         "include_mixed_in_tae_like": True,
         "gold_good_rf_threshold": args.gold_good_rf_threshold,

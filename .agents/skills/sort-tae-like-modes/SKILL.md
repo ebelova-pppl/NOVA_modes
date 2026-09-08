@@ -22,11 +22,22 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v5.yaml`. It pins the v18
+The preset is `configs/rules/tae_rules_production_v6.yaml`. It pins the v18
 ruleset and routing values, enables gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
 gates, and the final continuum crossing-tail gate. It explicitly disables
 exact-point continuum gate 3.
+Production-v6 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
+regardless of signed_delta. Equality uses the existing branches: EAE also
+requires fraction <0.4 and signed_delta <-0.1; fraction >0.5 is TAE-like;
+remaining cases are mixed and stay on the TAE side. All entry points share
+this decision in `src/tae_eae_features.py`. Confirm the additional
+`fraction_direct_eae_threshold=0.2` in shot and per-n summaries. The frozen
+v5 preset remains supported with this threshold explicitly set to zero by
+its schema adapter; use it to reproduce pre-v6 routing. Standalone split
+and RF-CNN runs can reproduce the old routing with
+`--fraction_direct_eae_threshold 0`. V6 preserves all v5 morphology gates,
+the v18 feature schema, continuum preprocessing, and model inputs.
 Do not combine a named configuration
 with config-owned threshold or gate flags; the CLI rejects such overrides.
 Confirm the configuration name, schema version, and SHA-256 in the shot and

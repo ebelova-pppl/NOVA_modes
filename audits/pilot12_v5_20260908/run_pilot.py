@@ -147,7 +147,7 @@ def preflight(args):
         row = queue.pop(0)
         shot = row["shot"]
         print(f"Preflight {shot} ({row['input_modes']} modes)", flush=True)
-        result = preprocess_shot(args.data_root / shot)
+        result = preprocess_shot(args.data_root / shot, fraction_direct_eae_threshold=0.0)
         rows = [dict(r) for r in result.rows]
         assert len(rows) == int(row["input_modes"])
         invalid = [r for r in rows if r["processing_status"] == "INVALID"]
@@ -270,6 +270,8 @@ def run(args):
                     "cnn_raw",
                     "--device",
                     "cpu",
+                    "--fraction_direct_eae_threshold",
+                    "0",
                 ]
             )
             print(f"[{index}/12] {shot}: {method}", flush=True)

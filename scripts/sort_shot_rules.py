@@ -30,6 +30,7 @@ ensure_repo_src_on_path()
 
 from make_tae_like_list import (  # noqa: E402
     DEFAULT_FRACTION_EAE_THRESHOLD,
+    DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
     DEFAULT_FRACTION_TAE_THRESHOLD,
     DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
     PreprocessResult,
@@ -174,6 +175,7 @@ SHOT_SUMMARY_FIELDS = [
     "rule_configuration_sha256",
     "fraction_tae_threshold",
     "fraction_eae_threshold",
+    "fraction_direct_eae_threshold",
     "signed_delta_eae_threshold",
     "include_mixed_in_tae_like",
     "rel_freq_tol",
@@ -239,6 +241,7 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--rel_freq_tol",
         "--fraction_tae_threshold",
         "--fraction_eae_threshold",
+        "--fraction_direct_eae_threshold",
         "--signed_delta_eae_threshold",
         "--axis_r_ax",
         "--axis_amplitude_min",
@@ -894,6 +897,7 @@ def build_summary(
     override_sha256: str,
     fraction_tae_threshold: float,
     fraction_eae_threshold: float,
+    fraction_direct_eae_threshold: float,
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
@@ -1019,6 +1023,7 @@ def build_summary(
         "rule_configuration_sha256": rule_configuration_sha256,
         "fraction_tae_threshold": fraction_tae_threshold,
         "fraction_eae_threshold": fraction_eae_threshold,
+        "fraction_direct_eae_threshold": fraction_direct_eae_threshold,
         "signed_delta_eae_threshold": signed_delta_eae_threshold,
         "include_mixed_in_tae_like": True,
         "rel_freq_tol": rel_freq_tol,
@@ -1116,6 +1121,7 @@ def _summary_by_n(
     override_sha256: str,
     fraction_tae_threshold: float,
     fraction_eae_threshold: float,
+    fraction_direct_eae_threshold: float,
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
@@ -1176,6 +1182,7 @@ def _summary_by_n(
             override_sha256=override_sha256,
             fraction_tae_threshold=fraction_tae_threshold,
             fraction_eae_threshold=fraction_eae_threshold,
+            fraction_direct_eae_threshold=fraction_direct_eae_threshold,
             signed_delta_eae_threshold=signed_delta_eae_threshold,
             rel_freq_tol=rel_freq_tol,
             axis_artifact_config=axis_artifact_config,
@@ -1344,6 +1351,7 @@ def run_shot(
     pattern: str = "egn*",
     fraction_tae_threshold: float = DEFAULT_FRACTION_TAE_THRESHOLD,
     fraction_eae_threshold: float = DEFAULT_FRACTION_EAE_THRESHOLD,
+    fraction_direct_eae_threshold: float = DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
     signed_delta_eae_threshold: float = DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
     rel_freq_tol: float = 0.02,
     axis_r_ax: float = DEFAULT_AXIS_R_AX,
@@ -1517,6 +1525,7 @@ def run_shot(
         pattern=pattern,
         fraction_tae_threshold=fraction_tae_threshold,
         fraction_eae_threshold=fraction_eae_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
         signed_delta_eae_threshold=signed_delta_eae_threshold,
     )
 
@@ -1576,6 +1585,7 @@ def run_shot(
         override_sha256=override_digest,
         fraction_tae_threshold=fraction_tae_threshold,
         fraction_eae_threshold=fraction_eae_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
@@ -1601,6 +1611,7 @@ def run_shot(
         override_sha256=override_digest,
         fraction_tae_threshold=fraction_tae_threshold,
         fraction_eae_threshold=fraction_eae_threshold,
+        fraction_direct_eae_threshold=fraction_direct_eae_threshold,
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
@@ -1712,6 +1723,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--fraction_eae_threshold", type=float, default=DEFAULT_FRACTION_EAE_THRESHOLD
+    )
+    parser.add_argument(
+        "--fraction_direct_eae_threshold", type=float,
+        default=DEFAULT_FRACTION_DIRECT_EAE_THRESHOLD,
+        help="Route fractions strictly below this directly to EAE regardless of signed_delta (default: 0.2; 0 restores v5 routing)",
     )
     parser.add_argument(
         "--signed_delta_eae_threshold",
@@ -2183,6 +2199,7 @@ def main() -> None:
         pattern=args.pattern,
         fraction_tae_threshold=args.fraction_tae_threshold,
         fraction_eae_threshold=args.fraction_eae_threshold,
+        fraction_direct_eae_threshold=args.fraction_direct_eae_threshold,
         signed_delta_eae_threshold=args.signed_delta_eae_threshold,
         rel_freq_tol=args.rel_freq_tol,
         axis_r_ax=args.axis_r_ax,
