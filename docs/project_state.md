@@ -3,6 +3,30 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 audited 0.1% extremum clearance and 1.0/1.1 width floors
+
+- The user proposed `ext_df_gap>0.001` and a minimum connected total-W
+  FWHM of 1 or 1.1 native grid intervals for the interior extremum exception.
+  Audited strict lower cuts while preserving the existing upper/radial
+  limits and all other gates. No production change has been adopted.
+- Across the current 27-shot batch, the 1.0 option newly rejects six GOOD
+  modes; 1.1 rejects eleven. All 58 survivors protected by the exception
+  were reloaded: raw fingerprints, complete v19 features, and decisions
+  exactly match the current saved exports. C50 N1 and all R06 remain INVALID.
+- All 2,390 training inputs were recomputed with shared preprocessing/rules,
+  matching the prior 543 labeled-GOOD / 25 labeled-BAD survivor baseline.
+  The 1.0 option rejects one training GOOD, H47 N7/2530, due to clearance
+  0.00006176. Width 1.1 adds three GOOD conflicts (E202855A01t020 N8/9221,
+  W29 N9/1982, H47 N9/1813) and rejects one labeled BAD (W29 N8/2304).
+- Width 1.0 by itself changes no survivor: for an interior peak of sampled
+  nonnegative W, interpolated connected FWHM cannot be less than one interval.
+  Width 1.1 also rejects E203262A04t018 N10/6623, previously approved GOOD
+  after the continuum repair; that approval's fingerprint still matches.
+- Evidence and both alternative change lists are in
+  `audits/extremum_floor_20260909/`. `shots_to_review.csv` has eleven modes;
+  `training_to_review.csv` has five. Next: review the clearance conflict and
+  additional 1.1-width conflicts before choosing/adopting the tighter exception.
+
 ## 2026-09-09 five narrow survivors traced to the extremum exception
 
 - Investigated user-questioned E205040A01t016 N6/2836, E204708F03t017

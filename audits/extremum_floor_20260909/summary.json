@@ -1,0 +1,85 @@
+{
+  "status": "audit_only",
+  "shot_counts": {
+    "all_inputs": 19325,
+    "RULE_EVALUATED": 4187,
+    "ROUTED_EAE": 14358,
+    "current_good": 956,
+    "current_selected": 950,
+    "INVALID": 780
+  },
+  "protected_shot_survivors": 58,
+  "training_rows": 2390,
+  "training_baseline": {
+    "good:GOOD": 543,
+    "bad:BAD": 1763,
+    "good:BAD": 32,
+    "bad:GOOD": 25,
+    "bad:ROUTED_EAE": 26,
+    "bad:INVALID": 1
+  },
+  "sweep": [
+    {
+      "clearance_floor": 0.001,
+      "width_floor_grid": 1.0,
+      "strict_lower_cuts": true,
+      "affected_counts": {
+        "shots": 6,
+        "training:good": 1
+      }
+    },
+    {
+      "clearance_floor": 0.001,
+      "width_floor_grid": 1.1,
+      "strict_lower_cuts": true,
+      "affected_counts": {
+        "shots": 11,
+        "training:good": 4,
+        "training:bad": 1
+      }
+    }
+  ],
+  "source_sha256": {
+    "scripts/tae_rule_engine.py": "dfcd558f6eea599c60decd8274d9a02aa64ee0ee09ba6c1faa9ad74949d448c5",
+    "scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b",
+    "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+    "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+    "src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+    "src/input_validity.py": "01ac8d455ac1d46795793f105c921944bbb32144038e36f7502a90df605e14f7",
+    "configs/known_invalid_inputs.csv": "0809ed5dbcc546f78586f3cff4795bdbeb42bac0e914776c3145d2ed55bf51cf",
+    "configs/rules/tae_rules_production_v7.yaml": "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
+    "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+    "audits/continuum_monotonic_tail_20260908/regenerated_shot_summary.csv": "1a4d652ce531ec451689578698e78b63689679794044f1cc2f0fbda8082eb005",
+    "audits/extremum_floor_20260909/audit.py": "09371976cbfba744233b19e51283869c460fcc7999d2805177ac0e1ea745442e"
+  },
+  "export_sha256": {
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE202806A02t025/all_modes_rules.csv": "2a38a572532a8e44d6a1b5041d1765342476df3bd30aa55c1a1c4234a605e990",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203609A01t020/all_modes_rules.csv": "7c1242e738bef54352b9748bd0fb5b78efce99dd617284086f9413dc1675e79e",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203963A01t025/all_modes_rules.csv": "dc2151a127487345c2dc2e21c3c4be23bc145a7ea6e1fef50cf1d9594796f64a",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204707A04t030/all_modes_rules.csv": "4a39d78990c50e90564e73f228eaea2888cb756be920912278e72a3b13deb96b",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204954A01t022/all_modes_rules.csv": "df8cdb9eeb4b897c8fc5224082ac89456537e8858e800cb63d603ee3a1fc61ba",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205035A01t020/all_modes_rules.csv": "216568f86966ea3b2fa1af2f1633f6b54e5ccb099351362f282464501a38f4b1",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205045A01t022/all_modes_rules.csv": "324a83af6c2fde9950de665233406e7df2ac23064f17195595a89d84a58a54d5",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205054A01t037/all_modes_rules.csv": "dde5c81123b5ab8b2165164d15fd98d21b8e4f3dc1de7cf91f6f847bf61a121f",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205057A01t020/all_modes_rules.csv": "6a921e9b7960703c1b4cf7b9a788c7188bb2835ab766033929729e8e0430d9d1",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K34/all_modes_rules.csv": "447545a683725a3b6f1dca2f1b61451c8af4cf03bb74f5b68a0facc76b2be89f",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K70/all_modes_rules.csv": "98e223d44d4ea31fe7cbdb14067d16825890cf237a2a3f05c31cfe612af9fab4",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123N80/all_modes_rules.csv": "8ab832f9a876f32d38f997e745578f4f6d690809d7decd2ce3eab7f29594eabc",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301E72/all_modes_rules.csv": "15c6c167fc55ad305a1f6a9025386d1892b7791fce0cfb5d5309ed38c5337d5c",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301H56/all_modes_rules.csv": "d0990a504e46a3b761d5d0183befec49b95d321e873ddbdacddbfd61bedcfae1",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301V21/all_modes_rules.csv": "70344909c800770798ba4206db770a57a21e8c158ad23c17b4918a40f44411e5",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205040A01t016/all_modes_rules.csv": "7d6440779df92b4d399fb2d4be44edc5e4581047ca796dfd19265a6578dc6a53",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204944A01t017/all_modes_rules.csv": "118d39fc32d0f07f2b834f44180d5e8cc46c5daa2bbb9cbc7113365412245fb8",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204708F03t017/all_modes_rules.csv": "8f7b84c34f40d2ec686e719dd454569c3ddc8e1b3801c5f6a358c1d38d65a4ca",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204645A16t015/all_modes_rules.csv": "99d343e0d09d2b60ba7b7c2bbfc6d68e5cd2de0201a80a17a54e6894929479ac",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203262A04t018/all_modes_rules.csv": "eb41ca85cde3eb65571fcb87853aae4ab90380227bb3ac8fe379f0fb84c6a2c7",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204621A03t030/all_modes_rules.csv": "2320dc4a7fb049ff9798542e47304907257a0ebfb6e33abdb91a1e5978cfe156",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205017A01t025/all_modes_rules.csv": "0232c1f5bf916057048a6458e5499759373f25ce76602b17d03e1d463abd5b32",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204186A01t020/all_modes_rules.csv": "bf67ce13b5492075ee75da17016e8eea3d947cd69c5e2a926e6991f833c73c15",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG133964R06/all_modes_rules.csv": "4e76b4e828ecbcd1615eea48952c09e7e867b3d158212c243e0d225dc743f898",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301C50/all_modes_rules.csv": "350d80e44b2f864c58f9b67e58431cc01fcfea778ea4f9c95566541223a547f3",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301L94/all_modes_rules.csv": "230975150b77d83181c396b392e28c06494fb0e511808b8aa38eb4003f56b586",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301U84/all_modes_rules.csv": "c511ff59fe91773c3d7f5d5f376f2edaa8281dd854ee557c721c3d1ec3f49963"
+  },
+  "verified_shot_feature_records": 58
+}
