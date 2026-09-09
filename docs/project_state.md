@@ -1,7 +1,25 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-08)
+### Project state (current snapshot, updated 2026-09-09)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-09 incremental disagreement list for continued review
+
+- Compared the new 229-row 27-shot disagreement list with the union of the
+  previous fifteen-shot v5 list (93) and fresh twelve-shot list (132). There
+  are 17 additions, 13 removals, and 212 retained cases with identical labels,
+  rule reasons, and input fingerprints. The older fifteen-shot disagreement
+  list is unchanged; all changes occur in the fresh twelve-shot cohort.
+- Four additions are among the 41 fingerprint-matched GOOD modes already
+  approved by the user, leaving 13 new cases to review: E203262 five,
+  E204645 seven, E205040 one. All remain rules BAD while RF-CNN changes
+  BAD to GOOD. No model or rule decision was changed by this comparison.
+- The focused `to_review.csv`, full 30-row `changes.csv`, methods, and input
+  hashes are under
+  `audits/continuum_monotonic_tail_20260908/disagreement_delta_20260909/`.
+  The user's edited question list is untouched: 31 of its current 33 rows
+  still disagree; E204645 N7/6025 and N8/5775 no longer do. The focused new
+  list does not repeat those existing questions or infer their adjudication.
 
 ## 2026-09-08 adopted shared monotonic continuum-tail repair
 
