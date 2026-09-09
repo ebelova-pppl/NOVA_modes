@@ -1,0 +1,13 @@
+{
+  "modes": 5,
+  "raw_fingerprints_match": true,
+  "all_grouped_features_match": true,
+  "all_decisions_match": true,
+  "scope": "Non-blind diagnostic of five user-questioned rule survivors; no decisions changed.",
+  "source_sha256": {
+    "scripts/tae_rule_engine.py": "dfcd558f6eea599c60decd8274d9a02aa64ee0ee09ba6c1faa9ad74949d448c5",
+    "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+    "src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+    "configs/rules/tae_rules_production_v7.yaml": "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429"
+  }
+}

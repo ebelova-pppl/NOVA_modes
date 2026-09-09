@@ -3,6 +3,29 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 five narrow survivors traced to the extremum exception
+
+- Investigated user-questioned E205040A01t016 N6/2836, E204708F03t017
+  N8/6836, N8/8950, N10/7424, and E204645A16t015 N6/4765. All nr=201;
+  raw input fingerprints, complete grouped v19 features, and preliminary
+  REVIEW decisions exactly reproduce the saved production exports.
+- Every mode has `interior_unresolved_envelope.candidate_found=true` and
+  `extremum_exception_applied=true`. Connected total-W FWHM values are
+  respectively 1.475, 1.064, 1.111, 1.024, and 1.130 grid intervals. All
+  qualify for the existing geometric exception (`ext_dr<=0.02`,
+  `0<=ext_df_gap<=0.04`), which imposes no minimum width or smoothness test.
+- The signed-spike gate misses them because all lobes with amplitude >=0.3
+  are wider than its one-interval low-r limit; narrower lobes have amplitude
+  <0.3. No repeated-turn packet qualifies. The recent A_cross/K_c exception
+  is unused in all five. Native signed-profile inspection confirms sharp
+  peaks, with a more extended surrounding body in E205040 N6/2836.
+- Compact evidence is in `audits/narrow_extremum_20260909/`; plots/local
+  diagnostics are ignored under `outputs/review_narrow_extremum_20260909/`.
+  This is a diagnostic only: no labels, production thresholds, or saved
+  shot outputs changed. Next candidate for calibration: require resolved
+  structure even for an extremum exception, auditing the protected training
+  GOOD modes before adopting any new cutoff.
+
 ## 2026-09-09 whole R06 shot invalidated by the user
 
 - The user invalidated **all 610 modes in `nstxuG133964R06`**, n=1–10,
