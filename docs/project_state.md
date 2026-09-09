@@ -3,6 +3,34 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 C50 N1 continuum / mode consistency issue
+
+- The user inspected all C50 TAE-side modes and reports resonance structure
+  displaced from continuum crossings for n=1, with other n appearing OK.
+  Non-blind raw-data and original stability-log checks confirm a mismatch
+  for all 14 N1 TAE-side modes: their inner gap crossing lies 2.42–9.73 grid
+  intervals farther out than the nearest logged singularity at the matching
+  mode frequency. This does not certify the other toroidal mode numbers.
+- N1/8889: log singularity r=0.470 versus upper crossing 0.517203;
+  N1/9040: 0.465 versus 0.511017; N1/9225: 0.455 versus 0.503648.
+  Their raw sharp harmonic features lie within one grid interval of the log
+  positions. The first two currently survive the rules and need provisional
+  treatment while this data issue is resolved.
+- All 14 raw fingerprints and recomputed crossing records match saved
+  outputs. Native metadata is ntor=1, nr=201, nhar=22; datcon indices are
+  3–199. The shared continuum cleanup changes zero points in datcon1.
+  Current equilibrium/profile/grid files match across N1–N10. The original
+  March stability cache targets are unavailable, and current continuum
+  files date from June; the responsible upstream calculation is unresolved.
+- Recorded the concern in main/G inventory notes without changing checked
+  membership, rule decisions, saved outputs, training labels, or the user's
+  question list. Recommended next step: set the 14 N1 TAE-side modes aside
+  for calibration/physical acceptance pending a paired upstream continuum/mode
+  consistency check with identical inputs;
+  no generic radius shift or rule relaxation is justified. Compact evidence
+  and reproduction are in `audits/c50_n1_alignment_20260909/`; local figures
+  are in `outputs/review_c50_n1_alignment_20260909/`.
+
 ## 2026-09-09 adopted smooth crossing-window exception
 
 - The user inspected all 13 additional candidates and authorized adoption.
