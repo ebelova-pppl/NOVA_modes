@@ -45,6 +45,7 @@ from cont_features import CONTINUUM_PREPROCESSING_VERSION, load_datcon_for_mode 
 from mode_features import radial_centroid, radial_width  # noqa: E402
 from mode_csv import read_mode_csv_entries  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
+from input_validity import KNOWN_INVALID_INPUT, load_input_validity_registry  # noqa: E402
 from tae_eae_features import (  # noqa: E402
     DEFAULT_FRACTION_TAE_THRESHOLD,
     DEFAULT_FRACTION_EAE_THRESHOLD,
@@ -133,6 +134,7 @@ SHOT_SUMMARY_FIELDS = [
     "n_total_files",
     "n_failed_load",
     "n_nan_or_invalid",
+    "n_known_invalid_inputs",
     "n_tae_like",
     "n_mixed",
     "n_eae_like",
@@ -172,6 +174,7 @@ SHOT_SUMMARY_FIELDS = [
 SUMMARY_BY_N_FIELDS = ["shot", "n", *[f for f in SHOT_SUMMARY_FIELDS if f != "shot"]]
 
 INVALID_REASON_NAMES = {
+    KNOWN_INVALID_INPUT,
     "nonfinite_mode_data",
     "too_small_nhar",
     "ntor-N_mismatch",
@@ -387,6 +390,8 @@ def mark_rejected(row: dict[str, Any], reason: str, error_message: str) -> dict[
     row["status"] = "rejected"
     row["rejection_reason"] = reason
     row["error_message"] = error_message
+    if reason == KNOWN_INVALID_INPUT:
+        row["final_label"] = "invalid"
     return row
 
 
@@ -891,6 +896,9 @@ def build_summary_row(
         "n_total_files": len(rows),
         "n_failed_load": sum(row.get("rejection_reason") == "mode_load_failed" for row in rows),
         "n_nan_or_invalid": sum(row.get("rejection_reason") in INVALID_REASON_NAMES for row in rows),
+        "n_known_invalid_inputs": sum(
+            row.get("rejection_reason") == KNOWN_INVALID_INPUT for row in rows
+        ),
         "n_tae_like": sum(row.get("gap_region") == "tae_like" for row in rows),
         "n_mixed": sum(row.get("gap_region") == "mixed" for row in rows),
         "n_eae_like": sum(row.get("gap_region") == "eae_like" for row in rows),
@@ -1217,6 +1225,7 @@ def run_rf_cnn_method(args: argparse.Namespace) -> None:
         n_max=args.n_max,
         pattern=args.pattern,
     )
+    input_validity = load_input_validity_registry()
 
     rf_clf = joblib.load(args.rf_model)
     cnn_clf = load_cnn_classifier(args.cnn_model, device=args.device, model_kind=args.cnn_model_kind)
@@ -1261,6 +1270,11 @@ def run_rf_cnn_method(args: argparse.Namespace) -> None:
                     "rad_width": float(radial_width(bundle["mode"], r_grid, rad_loc)),
                 }
             )
+
+            diagnostic = input_validity.diagnostic(shot, n)
+            if diagnostic is not None:
+                rows.append(mark_rejected(row, KNOWN_INVALID_INPUT, diagnostic))
+                continue
 
             scalars, reason, error = load_gap_scalars(
                 path,
@@ -1405,6 +1419,7 @@ def run_rf_cnn_method(args: argparse.Namespace) -> None:
     print(f"Method: {RF_CNN_METHOD}")
     print(f"Shot: {shot}")
     print(f"Total files: {summary_row['n_total_files']}")
+    print(f"Known invalid input exclusions: {summary_row['n_known_invalid_inputs']}")
     print(
         "Gap split: "
         f"tae_like={summary_row['n_tae_like']} "
@@ -1451,6 +1466,7 @@ def run_rules_method(args: argparse.Namespace):
     print(f"Method: {RULES_METHOD}")
     print(f"Shot: {summary['shot']}")
     print(f"Total files: {summary['n_total_files']}")
+    print(f"Known invalid input exclusions: {summary['n_known_invalid_inputs']}")
     print(
         "Gap split: "
         f"tae_like={summary['n_tae_like']} "

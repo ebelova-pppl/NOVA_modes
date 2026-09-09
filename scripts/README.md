@@ -15,6 +15,34 @@ Platform path configs are still recommended for `NOVA_DATA`,
 The CNN trainers use `$NOVA_TRAIN_CSV` when set and otherwise fall back to the
 canonical `training_labels/tae_like_train.csv` in the same checkout.
 
+## Known invalid inputs in shot sorting
+
+`make_tae_like_list.py`, `sort_shot_rules.py`, and both methods of
+`sort_shot_mixed.py` use the shared `src/input_validity.py` registry reader.
+`configs/known_invalid_inputs.csv` currently invalidates every file in
+`nstxuG142301C50/N1` at the user's request because eigenmode structure does
+not correspond to the continuum. It matches the exact shot basename and n,
+so relocating the data does not lose the exclusion. This applies before
+TAE/EAE routing, including modes formerly routed to EAE. Missing or malformed
+registry data aborts the run rather than silently dropping the exclusion.
+
+Rules exports use `processing_status=INVALID, final_decision=INVALID`;
+RF-CNN exports use `status=rejected, final_label=invalid`. Both retain the
+reason `KNOWN_INVALID_INPUT` and an explanation with issue, reviewer, date,
+evidence, and registry SHA-256. `rejected_modes.csv` contains the excluded
+rows, which cannot enter TAE/EAE, GOOD/BAD, or final representative lists.
+`n_known_invalid_inputs` is recorded in shot and per-n summaries and printed
+by the canonical sorter. Manual morphology overrides cannot revive INVALID
+inputs. Registry entries persist until corrected inputs are reviewed and
+the corresponding entry removed. Raw loaders/viewers remain available for
+diagnosis. No new classifier feature or morphology gate is introduced.
+
+The standard commands apply the registry automatically, for example:
+
+```text
+python scripts/sort_shot_mixed.py --method rules --shot_dir /path/to/SHOT --rf_model models/nova_mode_classifier.joblib --out_dir /path/to/output
+```
+
 ## CNN model scripts
 
 - `cnn_hybrid.py`

@@ -1,0 +1,3 @@
+shot,mode_key,input_fingerprint,rules_decision,rules_reason,rf_cnn_decision,p_rf_good,p_cnn_good,rf_cnn_tier
+nstxuG142301C50,nstxuG142301C50/N1/egn01w.8889E+02,98b750b26b69fb6ee8b0c7af90e2ef38b8366472883cea5ef132966bad26a9e8,GOOD,NO_GOOD_TEMPLATE,BAD,0.07333333333333333,1.0326020406491744e-37,gold_bad
+nstxuG142301C50,nstxuG142301C50/N1/egn01w.9040E+02,dd18041f4c345d6269965126e4676e39980db907f8166a5ace4f9fa6ac0abbbd,GOOD,NO_GOOD_TEMPLATE,BAD,0.023333333333333334,0.0,gold_bad

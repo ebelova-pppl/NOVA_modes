@@ -502,6 +502,25 @@ still become GOOD. The warning states that policy and counts affected GOOD
 modes. Intentionally disabled gates do not warn; every run replaces both
 reports to clear stale warnings. No resampling or automatic abort is implied.
 
+## Honor known invalid input scopes
+
+Before gap routing, both canonical sorting methods and `make_tae_like_list.py`
+apply `configs/known_invalid_inputs.csv` through shared `src/input_validity.py`.
+The registry currently excludes all `nstxuG142301C50/N1` inputs at the user's
+request for `CONTINUUM_MODE_MISMATCH`, covering both TAE and EAE frequency
+ranges. Match the exact shot basename and n; keep the exclusion active until
+corrected inputs have been reviewed and its registry entry removed.
+
+These are INVALID inputs, not morphology BAD decisions. The shared reason
+is `KNOWN_INVALID_INPUT`; diagnostics retain the issue, reviewer, evidence,
+and registry hash. Rules use `final_decision=INVALID`; RF-CNN uses
+`status=rejected, final_label=invalid`. They appear in `rejected_modes.csv`
+and the complete audit, with `n_known_invalid_inputs` in shot/per-n summaries.
+No GOOD/BAD/REVIEW override can restore an INVALID row. Raw files and viewers
+remain available for investigation. Do not tune a morphology gate to absorb
+this data inconsistency. NOVA calculates eigenfrequencies and eigenmode
+structure; call its run an eigenmode calculation, not a stability calculation.
+
 ## Add explicit adjudication
 
 Create or update fingerprinted overrides from a production sorter output. The

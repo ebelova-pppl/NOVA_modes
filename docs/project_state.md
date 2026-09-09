@@ -3,33 +3,47 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
-## 2026-09-09 C50 N1 continuum / mode consistency issue
+## 2026-09-09 C50 N1 invalidated by the user
 
-- The user inspected all C50 TAE-side modes and reports resonance structure
-  displaced from continuum crossings for n=1, with other n appearing OK.
-  Non-blind raw-data and original stability-log checks confirm a mismatch
-  for all 14 N1 TAE-side modes: their inner gap crossing lies 2.42–9.73 grid
-  intervals farther out than the nearest logged singularity at the matching
-  mode frequency. This does not certify the other toroidal mode numbers.
-- N1/8889: log singularity r=0.470 versus upper crossing 0.517203;
-  N1/9040: 0.465 versus 0.511017; N1/9225: 0.455 versus 0.503648.
-  Their raw sharp harmonic features lie within one grid interval of the log
-  positions. The first two currently survive the rules and need provisional
-  treatment while this data issue is resolved.
-- All 14 raw fingerprints and recomputed crossing records match saved
-  outputs. Native metadata is ntor=1, nr=201, nhar=22; datcon indices are
-  3–199. The shared continuum cleanup changes zero points in datcon1.
-  Current equilibrium/profile/grid files match across N1–N10. The original
-  March stability cache targets are unavailable, and current continuum
-  files date from June; the responsible upstream calculation is unresolved.
-- Recorded the concern in main/G inventory notes without changing checked
-  membership, rule decisions, saved outputs, training labels, or the user's
-  question list. Recommended next step: set the 14 N1 TAE-side modes aside
-  for calibration/physical acceptance pending a paired upstream continuum/mode
-  consistency check with identical inputs;
-  no generic radius shift or rule relaxation is justified. Compact evidence
-  and reproduction are in `audits/c50_n1_alignment_20260909/`; local figures
-  are in `outputs/review_c50_n1_alignment_20260909/`.
+- Terminology correction: NOVA calculates eigenfrequencies and eigenmode
+  structure. Describing its calculation as a stability calculation was
+  incorrect; use eigenmode calculation/log in these diagnostics.
+- The user invalidated **all 73 C50 n=1 modes** because eigenmode structure
+  does not correspond to the continuum. This includes 14 formerly TAE-side
+  and 59 formerly EAE-side modes. The cause remains unresolved. The original
+  14-mode audit found inner-crossing offsets of 2.42–9.73 grid intervals
+  relative to singularities in matching NOVA eigenmode logs. The continuum
+  cleanup changes zero datcon1 points; original eigenmode-run cache files
+  are unavailable. Other n appeared consistent in the user's inspection.
+- Added `configs/known_invalid_inputs.csv` and a shared input-validity loader.
+  Both canonical sorting methods and `make_tae_like_list.py` apply the exact
+  shot/ntor exclusion before routing or rule/model evaluation. The reason is
+  `KNOWN_INVALID_INPUT`, issue `CONTINUUM_MODE_MISMATCH`; diagnostics retain
+  the reviewer, date, evidence, and registry SHA-256. The exclusion persists
+  until corrected inputs have been reviewed and the registry entry removed.
+  GOOD/BAD/REVIEW overrides cannot revive INVALID inputs. Diagnostic viewers
+  and raw data remain available; frozen morphology presets are unchanged.
+- All 163 tests pass, including rules and RF-CNN integration, both frequency
+  families, no inference for excluded modes, exact scope, bad registry
+  rejection, and override protection. Both C50 output sets were regenerated
+  and published with 73 INVALID rows. Every field of all **538 N2–N10 rows
+  matches the previous outputs exactly**, including features/probabilities.
+  Current C50 counts: 194 TAE-side, 344 EAE-side, 73 INVALID; selected GOOD
+  is zero for rules (from two) and one for RF-CNN (unchanged).
+- Both output roots retain the previous C50 directory under
+  `before_c50_n1_invalid_20260909/`. All published/backup trees were checked
+  against their hashes. The audit contains `invalidated_modes.csv` (73 rows),
+  run inputs, verification/publication receipts, and reproduction code under
+  `audits/c50_n1_alignment_20260909/`. Earlier alignment results remain
+  historical; reproduce them against the pre-invalidation backup.
+- The current 27-shot disagreement list is now **232 rows**, under
+  `audits/c50_n1_alignment_20260909/current_disagreements.csv`. N1/8889 and
+  N1/9040 were removed as INVALID; nothing was added. The user's working
+  question list is preserved. Main/G inventory notes record the invalid N1
+  subset while retaining the checked shot status. No active training row
+  matches this scope, so training labels/checkpoints are unchanged.
+- Next: continue other-n/other-shot review; correct and recheck paired C50
+  N1 continuum/eigenmode data before removing the input-validity exclusion.
 
 ## 2026-09-09 adopted smooth crossing-window exception
 

@@ -24,6 +24,7 @@ ensure_repo_src_on_path()
 from cont_features import load_datcon_for_mode  # noqa: E402
 from mode_features import radial_centroid, radial_width  # noqa: E402
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
+from input_validity import KNOWN_INVALID_INPUT, load_input_validity_registry  # noqa: E402
 from tae_eae_features import (  # noqa: E402
     DEFAULT_FRACTION_TAE_THRESHOLD,
     DEFAULT_FRACTION_EAE_THRESHOLD,
@@ -272,6 +273,7 @@ def preprocess_shot(
     populated = preflight_n_dirs(
         source, n_min=n_min, n_max=n_max, pattern=pattern
     )
+    input_validity = load_input_validity_registry()
     rows: list[dict[str, Any]] = []
     rule_feature_data: dict[str, RuleFeatureData] = {}
     for n, _n_dir, files in populated:
@@ -317,6 +319,11 @@ def preprocess_shot(
                 )
                 continue
             row.update({"rad_loc": centroid, "rad_width": width})
+
+            diagnostic = input_validity.diagnostic(source.name, n)
+            if diagnostic is not None:
+                rows.append(_mark_invalid(row, KNOWN_INVALID_INPUT, diagnostic))
+                continue
 
             gap_data, reason, message = _load_gap_data(
                 path, mode=bundle["mode"], omega=bundle["omega"]

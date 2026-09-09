@@ -40,6 +40,21 @@ Plotting:
 - `viz/view_modes_csv.py`
 - `viz/plot_straightened_mode.py`
 
+Known invalid inputs (2026-09-09):
+
+- `configs/known_invalid_inputs.csv` records user-approved shot/ntor exclusions.
+  Both sorting methods and `make_tae_like_list.py` apply them before gap
+  routing or classification, retain them in `rejected_modes.csv`, and report
+  `n_known_invalid_inputs` in shot/per-n summaries. Diagnostics include the
+  issue, reviewer, evidence, and registry hash.
+- All 73 `nstxuG142301C50/N1` modes are INVALID because eigenmode structure
+  does not correspond to the continuum. The exact scope stays excluded on
+  reruns until corrected inputs are reviewed and the registry entry removed.
+  Raw files remain readable for diagnosis. See the
+  [C50 audit](audits/c50_n1_alignment_20260909/README.md).
+- NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
+  should refer to eigenmode calculations, not stability calculations.
+
 Production rules v7 (2026-09-09):
 
 - `sort_shot_mixed.py --method rules` now uses

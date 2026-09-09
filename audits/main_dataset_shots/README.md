@@ -56,3 +56,12 @@ before sorting by the next seeded candidate, `nstxuG142301E72`.
 `gamma_d=NaN` were found during the second pilot preflight, before inference;
 the next large-G candidate, `nstxuG142301U84`, replaced it. Active training
 counts include the previously requested N9/3737 label correction.
+
+On 2026-09-09 the user invalidated all 73 C50 N1 modes for a confirmed
+continuum/eigenmode inconsistency. The shared input-validity registry enforces
+that scope in both sorting methods. Both C50 exports were refreshed with
+checked backups under `before_c50_n1_invalid_20260909/`; N2–N10 rows are
+unchanged. The current comparison has **232 disagreements** at
+`../c50_n1_alignment_20260909/current_disagreements.csv`. This subset exclusion
+does not change the 27-shot checked membership. NOVA calculates eigenfrequencies
+and eigenmode structure; the diagnostic log is an eigenmode-calculation log.

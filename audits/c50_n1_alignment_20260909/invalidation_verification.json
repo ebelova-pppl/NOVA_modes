@@ -1,0 +1,45 @@
+{
+  "status": "verified",
+  "modes_invalidated": 73,
+  "unchanged_modes_per_method": 538,
+  "removed_disagreements": 2,
+  "current_disagreements": 232,
+  "trees": {
+    "rules": {
+      "old": {
+        "files": 19,
+        "tree_sha256": "1fb8d93c12366c5a5d636874842c343cfa9be5f2e3165d326ad5443251c08a45"
+      },
+      "new": {
+        "files": 19,
+        "tree_sha256": "ce6de1c28db6e46f038013ca37e2b9f2215c1cf04da63331cb18e7d2a75b2604"
+      }
+    },
+    "rf-cnn": {
+      "old": {
+        "files": 15,
+        "tree_sha256": "929034d94c8c070f18a224b914edaf93fc3a4f2caaf0e6169df3fedae0266abb"
+      },
+      "new": {
+        "files": 14,
+        "tree_sha256": "5aa46c99311e447bae48e424c7a1852e1a6073bb9258bbf56e9d193f22f24395"
+      }
+    }
+  },
+  "source_sha256": {
+    "src/input_validity.py": "613036333ff8d67c43066d9ea16b433711d63b5d07d642baa3a1cf63fe2fecd1",
+    "configs/known_invalid_inputs.csv": "8205ac1066ea6816eb383dbd49b6f2412da6b2996ea2bc9886fab3af9a467ba5",
+    "scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b",
+    "scripts/sort_shot_rules.py": "ebb1542754236b9baa564e4036fdd77fdbd81f26fc9338bece94100bdb36f2a0",
+    "scripts/sort_shot_mixed.py": "b9459e9913cd2ab43fd68d86388db3caf80f543dbca13ed4a6f115842c25fbb2",
+    "scripts/tae_rule_engine.py": "dfcd558f6eea599c60decd8274d9a02aa64ee0ee09ba6c1faa9ad74949d448c5",
+    "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+    "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+    "configs/rules/tae_rules_production_v7.yaml": "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
+    "models/nova_mode_classifier.joblib": "b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c",
+    "models/nova_cnn_raw.pt": "872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e",
+    "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a"
+  },
+  "verifier_sha256": "5191c2db8c8fc01a80dc3ccac636d79ba97ec802d4a9b131bdbbf81d2b55c436",
+  "previous_disagreements_sha256": "5cce1b18d186153a4e9e3c6671a7712e70c40373af91d861be172e0a8a2606b8"
+}

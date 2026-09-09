@@ -110,6 +110,7 @@ from tae_rule_io import (  # noqa: E402
     write_text,
     write_vertical_summary,
 )
+from input_validity import KNOWN_INVALID_INPUT  # noqa: E402
 
 
 SIMILARITY_THRESHOLD = 0.90
@@ -145,6 +146,7 @@ SHOT_SUMMARY_FIELDS = [
     "continuum_preprocessing_version",
     "n_total_files",
     "n_invalid",
+    "n_known_invalid_inputs",
     "n_tae_like",
     "n_mixed",
     "n_eae_like",
@@ -1001,6 +1003,9 @@ def build_summary(
         "continuum_preprocessing_version": CONTINUUM_PREPROCESSING_VERSION,
         "n_total_files": len(rows),
         "n_invalid": sum(row.get("final_decision") == "INVALID" for row in rows),
+        "n_known_invalid_inputs": sum(
+            row.get("preprocessing_primary_reason") == KNOWN_INVALID_INPUT for row in rows
+        ),
         "n_tae_like": sum(row.get("gap_region") == "tae_like" for row in rows),
         "n_mixed": sum(row.get("gap_region") == "mixed" for row in rows),
         "n_eae_like": sum(row.get("gap_region") == "eae_like" for row in rows),

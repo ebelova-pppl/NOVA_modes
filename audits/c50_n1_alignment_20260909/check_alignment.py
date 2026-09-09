@@ -1,4 +1,4 @@
-"""Compare C50 N1 crossings with the original stability-run singularity log.
+"""Compare C50 N1 crossings with the original eigenmode-run singularity log.
 
 Example:
   python audits/c50_n1_alignment_20260909/check_alignment.py \
