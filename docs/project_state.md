@@ -3,6 +3,37 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 whole R06 shot invalidated by the user
+
+- The user invalidated **all 610 modes in `nstxuG133964R06`**, n=1–10,
+  after visually finding poor eigenmode structures throughout and poloidal
+  harmonic spectra peaking at the largest retained m in some modes. This
+  records the user's review; the underlying cause has not been established.
+- Shared input-validity policy v2 supports `ntor=*` for a whole-shot scope.
+  The registry records issue `SUSPECT_EIGENMODE_STRUCTURE`; both sorters and
+  preprocessing exclude R06 before TAE/EAE routing and rule/model evaluation.
+  The exclusion covers future files in the shot and persists until corrected
+  inputs are reviewed and the registry entry removed. C50 remains N1-only.
+- Both canonical R06 output sets were regenerated and published: **610
+  INVALID, zero TAE/EAE/GOOD/BAD** per method. Previously there were 66
+  TAE-side and 544 EAE-side inputs; rules selected one GOOD and RF-CNN five.
+  All nr=201 and input fingerprints/metadata match the previous exports.
+  Previous directories are preserved under `before_r06_invalid_20260909/`
+  in each output root, with published/backup tree hashes verified.
+- All **164 tests pass**, including whole-shot coverage, an explicitly
+  scanned N11 fixture, no inference for excluded modes, empty usable lists,
+  malformed registry rejection, and the existing C50 per-n controls.
+- Main/G inventories now mark R06 `status=invalid_input`, retaining checked
+  history. No active training rows belong to R06. The current disagreement
+  list has **226 rows** at
+  `audits/r06_input_validity_20260909/current_disagreements.csv`; its six R06
+  removals are in `disagreements_removed.csv`. The user's working question
+  list is preserved. Other shot exports are untouched.
+- Evidence, input hashes, verification/publication receipts, and reproduction
+  instructions are in `audits/r06_input_validity_20260909/README.md`.
+  Next: continue the remaining disagreement review; investigate/correct R06
+  eigenmode inputs and harmonic coverage before reconsidering its validity.
+
 ## 2026-09-09 C50 N1 invalidated by the user
 
 - Terminology correction: NOVA calculates eigenfrequencies and eigenmode

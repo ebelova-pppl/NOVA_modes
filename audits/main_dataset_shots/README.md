@@ -61,7 +61,19 @@ On 2026-09-09 the user invalidated all 73 C50 N1 modes for a confirmed
 continuum/eigenmode inconsistency. The shared input-validity registry enforces
 that scope in both sorting methods. Both C50 exports were refreshed with
 checked backups under `before_c50_n1_invalid_20260909/`; N2–N10 rows are
-unchanged. The current comparison has **232 disagreements** at
+unchanged. That comparison had **232 disagreements** at
 `../c50_n1_alignment_20260909/current_disagreements.csv`. This subset exclusion
 does not change the 27-shot checked membership. NOVA calculates eigenfrequencies
 and eigenmode structure; the diagnostic log is an eigenmode-calculation log.
+
+Later on 2026-09-09 the user invalidated the whole `nstxuG133964R06` shot:
+poor eigenmode structures throughout and spectra peaking at the largest
+retained poloidal harmonic in some modes (cause unconfirmed). R06 now has
+`status=invalid_input` in both inventories. Its `post_training_checked=yes`
+and method history remain: checked records past processing, not input validity.
+Both R06 output sets now retain all 610 modes as INVALID, with no usable
+TAE/EAE/GOOD/BAD entries; backups are under `before_r06_invalid_20260909/`.
+The persistent registry uses `ntor=*` to cover all n. The current comparison
+has **226 disagreements** at `../r06_input_validity_20260909/current_disagreements.csv`,
+after removing six R06 entries. Checked membership remains 27, including
+this now-invalid shot; active training labels are unchanged.

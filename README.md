@@ -42,7 +42,8 @@ Plotting:
 
 Known invalid inputs (2026-09-09):
 
-- `configs/known_invalid_inputs.csv` records user-approved shot/ntor exclusions.
+- `configs/known_invalid_inputs.csv` records user-approved shot/ntor exclusions;
+  `ntor=*` excludes a whole shot across all n.
   Both sorting methods and `make_tae_like_list.py` apply them before gap
   routing or classification, retain them in `rejected_modes.csv`, and report
   `n_known_invalid_inputs` in shot/per-n summaries. Diagnostics include the
@@ -52,6 +53,11 @@ Known invalid inputs (2026-09-09):
   reruns until corrected inputs are reviewed and the registry entry removed.
   Raw files remain readable for diagnosis. See the
   [C50 audit](audits/c50_n1_alignment_20260909/README.md).
+- All 610 `nstxuG133964R06` modes are INVALID after the user's visual review:
+  poor eigenmode structures throughout, with spectra peaking at the largest
+  retained poloidal harmonic in some modes. The cause is unconfirmed. Both
+  output sets exclude the whole shot from usable lists until corrected data
+  are reviewed. See the [R06 audit](audits/r06_input_validity_20260909/README.md).
 - NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
   should refer to eigenmode calculations, not stability calculations.
 

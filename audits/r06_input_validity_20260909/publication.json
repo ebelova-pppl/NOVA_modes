@@ -1,0 +1,28 @@
+[
+  {
+    "method": "rules",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG133964R06",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_r06_invalid_20260909/nstxuG133964R06",
+    "old": {
+      "files": 19,
+      "tree_sha256": "376c05bdf035b696735b8852a43749a9f97a16470fc57b36a913137b631f5b6e"
+    },
+    "new": {
+      "files": 18,
+      "tree_sha256": "e9821a82478cb6cd95ff89fe2ddb4f7c97b1149914eec6f6636b82a7493bcc89"
+    }
+  },
+  {
+    "method": "rf-cnn",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs_ai/nstxuG133964R06",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs_ai/before_r06_invalid_20260909/nstxuG133964R06",
+    "old": {
+      "files": 15,
+      "tree_sha256": "de0712b2971d71f82d3de502c4c3f86d2cc9e9f5637467a89175bf2642380cb5"
+    },
+    "new": {
+      "files": 13,
+      "tree_sha256": "b1ae4fc2dac78d5c86348ac512c730c00551732864a46a4e59c9e976f409fea0"
+    }
+  }
+]

@@ -21,6 +21,7 @@ from sort_shot_mixed import parse_args, run_rf_cnn_method
 
 
 SHOT = "nstxuG142301C50"
+WHOLE_SHOT = "nstxuG133964R06"
 
 
 def fixture(root):
@@ -37,6 +38,11 @@ class InputValidityTests(unittest.TestCase):
         self.assertIn("CONTINUUM_MODE_MISMATCH", registry.diagnostic(SHOT, 1))
         self.assertIsNone(registry.diagnostic(SHOT, 2))
         self.assertIsNone(registry.diagnostic(SHOT + "_new", 1))
+        for n in (1, 10, 11):
+            self.assertIn(
+                "SUSPECT_EIGENMODE_STRUCTURE", registry.diagnostic(WHOLE_SHOT, n)
+            )
+        self.assertIsNone(registry.diagnostic(WHOLE_SHOT + "_new", 1))
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "registry.csv"
             original = REGISTRY_PATH.read_text()
@@ -45,10 +51,86 @@ class InputValidityTests(unittest.TestCase):
                 original + original.splitlines()[1] + "\n",
                 original.replace(",1,CONTINUUM", ",0,CONTINUUM"),
                 original.replace(",user,", ",,"),
+                original.replace(",*,", ",all,"),
+                original + original.splitlines()[2] + "\n",
             ]:
                 path.write_text(text)
                 with self.assertRaises(ValueError):
                     load_input_validity_registry(path)
+            # A per-n entry cannot narrow an existing whole-shot exclusion.
+            path.write_text(
+                original
+                + original.splitlines()[2]
+                .replace(",*,", ",1,")
+                .replace(",SUSPECT_EIGENMODE_STRUCTURE,", ",SPECIFIC_ISSUE,")
+                + "\n"
+            )
+            combined = load_input_validity_registry(path)
+            self.assertIn(
+                "SUSPECT_EIGENMODE_STRUCTURE", combined.diagnostic(WHOLE_SHOT, 1)
+            )
+
+    def test_whole_shot_excludes_every_n_in_both_sorters(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            shot = root / WHOLE_SHOT
+            fixture(root).rename(shot)
+            # The policy also covers a toroidal n absent from today's data.
+            write_mode(shot / "N11/egn11w.future", omega=1.0, ntor=11, nr=201)
+            write_datcon(shot / "N11/datcon11", nr=201)
+            result = run_configured_shot(
+                shot, root / "rules", rule_config="tae_rules_production_v7", n_max=11
+            )
+            self.assertEqual(len(result.final_rows), 4)
+            self.assertTrue(
+                all(r["final_decision"] == "INVALID" for r in result.final_rows)
+            )
+            self.assertEqual(result.summary["n_known_invalid_inputs"], 4)
+            self.assertEqual(result.summary["n_rule_evaluated"], 0)
+            self.assertEqual(result.summary["n_final_good"], 0)
+            out = root / "ai"
+            cnn = SimpleNamespace(predict=Mock())
+            module = SimpleNamespace(load_cnn_classifier=Mock(return_value=cnn))
+            args = parse_args(
+                [
+                    "--method",
+                    "rf-cnn",
+                    "--shot_dir",
+                    str(shot),
+                    "--out_dir",
+                    str(out),
+                    "--rf_model",
+                    "dummy_rf",
+                    "--cnn_model",
+                    "dummy_cnn",
+                    "--device",
+                    "cpu",
+                    "--n_max",
+                    "11",
+                ]
+            )
+            with patch.dict("sys.modules", {"cnn_infer_common": module}), patch(
+                "joblib.load", return_value=object()
+            ), patch("sort_shot.classify_mode_rf") as rf, contextlib.redirect_stdout(
+                io.StringIO()
+            ):
+                run_rf_cnn_method(args)
+            rf.assert_not_called()
+            cnn.predict.assert_not_called()
+            with (out / "all_modes_scored.csv").open() as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertEqual(len(rows), 4)
+            for row in rows:
+                self.assertEqual(row["final_label"], "invalid")
+                self.assertEqual(row["rejection_reason"], KNOWN_INVALID_INPUT)
+                self.assertEqual(row["gap_region"], "")
+                self.assertEqual(row["p_rf_good"], "")
+                self.assertEqual(row["p_cnn_good"], "")
+            with (out / "shot_summary_wide.csv").open() as handle:
+                summary = next(csv.DictReader(handle))
+            self.assertEqual(summary["n_known_invalid_inputs"], "4")
+            self.assertEqual(summary["n_sent_to_classifiers"], "0")
+            self.assertEqual(summary["n_final_good"], "0")
 
     def test_rules_invalidates_tae_and_eae_before_routing_and_overrides(self):
         with tempfile.TemporaryDirectory() as tmp:

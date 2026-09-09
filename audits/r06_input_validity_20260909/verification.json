@@ -1,0 +1,44 @@
+{
+  "status": "verified",
+  "modes_invalidated_per_method": 610,
+  "removed_disagreements": 6,
+  "current_disagreements": 226,
+  "trees": {
+    "rules": {
+      "old": {
+        "files": 19,
+        "tree_sha256": "376c05bdf035b696735b8852a43749a9f97a16470fc57b36a913137b631f5b6e"
+      },
+      "new": {
+        "files": 18,
+        "tree_sha256": "e9821a82478cb6cd95ff89fe2ddb4f7c97b1149914eec6f6636b82a7493bcc89"
+      }
+    },
+    "rf-cnn": {
+      "old": {
+        "files": 15,
+        "tree_sha256": "de0712b2971d71f82d3de502c4c3f86d2cc9e9f5637467a89175bf2642380cb5"
+      },
+      "new": {
+        "files": 13,
+        "tree_sha256": "b1ae4fc2dac78d5c86348ac512c730c00551732864a46a4e59c9e976f409fea0"
+      }
+    }
+  },
+  "source_sha256": {
+    "src/input_validity.py": "01ac8d455ac1d46795793f105c921944bbb32144038e36f7502a90df605e14f7",
+    "configs/known_invalid_inputs.csv": "0809ed5dbcc546f78586f3cff4795bdbeb42bac0e914776c3145d2ed55bf51cf",
+    "scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b",
+    "scripts/sort_shot_rules.py": "ebb1542754236b9baa564e4036fdd77fdbd81f26fc9338bece94100bdb36f2a0",
+    "scripts/sort_shot_mixed.py": "b9459e9913cd2ab43fd68d86388db3caf80f543dbca13ed4a6f115842c25fbb2",
+    "scripts/tae_rule_engine.py": "dfcd558f6eea599c60decd8274d9a02aa64ee0ee09ba6c1faa9ad74949d448c5",
+    "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+    "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+    "configs/rules/tae_rules_production_v7.yaml": "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
+    "models/nova_mode_classifier.joblib": "b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c",
+    "models/nova_cnn_raw.pt": "872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e",
+    "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a"
+  },
+  "verifier_sha256": "c126ac8b72a1e5f34ff3d2c81c4c47406173fbb529a27db466b3dff688a31782",
+  "previous_disagreements_sha256": "72ac527304cfd23c62aa4c0ed2e5251cdc8f11f9290dc6710038226ac1a4c944"
+}

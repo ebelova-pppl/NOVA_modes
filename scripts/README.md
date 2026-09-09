@@ -19,10 +19,14 @@ canonical `training_labels/tae_like_train.csv` in the same checkout.
 
 `make_tae_like_list.py`, `sort_shot_rules.py`, and both methods of
 `sort_shot_mixed.py` use the shared `src/input_validity.py` registry reader.
-`configs/known_invalid_inputs.csv` currently invalidates every file in
-`nstxuG142301C50/N1` at the user's request because eigenmode structure does
-not correspond to the continuum. It matches the exact shot basename and n,
-so relocating the data does not lose the exclusion. This applies before
+`configs/known_invalid_inputs.csv` currently invalidates `nstxuG142301C50/N1`
+for continuum/eigenmode mismatch, and the whole `nstxuG133964R06` shot after
+the user's visual assessment of poor eigenmode structures and some spectra
+peaking at the largest retained poloidal harmonic (cause unconfirmed).
+It matches the exact shot basename; `ntor` is a positive integer for one n,
+or `*` for every n in a whole shot, including files added later. Whole-shot
+entries take precedence if a per-n entry also exists. Relocating the data
+does not lose the exclusion. This applies before
 TAE/EAE routing, including modes formerly routed to EAE. Missing or malformed
 registry data aborts the run rather than silently dropping the exclusion.
 

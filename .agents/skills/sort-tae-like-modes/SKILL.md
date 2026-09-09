@@ -506,10 +506,15 @@ reports to clear stale warnings. No resampling or automatic abort is implied.
 
 Before gap routing, both canonical sorting methods and `make_tae_like_list.py`
 apply `configs/known_invalid_inputs.csv` through shared `src/input_validity.py`.
-The registry currently excludes all `nstxuG142301C50/N1` inputs at the user's
-request for `CONTINUUM_MODE_MISMATCH`, covering both TAE and EAE frequency
-ranges. Match the exact shot basename and n; keep the exclusion active until
-corrected inputs have been reviewed and its registry entry removed.
+The registry excludes `nstxuG142301C50/N1` for `CONTINUUM_MODE_MISMATCH`
+and the whole `nstxuG133964R06` shot for `SUSPECT_EIGENMODE_STRUCTURE`,
+covering both TAE and EAE frequency ranges. R06 records the user's visual
+assessment of poor structures throughout and some spectra peaking at the
+largest retained poloidal harmonic; its cause is unconfirmed. Match the exact
+shot basename: a positive integer `ntor` covers one n, while `ntor=*` covers
+the whole shot, including future files. Whole-shot entries take precedence
+if a per-n entry also exists. Keep exclusions active until corrected inputs
+have been reviewed and their registry entries removed.
 
 These are INVALID inputs, not morphology BAD decisions. The shared reason
 is `KNOWN_INVALID_INPUT`; diagnostics retain the issue, reviewer, evidence,
