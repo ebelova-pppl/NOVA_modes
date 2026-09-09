@@ -3,7 +3,7 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
-## 2026-09-09 width-independent near-axis amplitude proposal
+## 2026-09-09 near-axis amplitude and energy concentration proposal
 
 - The user flagged L94 N5/2135 for near-unit amplitude extremely close to
   the axis and clarified that a width condition does not address the issue.
@@ -19,14 +19,24 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   E202855A01t020 N1/8188 (axis amplitude 0.702598); limit 0.8 affects none.
   The broader r_cap=0.015 with limit 0.5 additionally flags E204645A16t015
   N1/3712. Labeled BAD training modes were not screened in this audit.
-- A conservative proposed cap is 0.8 within r<=0.01. N1/8188 also has an
-  abrupt inner rise and remains a visual-review case for tighter limits.
-  This is a non-blind calibration proposal, not an adopted production gate
-  or proof of a boundary-condition error. Production v8 and truth labels
-  are unchanged. Evidence is in `audits/axis_amplitude_20260909/`; plots and
+- The user subsequently accepted the two other candidates as real modes:
+  their energy is mostly away from the axis. The updated joint proposal is
+  `max_{h,r<=0.015}|xi_h| > 0.5 AND F_inner(r<=0.05) > 0.5`, independent
+  of width. F_inner integrates all-harmonic W over dr with the shared
+  piecewise-linear integration helper; no volume weighting is added.
+  L94 has 60.00% of its radial energy inside r<=0.05, versus 7.62% for
+  training N1/8188 and 3.79% for A16t015 N1/3712.
+- Reloaded the same 950 batch survivors and 575 training GOOD modes for
+  the combined check: only L94 N5/2135 is newly rejected; both user-approved
+  comparison modes remain GOOD. At energy radius 0.05, fraction thresholds
+  0.2, 0.3, and 0.5 give the same result. This supersedes the initial 0.8
+  amplitude-only proposal. It adds a potential rejection condition without
+  weakening existing gates. Numerical thresholds have not been adopted.
+- This is non-blind calibration, not proof of a boundary-condition error.
+  Production v8 and truth labels are unchanged. Evidence and the one-row
+  `combined_changes.csv` are in `audits/axis_amplitude_20260909/`; plots and
   full measurements are ignored in `outputs/review_axis_amplitude_20260909/`.
-  Next: choose the near-axis radius/amplitude cap, reviewing the additional
-  candidates before selecting a stricter option.
+  Next: select the joint thresholds before implementing the additional gate.
 
 ## 2026-09-09 adopted clearance >0.1% for the interior extremum exception
 

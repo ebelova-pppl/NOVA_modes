@@ -47,11 +47,77 @@
       "newly_rejected_training_good": 0
     }
   ],
+  "combined_proposal": {
+    "amplitude_radius": 0.015,
+    "amplitude_min_exclusive": 0.5,
+    "energy_radius": 0.05,
+    "energy_fraction_min_exclusive": 0.5,
+    "newly_rejected_shot_good": 1,
+    "newly_rejected_training_good": 0,
+    "energy_definition": "integral_0^R sum_h abs(xi_h)^2 dr / integral_0^1 sum_h abs(xi_h)^2 dr"
+  },
+  "energy_sensitivity": [
+    {
+      "energy_radius": 0.03,
+      "energy_fraction_min": 0.2,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.03,
+      "energy_fraction_min": 0.3,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.03,
+      "energy_fraction_min": 0.5,
+      "newly_rejected_shot_good": 0,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.05,
+      "energy_fraction_min": 0.2,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.05,
+      "energy_fraction_min": 0.3,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.05,
+      "energy_fraction_min": 0.5,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.1,
+      "energy_fraction_min": 0.2,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.1,
+      "energy_fraction_min": 0.3,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    },
+    {
+      "energy_radius": 0.1,
+      "energy_fraction_min": 0.5,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0
+    }
+  ],
   "source_sha256": {
     "scripts/tae_rule_engine.py": "c97f4d9741f58defc48763c1d155f98d616133c9f413b066e5610cf28174524a",
     "scripts/tae_rule_config.py": "d9f64fadaf2c1477f90a5d79b696a39b43355c803e8108d8dd40467995cd7402",
+    "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
     "configs/rules/tae_rules_production_v8.yaml": "86436a3486cd2d3bd9fd8a16d3af51f2127cb0325017de392ae7d1d36d8647e0",
     "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
-    "audits/axis_amplitude_20260909/audit.py": "7032c492ad43c23b8719a765b6d59d2e035a30df8e25852ae76fec08ff15ff8e"
+    "audits/axis_amplitude_20260909/audit.py": "3403d20c9debe6d0331bc24ca7c8da2dd22141ee3c8b10512b0136dd828d1e86"
   }
 }
