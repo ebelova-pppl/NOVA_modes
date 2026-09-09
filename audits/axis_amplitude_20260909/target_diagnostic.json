@@ -1,0 +1,77 @@
+{
+  "mode_key": "nstxuG142301L94/N5/egn05w.2135E+02",
+  "input_fingerprint": "3f835f34c778e7d62c0a12cd3181f21c991e30ac91aa25882f366858bbc8a20d",
+  "prior_seen": true,
+  "raw_v20_features_and_decision_reproduced": true,
+  "dominant_stored_harmonic": 7,
+  "samples": [
+    {
+      "r": 0.0,
+      "signed_amplitude": 0.0
+    },
+    {
+      "r": 0.005,
+      "signed_amplitude": 0.7104168901845153
+    },
+    {
+      "r": 0.01,
+      "signed_amplitude": 1.0
+    },
+    {
+      "r": 0.015,
+      "signed_amplitude": 0.8119968199631522
+    },
+    {
+      "r": 0.02,
+      "signed_amplitude": 0.8299033316314924
+    },
+    {
+      "r": 0.025,
+      "signed_amplitude": 0.7321971142053025
+    },
+    {
+      "r": 0.03,
+      "signed_amplitude": 0.7074757610083873
+    }
+  ],
+  "axis_features": {
+    "r_ax": 0.03,
+    "axis_candidate_found": false,
+    "axis_candidate_amplitude_min": 0.2,
+    "axis_candidate_width_limit_grid": 10.0,
+    "axis_local_peak_count": 153,
+    "axis_amplitude_qualified_peak_count": 2,
+    "axis_width_qualified_peak_count": 99,
+    "axis_peak": 1.0,
+    "axis_peak_harmonic_index": 7,
+    "axis_peak_r": 0.01,
+    "axis_peak_is_local_max": true,
+    "axis_halfmax_width_r": 0.05262501895501507,
+    "axis_halfmax_width_grid": 10.525003791003014,
+    "axis_halfmax_outer_edge_r": 0.0561440794313935,
+    "axis_component_touches_boundary": false
+  },
+  "energy_features": {
+    "peak_r_max": 0.5,
+    "width_max_grid": 2.0,
+    "extremum_r_min": 0.03,
+    "extremum_r_max": 0.5,
+    "ext_dr_max": 0.02,
+    "ext_df_gap_min": 0.001,
+    "ext_df_gap_max": 0.04,
+    "ext_df_gap_min_inclusive": false,
+    "candidate_found": false,
+    "energy_peak": 1.0,
+    "energy_peak_r": 0.01,
+    "energy_halfmax_width_r": 0.025331849036038648,
+    "energy_halfmax_width_grid": 5.06636980720773,
+    "energy_halfmax_inner_edge_r": 0.004925637801106485,
+    "energy_halfmax_outer_edge_r": 0.03025748683714513,
+    "energy_component_touches_boundary": false,
+    "extremum_match_found": true,
+    "ext_dr": 0.165,
+    "ext_df_gap": 0.07429278508405117,
+    "ext_energy_frac": 0.060344259125829885,
+    "extremum_exception_applied": false
+  }
+}

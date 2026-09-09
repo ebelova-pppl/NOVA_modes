@@ -3,6 +3,31 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 width-independent near-axis amplitude proposal
+
+- The user flagged L94 N5/2135 for near-unit amplitude extremely close to
+  the axis and clarified that a width condition does not address the issue.
+  Raw v20 features/decision and input fingerprint reproduce the saved v8
+  survivor. Stored harmonic h=7 rises from 0 to 0.710417 to 1 at r=0,
+  0.005, and 0.01. Its long shoulder gives an amplitude FWHM of 10.525
+  intervals, narrowly missing the axis gate; no exception was needed to pass.
+- Audited independent `max_{h,r<=r_cap}|xi_h(r)| > A_limit` using radii
+  0.01/0.015 and limits 0.5/0.7/0.8, without any width requirement.
+  Reloaded all 950 current batch GOOD survivors and 575 training GOOD modes;
+  all nr=201. At r_cap=0.01 every candidate limit flags only L94 N5/2135
+  in the batch. Limits 0.5/0.7 also reject one training GOOD survivor,
+  E202855A01t020 N1/8188 (axis amplitude 0.702598); limit 0.8 affects none.
+  The broader r_cap=0.015 with limit 0.5 additionally flags E204645A16t015
+  N1/3712. Labeled BAD training modes were not screened in this audit.
+- A conservative proposed cap is 0.8 within r<=0.01. N1/8188 also has an
+  abrupt inner rise and remains a visual-review case for tighter limits.
+  This is a non-blind calibration proposal, not an adopted production gate
+  or proof of a boundary-condition error. Production v8 and truth labels
+  are unchanged. Evidence is in `audits/axis_amplitude_20260909/`; plots and
+  full measurements are ignored in `outputs/review_axis_amplitude_20260909/`.
+  Next: choose the near-axis radius/amplitude cap, reviewing the additional
+  candidates before selecting a stricter option.
+
 ## 2026-09-09 adopted clearance >0.1% for the interior extremum exception
 
 - The user selected **relative frequency clearance >0.1% only**, with no

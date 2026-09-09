@@ -1,0 +1,57 @@
+{
+  "status": "audit_only_not_adopted",
+  "prior_seen": true,
+  "shot_survivors": 950,
+  "training_good_labels": 575,
+  "comparisons": [
+    {
+      "radius": 0.01,
+      "amplitude_limit": 0.5,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 1,
+      "newly_rejected_training_good": 1
+    },
+    {
+      "radius": 0.01,
+      "amplitude_limit": 0.7,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 1,
+      "newly_rejected_training_good": 1
+    },
+    {
+      "radius": 0.01,
+      "amplitude_limit": 0.8,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0,
+      "newly_rejected_training_good": 0
+    },
+    {
+      "radius": 0.015,
+      "amplitude_limit": 0.5,
+      "newly_rejected_shot_good": 2,
+      "training_good_flagged": 1,
+      "newly_rejected_training_good": 1
+    },
+    {
+      "radius": 0.015,
+      "amplitude_limit": 0.7,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 1,
+      "newly_rejected_training_good": 1
+    },
+    {
+      "radius": 0.015,
+      "amplitude_limit": 0.8,
+      "newly_rejected_shot_good": 1,
+      "training_good_flagged": 0,
+      "newly_rejected_training_good": 0
+    }
+  ],
+  "source_sha256": {
+    "scripts/tae_rule_engine.py": "c97f4d9741f58defc48763c1d155f98d616133c9f413b066e5610cf28174524a",
+    "scripts/tae_rule_config.py": "d9f64fadaf2c1477f90a5d79b696a39b43355c803e8108d8dd40467995cd7402",
+    "configs/rules/tae_rules_production_v8.yaml": "86436a3486cd2d3bd9fd8a16d3af51f2127cb0325017de392ae7d1d36d8647e0",
+    "training_labels/tae_like_train.csv": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+    "audits/axis_amplitude_20260909/audit.py": "7032c492ad43c23b8719a765b6d59d2e035a30df8e25852ae76fec08ff15ff8e"
+  }
+}
