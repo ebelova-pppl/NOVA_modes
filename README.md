@@ -40,6 +40,21 @@ Plotting:
 - `viz/view_modes_csv.py`
 - `viz/plot_straightened_mode.py`
 
+Production rules v7 (2026-09-09):
+
+- `sort_shot_mixed.py --method rules` now uses
+  `configs/rules/tae_rules_production_v7.yaml` (ruleset/features v19).
+  Each offending continuum-crossing window is excused only when its
+  interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
+  its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
+  crossing must qualify; all other rejection gates still apply.
+- V5/v6 configuration files remain frozen and explicitly disable the new
+  exception when loaded. Their decisions remain supported; new exports use
+  the current v19 audit schema. RF/CNN feature columns and weights are unchanged.
+- The reviewed impact audit recovers 19 modes in the 27-shot batch and two
+  labeled GOOD training modes, with no newly accepted labeled BAD training
+  modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
+
 Shared continuum preprocessing (adopted 2026-09-08):
 
 - `src/cont_features.py` now repairs sustained steep rises of both continuum
@@ -145,7 +160,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v6`
+  `--method rules` path loads the immutable `tae_rules_production_v7`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -164,7 +179,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v6` configuration automatically:
+`tae_rules_production_v7` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -325,7 +340,7 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v6.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v7.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -338,9 +353,9 @@ named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
 `GOOD` before manual overrides and duplicate processing.
 
-Production v6 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
-regardless of `signed_delta`. All other routing branches and v18 morphology
-gates are preserved. The fraction counts mode energy where the upper TAE
+Production v7 inherits v6 routing: `fraction_below_upper2 < 0.2` goes directly
+to EAE-like, regardless of `signed_delta`. It adds the approved gate-4
+exception described above; other morphology gates retain their thresholds. The fraction counts mode energy where the upper TAE
 boundary is defined. V5 remains available via `--rule_config
 tae_rules_production_v5`, with its original routing; saved v5 output lists
 require regeneration to reflect v6. Standalone split and RF-CNN workflows
@@ -440,7 +455,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v18`; the near-axis group records the independent
+`tae-rule-features-grouped-v19`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The

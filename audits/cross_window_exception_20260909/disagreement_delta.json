@@ -1,0 +1,18 @@
+{
+  "previous": 229,
+  "current": 234,
+  "retained": 222,
+  "added": 12,
+  "removed": 7,
+  "new_unreviewed": 0,
+  "current_directions": {
+    "BAD/GOOD": 115,
+    "GOOD/BAD": 119
+  },
+  "source_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/continuum_monotonic_tail_20260908/regenerated_disagreements.csv": "747793c119d2c901e9c19e811dbc5de9de75e6a7bd5ed2389d48586f02a11fd7",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/cross_window_exception_20260909/regenerated_disagreements.csv": "5cce1b18d186153a4e9e3c6671a7712e70c40373af91d861be172e0a8a2606b8",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/cross_window_exception_20260909/user_review.csv": "f6bfad51c0a996a1da8114da00725b36bd2426473569fc8ad37debfbf20985d9",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/cross_window_exception_20260909/adopted_changes.csv": "3a0a1a74d31f041470befde78e654a78c03488abd454a48e059dd0b8c57eaa82"
+  }
+}

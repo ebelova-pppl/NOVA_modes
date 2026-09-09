@@ -69,6 +69,10 @@ class EaeRoutingTests(unittest.TestCase):
         old_kwargs, new_kwargs = dict(old.run_kwargs), dict(new.run_kwargs)
         old_kwargs.pop("fraction_direct_eae_threshold")
         new_kwargs.pop("fraction_direct_eae_threshold")
+        for key in list(old_kwargs):
+            if key.startswith("cross_window_exception_"):
+                old_kwargs.pop(key)
+                new_kwargs.pop(key)
         self.assertEqual(old_kwargs, new_kwargs)
         self.assertEqual(
             classify_gap_region(0.1, 0.1, fraction_direct_eae_threshold=0), "mixed"

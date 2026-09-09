@@ -28,8 +28,14 @@ adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
 RF-CNN exports are current in the user-selected output roots, with previous
 shot directories retained under `before_continuum_tail_20260908/` in each
 root. The same 27 cases remain checked; their inventory notes record the
-regeneration. Current results and disagreements are in
-`../continuum_monotonic_tail_20260908/`; earlier pilot tables remain historical.
+regeneration. On 2026-09-09, all 27 rules exports were regenerated again
+with production v7's approved smooth-crossing exception; RF-CNN results
+remain unchanged. Previous rules exports are retained under
+`before_cross_window_exception_20260909/` in the rules root. Current results,
+234 disagreements, and the change list are in
+`../cross_window_exception_20260909/`. Its twelve new disagreements are all
+already user-approved GOOD modes. Earlier repair and pilot tables remain
+historical; the checked membership and training labels are unchanged.
 
 The active list contains 14 training shots and 2,390 labels. Q62 is marked
 `suspended_training_q62`, not as an active training shot: its 249 reviewed

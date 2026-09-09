@@ -3,6 +3,132 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 adopted smooth crossing-window exception
+
+- The user inspected all 13 additional candidates and authorized adoption.
+  Their fingerprinted GOOD review is in
+  `audits/cross_window_exception_20260909/user_review.csv`.
+- Production preset **v7**, ruleset/grouped audit schema **v19**, now excuses
+  BAD_CONT_CROSS_WINDOW only when every violating crossing independently
+  satisfies strict **A_cross < 0.2 AND K_c < 0.1** on nr=201. A_cross is the
+  maximum magnitude after signed-harmonic interpolation to the crossing.
+  K retains the shared unscaled second difference and +/-4-grid window.
+  Equality or undefined K cannot grant the exception; other resolutions
+  retain the original crossing-window gate, with eligibility recorded.
+  Earlier and later BAD gates remain active, including grid-scale widths.
+- V5/v6 preset files remain byte-for-byte frozen; their adapters explicitly
+  disable the exception. New exports use schema v19, including when an older
+  preset is selected. RF/CNN feature schemas, checkpoints, training labels,
+  continuum repair, and routing are unchanged.
+- All 160 tests pass, covering signed interpolation, strict cuts, every
+  offending crossing, rough low-amplitude crossings, nr=401 rejection,
+  earlier gate precedence, shared tail K, legacy-v6/current-v7 workflow,
+  and an empty individual zero-width calibration window.
+- All 27 rules runs have been regenerated and published with the active RF ranker.
+  They recover exactly the 19 audited modes: three E204186A01t020, three
+  E204621A03t030, eight E205045A01t022, and five E205057A01t020. GOOD rises
+  **940 -> 959 before deduplication**, and **934 -> 953 selected**. Every
+  other final label and every pre-existing grouped feature stays unchanged.
+- Fresh raw-data recomputation matches every complete v19 record for all
+  4,267 TAE-side modes. All prior feature values match the v6 exports exactly;
+  every other label and routing result is preserved across 19,325 inputs.
+  All 2,390 training rows were reevaluated with and without the exception:
+  **two labeled GOOD, zero labeled BAD** are recovered. Accepted training
+  GOOD rises 541 -> 543; accepted BAD stays 25. The known invalid input and
+  26 EAE-routed training rows remain excluded.
+- Canonical outputs are current in `/p/hym/ebelova/NOVA/sort_outputs/<SHOT>/`.
+  All 27 previous directories are preserved under that root's
+  `before_cross_window_exception_20260909/`. Published output and backup
+  hashes match the verified local copies. No RF-ranking fallback or
+  resolution rejection-gate exclusion occurred. Existing RF-CNN outputs
+  remain valid and their comparison CSV hashes are unchanged.
+- The current disagreement list has **234** entries (115 rules-BAD/AI-GOOD,
+  119 rules-GOOD/AI-BAD), versus 229 previously: 222 unchanged, seven removed,
+  and twelve added. All twelve additions have fingerprint-matched GOOD
+  approval among the user's 13 reviewed modes; **no newly appearing case
+  needs another review**. Full/current lists, the 19-row change list, hashes,
+  and publication evidence are in `audits/cross_window_exception_20260909/`.
+  The user's question list is preserved. Main/G inventory notes record v7;
+  the same 27 shots remain checked. Next: continue outstanding disagreement
+  review before expanding production to additional database shots.
+
+## 2026-09-09 hypothetical crossing-window exception impact
+
+- Audited the user's **A_cross < 0.2 AND K_cross < 0.1** exception, using
+  signed-harmonic interpolation at each true crossing and the existing
+  +/-4-grid K. Every window that violates gate 4 must independently qualify;
+  all other gates remain active. No production code or labels changed.
+- Of 1,247 window rejections in the 27-shot batch, **19 pass all gates**:
+  E204186A01t020 three, E204621A03t030 three, E205045A01t022 eight, and
+  E205057A01t020 five. This includes the six modes just discussed and leaves
+  13 additional candidates for inspection. GOOD would increase 940 -> 959
+  before deduplication; these counts do not predict final representatives.
+- Fresh evaluation of all 2,390 training rows recovers **two labeled GOOD
+  and zero labeled BAD**: E204669M03t025 N8/9673 and E205052A01t022 N9/1061.
+  Existing accepted BAD labels stay at 25; accepted GOOD labels rise 541 ->
+  543. Known routing exclusions and the one invalid training input persist.
+- Raw fingerprints, crossing records, and K features match saved outputs;
+  complete features match for every possible shot recovery in the sweep.
+  Holding A_cross<0.2 and relaxing K<0.4 would recover 37 shot modes and
+  admit two additional labeled BAD training modes. Compact reproducible
+  evidence, both sweeps, all 21 recoveries, and the focused 13-row list are
+  under `audits/cross_window_exception_20260909/`. This was the pre-adoption
+  audit; the user subsequently approved the
+  13 additional candidates and adoption (see above). The grid-scale width
+  threshold is unchanged.
+
+## 2026-09-09 crossing-window disagreement reviews
+
+- The user chose to retain the current grid-scale width thresholds after
+  reviewing the E204645 examples; no relaxation below r=0.7 is planned.
+- Inspected `nstxuE204186A01t020/N2/egn02w.8520E+01` non-blind. Its raw
+  fingerprint and complete recomputed features match the saved rules output.
+  It fails only BAD_CONT_CROSS_WINDOW: near the upper crossing at r=0.078013,
+  W/max(W) reaches 0.062800 at r=0.085, above the 0.05 cutoff. Amplitude
+  0.234258 stays below 0.25; W/max(W) at the crossing itself is 0.033776.
+- The dominant signed harmonics rise smoothly through this crossing. The
+  inner tail carries 0.1367% of total integrated energy, the full +/-0.01
+  crossing window carries 0.2787%, and K_cross=0.055661. This is a plausible
+  conservative false rejection from the window reaching into the smooth
+  rising flank. Disabling only the crossing-window gate passes all remaining
+  BAD gates. This is diagnostic interpretation, not an approved relabeling
+  or rule change. Local plots, measurements, and generator are under
+  `outputs/review_e204186_n2_8520_20260909/`.
+- Follow-up raw-data inspection verified saved fingerprints and complete
+  features for E204186A01t020 N8/1178 and N9/1204, and E204621A03t030
+  N9/1326, N10/1010, and N10/1042. All fail BAD_CONT_CROSS_WINDOW; disabling
+  only that decision passes every remaining BAD gate. In that order, the
+  offending window W/max(W) values are 6.214%, 8.240%, 5.396%, 6.424%, and
+  13.502%, versus 2.157%, 1.726%, 0.979%, 0.667%, and 0.830% at the crossings.
+  E204186 N9/1204 and E204621 N10/1042 also exceed the 0.25 amplitude
+  cutoff, at 0.279023 and 0.301633 respectively.
+- The dominant harmonics change sign smoothly near these crossings, with
+  K_cross=0.022–0.073 at the offending crossings. The windows reach into
+  adjacent lobes; the E204186 winners are inward of the crossing and the
+  E204621 winners outward. These are not all negligible tails: integrated
+  energy inward of the relevant crossing is 4.404%, 22.102%, 35.894%,
+  11.065%, and 25.458%, respectively. A possible smooth-node adjustment
+  needs separate calibration; no labels or gate thresholds were changed.
+  Local plots, full measurements, five-row summary, and generator are under
+  `outputs/review_cross_window_five_20260909/`.
+
+## 2026-09-09 E204645 seven-mode rejection explanation
+
+- Inspected the user's N10/5190, N10/5446, N10/5761, N8/3611, N7/4136,
+  N7/4255, and N10/3812 non-blind. All first fail BAD_GRID_SCALE_SPIKE:
+  amplitude 0.310–0.692 and signed-lobe FWHM 0.645–0.990 grid intervals
+  at r=0.495–0.635. All have nr=201 and fraction_below_upper2=1; the
+  rejection is independent of the repaired edge continuum.
+- Verified all seven raw fingerprints and complete recomputed feature
+  dictionaries against the current saved rules output. With only the
+  grid-spike decision disabled, six pass every remaining BAD gate;
+  N10/3812 still fails BAD_GRID_SCALE_PACKET at stored harmonic index 51.
+- Neighboring harmonics show related, radially shifted narrow structure.
+  Whether to distinguish coherent edge morphology from numerical spikes
+  requires further calibration; no rules or labels changed. Compact
+  evidence is in `audits/grid_scale_e204645_20260909/`; grid-point figures
+  are local under `outputs/review_grid_scale_e204645_20260909/`.
+
 ## 2026-09-09 incremental disagreement list for continued review
 
 - Compared the new 229-row 27-shot disagreement list with the union of the

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tae_rule_engine import (
+    PREVIOUS_RULESET_VERSION,
     RULESET_VERSION,
     AxisArtifactConfig,
     ContinuumCrossingConfig,
@@ -28,15 +29,16 @@ from tae_eae_features import validate_routing_thresholds
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v6"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v6"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v7"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v7"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398"
+    "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429"
 )
 FROZEN_CONFIGURATION_SHA256 = {
     "tae_rules_production_v5": (
         "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f"
     ),
+    "tae_rules_production_v6": "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398",
     PRODUCTION_RULE_CONFIG_NAME: PRODUCTION_RULE_CONFIG_SHA256,
 }
 
@@ -133,17 +135,26 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         context="configuration",
     )
     schema_version = _string(document, "schema_version", context="configuration")
-    if schema_version not in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v5"}:
+    if schema_version not in {
+        RULE_CONFIG_SCHEMA_VERSION,
+        "tae-rule-run-config-v6",
+        "tae-rule-run-config-v5",
+    }:
         raise ValueError(
             f"unsupported rule configuration schema {schema_version!r}; "
-            f"expected {RULE_CONFIG_SCHEMA_VERSION!r} or 'tae-rule-run-config-v5'"
+            f"expected {RULE_CONFIG_SCHEMA_VERSION!r}, v6, or v5"
         )
     name = _string(document, "name", context="configuration")
     rule_set_version = _string(document, "rule_set_version", context="configuration")
-    if rule_set_version != RULESET_VERSION:
+    expected_ruleset = (
+        RULESET_VERSION
+        if schema_version == RULE_CONFIG_SCHEMA_VERSION
+        else PREVIOUS_RULESET_VERSION
+    )
+    if rule_set_version != expected_ruleset:
         raise ValueError(
             f"configuration {name!r} pins ruleset {rule_set_version!r}, but "
-            f"this checkout provides {RULESET_VERSION!r}"
+            f"this schema requires {expected_ruleset!r}"
         )
 
     routing = _mapping(document["routing"], context="routing")
@@ -156,7 +167,8 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
             "include_mixed_in_tae_like",
         } | (
             {"fraction_direct_eae_threshold"}
-            if schema_version == RULE_CONFIG_SCHEMA_VERSION else set()
+            if schema_version != "tae-rule-run-config-v5"
+            else set()
         ),
         context="routing",
     )
@@ -169,7 +181,8 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     # Frozen v5 predates the unconditional branch; never inherit the new default.
     fraction_direct_eae_threshold = (
         _float(routing, "fraction_direct_eae_threshold", context="routing")
-        if schema_version == RULE_CONFIG_SCHEMA_VERSION else 0.0
+        if schema_version != "tae-rule-run-config-v5"
+        else 0.0
     )
     signed_delta_eae_threshold = _float(
         routing, "signed_delta_eae_threshold", context="routing"
@@ -352,7 +365,12 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     )
     _require_exact_keys(
         window,
-        {"enabled", "half_width_grid", "amplitude_min", "w_min"},
+        {"enabled", "half_width_grid", "amplitude_min", "w_min"}
+        | (
+            {"smooth_exception"}
+            if schema_version == RULE_CONFIG_SCHEMA_VERSION
+            else set()
+        ),
         context="gates.continuum_crossing_window",
     )
     window_enabled = _bool(
@@ -365,10 +383,43 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         window, "amplitude_min", context="gates.continuum_crossing_window"
     )
     window_w = _float(window, "w_min", context="gates.continuum_crossing_window")
-    ContinuumCrossingWindowConfig(
+    exception_kwargs = {"exception_amplitude_max": None, "exception_k_max": None}
+    if schema_version == RULE_CONFIG_SCHEMA_VERSION:
+        context = "gates.continuum_crossing_window.smooth_exception"
+        exception = _mapping(window["smooth_exception"], context=context)
+        _require_exact_keys(
+            exception,
+            {
+                "enabled",
+                "amplitude_max",
+                "k_max",
+                "half_width_grid",
+                "calibrated_n_radial",
+            },
+            context=context,
+        )
+        enabled = _bool(exception, "enabled", context=context)
+        exception_kwargs = {
+            "exception_amplitude_max": _float(
+                exception, "amplitude_max", context=context
+            ),
+            "exception_k_max": _float(exception, "k_max", context=context),
+            "exception_half_width_grid": _int(
+                exception, "half_width_grid", context=context
+            ),
+            "exception_calibrated_n_radial": _int(
+                exception, "calibrated_n_radial", context=context
+            ),
+        }
+        # Validate stored thresholds even when the named exception is disabled.
+        ContinuumCrossingWindowConfig(**exception_kwargs)
+        if not enabled:
+            exception_kwargs["exception_amplitude_max"] = None
+    window_config = ContinuumCrossingWindowConfig(
         half_width_grid=window_half_width,
         amplitude_min=window_amplitude,
         w_min=window_w,
+        **exception_kwargs,
     )
 
     edge = _mapping(gates["edge_artifact"], context="gates.edge_artifact")
@@ -556,6 +607,10 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
             window_amplitude if window_enabled else None
         ),
         "cross_window_w_min": window_w if window_enabled else None,
+        "cross_window_exception_amplitude_max": window_config.exception_amplitude_max,
+        "cross_window_exception_k_max": window_config.exception_k_max,
+        "cross_window_exception_half_width_grid": window_config.exception_half_width_grid,
+        "cross_window_exception_calibrated_n_radial": window_config.exception_calibrated_n_radial,
         "edge_r_min": edge_r,
         "edge_width_max_grid": edge_width if edge_enabled else None,
         "interior_envelope_peak_r_max": interior_peak_r,

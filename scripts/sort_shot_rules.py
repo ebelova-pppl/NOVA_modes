@@ -44,6 +44,10 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
     DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
     DEFAULT_CROSS_WINDOW_W_MIN,
+    DEFAULT_CROSS_WINDOW_EXCEPTION_AMPLITUDE_MAX,
+    DEFAULT_CROSS_WINDOW_EXCEPTION_K_MAX,
+    DEFAULT_CROSS_WINDOW_EXCEPTION_HALF_WIDTH_GRID,
+    DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL,
     DEFAULT_EDGE_R_MIN,
     DEFAULT_EDGE_WIDTH_MAX_GRID,
     DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
@@ -210,6 +214,13 @@ SHOT_SUMMARY_FIELDS = [
     "continuum_crossing_window_half_width_grid",
     "continuum_crossing_window_amplitude_min",
     "continuum_crossing_window_w_min",
+    "continuum_crossing_window_exception_enabled",
+    "continuum_crossing_window_exception_amplitude_max",
+    "continuum_crossing_window_exception_k_max",
+    "continuum_crossing_window_exception_half_width_grid",
+    "continuum_crossing_window_exception_calibrated_n_radial",
+    "n_continuum_crossing_window_exception_resolution_eligible",
+    "n_continuum_crossing_window_exception_resolution_ineligible",
     "edge_artifact_gate_enabled",
     "edge_artifact_r_min",
     "edge_artifact_width_max_grid",
@@ -271,6 +282,11 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--cross_window_amplitude_min",
         "--cross_window_w_min",
         "--disable_cont_cross_window",
+        "--cross_window_exception_amplitude_max",
+        "--cross_window_exception_k_max",
+        "--cross_window_exception_half_width_grid",
+        "--cross_window_exception_calibrated_n_radial",
+        "--disable_cross_window_exception",
         "--edge_r_min",
         "--edge_width_max_grid",
         "--disable_edge_artifact",
@@ -958,6 +974,11 @@ def build_summary(
                 "interior_harmonic_incoherence",
             ),
             ("continuum_crossing_tail", "crossing_features", "continuum_crossing_tail"),
+            (
+                "continuum_crossing_window_exception",
+                "crossing_features",
+                "continuum_crossing_window_exception",
+            ),
         ):
             try:
                 eligible = parsed_features[group][feature]["resolution_eligible"]
@@ -1075,6 +1096,17 @@ def build_summary(
             cross_window_config.amplitude_min
         ),
         "continuum_crossing_window_w_min": cross_window_config.w_min,
+        "continuum_crossing_window_exception_enabled": cross_window_config.exception_enabled,
+        "continuum_crossing_window_exception_amplitude_max": cross_window_config.exception_amplitude_max,
+        "continuum_crossing_window_exception_k_max": cross_window_config.exception_k_max,
+        "continuum_crossing_window_exception_half_width_grid": cross_window_config.exception_half_width_grid,
+        "continuum_crossing_window_exception_calibrated_n_radial": cross_window_config.exception_calibrated_n_radial,
+        "n_continuum_crossing_window_exception_resolution_eligible": resolution_counts[
+            "continuum_crossing_window_exception_eligible"
+        ],
+        "n_continuum_crossing_window_exception_resolution_ineligible": resolution_counts[
+            "continuum_crossing_window_exception_ineligible"
+        ],
         "edge_artifact_gate_enabled": edge_config.enabled,
         "edge_artifact_r_min": edge_config.r_edge_min,
         "edge_artifact_width_max_grid": edge_config.edge_width_max_grid,
@@ -1395,6 +1427,12 @@ def run_shot(
     cross_window_half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
     cross_window_amplitude_min: float | None = DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN,
     cross_window_w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN,
+    cross_window_exception_amplitude_max: (
+        float | None
+    ) = DEFAULT_CROSS_WINDOW_EXCEPTION_AMPLITUDE_MAX,
+    cross_window_exception_k_max: float | None = DEFAULT_CROSS_WINDOW_EXCEPTION_K_MAX,
+    cross_window_exception_half_width_grid: int = DEFAULT_CROSS_WINDOW_EXCEPTION_HALF_WIDTH_GRID,
+    cross_window_exception_calibrated_n_radial: int = DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL,
     edge_r_min: float = DEFAULT_EDGE_R_MIN,
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
     interior_envelope_peak_r_max: float = DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
@@ -1477,6 +1515,10 @@ def run_shot(
         half_width_grid=cross_window_half_width_grid,
         amplitude_min=cross_window_amplitude_min,
         w_min=cross_window_w_min,
+        exception_amplitude_max=cross_window_exception_amplitude_max,
+        exception_k_max=cross_window_exception_k_max,
+        exception_half_width_grid=cross_window_exception_half_width_grid,
+        exception_calibrated_n_radial=cross_window_exception_calibrated_n_radial,
     )
     edge_config = EdgeArtifactConfig(
         r_edge_min=edge_r_min,
@@ -1982,6 +2024,35 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--cross_window_exception_amplitude_max",
+        type=float,
+        default=DEFAULT_CROSS_WINDOW_EXCEPTION_AMPLITUDE_MAX,
+        help="Strict maximum interpolated crossing amplitude for the smooth-window exception (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--cross_window_exception_k_max",
+        type=float,
+        default=DEFAULT_CROSS_WINDOW_EXCEPTION_K_MAX,
+        help="Strict maximum native-grid K at the same crossing for the window exception (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--cross_window_exception_half_width_grid",
+        type=int,
+        default=DEFAULT_CROSS_WINDOW_EXCEPTION_HALF_WIDTH_GRID,
+        help="Half-width of the exception's K stencil-center window, independent of the tail gate (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--cross_window_exception_calibrated_n_radial",
+        type=int,
+        default=DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL,
+        help="Radial grid size eligible for the exception; other grids retain the original window gate (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--disable_cross_window_exception",
+        action="store_true",
+        help="Retain crossing amplitude and K evidence but disable the smooth-window exception",
+    )
+    parser.add_argument(
         "--edge_r_min",
         type=float,
         default=DEFAULT_EDGE_R_MIN,
@@ -2261,6 +2332,14 @@ def main() -> None:
         cross_window_w_min=(
             None if args.disable_cont_cross_window else args.cross_window_w_min
         ),
+        cross_window_exception_amplitude_max=(
+            None
+            if args.disable_cross_window_exception
+            else args.cross_window_exception_amplitude_max
+        ),
+        cross_window_exception_k_max=args.cross_window_exception_k_max,
+        cross_window_exception_half_width_grid=args.cross_window_exception_half_width_grid,
+        cross_window_exception_calibrated_n_radial=args.cross_window_exception_calibrated_n_radial,
         edge_r_min=args.edge_r_min,
         edge_width_max_grid=(
             None if args.disable_edge_artifact else args.edge_width_max_grid

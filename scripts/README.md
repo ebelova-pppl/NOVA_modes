@@ -949,7 +949,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v6` configuration. A rejection gate produces automatic
+`tae_rules_production_v7` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1188,9 +1188,9 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v6.yaml`, stored as strict
+`configs/rules/tae_rules_production_v7.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v18 ruleset, routing thresholds, relative-frequency tolerance, all
+current v19 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
@@ -1204,7 +1204,7 @@ gate thresholds, and these gate states:
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v6 identity.
+config-owned threshold or gate override to retain the production-v7 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
@@ -1224,7 +1224,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v6` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v7` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1235,7 +1235,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-v18`
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-v19`
 ruleset implements ten ordered BAD decisions, treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
@@ -1246,7 +1246,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v18`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v19`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1482,6 +1482,37 @@ magnitude comparisons are inclusive. Override the settings with
 `--cross_window_half_width_grid`, `--cross_window_amplitude_min`, and
 `--cross_window_w_min`; use `--disable_cont_cross_window` to retain the
 measurements while disabling this decision.
+
+Production v7 adds a smooth-crossing exception to gate 4. At **each** crossing
+whose window meets either rejection cutoff, interpolate every signed harmonic
+to the exact crossing radius and take the largest absolute amplitude.
+Excuse that window only when `A_cross < 0.2 AND K_c < 0.1` on nr=201.
+K uses the same unscaled signed second-difference calculation as the tail
+gate, with its own independent +/-4-grid stencil-center window. Both cuts
+are strict; equality, undefined K, or another radial resolution cannot grant
+the exception. Any other offending crossing still rejects the mode. Later
+gates run normally after an exception, and earlier BAD decisions keep precedence.
+
+The original window maxima remain in the output. Per-crossing amplitudes,
+K, violations, exemption flags, counts, thresholds, and resolution status are
+under `crossing_features.continuum_crossing_window_exception`. This is an
+addition to the rule audit schema v19; RF/CNN feature schemas are unchanged.
+Calibrate with `--cross_window_exception_amplitude_max`,
+`--cross_window_exception_k_max`, `--cross_window_exception_half_width_grid`,
+and `--cross_window_exception_calibrated_n_radial`, or use
+`--disable_cross_window_exception` to retain measurements and reproduce the
+original window decision. These options belong to a named configuration when
+one is selected. For example:
+
+```text
+python scripts/sort_shot_rules.py --shot_dir /path/to/shot --out_dir /path/to/audit --disable_cross_window_exception
+```
+
+Frozen v5/v6 configurations remain supported and explicitly disable the
+exception. They preserve their prior decisions while emitting current v19
+audit metadata; exact historical exports require the earlier checkout.
+On nr!=201 the original window gate remains fully active. This exception
+does not add a skipped rejection gate to resolution warnings.
 
 The fifth gate uses the global radial-energy envelope
 `W(r)=sum_h |mode_h(r)|^2`, normalized by its global maximum. Its provisional

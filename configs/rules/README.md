@@ -1,9 +1,20 @@
 # Deterministic TAE rule configurations
 
-`tae_rules_production_v6.yaml` is the current frozen deterministic production
-preset (configuration schema v6, unchanged ruleset/features v18). It routes
+`tae_rules_production_v7.yaml` is the current frozen deterministic production
+preset (configuration schema v7, ruleset/features v19). It adds the reviewed
+smooth-crossing exception inside `continuum_crossing_window.smooth_exception`:
+every offending window must have interpolated `A_cross < 0.2` and `K_c < 0.1`
+at that same crossing, on nr=201. K uses an independent +/-4-grid stencil-center
+window. Any unexcused crossing or other BAD gate retains rejection. The v7
+SHA-256 is `10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429`.
+
+Frozen v5/v6 files remain byte-for-byte unchanged. Their loaders explicitly
+disable the exception, preserving prior decisions while recording the current
+v19 audit schema. V7 and both legacy adapters share all other morphology gates.
+
+The inherited v6 routing sends
 `fraction_below_upper2 < 0.2` directly to EAE-like, regardless of signed_delta.
-All previous routing branches and morphology gates remain as in v5. The
+V6 retained the other routing branches and morphology gates from v5. The
 strict 20% threshold is recorded as `fraction_direct_eae_threshold` in both
 the configuration and shot/per-n summaries. The frozen v6 SHA-256 is
 `b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398`.
@@ -59,7 +70,8 @@ evidence or a radial sample count other than the calibrated `201` fails open
 while retaining the audit measurements.
 
 The current grouped `rule_features` output schema is
-`tae-rule-features-grouped-v18`. It adds the crossing-tail energy, roughness,
+`tae-rule-features-grouped-v19`. It adds the per-crossing window-exception
+amplitudes, K, decisions, and resolution status, retaining crossing-tail energy, roughness,
 resolution status, individual crossing records, and qualifying witness.
 The complete near-axis amplitude and selected sign-flip-run evidence remain.
 The inherited audit summaries for the global
@@ -77,7 +89,7 @@ extremum-feature definition.
 `tae_rules_production_v3.yaml`, and `tae_rules_production_v4.yaml` remain
 byte-for-byte as the historical v14, v15, v16, and v17 presets. Use the
 corresponding historical checkout to execute a pinned older ruleset.
-The canonical sorter loads production-v6 automatically
+The canonical sorter loads production-v7 automatically
 under its default rules method:
 
 ```bash
@@ -104,7 +116,7 @@ For a conservative audit of this exact preset without survivor promotion, run:
 python scripts/sort_shot_rules.py \
   --shot_dir /path/to/SHOT \
   --out_dir /path/to/audit-output \
-  --rule_config tae_rules_production_v6
+  --rule_config tae_rules_production_v7
 ```
 
 Use `sort_shot_rules.py` without `--rule_config` for threshold calibration and

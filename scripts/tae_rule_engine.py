@@ -46,6 +46,10 @@ DEFAULT_W_CROSS_THRESHOLD = 0.03
 DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID = 2
 DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN = 0.25
 DEFAULT_CROSS_WINDOW_W_MIN = 0.05
+DEFAULT_CROSS_WINDOW_EXCEPTION_AMPLITUDE_MAX = 0.2
+DEFAULT_CROSS_WINDOW_EXCEPTION_K_MAX = 0.1
+DEFAULT_CROSS_WINDOW_EXCEPTION_HALF_WIDTH_GRID = 4
+DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL = 201
 DEFAULT_EDGE_R_MIN = 0.97
 DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
 DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX = 0.5
@@ -66,10 +70,13 @@ DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID = 4
 DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL = 201
 HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD = 3.0
 
-RULESET_VERSION = (
+PREVIOUS_RULESET_VERSION = (
     "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-"
     "grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-"
     "continuum-crossing-tail-v18"
+)
+RULESET_VERSION = (
+    PREVIOUS_RULESET_VERSION.removesuffix("-v18") + "-smooth-crossing-window-v19"
 )
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
@@ -86,7 +93,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v18"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v19"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -322,6 +329,12 @@ class ContinuumCrossingWindowConfig:
     half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID
     amplitude_min: float | None = DEFAULT_CROSS_WINDOW_AMPLITUDE_MIN
     w_min: float | None = DEFAULT_CROSS_WINDOW_W_MIN
+    exception_amplitude_max: float | None = DEFAULT_CROSS_WINDOW_EXCEPTION_AMPLITUDE_MAX
+    exception_k_max: float | None = DEFAULT_CROSS_WINDOW_EXCEPTION_K_MAX
+    exception_half_width_grid: int = DEFAULT_CROSS_WINDOW_EXCEPTION_HALF_WIDTH_GRID
+    exception_calibrated_n_radial: int = (
+        DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL
+    )
 
     def __post_init__(self) -> None:
         if isinstance(self.half_width_grid, bool) or not isinstance(
@@ -333,6 +346,7 @@ class ContinuumCrossingWindowConfig:
         for name, value in (
             ("amplitude_min", self.amplitude_min),
             ("w_min", self.w_min),
+            ("exception_amplitude_max", self.exception_amplitude_max),
         ):
             if value is not None and (
                 not math.isfinite(value) or not 0.0 <= value <= 1.0
@@ -340,6 +354,26 @@ class ContinuumCrossingWindowConfig:
                 raise ValueError(
                     f"cross_window {name} must be null or finite and in [0, 1]"
                 )
+        if self.exception_k_max is not None and (
+            not math.isfinite(self.exception_k_max) or self.exception_k_max < 0
+        ):
+            raise ValueError(
+                "cross_window exception_k_max must be null or finite and nonnegative"
+            )
+        for name, value, minimum in (
+            ("exception_half_width_grid", self.exception_half_width_grid, 0),
+            ("exception_calibrated_n_radial", self.exception_calibrated_n_radial, 3),
+        ):
+            if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+                raise ValueError(f"cross_window {name} must be an integer >= {minimum}")
+
+    @property
+    def exception_enabled(self) -> bool:
+        return (
+            self.exception_amplitude_max is not None
+            and self.exception_k_max is not None
+        )
+
     @property
     def enabled(self) -> bool:
         """Return whether either crossing-neighborhood threshold is configured."""
@@ -542,6 +576,27 @@ def empty_continuum_crossing_tail_features(
     }
 
 
+def _crossing_roughness(
+    normalized_mode: np.ndarray,
+    second_differences: np.ndarray,
+    radial_grid: np.ndarray,
+    r_cross: float,
+    half_width_grid: int,
+) -> dict[str, float | int | None]:
+    """Shared native-grid K for the window exception and crossing-tail gate."""
+    centers = np.abs(radial_grid[1:-1] - r_cross) <= half_width_grid * (
+        radial_grid[1] - radial_grid[0]
+    )
+    denominator = float(np.sum(normalized_mode[:, 1:-1][:, centers] ** 2))
+    numerator = float(np.sum(second_differences[:, centers] ** 2))
+    return {
+        "K_cross": math.sqrt(numerator / denominator) if denominator > 0 else None,
+        "n_centers": int(np.count_nonzero(centers)),
+        "second_difference_energy": numerator,
+        "local_amplitude_energy": denominator,
+    }
+
+
 def extract_continuum_crossing_tail_features(
     mode: np.ndarray,
     crossing_records: list[Mapping[str, Any]],
@@ -601,10 +656,8 @@ def extract_continuum_crossing_tail_features(
             raise ValueError(
                 "continuum crossing tail requires a finite lower/upper crossing in [0, 1]"
             )
-        centers = np.abs(r[1:-1] - rc) <= resolved.half_width_grid * (r[1] - r[0])
-        denominator = float(np.sum(A[:, 1:-1][:, centers] ** 2))
-        numerator = float(np.sum(d2[:, centers] ** 2))
-        k = math.sqrt(numerator / denominator) if denominator > 0 else None
+        roughness = _crossing_roughness(A, d2, r, rc, resolved.half_width_grid)
+        k = roughness["K_cross"]
         inner, outer, fraction, ratio, side = None, None, None, None, None
         if total > 0:
             samples = np.r_[0.0, r[(r > 0) & (r < rc)], rc]
@@ -630,10 +683,7 @@ def extract_continuum_crossing_tail_features(
                 "tail_fraction": fraction,
                 "tail_energy": fraction * total if fraction is not None else None,
                 "tail_over_top2": ratio,
-                "K_cross": k,
-                "n_centers": int(np.count_nonzero(centers)),
-                "second_difference_energy": numerator,
-                "local_amplitude_energy": denominator,
+                **roughness,
                 "thresholds_pass": bool(thresholds_pass) if resolved.enabled else None,
                 "candidate_found": bool(
                     thresholds_pass and result["resolution_eligible"]
@@ -982,6 +1032,9 @@ def empty_rule_features(
             ),
             **empty_continuum_crossing_window_features(
                 cross_window_config.half_width_grid
+            ),
+            "continuum_crossing_window_exception": empty_crossing_window_exception_features(
+                cross_window_config
             ),
         },
         "crossing_records": [],
@@ -1854,6 +1907,7 @@ def extract_continuum_crossing_window_features(
     crossing_records: list[Mapping[str, Any]],
     *,
     half_width_grid: int = DEFAULT_CROSS_WINDOW_HALF_WIDTH_GRID,
+    allow_empty: bool = False,
 ) -> dict[str, Any]:
     """Measure harmonic amplitude and normalized energy near true crossings.
 
@@ -1861,6 +1915,8 @@ def extract_continuum_crossing_window_features(
     ``abs(r_i - r_cross) <= half_width_grid * delta_r``. Winners are selected
     independently for individual-harmonic absolute amplitude and total radial
     energy so both kinds of evidence remain auditable.
+    ``allow_empty`` supports per-crossing diagnostics for zero-width
+    calibration windows whose crossing lies between radial samples.
     """
     if isinstance(half_width_grid, bool) or not isinstance(half_width_grid, int):
         raise ValueError("cross_window half_width_grid must be an integer")
@@ -1928,6 +1984,8 @@ def extract_continuum_crossing_window_features(
                 energy_winner = (energy, sample_index, boundary, r_cross)
 
     if amplitude_winner is None or energy_winner is None:
+        if allow_empty:
+            return result
         raise ValueError("crossing window contains no radial grid samples")
 
     amplitude, harmonic_index, sample_index, boundary, r_cross = amplitude_winner
@@ -1970,6 +2028,103 @@ def extract_continuum_crossing_window_features(
             "cross_window_W_crossing_r": r_cross,
             "cross_window_W_distance_grid": abs(sample_r - r_cross) / delta_r,
         }
+    )
+    return result
+
+
+def empty_crossing_window_exception_features(
+    config: ContinuumCrossingWindowConfig,
+) -> dict[str, Any]:
+    return {
+        "enabled": config.exception_enabled,
+        "amplitude_max": config.exception_amplitude_max,
+        "k_max": config.exception_k_max,
+        "half_width_grid": config.exception_half_width_grid,
+        "calibrated_n_radial": config.exception_calibrated_n_radial,
+        "n_radial": None,
+        "resolution_eligible": None,
+        "n_violating_crossings": 0,
+        "n_exempted_crossings": 0,
+        "n_unexcused_crossings": 0,
+        "all_violations_exempted": False,
+        "records": [],
+    }
+
+
+def extract_crossing_window_exception_features(
+    mode: np.ndarray,
+    crossing_records: list[Mapping[str, Any]],
+    *,
+    config: ContinuumCrossingWindowConfig | None = None,
+) -> dict[str, Any]:
+    """Excuse only individual violating windows with low point amplitude and K.
+
+    A_cross interpolates every signed harmonic before taking its magnitude.
+    The original window maxima remain unchanged. Undefined K or an ineligible
+    grid never grants an exception; another offending crossing still rejects.
+    """
+    resolved = config or ContinuumCrossingWindowConfig()
+    A = np.asarray(mode, dtype=float)
+    if A.ndim != 2 or A.shape[0] < 1 or A.shape[1] < 2 or not np.isfinite(A).all():
+        raise ValueError("mode must be finite with shape (n_harmonics, n_radial>=2)")
+    r = np.linspace(0, 1, A.shape[1])
+    peak = float(np.max(np.abs(A)))
+    normalized = A if peak == 0 else A / peak
+    d2 = normalized[:, 2:] - 2 * normalized[:, 1:-1] + normalized[:, :-2]
+    result = empty_crossing_window_exception_features(resolved)
+    eligible = A.shape[1] == resolved.exception_calibrated_n_radial
+    result.update(n_radial=A.shape[1], resolution_eligible=eligible)
+    for crossing in sorted(
+        crossing_records, key=lambda x: (x["r_cross"], x["boundary"])
+    ):
+        window = extract_continuum_crossing_window_features(
+            A, [crossing], half_width_grid=resolved.half_width_grid, allow_empty=True
+        )
+        violation = (
+            resolved.amplitude_min is not None
+            and window["cross_window_A_max"] is not None
+            and window["cross_window_A_max"] >= resolved.amplitude_min
+        ) or (
+            resolved.w_min is not None
+            and window["cross_window_W_max"] is not None
+            and window["cross_window_W_max"] >= resolved.w_min
+        )
+        rc = crossing["r_cross"]
+        signed = np.array([np.interp(rc, r, profile) for profile in A])
+        amplitude = float(np.max(np.abs(signed)))
+        roughness = _crossing_roughness(
+            normalized, d2, r, rc, resolved.exception_half_width_grid
+        )
+        k = roughness["K_cross"]
+        passes = bool(
+            resolved.exception_enabled
+            and eligible
+            and k is not None
+            and amplitude < resolved.exception_amplitude_max
+            and k < resolved.exception_k_max
+        )
+        exempted = bool(violation and passes)
+        result["records"].append(
+            {
+                "boundary": crossing["boundary"],
+                "r_cross": rc,
+                "A_cross": amplitude,
+                "A_cross_harmonic_index": int(np.argmax(np.abs(signed))),
+                **roughness,
+                "window_A_max": window["cross_window_A_max"],
+                "window_W_max": window["cross_window_W_max"],
+                "window_violation": bool(violation),
+                "exception_conditions_pass": passes,
+                "exempted": exempted,
+            }
+        )
+        result["n_violating_crossings"] += int(violation)
+        result["n_exempted_crossings"] += int(exempted)
+    result["n_unexcused_crossings"] = (
+        result["n_violating_crossings"] - result["n_exempted_crossings"]
+    )
+    result["all_violations_exempted"] = bool(
+        result["n_violating_crossings"] > 0 and result["n_unexcused_crossings"] == 0
     )
     return result
 
@@ -2630,6 +2785,12 @@ def evaluate_mode(
             feature_status["crossing_records"],
             half_width_grid=cross_window_config.half_width_grid,
         )
+        cross_window_exception_features = extract_crossing_window_exception_features(
+            mode, feature_status["crossing_records"], config=cross_window_config
+        )
+        cross_window_features["continuum_crossing_window_exception"] = (
+            cross_window_exception_features
+        )
         interior_envelope_features = (
             extract_interior_unresolved_envelope_features(
                 mode,
@@ -2811,6 +2972,7 @@ def evaluate_mode(
         and n_cross > 0.0
         and cross_window_features["cross_window_candidate_found"]
         and (amplitude_hit or energy_hit)
+        and not cross_window_exception_features["all_violations_exempted"]
     ):
         return RuleResult(
             path=path,

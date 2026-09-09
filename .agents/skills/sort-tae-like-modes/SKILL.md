@@ -22,12 +22,31 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v6.yaml`. It pins the v18
+The preset is `configs/rules/tae_rules_production_v7.yaml`. It pins the v19
 ruleset and routing values, enables gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
 gates, and the final continuum crossing-tail gate. It explicitly disables
 exact-point continuum gate 3.
-Production-v6 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
+
+Production v7 excuses a violating gate-4 window only when the same crossing
+has strict `A_cross < 0.2 AND K_c < 0.1`, on nr=201. Interpolate each signed
+harmonic to the crossing before taking its magnitude, then maximize over
+harmonics. K uses the shared unscaled second-difference calculation with an
+independent +/-4-grid stencil-center window. Every offending crossing must
+qualify; another unexcused crossing still rejects, and all other gates retain
+precedence. Equality, undefined K, or nr!=201 cannot grant the exception.
+The original window maxima remain available; per-crossing measurements and
+exemption flags are under `crossing_features.continuum_crossing_window_exception`.
+Configure it with `--cross_window_exception_amplitude_max`,
+`--cross_window_exception_k_max`, `--cross_window_exception_half_width_grid`,
+`--cross_window_exception_calibrated_n_radial`, or disable it with
+`--disable_cross_window_exception` in the calibration CLI. Named v5/v6
+configurations explicitly disable the exception and preserve old decisions,
+while new exports use the v19 audit schema. Exact older exports require their
+historical checkout. The exception never skips the rejection gate on other
+resolutions; the original window criteria remain active there.
+
+Production-v7 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
 regardless of signed_delta. Equality uses the existing branches: EAE also
 requires fraction <0.4 and signed_delta <-0.1; fraction >0.5 is TAE-like;
 remaining cases are mixed and stay on the TAE side. All entry points share
@@ -119,7 +138,7 @@ defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v18 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v19 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match

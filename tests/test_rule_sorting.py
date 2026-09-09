@@ -495,7 +495,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v18")
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v19")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -512,7 +512,7 @@ class RuleAndOverrideTests(unittest.TestCase):
             set(features["crossing_features"]),
             set(EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES)
             | CROSS_WINDOW_FEATURE_NAMES
-            | {"continuum_crossing_tail"},
+            | {"continuum_crossing_tail", "continuum_crossing_window_exception"},
         )
         self.assertEqual(
             set(features["extremum_features"]),
@@ -3117,12 +3117,12 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v6")
+        self.assertEqual(configuration.name, "tae_rules_production_v7")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "b611a7554e61e3a16311d4fcdb0ff4854953fce769f70b6267308bfa46c1e398",
+            "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3152,6 +3152,10 @@ class WorkflowOutputTests(unittest.TestCase):
                 "cross_window_half_width_grid": 2,
                 "cross_window_amplitude_min": 0.25,
                 "cross_window_w_min": 0.05,
+                "cross_window_exception_amplitude_max": 0.2,
+                "cross_window_exception_k_max": 0.1,
+                "cross_window_exception_half_width_grid": 4,
+                "cross_window_exception_calibrated_n_radial": 201,
                 "edge_r_min": 0.97,
                 "edge_width_max_grid": 10.0,
                 "interior_envelope_peak_r_max": 0.5,
