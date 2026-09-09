@@ -243,6 +243,24 @@ Continue to inspect summed `W(r)` and signed-harmonic packets as supporting
 evidence. Integrated near-axis energy can strengthen a BAD decision, but small
 integrated energy does not rescue a narrow individual-harmonic spike.
 
+## Dominant near-axis energy
+
+The user-approved 2026-09-09 extension distinguishes a large axis bump on an
+extended real mode from a mode dominated by the near-axis structure. A large
+amplitude alone is insufficient for this additional rejection: compare the
+full all-harmonic radial-energy distribution. The user accepted
+E202855A01t020 N1/8188 and E204645A16t015 N1/3712 because most energy lies away
+from the axis, and rejected the axis-dominated G L94 N5/2135 example.
+
+The production-v9 `axis_energy_concentration` gate requires
+`max_(h,r<=0.015)|xi_h| > 0.5 AND F_inner(r<=0.05) > 0.5`, where F_inner is
+`integral_0^R sum_h|xi_h|^2 dr / integral_0^1 sum_h|xi_h|^2 dr` using the
+shared piecewise-linear energy integration. There is no width condition.
+The larger integration window captures the inner lobe beyond its initial
+rise. Existing narrow-axis and other BAD rules retain precedence; this
+additional condition provides no exemption from them. These are non-blind
+calibrated morphology cuts, not proof of an upstream boundary-condition bug.
+
 ## Outer-boundary artifacts
 
 For high-r boundary artifacts, inspect both the summed radial envelope

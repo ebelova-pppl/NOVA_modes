@@ -77,6 +77,9 @@ class EaeRoutingTests(unittest.TestCase):
         self.assertEqual(new_kwargs.pop("interior_envelope_ext_df_gap_min"), 0.001)
         self.assertTrue(old_kwargs.pop("interior_envelope_ext_df_gap_min_inclusive"))
         self.assertFalse(new_kwargs.pop("interior_envelope_ext_df_gap_min_inclusive"))
+        for key in ("axis_energy_amplitude_min", "axis_energy_fraction_min"):
+            self.assertIsNone(old_kwargs.pop(key))
+            self.assertEqual(new_kwargs.pop(key), 0.5)
         self.assertEqual(old_kwargs, new_kwargs)
         self.assertEqual(
             classify_gap_region(0.1, 0.1, fraction_direct_eae_threshold=0), "mixed"

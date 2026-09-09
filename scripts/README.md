@@ -981,7 +981,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v8` configuration. A rejection gate produces automatic
+`tae_rules_production_v9` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1220,9 +1220,9 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v8.yaml`, stored as strict
+`configs/rules/tae_rules_production_v9.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v20 ruleset, routing thresholds, relative-frequency tolerance, all
+current v21 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
@@ -1230,13 +1230,14 @@ gate thresholds, and these gate states:
   (`BAD_CONT_CROSS_WINDOW`), and 5
   (`BAD_EDGE_SPIKE`), plus the interior-envelope gate
   (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`), followed by the calibrated interior
-  harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`) and final
-  crossing-tail gate (`BAD_CONTINUUM_CROSSING_TAIL`);
+  harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`),
+  crossing-tail gate (`BAD_CONTINUUM_CROSSING_TAIL`), and final axis-energy
+  gate (`BAD_AXIS_ENERGY_CONCENTRATION`);
 - disabled: gate 3 (`BAD_CONT_CROSS`), while retaining its frozen latent
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v8 identity.
+config-owned threshold or gate override to retain the production-v9 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
@@ -1256,7 +1257,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v8` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v9` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1267,8 +1268,8 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-v20`
-ruleset implements ten ordered BAD decisions, treating the short-window packet
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-v21`
+ruleset implements eleven ordered BAD decisions, treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
 template. Modes that do not fire any
@@ -1278,9 +1279,14 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v20`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v21`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
+
+- `boundary_features.axis_energy_concentration`: enable state, four configured
+  thresholds, native nr and axis sample count, maximum absolute/signed axis
+  amplitude with stored harmonic index and radius, total radial energy,
+  inner-energy fraction, and candidate status;
 
 - `rf_standard_features`: the production 22, including `rad_loc`,
   `rad_width`, the mode-shape statistics, `gamma_d`, `ntor`, and the
@@ -1541,7 +1547,7 @@ python scripts/sort_shot_rules.py --shot_dir /path/to/shot --out_dir /path/to/au
 ```
 
 Frozen v5/v6 configurations remain supported and explicitly disable the
-exception. They preserve their prior decisions while emitting current v20
+exception. They preserve their prior decisions while emitting current v21
 audit metadata; exact historical exports require the earlier checkout.
 On nr!=201 the original window gate remains fully active. This exception
 does not add a skipped rejection gate to resolution warnings.
@@ -1673,7 +1679,7 @@ open. Override the settings with the five
 applying the decision. Shot and per-`n` summaries record all five settings plus
 the counts of resolution-eligible and resolution-ineligible evaluated modes.
 
-The final gate, `continuum_crossing_tail`, applies:
+The `continuum_crossing_tail` gate applies:
 
 ```text
 E_h = integral_0^1 A_h(r)^2 dr
@@ -1714,6 +1720,43 @@ Shot and per-n summaries include the enable state, all four settings, and
 eligible/ineligible counts. Named configurations prohibit these overrides.
 The frozen production-v5 preset enables this gate; v4 remains a historical
 preset requiring its corresponding checkout.
+
+The final gate, `axis_energy_concentration`, is enabled in production v9:
+
+```text
+A_axis = max_(h, native r_i <= 0.015) |xi_h(r_i)|
+W(r) = sum_h |xi_h(r)|^2
+F_inner = integral_0^0.05 W(r) dr / integral_0^1 W(r) dr
+IF A_axis > 0.5 AND F_inner > 0.5
+THEN BAD_AXIS_ENERGY_CONCENTRATION
+```
+
+It runs after all earlier rejection gates; their reasons and exceptions are
+unchanged. Both cuts are strict, so equality passes. There is no width,
+local-maximum, harmonic-adjacency, or continuum-extremum requirement. Use
+all stored harmonics in the energy integral, with the shared piecewise-linear
+W integration and exact endpoints. No volume/Jacobian weighting is added.
+A zero total energy leaves the fraction undefined and cannot qualify.
+
+Both windows are specified in normalized radius. The amplitude maximum uses
+native samples, with radius equality included, and the energy endpoint can
+fall between samples. The gate runs at every nr without a resolution-based
+skip; its scientific calibration used nr=201. Measurements, peak harmonic
+index/radius, sample count, and thresholds are recorded in
+`boundary_features.axis_energy_concentration`, including for disabled runs.
+
+Calibration options are `--axis_energy_amplitude_r_max` (0.015),
+`--axis_energy_amplitude_min` (0.5), `--axis_energy_r_max` (0.05), and
+`--axis_energy_fraction_min` (0.5). `--disable_axis_energy_concentration`
+disables the decision while preserving its measurements. Named v5-v8
+presets explicitly disable the gate and retain their earlier decisions;
+new exports still use the v21 audit schema. Shot/per-n summaries record
+`axis_energy_concentration_gate_enabled` and all four `axis_energy_*` values.
+For example, a conservative calibration run retaining only its evidence is:
+
+```text
+python scripts/sort_shot_rules.py --shot_dir /path/to/SHOT --out_dir /path/to/audit --disable_axis_energy_concentration
+```
 
 Unsupported native grids are reported prominently by the shared workflow,
 including `sort_shot_mixed.py --method rules`. If either enabled

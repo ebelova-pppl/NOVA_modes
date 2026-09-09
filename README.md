@@ -61,9 +61,20 @@ Known invalid inputs (2026-09-09):
 - NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
   should refer to eigenmode calculations, not stability calculations.
 
-Production rules v8 (2026-09-09):
+Production rules v9 (2026-09-09):
 
-- The narrow interior-envelope exception now requires relative frequency
+- New `axis_energy_concentration` gate: reject as
+  `BAD_AXIS_ENERGY_CONCENTRATION` when **both** maximum absolute harmonic
+  amplitude inside `r<=0.015` exceeds 0.5 and more than 50% of integrated
+  all-harmonic radial energy lies inside `r<=0.05`. No width or local-peak
+  condition is imposed. The gate runs last, preserving all earlier BAD
+  reasons, and evaluates every native radial resolution. See the
+  [axis-energy audit](audits/axis_amplitude_20260909/README.md).
+- Frozen v5-v8 presets explicitly disable this new gate. New exports record
+  its measurements under `boundary_features.axis_energy_concentration` and
+  its enable state and four thresholds in shot/per-n summaries.
+
+- The retained v8 narrow interior-envelope exception requires relative frequency
   clearance **strictly greater than 0.1%**: `0.001 < ext_df_gap <= 0.04`.
   No minimum-width floor was added. Clearance is divided by mode frequency;
   the existing `r_peak<=0.5`, energy-FWHM<=2 applicability and radial match
@@ -73,14 +84,14 @@ Production rules v8 (2026-09-09):
   the clearance lower comparison includes equality.
 
 - `sort_shot_mixed.py --method rules` now uses
-  `configs/rules/tae_rules_production_v8.yaml` (ruleset/features v20).
+  `configs/rules/tae_rules_production_v9.yaml` (ruleset/features v21).
   Each offending continuum-crossing window is excused only when its
   interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
   its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
   crossing must qualify; all other rejection gates still apply.
 - V5/v6 configuration files remain frozen and explicitly disable the smooth-crossing
   exception when loaded. Their decisions remain supported; new exports use
-  the current v20 audit schema. RF/CNN feature columns and weights are unchanged.
+  the current v21 audit schema. RF/CNN feature columns and weights are unchanged.
 - The earlier smooth-crossing impact audit recovered 19 modes in the 27-shot batch and two
   labeled GOOD training modes, with no newly accepted labeled BAD training
   modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
@@ -190,7 +201,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v8`
+  `--method rules` path loads the immutable `tae_rules_production_v9`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -209,7 +220,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v8` configuration automatically:
+`tae_rules_production_v9` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -370,12 +381,12 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v8.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v9.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
-harmonic-incoherence gate, and the final
-continuum crossing-tail gate are enabled; exact-point continuum gate 3
+harmonic-incoherence gate, continuum crossing-tail gate, and final
+axis energy-concentration gate are enabled; exact-point continuum gate 3
 is explicitly disabled. The sorter
 records the configuration name, schema, and SHA-256 in
 all shot and per-`n` summaries and rejects threshold/gate overrides when the
@@ -383,7 +394,7 @@ named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
 `GOOD` before manual overrides and duplicate processing.
 
-Production v8 retains v6 routing: `fraction_below_upper2 < 0.2` goes directly
+Production v9 retains v6 routing: `fraction_below_upper2 < 0.2` goes directly
 to EAE-like, regardless of `signed_delta`. It retains v7's approved gate-4
 exception and tightens the interior extremum clearance as described above.
 The fraction counts mode energy where the upper TAE
@@ -404,7 +415,7 @@ python scripts/sort_shot_rules.py \
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The shared engine implements ten ordered BAD decisions;
+routing conventions. The shared engine implements eleven ordered BAD decisions;
 production-v5 enables nine of them and disables exact-point continuum gate 3.
 The decisions reject a calibrated narrow local maximum at `r <= 0.03`
 (`BAD_AXIS_SPIKE`), a large unresolved
@@ -459,7 +470,7 @@ modes receive the engine verdict `REVIEW`, not `GOOD`, with primary reason
 the calibration CLI leaves them as REVIEW. Invalid inputs remain `INVALID`,
 and valid EAE-like modes are routed without a fabricated rule decision.
 
-The final `continuum_crossing_tail` gate returns
+The `continuum_crossing_tail` gate returns
 `BAD_CONTINUUM_CROSSING_TAIL` when the **same** actual lower/upper crossing
 has strict `K_c > 0.4` and `T_2 > 0.035` on a 201-point radial grid.
 `T_2=E_tail/(E_h1+E_h2)` uses the two strongest individual harmonics by
@@ -468,7 +479,7 @@ harmonics on the side opposite the global energy peak. K is the unscaled
 signed second-difference norm divided by the local amplitude norm, over
 complete stencil centers within ±4 native intervals of that crossing.
 Other resolutions retain measurements but do not fire this gate. The gate
-runs last to preserve every earlier primary reason. Details and calibration
+preserves the preceding primary reasons. The axis-energy gate follows it. Details and calibration
 controls are in `scripts/README.md`; older frozen presets remain unchanged.
 
 If an evaluated TAE-side mode has `nr != 201`, the interior harmonic-incoherence
@@ -486,7 +497,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v20`; the near-axis group records the independent
+`tae-rule-features-grouped-v21`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The

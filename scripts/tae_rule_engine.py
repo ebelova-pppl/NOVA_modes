@@ -14,7 +14,7 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
-from cont_features import continuum_extremum_features  # noqa: E402
+from cont_features import continuum_extremum_features, _energy_fraction_in_window  # noqa: E402
 from mode_features import (  # noqa: E402
     EXPERIMENTAL_CROSSING_RF_FEATURE_NAMES,
     EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES,
@@ -29,6 +29,10 @@ from tae_rule_io import empty_rule_row, stable_json  # noqa: E402
 DEFAULT_AXIS_R_AX = 0.03
 DEFAULT_AXIS_AMPLITUDE_MIN = 0.2
 DEFAULT_AXIS_WIDTH_MAX_GRID = 10.0
+DEFAULT_AXIS_ENERGY_AMPLITUDE_R_MAX = 0.015
+DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN = 0.5
+DEFAULT_AXIS_ENERGY_R_MAX = 0.05
+DEFAULT_AXIS_ENERGY_FRACTION_MIN = 0.5
 DEFAULT_GRID_SCALE_AMPLITUDE_MIN = 0.3
 DEFAULT_GRID_SCALE_WIDTH_MAX_GRID = 1.0
 DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R = 0.7
@@ -78,8 +82,10 @@ LEGACY_RULESET_VERSION = (
 PREVIOUS_RULESET_VERSION = (
     LEGACY_RULESET_VERSION.removesuffix("-v18") + "-smooth-crossing-window-v19"
 )
-RULESET_VERSION = PREVIOUS_RULESET_VERSION.removesuffix("-v19") + "-extremum-clearance-v20"
+CLEARANCE_RULESET_VERSION = PREVIOUS_RULESET_VERSION.removesuffix("-v19") + "-extremum-clearance-v20"
+RULESET_VERSION = CLEARANCE_RULESET_VERSION.removesuffix("-v20") + "-axis-energy-concentration-v21"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
+BAD_AXIS_ENERGY_CONCENTRATION = "BAD_AXIS_ENERGY_CONCENTRATION"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
 BAD_GRID_SCALE_PACKET = "BAD_GRID_SCALE_PACKET"
 BAD_NEAR_AXIS_GRID_OSCILLATION = "BAD_NEAR_AXIS_GRID_OSCILLATION"
@@ -94,7 +100,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v20"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v21"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -112,6 +118,92 @@ RULE_FEATURE_GROUP_NAMES = (
     "extremum_features",
     "boundary_features",
 )
+
+
+@dataclass(frozen=True)
+class AxisEnergyConcentrationConfig:
+    """Width-independent amplitude and integrated-energy cuts near the axis."""
+
+    amplitude_r_max: float = DEFAULT_AXIS_ENERGY_AMPLITUDE_R_MAX
+    amplitude_min: float | None = DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN
+    energy_r_max: float = DEFAULT_AXIS_ENERGY_R_MAX
+    energy_fraction_min: float | None = DEFAULT_AXIS_ENERGY_FRACTION_MIN
+
+    def __post_init__(self) -> None:
+        for name in ("amplitude_r_max", "energy_r_max"):
+            value = getattr(self, name)
+            if not math.isfinite(value) or not 0.0 < value <= 1.0:
+                raise ValueError(f"axis energy {name} must be finite and in (0, 1]")
+        for name in ("amplitude_min", "energy_fraction_min"):
+            value = getattr(self, name)
+            if value is not None and (not math.isfinite(value) or not 0.0 <= value <= 1.0):
+                raise ValueError(f"axis energy {name} must be null or finite and in [0, 1]")
+
+    @property
+    def enabled(self) -> bool:
+        return self.amplitude_min is not None and self.energy_fraction_min is not None
+
+
+def empty_axis_energy_concentration_features(
+    config: AxisEnergyConcentrationConfig | None = None,
+) -> dict[str, Any]:
+    resolved = config or AxisEnergyConcentrationConfig()
+    return {
+        "enabled": resolved.enabled,
+        "amplitude_r_max": resolved.amplitude_r_max,
+        "amplitude_min": resolved.amplitude_min,
+        "energy_r_max": resolved.energy_r_max,
+        "energy_fraction_min": resolved.energy_fraction_min,
+        "n_radial": None,
+        "axis_sample_count": None,
+        "axis_amplitude": None,
+        "axis_signed_amplitude": None,
+        "axis_harmonic_index": None,
+        "axis_peak_r": None,
+        "total_energy": None,
+        "inner_energy_fraction": None,
+        "candidate_found": None,
+    }
+
+
+def extract_axis_energy_concentration_features(
+    mode: np.ndarray, *, config: AxisEnergyConcentrationConfig | None = None,
+) -> dict[str, Any]:
+    """Measure native samples and piecewise-linear all-harmonic W energy."""
+    resolved = config or AxisEnergyConcentrationConfig()
+    mode_array = np.asarray(mode, dtype=float)
+    if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
+        raise ValueError("mode must have shape (n_harmonics, n_radial), n_radial >= 2")
+    if not np.all(np.isfinite(mode_array)):
+        raise ValueError("mode contains non-finite values")
+    radial_grid = np.linspace(0.0, 1.0, mode_array.shape[1])
+    indices = np.flatnonzero(radial_grid <= resolved.amplitude_r_max)
+    window = mode_array[:, indices]
+    h, j = np.unravel_index(np.argmax(np.abs(window)), window.shape)
+    amplitude = float(abs(window[h, j]))
+    W = np.sum(mode_array**2, axis=0)
+    total = float(np.trapezoid(W, radial_grid))
+    if not math.isfinite(total):
+        raise ValueError("axis energy integral is non-finite")
+    # A zero-energy input has no defined energy fraction and cannot qualify.
+    fraction = (
+        _energy_fraction_in_window(
+            W, radial_grid, resolved.energy_r_max / 2, resolved.energy_r_max / 2
+        ) if total > 0.0 else None
+    )
+    result = empty_axis_energy_concentration_features(resolved)
+    result.update(
+        n_radial=mode_array.shape[1], axis_sample_count=int(indices.size),
+        axis_amplitude=amplitude, axis_signed_amplitude=float(window[h, j]),
+        axis_harmonic_index=int(h), axis_peak_r=float(radial_grid[indices[j]]),
+        total_energy=total, inner_energy_fraction=fraction,
+        candidate_found=bool(
+            resolved.enabled and fraction is not None
+            and amplitude > resolved.amplitude_min
+            and fraction > resolved.energy_fraction_min
+        ),
+    )
+    return result
 
 
 @dataclass(frozen=True)
@@ -978,6 +1070,7 @@ def empty_rule_features(
         InteriorHarmonicIncoherenceConfig | None
     ) = None,
     continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
+    axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -1048,6 +1141,9 @@ def empty_rule_features(
             **{name: None for name in EXPERIMENTAL_EXTREMUM_RF_FEATURE_NAMES},
         },
         "boundary_features": {
+            "axis_energy_concentration": empty_axis_energy_concentration_features(
+                axis_energy_concentration_config
+            ),
             "axis_artifact": empty_axis_artifact_features(
                 axis_config.r_ax,
                 axis_config.axis_amplitude_min,
@@ -1072,6 +1168,7 @@ def grouped_rule_features(
     interior_unresolved_envelope_features: Mapping[str, Any],
     interior_harmonic_incoherence_features: Mapping[str, Any],
     continuum_crossing_tail_features: Mapping[str, Any],
+    axis_energy_concentration_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -1112,6 +1209,7 @@ def grouped_rule_features(
             },
         },
         "boundary_features": {
+            "axis_energy_concentration": dict(axis_energy_concentration_features),
             "axis_artifact": dict(axis_artifact_features),
             "edge_artifact": dict(edge_artifact_features),
         },
@@ -2643,6 +2741,7 @@ def evaluate_mode(
     low2: np.ndarray | None = None,
     high2: np.ndarray | None = None,
     axis_artifact_config: AxisArtifactConfig | None = None,
+    axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -2657,6 +2756,7 @@ def evaluate_mode(
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
+    axis_energy_config = axis_energy_concentration_config or AxisEnergyConcentrationConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
     near_axis_oscillation_config = (
@@ -2713,6 +2813,7 @@ def evaluate_mode(
                 interior_config,
                 incoherence_config,
                 tail_config,
+                axis_energy_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -2829,6 +2930,7 @@ def evaluate_mode(
             extract_continuum_crossing_tail_features(
                 mode, feature_status["crossing_records"], config=tail_config
             ),
+            extract_axis_energy_concentration_features(mode, config=axis_energy_config),
         )
     except Exception as exc:
         return RuleResult(
@@ -2852,6 +2954,7 @@ def evaluate_mode(
                 interior_config,
                 incoherence_config,
                 tail_config,
+                axis_energy_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -3071,6 +3174,15 @@ def evaluate_mode(
             primary_reason=BAD_CONTINUUM_CROSSING_TAIL,
             triggered_rules=(BAD_CONTINUUM_CROSSING_TAIL,),
             features=features,
+        )
+
+    # Append the gate so existing BAD primary reasons retain precedence.
+    if features["boundary_features"]["axis_energy_concentration"]["candidate_found"]:
+        return RuleResult(
+            path=path, mode_key=mode_key, shot=shot, ntor=ntor,
+            frequency=frequency, input_fingerprint=fingerprint, gap_region=gap_region,
+            decision="BAD", primary_reason=BAD_AXIS_ENERGY_CONCENTRATION,
+            triggered_rules=(BAD_AXIS_ENERGY_CONCENTRATION,), features=features,
         )
 
     # Not rejected is not equivalent to GOOD. Positive templates and later

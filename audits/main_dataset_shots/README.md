@@ -81,7 +81,7 @@ this now-invalid shot; active training labels are unchanged.
 All 27 rules exports were then regenerated on 2026-09-09 with production v8:
 the interior extremum exception requires clearance strictly greater than
 0.1%, with no additional minimum width. Six GOOD modes become BAD, leaving
-950 GOOD before duplicate removal and 944 selected. Current results and
+950 GOOD before duplicate removal and 944 selected. Those results and
 **228 disagreements** are in `../extremum_floor_20260909/`; its added/removed
 lists contain four/two modes. Previous rules directories are retained under
 `before_extremum_clearance_v8_20260909/`; RF-CNN exports remain unchanged.
@@ -89,3 +89,14 @@ Eight already-INVALID C50 N1 files are now absent from the raw directory,
 so the refreshed rules inventory has 65 C50 N1 inputs while the historical
 RF-CNN export retains 73. The audit records that difference explicitly.
 All 27 checked statuses and active training labels remain unchanged.
+
+Production v9 subsequently adds the user-approved axis-energy concentration
+gate: amplitude >0.5 inside r<=0.015 AND more than 50% of radial energy
+inside r<=0.05. All 27 rules outputs were regenerated and verified, with
+only L94 N5/2135 changing GOOD->BAD. Totals are now 949 GOOD before duplicate
+removal and 943 selected. All 2,390 training decisions are unchanged.
+The current **227 disagreements** are in
+`../axis_amplitude_20260909/current_disagreements.csv`, with no additions and
+only L94 N5/2135 removed. Previous rules outputs are retained under
+`before_axis_energy_v9_20260909/`; RF-CNN outputs and checked membership are
+unchanged. Both inventories record this regeneration in their notes.

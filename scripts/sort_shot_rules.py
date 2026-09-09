@@ -83,6 +83,11 @@ from tae_rule_engine import (  # noqa: E402
     NO_GOOD_TEMPLATE,
     RULESET_VERSION,
     AxisArtifactConfig,
+    AxisEnergyConcentrationConfig,
+    DEFAULT_AXIS_ENERGY_AMPLITUDE_R_MAX,
+    DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN,
+    DEFAULT_AXIS_ENERGY_R_MAX,
+    DEFAULT_AXIS_ENERGY_FRACTION_MIN,
     ContinuumCrossingConfig,
     ContinuumCrossingWindowConfig,
     ContinuumCrossingTailConfig,
@@ -194,6 +199,11 @@ SHOT_SUMMARY_FIELDS = [
     "axis_artifact_r_ax",
     "axis_artifact_amplitude_min",
     "axis_artifact_width_max_grid",
+    "axis_energy_concentration_gate_enabled",
+    "axis_energy_amplitude_r_max",
+    "axis_energy_amplitude_min",
+    "axis_energy_r_max",
+    "axis_energy_fraction_min",
     "grid_scale_spike_gate_enabled",
     "grid_scale_spike_amplitude_min",
     "grid_scale_spike_width_max_grid",
@@ -263,6 +273,11 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--axis_amplitude_min",
         "--axis_width_max_grid",
         "--disable_axis_artifact",
+        "--axis_energy_amplitude_r_max",
+        "--axis_energy_amplitude_min",
+        "--axis_energy_r_max",
+        "--axis_energy_fraction_min",
+        "--disable_axis_energy_concentration",
         "--grid_scale_amplitude_min",
         "--grid_scale_width_max_grid",
         "--grid_scale_high_r_cutoff_r",
@@ -923,6 +938,7 @@ def build_summary(
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
+    axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -940,6 +956,7 @@ def build_summary(
     rule_configuration_sha256: str = "",
 ) -> dict[str, Any]:
     axis_config = axis_artifact_config or AxisArtifactConfig()
+    axis_energy_config = axis_energy_concentration_config or AxisEnergyConcentrationConfig()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
     near_axis_oscillation_config = (
@@ -1061,6 +1078,11 @@ def build_summary(
         "similarity_threshold": SIMILARITY_THRESHOLD,
         "radial_location_tolerance": RADIAL_LOCATION_TOLERANCE,
         "radial_width_tolerance": RADIAL_WIDTH_TOLERANCE,
+        "axis_energy_concentration_gate_enabled": axis_energy_config.enabled,
+        "axis_energy_amplitude_r_max": axis_energy_config.amplitude_r_max,
+        "axis_energy_amplitude_min": axis_energy_config.amplitude_min,
+        "axis_energy_r_max": axis_energy_config.energy_r_max,
+        "axis_energy_fraction_min": axis_energy_config.energy_fraction_min,
         "axis_artifact_gate_enabled": axis_config.enabled,
         "axis_artifact_r_ax": axis_config.r_ax,
         "axis_artifact_amplitude_min": axis_config.axis_amplitude_min,
@@ -1168,6 +1190,7 @@ def _summary_by_n(
     signed_delta_eae_threshold: float,
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
+    axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -1229,6 +1252,7 @@ def _summary_by_n(
             signed_delta_eae_threshold=signed_delta_eae_threshold,
             rel_freq_tol=rel_freq_tol,
             axis_artifact_config=axis_artifact_config,
+            axis_energy_concentration_config=axis_energy_concentration_config,
             grid_scale_spike_config=grid_scale_spike_config,
             grid_scale_packet_config=grid_scale_packet_config,
             near_axis_grid_oscillation_config=(
@@ -1400,6 +1424,10 @@ def run_shot(
     axis_r_ax: float = DEFAULT_AXIS_R_AX,
     axis_amplitude_min: float | None = DEFAULT_AXIS_AMPLITUDE_MIN,
     axis_width_max_grid: float | None = DEFAULT_AXIS_WIDTH_MAX_GRID,
+    axis_energy_amplitude_r_max: float = DEFAULT_AXIS_ENERGY_AMPLITUDE_R_MAX,
+    axis_energy_amplitude_min: float | None = DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN,
+    axis_energy_r_max: float = DEFAULT_AXIS_ENERGY_R_MAX,
+    axis_energy_fraction_min: float | None = DEFAULT_AXIS_ENERGY_FRACTION_MIN,
     grid_scale_amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
     grid_scale_width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
     grid_scale_high_r_cutoff_r: float = DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
@@ -1491,6 +1519,12 @@ def run_shot(
     if rule_survivor_policy not in RULE_SURVIVOR_POLICIES:
         allowed = ", ".join(sorted(RULE_SURVIVOR_POLICIES))
         raise ValueError(f"rule_survivor_policy must be one of: {allowed}")
+    axis_energy_config = AxisEnergyConcentrationConfig(
+        amplitude_r_max=axis_energy_amplitude_r_max,
+        amplitude_min=axis_energy_amplitude_min,
+        energy_r_max=axis_energy_r_max,
+        energy_fraction_min=axis_energy_fraction_min,
+    )
     axis_config = AxisArtifactConfig(
         r_ax=axis_r_ax,
         axis_amplitude_min=axis_amplitude_min,
@@ -1594,6 +1628,7 @@ def run_shot(
             low2=None if feature_data is None else feature_data.low2,
             high2=None if feature_data is None else feature_data.high2,
             axis_artifact_config=axis_config,
+            axis_energy_concentration_config=axis_energy_config,
             grid_scale_spike_config=grid_config,
             grid_scale_packet_config=packet_config,
             near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1644,6 +1679,7 @@ def run_shot(
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
+        axis_energy_concentration_config=axis_energy_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
         near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1670,6 +1706,7 @@ def run_shot(
         signed_delta_eae_threshold=signed_delta_eae_threshold,
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
+        axis_energy_concentration_config=axis_energy_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
         near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1788,6 +1825,22 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--signed_delta_eae_threshold",
         type=float,
         default=DEFAULT_SIGNED_DELTA_EAE_THRESHOLD,
+    )
+    for flag, default, help_text in (
+        ("axis_energy_amplitude_r_max", DEFAULT_AXIS_ENERGY_AMPLITUDE_R_MAX,
+         "Inclusive normalized radius for the axis-energy amplitude maximum"),
+        ("axis_energy_amplitude_min", DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN,
+         "Strict minimum absolute harmonic amplitude for axis-energy rejection"),
+        ("axis_energy_r_max", DEFAULT_AXIS_ENERGY_R_MAX,
+         "Upper radius of the integrated inner-energy window, starting at r=0"),
+        ("axis_energy_fraction_min", DEFAULT_AXIS_ENERGY_FRACTION_MIN,
+         "Strict minimum fraction of total radial energy inside the inner window"),
+    ):
+        parser.add_argument("--" + flag, type=float, default=default,
+                            help=f"{help_text} (default: {default:g})")
+    parser.add_argument(
+        "--disable_axis_energy_concentration", action="store_true",
+        help="Disable joint near-axis amplitude/energy rejection, retaining measurements",
     )
     parser.add_argument(
         "--axis_r_ax",
@@ -2295,6 +2348,12 @@ def main() -> None:
         axis_amplitude_min=(
             None if args.disable_axis_artifact else args.axis_amplitude_min
         ),
+        axis_energy_amplitude_r_max=args.axis_energy_amplitude_r_max,
+        axis_energy_amplitude_min=(None if args.disable_axis_energy_concentration
+                                   else args.axis_energy_amplitude_min),
+        axis_energy_r_max=args.axis_energy_r_max,
+        axis_energy_fraction_min=(None if args.disable_axis_energy_concentration
+                                  else args.axis_energy_fraction_min),
         axis_width_max_grid=(
             None if args.disable_axis_artifact else args.axis_width_max_grid
         ),
@@ -2429,6 +2488,14 @@ def main() -> None:
             f"schema={summary['rule_configuration_schema_version']} "
             f"sha256={summary['rule_configuration_sha256']}"
         )
+    print(
+        "Axis energy concentration gate: "
+        f"enabled={summary['axis_energy_concentration_gate_enabled']} "
+        f"amplitude_r_max={summary['axis_energy_amplitude_r_max']} "
+        f"amplitude>{summary['axis_energy_amplitude_min']} "
+        f"energy_r_max={summary['axis_energy_r_max']} "
+        f"energy_fraction>{summary['axis_energy_fraction_min']}"
+    )
     print(
         "Axis artifact gate: "
         f"enabled={summary['axis_artifact_gate_enabled']} "

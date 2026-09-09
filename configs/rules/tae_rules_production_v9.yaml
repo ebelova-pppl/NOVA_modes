@@ -1,0 +1,100 @@
+{
+  "schema_version": "tae-rule-run-config-v9",
+  "name": "tae_rules_production_v9",
+  "rule_set_version": "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-v21",
+  "routing": {
+    "fraction_tae_threshold": 0.5,
+    "fraction_eae_threshold": 0.4,
+    "fraction_direct_eae_threshold": 0.2,
+    "signed_delta_eae_threshold": -0.1,
+    "include_mixed_in_tae_like": true
+  },
+  "deduplication": {
+    "rel_freq_tol": 0.02
+  },
+  "gates": {
+    "axis_artifact": {
+      "enabled": true,
+      "r_ax": 0.03,
+      "amplitude_min": 0.2,
+      "width_max_grid": 10.0
+    },
+    "grid_scale_spike": {
+      "enabled": true,
+      "amplitude_min": 0.3,
+      "width_max_grid": 1.0,
+      "high_r_cutoff_r": 0.7,
+      "high_r_width_max_grid": 0.75
+    },
+    "grid_scale_packet": {
+      "enabled": true,
+      "amplitude_min": 0.3,
+      "step_min": 0.2,
+      "min_large_turns": 3,
+      "window_span_grid": 4,
+      "peak_r_max": 0.5
+    },
+    "near_axis_grid_oscillation": {
+      "enabled": true,
+      "peak_r_max": 0.1,
+      "amplitude_min": 0.1,
+      "min_consecutive_sign_flips": 4,
+      "step_l2_min": 0.3
+    },
+    "continuum_crossing": {
+      "enabled": false,
+      "w_cross_threshold": 0.03
+    },
+    "continuum_crossing_window": {
+      "enabled": true,
+      "half_width_grid": 2,
+      "amplitude_min": 0.25,
+      "w_min": 0.05,
+      "smooth_exception": {
+        "enabled": true,
+        "amplitude_max": 0.2,
+        "k_max": 0.1,
+        "half_width_grid": 4,
+        "calibrated_n_radial": 201
+      }
+    },
+    "edge_artifact": {
+      "enabled": true,
+      "r_edge_min": 0.97,
+      "width_max_grid": 10.0
+    },
+    "interior_unresolved_envelope": {
+      "enabled": true,
+      "peak_r_max": 0.5,
+      "width_max_grid": 2.0,
+      "extremum_r_min": 0.03,
+      "extremum_r_max": 0.5,
+      "ext_dr_max": 0.02,
+      "ext_df_gap_min": 0.001,
+      "ext_df_gap_max": 0.04,
+      "ext_df_gap_min_inclusive": false
+    },
+    "interior_harmonic_incoherence": {
+      "enabled": true,
+      "core_r_max": 0.5,
+      "active_core_energy_fraction_min": 0.005,
+      "max_lag_grid": 5,
+      "score_threshold": 0.1,
+      "calibrated_n_radial": 201
+    },
+    "continuum_crossing_tail": {
+      "enabled": true,
+      "k_min": 0.4,
+      "top2_ratio_min": 0.035,
+      "half_width_grid": 4,
+      "calibrated_n_radial": 201
+    },
+    "axis_energy_concentration": {
+      "enabled": true,
+      "amplitude_r_max": 0.015,
+      "amplitude_min": 0.5,
+      "energy_r_max": 0.05,
+      "energy_fraction_min": 0.5
+    }
+  }
+}

@@ -22,13 +22,13 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v8.yaml`. It pins the v20
+The preset is `configs/rules/tae_rules_production_v9.yaml`. It pins the v21
 ruleset and routing values, enables gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
-gates, and the final continuum crossing-tail gate. It explicitly disables
+gates, the continuum crossing-tail gate, and the final axis-energy gate. It explicitly disables
 exact-point continuum gate 3.
 
-Production v8 retains the v7 exception: it excuses a violating gate-4 window only when the same crossing
+Production v9 retains the v7 exception: it excuses a violating gate-4 window only when the same crossing
 has strict `A_cross < 0.2 AND K_c < 0.1`, on nr=201. Interpolate each signed
 harmonic to the crossing before taking its magnitude, then maximize over
 harmonics. K uses the shared unscaled second-difference calculation with an
@@ -42,11 +42,11 @@ Configure it with `--cross_window_exception_amplitude_max`,
 `--cross_window_exception_calibrated_n_radial`, or disable it with
 `--disable_cross_window_exception` in the calibration CLI. Named v5/v6
 configurations explicitly disable the exception and preserve old decisions,
-while new exports use the v20 audit schema. Exact older exports require their
+while new exports use the v21 audit schema. Exact older exports require their
 historical checkout. The exception never skips the rejection gate on other
 resolutions; the original window criteria remain active there.
 
-Production-v8 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
+Production-v9 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
 regardless of signed_delta. Equality uses the existing branches: EAE also
 requires fraction <0.4 and signed_delta <-0.1; fraction >0.5 is TAE-like;
 remaining cases are mixed and stay on the TAE side. All entry points share
@@ -107,7 +107,7 @@ python scripts/sort_shot_rules.py \
 
 The command aborts before processing if a populated requested `N#` directory
 lacks `datcon#`. It uses the shared NOVA loader, continuum loader, and canonical
-TAE/EAE/mixed split. Ten ordered BAD decisions detect narrow near-axis
+TAE/EAE/mixed split. Eleven ordered BAD decisions detect narrow near-axis
 spikes, unresolved signed-harmonic spikes and short large-turn packets whose
 strongest window sample is at `r <= 0.5`, relatively large consecutive
 sign-flip oscillations at strict `r < 0.1`, continuum crossings carrying
@@ -138,7 +138,7 @@ defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v20 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v21 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -468,7 +468,7 @@ prediction to make a rule decision.
 
 ## Continuum crossing-tail rejection
 
-The final gate is `continuum_crossing_tail`, with reason
+The continuum tail gate is `continuum_crossing_tail`, with reason
 `BAD_CONTINUUM_CROSSING_TAIL`. Preserve every earlier primary reason.
 At each actual lower/upper crossing, use the side opposite the global W peak
 as the tail (inner if r_cross < r_peak, outer otherwise). Retain all harmonics
@@ -507,6 +507,41 @@ other enabled gates run on the native grid, and production survivors can
 still become GOOD. The warning states that policy and counts affected GOOD
 modes. Intentionally disabled gates do not warn; every run replaces both
 reports to clear stale warnings. No resampling or automatic abort is implied.
+
+## Axis energy concentration rejection
+
+The final production-v9 gate is `axis_energy_concentration`, with reason
+`BAD_AXIS_ENERGY_CONCENTRATION`. Keep every earlier BAD primary reason.
+Reject only when both strict conditions hold:
+
+```text
+max_(h, native r_i <= 0.015) |xi_h(r_i)| > 0.5
+AND integral_0^0.05 W(r) dr / integral_0^1 W(r) dr > 0.5
+W(r) = sum_h |xi_h(r)|^2
+```
+
+Use existing globally normalized amplitudes and all harmonics in the energy
+fraction. The shared piecewise-linear W integration includes the exact
+window endpoints; do not add volume/Jacobian weighting. No width, local-peak,
+or continuum-extremum condition is imposed. Equality at either amplitude or
+energy cut passes. A zero-energy input has an undefined fraction and cannot
+qualify. The condition targets dominant inner energy while retaining the
+user-approved extended modes E202855A01t020 N1/8188 and E204645A16t015 N1/3712.
+
+Evaluate on every native radial grid; there is no nr-based skip. Scientific
+calibration used nr=201, so do not claim resolution-independent accuracy.
+Record the thresholds, native nr, axis sample count, maximum absolute/signed
+amplitude, stored harmonic index and peak radius, total radial energy,
+inner fraction, and candidate status under
+`boundary_features.axis_energy_concentration` even when disabled. Summaries
+record `axis_energy_concentration_gate_enabled` plus
+`axis_energy_amplitude_r_max`, `axis_energy_amplitude_min`,
+`axis_energy_r_max`, and `axis_energy_fraction_min`.
+
+The corresponding calibration flags use those four `--axis_energy_*` names;
+`--disable_axis_energy_concentration` disables rejection while retaining
+measurements. Frozen v5-v8 presets explicitly disable this added gate and
+retain their earlier decisions while emitting current audit metadata.
 
 ## Honor known invalid input scopes
 

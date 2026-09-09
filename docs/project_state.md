@@ -3,6 +3,49 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 adopted axis energy concentration gate (v9)
+
+- The user approved the joint condition. Added final rejection reason
+  `BAD_AXIS_ENERGY_CONCENTRATION` for `max_{h,r<=0.015}|xi_h| > 0.5 AND
+  F_inner(r<=0.05) > 0.5`. Both cuts are strict and have no width condition.
+  F_inner uses the shared piecewise-linear integral of all-harmonic W over
+  dr; a zero-energy input has an undefined fraction and cannot qualify.
+- The final position preserves every earlier BAD reason and provides no
+  exception from earlier gates. The condition evaluates every native radial
+  grid without a resolution-based skip; calibration used nr=201. Features
+  record sample count, radius/harmonic/amplitude, energy fraction, total
+  energy, enable state and thresholds in `boundary_features.axis_energy_concentration`.
+  Shot/per-n summaries and calibration CLI expose the same four thresholds.
+- Production v9 pins ruleset/features v21; its SHA-256 is
+  `e5d3ae4bac8cea9b9606a7e6337180e205f9294ea56529ec4a25f0a55d2f6bf7`.
+  Frozen v5-v8 files are unchanged and their adapters explicitly disable
+  the new gate. RF/CNN inputs and weights are unchanged.
+- All 174 tests pass, including both strict boundaries, signed amplitude,
+  all-harmonic energy, interpolated integration endpoints, native nr=51/101/
+  201/401, zero energy, disabled measurements, earlier-gate precedence,
+  legacy behavior, CLI override protection, and canonical v9 outputs.
+- All 27 rules exports were regenerated, verified and published. The only
+  decision change is L94 N5/2135 GOOD->BAD; all 4,187 evaluated modes retain
+  their prior measured features, and every other reason/decision/selected
+  representative is unchanged. There are 949 GOOD before deduplication and
+  943 selected. Input totals remain 19,317: 772 INVALID, 14,358 EAE, and
+  4,187 rule-evaluated. Both user-approved comparison modes remain GOOD.
+- Recomputed all 2,390 training modes with the new gate disabled/enabled:
+  **zero decision changes**, including labeled BAD cases. Training counts
+  remain 542 GOOD-label survivors / 33 rejected and 25 BAD-label survivors /
+  1,763 rejected, plus 26 EAE and one INVALID labeled BAD. Input fingerprints
+  match the earlier training audit and every pre-existing feature agrees.
+- Previous rules exports are retained under `before_axis_energy_v9_20260909/`.
+  Published/backup tree hashes and source hashes were checked; RF-CNN exports
+  and training labels are unchanged. Verification/publication receipts,
+  `adopted_changes.csv`, and `adopted_shot_summary.csv` are in
+  `audits/axis_amplitude_20260909/`; runtime outputs/logs remain ignored under
+  `outputs/review_axis_energy_v9_20260909/`.
+- The current comparison is `audits/axis_amplitude_20260909/current_disagreements.csv`
+  with 227 rows (down from 228): no additions, only L94 N5/2135 removed.
+  `disagreements_removed.csv` records that removal; the user's working
+  disagreement list is preserved. Next: continue the remaining mode review.
+
 ## 2026-09-09 near-axis amplitude and energy concentration proposal
 
 - The user flagged L94 N5/2135 for near-unit amplitude extremely close to
@@ -31,12 +74,13 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   comparison modes remain GOOD. At energy radius 0.05, fraction thresholds
   0.2, 0.3, and 0.5 give the same result. This supersedes the initial 0.8
   amplitude-only proposal. It adds a potential rejection condition without
-  weakening existing gates. Numerical thresholds have not been adopted.
+  weakening existing gates. These thresholds were subsequently approved;
+  implementation and regression status are recorded above.
 - This is non-blind calibration, not proof of a boundary-condition error.
   Production v8 and truth labels are unchanged. Evidence and the one-row
   `combined_changes.csv` are in `audits/axis_amplitude_20260909/`; plots and
   full measurements are ignored in `outputs/review_axis_amplitude_20260909/`.
-  Next: select the joint thresholds before implementing the additional gate.
+  This section records the pre-adoption calibration; see the v9 update above.
 
 ## 2026-09-09 adopted clearance >0.1% for the interior extremum exception
 

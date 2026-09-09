@@ -1,0 +1,353 @@
+[
+  {
+    "shot": "nstxuE202806A02t025",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE202806A02t025",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE202806A02t025",
+    "new": {
+      "files": 18,
+      "tree_sha256": "c3bf89e86415541d5e9a75cdeb4617e2f7b3bbe5e87ad2e4e3e9d3f3b2136d8b"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "ec1697451828d40e2a04e610795ad2ac030b7929ab6202774bd87a802448cd2b"
+    }
+  },
+  {
+    "shot": "nstxuE203609A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203609A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE203609A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "db851a4bb710c479badd2f883dff4388f01a0ad790e1ed10d4485c77ce593f88"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "956add8c1e6e460e5251d9e6e9e45ddba4ba880a68217ef3bdf572faefb4bd68"
+    }
+  },
+  {
+    "shot": "nstxuE203963A01t025",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203963A01t025",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE203963A01t025",
+    "new": {
+      "files": 18,
+      "tree_sha256": "88a40a58dd4d5cab32f9040cedf64b5b5cd97207663addf58a54f51155ee9191"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "514c5cfec5ccefde507237a5a3db51a6b8d221c11c1a3aad3fd3c0eaa276515a"
+    }
+  },
+  {
+    "shot": "nstxuE204707A04t030",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204707A04t030",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204707A04t030",
+    "new": {
+      "files": 18,
+      "tree_sha256": "56f647ecc30b8281d96ae524d004dbf39964ff008be68011c480538aa60e84a5"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "79f73095f139dbfa8a99bf7e0a07e0e20edaba9a4e786c2667657a114edec57b"
+    }
+  },
+  {
+    "shot": "nstxuE204954A01t022",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204954A01t022",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204954A01t022",
+    "new": {
+      "files": 18,
+      "tree_sha256": "925dce3895dbc6505f7e25774d138a51a8570eaa563de1d91ecef3d791645cb2"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "94a1ed5e5d25736fda8683e21337cd63145abc27ab7de90f40d9dddb3a4b56fc"
+    }
+  },
+  {
+    "shot": "nstxuE205035A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205035A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE205035A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "1d1aab76c5c333302cea3c10b4d89aeb2d24f62554a0d8f17df831e9e0128979"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "9d77044dac4b8bc5bad6c1dc086b17919606318bb5e27bf749e13b2ee9b92d3f"
+    }
+  },
+  {
+    "shot": "nstxuE205045A01t022",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205045A01t022",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE205045A01t022",
+    "new": {
+      "files": 18,
+      "tree_sha256": "11006b6bab14687bd484968f68d5f6624a97ff094e1bf0455f412ebea5f6d92f"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "63f0f9ad468560eec0466053155a5d9996cdcc67ee5ef5253d1c5807349ecca2"
+    }
+  },
+  {
+    "shot": "nstxuE205054A01t037",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205054A01t037",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE205054A01t037",
+    "new": {
+      "files": 18,
+      "tree_sha256": "f9fb63dddb3ac0a22610623ac21f492b124038e36398477be8aae5d2ef478e8d"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "23d15973f0ebac7cd98001f5ff7b47dff45f20ddb682c43b24fcb73aa702d39a"
+    }
+  },
+  {
+    "shot": "nstxuE205057A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205057A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE205057A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "c652dc2deef30d0866778124c0381768cc3d3ded9bb8a3ea387b1e6afcbb76f0"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "e7ddef867e83bf19b72d313760526c998a56b7a8e6a053d59963a63c1ac774fc"
+    }
+  },
+  {
+    "shot": "nstxuG121123K34",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K34",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG121123K34",
+    "new": {
+      "files": 18,
+      "tree_sha256": "61b863c5d066eac1d3e93250fb0ebe3784f69454bd21f3c72724f4ad1a35d023"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "cae7b84f9e8a1965cbbf929ff4e305d4dd9328f1093c7466df4d3d3d074b0baa"
+    }
+  },
+  {
+    "shot": "nstxuG121123K70",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K70",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG121123K70",
+    "new": {
+      "files": 18,
+      "tree_sha256": "f9729dc36923709eeb8cc2262cd5fc293369bf08ce97557865b1238c08301964"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "0bdc20b76f86d7f16046d0ca436b37a76c63bc378c755f1dcb1edde002d09e3b"
+    }
+  },
+  {
+    "shot": "nstxuG121123N80",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123N80",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG121123N80",
+    "new": {
+      "files": 18,
+      "tree_sha256": "8d8b199512f7153c39fd893dbcbc2ec5947f9aaad3020b7222f5e2594b65ff83"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "548428a799e1d0d119fa3c2f8c4d96bbba24e8f2f621480cf416361b61883807"
+    }
+  },
+  {
+    "shot": "nstxuG142301E72",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301E72",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG142301E72",
+    "new": {
+      "files": 18,
+      "tree_sha256": "be75c0c595706dc76db617af9e26a162b5f40ac6d825a401e269605d17f0604b"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "ab8ba8d94225384e311dfc3e0c4506d6d7ca3756401a85e865ae425558d74a99"
+    }
+  },
+  {
+    "shot": "nstxuG142301H56",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301H56",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG142301H56",
+    "new": {
+      "files": 18,
+      "tree_sha256": "a254200a1c51169b0e61ca702e6a1e7ceeeeca345cc8b9369db21104e5c883c2"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "e3972c42a1b79cecd2051d42aa18eda0b1ed9534a778393806b72e76e604fabb"
+    }
+  },
+  {
+    "shot": "nstxuG142301V21",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301V21",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG142301V21",
+    "new": {
+      "files": 18,
+      "tree_sha256": "133a75850c2fe7b031d3d7bd4f82a7055dbc0ff80fc8d434cabbfe60d7bf3a85"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "20f3139cd41cfffdba55d0e9252ae2537fa511ba45e5abf5234b1ab4701a1e54"
+    }
+  },
+  {
+    "shot": "nstxuE205040A01t016",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205040A01t016",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE205040A01t016",
+    "new": {
+      "files": 18,
+      "tree_sha256": "67ecb00fec83da4fbca572090927f612f6e37f701da8223e03efc4ef3b7b1f23"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "71ce088c1481495f64e87cbb70db7f4dedf35dbf812e78163c02318788493146"
+    }
+  },
+  {
+    "shot": "nstxuE204944A01t017",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204944A01t017",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204944A01t017",
+    "new": {
+      "files": 18,
+      "tree_sha256": "d907c52f971616d87a3d4015b831d1f2e60a59d6484f170c4355ef212b21fb80"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "e4692e3d583a2f253849bec510db4e04c426576e270cccfd5946e389b2308184"
+    }
+  },
+  {
+    "shot": "nstxuE204708F03t017",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204708F03t017",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204708F03t017",
+    "new": {
+      "files": 18,
+      "tree_sha256": "0b83b1908040cac1d98f7f9a2d230f0cb8c1138d992a5db83410f3dff8a08774"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "8a9b8ff2b65ecd8f75c94bc3d6afc094185ab549da21dc06db21e6f84a47e5d9"
+    }
+  },
+  {
+    "shot": "nstxuE204645A16t015",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204645A16t015",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204645A16t015",
+    "new": {
+      "files": 18,
+      "tree_sha256": "87194f78660170a66f13e4b29d8f9b325e7ebe50ec49d4e9406b7e278346e54c"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "8173d62a9381523fa8f1a3b05ca9186a9287f4ad66c5db6370ea6238845aae0d"
+    }
+  },
+  {
+    "shot": "nstxuE203262A04t018",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203262A04t018",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE203262A04t018",
+    "new": {
+      "files": 18,
+      "tree_sha256": "769ab26ef0838a2d8950f195fd50ba10e7ad4d19cf5af625a2700b64cedc5b2d"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "42e97d1260daa9061d94a7def2a55ac87797567d796205f22ec4482ad65e99b2"
+    }
+  },
+  {
+    "shot": "nstxuE204621A03t030",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204621A03t030",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204621A03t030",
+    "new": {
+      "files": 18,
+      "tree_sha256": "2026f418361de85bfb0e62b13f281a44329911d6d019b305a61e0eadd04e2d57"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "2dfe3d6a2df5f7db278ea9a754e919594e1bd0d13567bcd572cfaa9bc2b9f5c8"
+    }
+  },
+  {
+    "shot": "nstxuE205017A01t025",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205017A01t025",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE205017A01t025",
+    "new": {
+      "files": 18,
+      "tree_sha256": "5818fa4a0c495c59b32b1381248164143c6f975546d20d98776695003e77cffe"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "d3d90c68eb826deee8d27d37307a8e0a070618d4c4f33eaa5086eb3cef11257c"
+    }
+  },
+  {
+    "shot": "nstxuE204186A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204186A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuE204186A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "b5ad2de4e5781b817221d9917e47cf24325bfd212f1f9a20252ab47eb47649e6"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "b2c0bf306ad42093f03af1be7180941d55ba3ddc21b906dbdf311e7a76839a1d"
+    }
+  },
+  {
+    "shot": "nstxuG133964R06",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG133964R06",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG133964R06",
+    "new": {
+      "files": 18,
+      "tree_sha256": "2dbd690dc2499c9a573773c2a08467c53d28f3086447454583f241ee3fdc7eaf"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "5df28a484bbe9f6b2c891fe006689fc013334c8f315961a8297b33d0fc49ed90"
+    }
+  },
+  {
+    "shot": "nstxuG142301C50",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301C50",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG142301C50",
+    "new": {
+      "files": 18,
+      "tree_sha256": "b9a531b0aa5adf8c45aab25856cf8075b8e855a0c19d4c27306d9ab7eefe75cd"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "ab79154c88be9289717c2d39568246bd0155355bb89f6493edc2fbea37ae013e"
+    }
+  },
+  {
+    "shot": "nstxuG142301L94",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301L94",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG142301L94",
+    "new": {
+      "files": 18,
+      "tree_sha256": "b12ad2011c72eb064f320f2c306630584b1893d591eb85e672eabf38dbcf48d8"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "c8d00a2812ac0b39dc308d4b78f7f1f17aac990b1f91fee7af6e35cb91683873"
+    }
+  },
+  {
+    "shot": "nstxuG142301U84",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301U84",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_axis_energy_v9_20260909/nstxuG142301U84",
+    "new": {
+      "files": 18,
+      "tree_sha256": "2f6d06da506b83652ea85750a3f187c2d4df9d0bd91bafa5a5c73ca093d4a66b"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "d79962745a73b75cc2bc5e37f68821a836a4b6f7ed874d31fdf22dc066246354"
+    }
+  }
+]
