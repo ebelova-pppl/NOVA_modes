@@ -57,7 +57,7 @@ DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID = 2.0
 DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN = 0.03
 DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX = 0.50
 DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX = 0.02
-DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN = 0.0
+DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN = 0.001
 DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX = 0.04
 DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX = 0.5
 DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN = 0.005
@@ -70,14 +70,15 @@ DEFAULT_CONTINUUM_CROSSING_TAIL_HALF_WIDTH_GRID = 4
 DEFAULT_CONTINUUM_CROSSING_TAIL_CALIBRATED_N_RADIAL = 201
 HARMONIC_PARTICIPATION_EFFECTIVE_COUNT_THRESHOLD = 3.0
 
-PREVIOUS_RULESET_VERSION = (
+LEGACY_RULESET_VERSION = (
     "tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-"
     "grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-"
     "continuum-crossing-tail-v18"
 )
-RULESET_VERSION = (
-    PREVIOUS_RULESET_VERSION.removesuffix("-v18") + "-smooth-crossing-window-v19"
+PREVIOUS_RULESET_VERSION = (
+    LEGACY_RULESET_VERSION.removesuffix("-v18") + "-smooth-crossing-window-v19"
 )
+RULESET_VERSION = PREVIOUS_RULESET_VERSION.removesuffix("-v19") + "-extremum-clearance-v20"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
 BAD_GRID_SCALE_PACKET = "BAD_GRID_SCALE_PACKET"
@@ -93,7 +94,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v19"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v20"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -415,8 +416,11 @@ class InteriorUnresolvedEnvelopeConfig:
     ext_dr_max: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX
     ext_df_gap_min: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN
     ext_df_gap_max: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX
+    ext_df_gap_min_inclusive: bool = False
 
     def __post_init__(self) -> None:
+        if not isinstance(self.ext_df_gap_min_inclusive, bool):
+            raise ValueError("ext_df_gap_min_inclusive must be a boolean")
         if not math.isfinite(self.peak_r_max) or not 0.0 <= self.peak_r_max <= 1.0:
             raise ValueError(
                 "interior envelope peak_r_max must be finite and in [0, 1]"
@@ -879,6 +883,7 @@ def empty_interior_unresolved_envelope_features(
         "ext_dr_max": resolved.ext_dr_max,
         "ext_df_gap_min": resolved.ext_df_gap_min,
         "ext_df_gap_max": resolved.ext_df_gap_max,
+        "ext_df_gap_min_inclusive": resolved.ext_df_gap_min_inclusive,
         "candidate_found": None,
         "energy_peak": None,
         "energy_peak_r": None,
@@ -2334,9 +2339,12 @@ def extract_interior_unresolved_envelope_features(
         and ext_dr is not None
         and ext_dr <= resolved.ext_dr_max + ext_dr_tolerance
         and ext_df_gap is not None
-        and resolved.ext_df_gap_min - ext_df_tolerance
-        <= ext_df_gap
-        <= resolved.ext_df_gap_max + ext_df_tolerance
+        and (
+            ext_df_gap >= resolved.ext_df_gap_min - ext_df_tolerance
+            if resolved.ext_df_gap_min_inclusive
+            else ext_df_gap > resolved.ext_df_gap_min
+        )
+        and ext_df_gap <= resolved.ext_df_gap_max + ext_df_tolerance
     )
     result["extremum_exception_applied"] = bool(
         candidate_found is True and exception_qualified

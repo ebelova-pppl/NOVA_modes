@@ -1,5 +1,45 @@
 # Extremum-exception clearance and width floors, 2026-09-09
 
+**Adopted decision:** the user subsequently selected clearance **>0.1% only**,
+with no additional minimum-width requirement. Production v8 implements
+`0.001 < ext_df_gap <= 0.04` in the existing interior extremum exception.
+The comparison below is the pre-adoption audit. Its six shot and one training
+changes are the accepted clearance-only projection; the 1.1 option was not
+adopted. Training labels remain unchanged, including H47 N7/2530.
+
+All 27 production rules exports have been regenerated and published as v8.
+The six changes exactly match the earlier clearance-only projection:
+`clearance_adopted_changes.csv`. The 4,187 evaluated modes retain every
+measured feature; only the lower-cut metadata and its exception flag change.
+GOOD totals are 950 before duplicate removal and 944 selected (six fewer
+each). `clearance_shot_summary.csv` records every shot.
+
+All 2,390 training inputs were recomputed. The sole new decision conflict is
+H47 N7/2530, documented in `clearance_training_change.csv`: 542 labeled GOOD
+survive, 33 are rejected; the 25 labeled BAD survivors are unchanged. No
+training truth label was edited. All 167 tests passed, including strict
+boundary equality, the next representable value above it, old-preset
+tangency, and canonical workflow/CLI checks.
+
+The refreshed `current_disagreements.csv` has **228 rows**, compared with
+226 in the preceding R06-invalid comparison. Only `disagreements_added.csv`
+(four rows) needs new review; `disagreements_removed.csv` contains two rows.
+The user's `disagreements_elena.csv` is preserved.
+
+During regeneration, eight formerly INVALID C50 N1 inputs were absent from
+the raw directory. `absent_invalid_inputs.csv` records their previous
+fingerprints. Rules now inventory 19,317 inputs, including 772 INVALID,
+with 65 remaining C50 N1 entries. RF-CNN exports remain byte-for-byte
+unchanged and still include the eight historical INVALID rows. No valid
+input disappeared. C50 exclusion diagnostics also update their registry
+provenance from v1 to v2; their exclusion reason is unchanged.
+
+`clearance_verification.json` records these counts and source/export hashes;
+`clearance_publication.json` records the 27 published and backup directories.
+The existing outputs are backed up under
+`before_extremum_clearance_v8_20260909/` in the rules root. Staged exports and
+runtime logs remain ignored under `outputs/review_extremum_clearance_v8_20260909/`.
+
 The user proposed relative frequency clearance of 0.1% and a minimum width
 of 1 or 1.1 grid intervals. This audit interprets those as **strict lower
 requirements for the existing interior-envelope extremum exception**:
@@ -85,6 +125,16 @@ under `outputs/review_extremum_floor_20260909/`.
 python audits/extremum_floor_20260909/audit.py --rules-root /path/to/sort_outputs --training-root /path/to/training/data --out-dir outputs/review_extremum_floor_20260909
 ```
 
-The 1.1 option needs review of its additional training GOOD conflicts and
-the previously approved shot mode before adoption. The 0.1% floor also needs
-review of H47 N7/2530. No choice has been adopted by this audit.
+The 1.1 option remains unadopted. The user selected the clearance-only policy
+after seeing the H47 N7/2530 conflict and the alternative width impacts.
+The original impact script/receipts are historical; reproduce that pre-v8
+audit from checkout `f018a25`. Current default engine behavior includes the
+adopted clearance floor.
+
+`adopt_clearance.py` stages all 27 canonical rules runs with the active RF
+representative ranker, compares every prior feature/decision, and rechecks
+all training inputs against the saved pre-adoption measurements. `verify`
+reuses completed staged exports; `publish` requires matching source/tree
+hashes and keeps previous directories under
+`before_extremum_clearance_v8_20260909/`. RF-CNN outputs are hash checked and
+preserved. The verification script's docstring gives the portable commands.

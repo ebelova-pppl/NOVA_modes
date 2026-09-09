@@ -73,6 +73,10 @@ class EaeRoutingTests(unittest.TestCase):
             if key.startswith("cross_window_exception_"):
                 old_kwargs.pop(key)
                 new_kwargs.pop(key)
+        self.assertEqual(old_kwargs.pop("interior_envelope_ext_df_gap_min"), 0.0)
+        self.assertEqual(new_kwargs.pop("interior_envelope_ext_df_gap_min"), 0.001)
+        self.assertTrue(old_kwargs.pop("interior_envelope_ext_df_gap_min_inclusive"))
+        self.assertFalse(new_kwargs.pop("interior_envelope_ext_df_gap_min_inclusive"))
         self.assertEqual(old_kwargs, new_kwargs)
         self.assertEqual(
             classify_gap_region(0.1, 0.1, fraction_direct_eae_threshold=0), "mixed"

@@ -3,12 +3,53 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-09 adopted clearance >0.1% for the interior extremum exception
+
+- The user selected **relative frequency clearance >0.1% only**, with no
+  additional minimum-width requirement. Production preset v8 uses
+  `0.001 < ext_df_gap <= 0.04`; equality at the lower bound fails. Existing
+  `r_peak<=0.5`, connected total-W FWHM<=2 applicability and `ext_dr<=0.02`
+  match limit remain. This tightens the existing exception, not gap routing.
+- The shared rule engine and calibration CLI use the strict lower cut.
+  Grouped schema/ruleset v20 and shot/per-n summaries record the comparison
+  via `ext_df_gap_min_inclusive=false`. Frozen v5-v7 presets stay byte-for-byte
+  unchanged and explicitly select their old inclusive zero lower bound.
+  Current preset: `configs/rules/tae_rules_production_v8.yaml`, SHA-256
+  `86436a3486cd2d3bd9fd8a16d3af51f2127cb0325017de392ae7d1d36d8647e0`.
+- All 167 tests pass, including exact lower-bound equality, the next
+  representable value above it, the retained upper bound, legacy tangency,
+  frozen-config reproduction, canonical integration, and CLI provenance.
+- Regenerated and published all 27 rules exports with the active RF duplicate
+  ranker. Every one of the 4,187 evaluated modes retains its measured features;
+  exactly six decisions change GOOD->BAD. GOOD totals go from 956 to 950
+  before deduplication and 950 to 944 selected. Previous exports are retained
+  under `before_extremum_clearance_v8_20260909/` in the rules output root.
+  Source, new/old export, and unchanged RF-CNN export hashes were verified.
+- Recomputed all 2,390 training modes. H47 N7/2530 is the only new conflict:
+  labeled-GOOD survivors go from 543 to 542 (33 now rejected), while 25
+  labeled-BAD survivors remain. Training labels and model weights are unchanged.
+  Of the five originally questioned narrow modes, only F03t017 N8/8950 changes
+  to BAD; the other four pass the new clearance requirement.
+- Eight previously INVALID C50 N1 files were absent from the raw directory
+  during regeneration. New rules exports therefore contain 19,317 inputs
+  (772 INVALID, 14,358 EAE, 4,187 rule-evaluated), with 65 remaining C50 N1
+  entries. Their exclusion diagnostics now record registry v2. RF-CNN retains
+  its earlier 73 INVALID C50 N1 rows. This input-inventory difference has no
+  effect on the valid-mode comparison; all evaluated modes still have nr=201.
+- Compact evidence, `absent_invalid_inputs.csv`, and verification/publication
+  receipts are in `audits/extremum_floor_20260909/`. The current comparison is
+  `current_disagreements.csv` (228 rows); `disagreements_added.csv` has four
+  rows and `disagreements_removed.csv` two. The user's working question list
+  is preserved. Next: continue disagreement review using the added list;
+  H47 N7/2530 remains a recorded training-label conflict for visual review.
+
 ## 2026-09-09 audited 0.1% extremum clearance and 1.0/1.1 width floors
 
 - The user proposed `ext_df_gap>0.001` and a minimum connected total-W
   FWHM of 1 or 1.1 native grid intervals for the interior extremum exception.
   Audited strict lower cuts while preserving the existing upper/radial
-  limits and all other gates. No production change has been adopted.
+  limits and all other gates. This was the pre-adoption comparison; the
+  subsequent clearance-only adoption is recorded above.
 - Across the current 27-shot batch, the 1.0 option newly rejects six GOOD
   modes; 1.1 rejects eleven. All 58 survivors protected by the exception
   were reloaded: raw fingerprints, complete v19 features, and decisions
@@ -24,8 +65,8 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   after the continuum repair; that approval's fingerprint still matches.
 - Evidence and both alternative change lists are in
   `audits/extremum_floor_20260909/`. `shots_to_review.csv` has eleven modes;
-  `training_to_review.csv` has five. Next: review the clearance conflict and
-  additional 1.1-width conflicts before choosing/adopting the tighter exception.
+  `training_to_review.csv` has five. The user subsequently selected clearance
+  only; the extra 1.1-width restrictions remain unadopted.
 
 ## 2026-09-09 five narrow survivors traced to the extremum exception
 

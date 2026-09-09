@@ -61,18 +61,27 @@ Known invalid inputs (2026-09-09):
 - NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
   should refer to eigenmode calculations, not stability calculations.
 
-Production rules v7 (2026-09-09):
+Production rules v8 (2026-09-09):
+
+- The narrow interior-envelope exception now requires relative frequency
+  clearance **strictly greater than 0.1%**: `0.001 < ext_df_gap <= 0.04`.
+  No minimum-width floor was added. Clearance is divided by mode frequency;
+  the existing `r_peak<=0.5`, energy-FWHM<=2 applicability and radial match
+  remain. See [the clearance audit](audits/extremum_floor_20260909/README.md).
+- Frozen v5-v7 presets retain their inclusive zero-clearance lower bound.
+  Current audit features and shot/per-n summaries explicitly record whether
+  the clearance lower comparison includes equality.
 
 - `sort_shot_mixed.py --method rules` now uses
-  `configs/rules/tae_rules_production_v7.yaml` (ruleset/features v19).
+  `configs/rules/tae_rules_production_v8.yaml` (ruleset/features v20).
   Each offending continuum-crossing window is excused only when its
   interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
   its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
   crossing must qualify; all other rejection gates still apply.
-- V5/v6 configuration files remain frozen and explicitly disable the new
+- V5/v6 configuration files remain frozen and explicitly disable the smooth-crossing
   exception when loaded. Their decisions remain supported; new exports use
-  the current v19 audit schema. RF/CNN feature columns and weights are unchanged.
-- The reviewed impact audit recovers 19 modes in the 27-shot batch and two
+  the current v20 audit schema. RF/CNN feature columns and weights are unchanged.
+- The earlier smooth-crossing impact audit recovered 19 modes in the 27-shot batch and two
   labeled GOOD training modes, with no newly accepted labeled BAD training
   modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
 
@@ -181,7 +190,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v7`
+  `--method rules` path loads the immutable `tae_rules_production_v8`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -200,7 +209,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v7` configuration automatically:
+`tae_rules_production_v8` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -361,7 +370,7 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v7.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v8.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -374,9 +383,10 @@ named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
 `GOOD` before manual overrides and duplicate processing.
 
-Production v7 inherits v6 routing: `fraction_below_upper2 < 0.2` goes directly
-to EAE-like, regardless of `signed_delta`. It adds the approved gate-4
-exception described above; other morphology gates retain their thresholds. The fraction counts mode energy where the upper TAE
+Production v8 retains v6 routing: `fraction_below_upper2 < 0.2` goes directly
+to EAE-like, regardless of `signed_delta`. It retains v7's approved gate-4
+exception and tightens the interior extremum clearance as described above.
+The fraction counts mode energy where the upper TAE
 boundary is defined. V5 remains available via `--rule_config
 tae_rules_production_v5`, with its original routing; saved v5 output lists
 require regeneration to reflect v6. Standalone split and RF-CNN workflows
@@ -412,7 +422,7 @@ peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
 (`BAD_EDGE_SPIKE`). The following gate rejects a global total-energy envelope with
 connected FWHM no greater than two grid intervals and peak at `r <= 0.5`, unless
 the peak is aligned with a gate-specific inner continuum extremum within
-`ext_dr <= 0.02` and `0 <= ext_df_gap <= 0.04`
+`ext_dr <= 0.02` and `0.001 < ext_df_gap <= 0.04`
 (`BAD_INTERIOR_UNRESOLVED_ENVELOPE`). Next, a calibrated 201-point mode is
 rejected as `BAD_INTERIOR_HARMONIC_INCOHERENCE` when
 `f_core * J_core * N_eff_core * (1 - C_adj) > 0.10`. This score combines the
@@ -476,7 +486,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v19`; the near-axis group records the independent
+`tae-rule-features-grouped-v20`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The

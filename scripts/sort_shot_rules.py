@@ -234,6 +234,7 @@ SHOT_SUMMARY_FIELDS = [
     "interior_envelope_ext_dr_max",
     "interior_envelope_ext_df_gap_min",
     "interior_envelope_ext_df_gap_max",
+    "interior_envelope_ext_df_gap_min_inclusive",
     "interior_harmonic_incoherence_gate_enabled",
     "interior_harmonic_core_r_max",
     "interior_harmonic_active_core_energy_fraction_min",
@@ -299,6 +300,7 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--interior_envelope_ext_dr_max",
         "--interior_envelope_ext_df_gap_min",
         "--interior_envelope_ext_df_gap_max",
+        "--interior_envelope_ext_df_gap_min_inclusive",
         "--disable_interior_unresolved_envelope",
         "--interior_harmonic_core_r_max",
         "--interior_harmonic_active_core_energy_fraction_min",
@@ -1123,6 +1125,7 @@ def build_summary(
         "interior_envelope_ext_dr_max": interior_config.ext_dr_max,
         "interior_envelope_ext_df_gap_min": interior_config.ext_df_gap_min,
         "interior_envelope_ext_df_gap_max": interior_config.ext_df_gap_max,
+        "interior_envelope_ext_df_gap_min_inclusive": interior_config.ext_df_gap_min_inclusive,
         "interior_harmonic_incoherence_gate_enabled": (
             incoherence_config.enabled
         ),
@@ -1457,6 +1460,7 @@ def run_shot(
     interior_envelope_ext_df_gap_max: float = (
         DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX
     ),
+    interior_envelope_ext_df_gap_min_inclusive: bool = False,
     interior_harmonic_core_r_max: float = (
         DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX
     ),
@@ -1537,6 +1541,7 @@ def run_shot(
         ext_dr_max=interior_envelope_ext_dr_max,
         ext_df_gap_min=interior_envelope_ext_df_gap_min,
         ext_df_gap_max=interior_envelope_ext_df_gap_max,
+        ext_df_gap_min_inclusive=interior_envelope_ext_df_gap_min_inclusive,
     )
     incoherence_config = InteriorHarmonicIncoherenceConfig(
         core_r_max=interior_harmonic_core_r_max,
@@ -2135,10 +2140,15 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN,
         help=(
-            "Inclusive minimum signed gap-side frequency clearance for the "
+            "Strict minimum signed gap-side frequency clearance / mode frequency for the "
             "narrow-envelope extremum exception "
             f"(default: {DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN:g})"
         ),
+    )
+    parser.add_argument(
+        "--interior_envelope_ext_df_gap_min_inclusive",
+        action="store_true",
+        help="Include equality at the extremum-clearance lower limit (legacy calibration behavior)",
     )
     parser.add_argument(
         "--interior_envelope_ext_df_gap_max",
@@ -2368,6 +2378,7 @@ def main() -> None:
         interior_envelope_ext_df_gap_max=(
             args.interior_envelope_ext_df_gap_max
         ),
+        interior_envelope_ext_df_gap_min_inclusive=args.interior_envelope_ext_df_gap_min_inclusive,
         interior_harmonic_core_r_max=args.interior_harmonic_core_r_max,
         interior_harmonic_active_core_energy_fraction_min=(
             args.interior_harmonic_active_core_energy_fraction_min
@@ -2485,7 +2496,8 @@ def main() -> None:
         f"{summary['interior_envelope_extremum_r_max']}] "
         f"ext_dr_max={summary['interior_envelope_ext_dr_max']} "
         "ext_df_gap_range="
-        f"[{summary['interior_envelope_ext_df_gap_min']}, "
+        f"{'[' if summary['interior_envelope_ext_df_gap_min_inclusive'] else '('}"
+        f"{summary['interior_envelope_ext_df_gap_min']}, "
         f"{summary['interior_envelope_ext_df_gap_max']}]"
     )
     print(

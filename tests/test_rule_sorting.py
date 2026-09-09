@@ -495,7 +495,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v19")
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v20")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -527,7 +527,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(interior_features["extremum_r_min"], 0.03)
         self.assertEqual(interior_features["extremum_r_max"], 0.5)
         self.assertEqual(interior_features["ext_dr_max"], 0.02)
-        self.assertEqual(interior_features["ext_df_gap_min"], 0.0)
+        self.assertEqual(interior_features["ext_df_gap_min"], 0.001)
         self.assertEqual(interior_features["ext_df_gap_max"], 0.04)
         self.assertFalse(interior_features["candidate_found"])
         self.assertFalse(interior_features["extremum_exception_applied"])
@@ -1916,10 +1916,10 @@ class RuleAndOverrideTests(unittest.TestCase):
                 True,
             ),
             (
-                "inclusive zero frequency bound",
+                "zero frequency clearance fails",
                 25.0 + 30.0 * (radial_grid - radial_grid[31]) ** 2,
                 True,
-                True,
+                False,
             ),
             (
                 "negative frequency clearance",
@@ -1966,7 +1966,7 @@ class RuleAndOverrideTests(unittest.TestCase):
                 )
                 if name == "inclusive upper frequency bound":
                     self.assertAlmostEqual(features["ext_df_gap"], 0.04)
-                elif name == "inclusive zero frequency bound":
+                elif name == "zero frequency clearance fails":
                     self.assertAlmostEqual(features["ext_df_gap"], 0.0)
                 expected_decision = "REVIEW" if exception_applied else "BAD"
                 self.assertEqual(result.decision, expected_decision)
@@ -3117,12 +3117,12 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v7")
+        self.assertEqual(configuration.name, "tae_rules_production_v8")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
+            "86436a3486cd2d3bd9fd8a16d3af51f2127cb0325017de392ae7d1d36d8647e0",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3163,7 +3163,8 @@ class WorkflowOutputTests(unittest.TestCase):
                 "interior_envelope_extremum_r_min": 0.03,
                 "interior_envelope_extremum_r_max": 0.5,
                 "interior_envelope_ext_dr_max": 0.02,
-                "interior_envelope_ext_df_gap_min": 0.0,
+                "interior_envelope_ext_df_gap_min": 0.001,
+                "interior_envelope_ext_df_gap_min_inclusive": False,
                 "interior_envelope_ext_df_gap_max": 0.04,
                 "interior_harmonic_core_r_max": 0.5,
                 "interior_harmonic_active_core_energy_fraction_min": 0.005,
@@ -3232,7 +3233,7 @@ class WorkflowOutputTests(unittest.TestCase):
         self.assertEqual(result.summary["interior_envelope_extremum_r_min"], 0.03)
         self.assertEqual(result.summary["interior_envelope_extremum_r_max"], 0.5)
         self.assertEqual(result.summary["interior_envelope_ext_dr_max"], 0.02)
-        self.assertEqual(result.summary["interior_envelope_ext_df_gap_min"], 0.0)
+        self.assertEqual(result.summary["interior_envelope_ext_df_gap_min"], 0.001)
         self.assertEqual(result.summary["interior_envelope_ext_df_gap_max"], 0.04)
         self.assertTrue(
             result.summary["interior_harmonic_incoherence_gate_enabled"]
@@ -3444,7 +3445,7 @@ class WorkflowOutputTests(unittest.TestCase):
             )
             self.assertEqual(first.summary["interior_envelope_ext_dr_max"], 0.02)
             self.assertEqual(
-                first.summary["interior_envelope_ext_df_gap_min"], 0.0
+                first.summary["interior_envelope_ext_df_gap_min"], 0.001
             )
             self.assertEqual(
                 first.summary["interior_envelope_ext_df_gap_max"], 0.04

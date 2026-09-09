@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from tae_rule_engine import (
+    LEGACY_RULESET_VERSION,
     PREVIOUS_RULESET_VERSION,
     RULESET_VERSION,
     AxisArtifactConfig,
@@ -29,12 +30,13 @@ from tae_eae_features import validate_routing_thresholds
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v7"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v7"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v8"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v8"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429"
+    "86436a3486cd2d3bd9fd8a16d3af51f2127cb0325017de392ae7d1d36d8647e0"
 )
 FROZEN_CONFIGURATION_SHA256 = {
+    "tae_rules_production_v7": "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
     "tae_rules_production_v5": (
         "982cc0ba3f17aae03a9fc6a4b662104200df0ff2897bda4de21131ce71c5bc9f"
     ),
@@ -137,19 +139,21 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     schema_version = _string(document, "schema_version", context="configuration")
     if schema_version not in {
         RULE_CONFIG_SCHEMA_VERSION,
+        "tae-rule-run-config-v7",
         "tae-rule-run-config-v6",
         "tae-rule-run-config-v5",
     }:
         raise ValueError(
             f"unsupported rule configuration schema {schema_version!r}; "
-            f"expected {RULE_CONFIG_SCHEMA_VERSION!r}, v6, or v5"
+            f"expected {RULE_CONFIG_SCHEMA_VERSION!r}, v7, v6, or v5"
         )
     name = _string(document, "name", context="configuration")
     rule_set_version = _string(document, "rule_set_version", context="configuration")
     expected_ruleset = (
         RULESET_VERSION
         if schema_version == RULE_CONFIG_SCHEMA_VERSION
-        else PREVIOUS_RULESET_VERSION
+        else PREVIOUS_RULESET_VERSION if schema_version == "tae-rule-run-config-v7"
+        else LEGACY_RULESET_VERSION
     )
     if rule_set_version != expected_ruleset:
         raise ValueError(
@@ -368,7 +372,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         {"enabled", "half_width_grid", "amplitude_min", "w_min"}
         | (
             {"smooth_exception"}
-            if schema_version == RULE_CONFIG_SCHEMA_VERSION
+            if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v7"}
             else set()
         ),
         context="gates.continuum_crossing_window",
@@ -384,7 +388,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     )
     window_w = _float(window, "w_min", context="gates.continuum_crossing_window")
     exception_kwargs = {"exception_amplitude_max": None, "exception_k_max": None}
-    if schema_version == RULE_CONFIG_SCHEMA_VERSION:
+    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v7"}:
         context = "gates.continuum_crossing_window.smooth_exception"
         exception = _mapping(window["smooth_exception"], context=context)
         _require_exact_keys(
@@ -451,7 +455,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
             "ext_dr_max",
             "ext_df_gap_min",
             "ext_df_gap_max",
-        },
+        } | ({"ext_df_gap_min_inclusive"} if schema_version == RULE_CONFIG_SCHEMA_VERSION else set()),
         context="gates.interior_unresolved_envelope",
     )
     interior_enabled = _bool(
@@ -478,6 +482,11 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     interior_ext_df_max = _float(
         interior, "ext_df_gap_max", context="gates.interior_unresolved_envelope"
     )
+    # Frozen v5-v7 use the inclusive lower comparison, including tangency.
+    interior_ext_df_min_inclusive = (
+        _bool(interior, "ext_df_gap_min_inclusive", context="gates.interior_unresolved_envelope")
+        if schema_version == RULE_CONFIG_SCHEMA_VERSION else True
+    )
     InteriorUnresolvedEnvelopeConfig(
         peak_r_max=interior_peak_r,
         width_max_grid=interior_width,
@@ -486,6 +495,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         ext_dr_max=interior_ext_dr,
         ext_df_gap_min=interior_ext_df_min,
         ext_df_gap_max=interior_ext_df_max,
+        ext_df_gap_min_inclusive=interior_ext_df_min_inclusive,
     )
 
     incoherence = _mapping(
@@ -622,6 +632,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "interior_envelope_ext_dr_max": interior_ext_dr,
         "interior_envelope_ext_df_gap_min": interior_ext_df_min,
         "interior_envelope_ext_df_gap_max": interior_ext_df_max,
+        "interior_envelope_ext_df_gap_min_inclusive": interior_ext_df_min_inclusive,
         "interior_harmonic_core_r_max": incoherence_core_r_max,
         "interior_harmonic_active_core_energy_fraction_min": (
             incoherence_active_fraction

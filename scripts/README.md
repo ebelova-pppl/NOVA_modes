@@ -981,7 +981,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v7` configuration. A rejection gate produces automatic
+`tae_rules_production_v8` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1220,9 +1220,9 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v7.yaml`, stored as strict
+`configs/rules/tae_rules_production_v8.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v19 ruleset, routing thresholds, relative-frequency tolerance, all
+current v20 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
@@ -1236,7 +1236,7 @@ gate thresholds, and these gate states:
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v7 identity.
+config-owned threshold or gate override to retain the production-v8 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
@@ -1256,7 +1256,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v7` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v8` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1267,7 +1267,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-v19`
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-v20`
 ruleset implements ten ordered BAD decisions, treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
@@ -1278,7 +1278,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v19`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v20`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1541,7 +1541,7 @@ python scripts/sort_shot_rules.py --shot_dir /path/to/shot --out_dir /path/to/au
 ```
 
 Frozen v5/v6 configurations remain supported and explicitly disable the
-exception. They preserve their prior decisions while emitting current v19
+exception. They preserve their prior decisions while emitting current v20
 audit metadata; exact historical exports require the earlier checkout.
 On nr!=201 the original window gate remains fully active. This exception
 does not add a skipped rejection gate to resolution warnings.
@@ -1578,7 +1578,8 @@ interior_unresolved_envelope:
   extremum_r_min: 0.03
   extremum_r_max: 0.50
   ext_dr_max: 0.02
-  ext_df_gap_min: 0
+  ext_df_gap_min: 0.001
+  ext_df_gap_min_inclusive: false
   ext_df_gap_max: 0.04
 ```
 
@@ -1587,7 +1588,15 @@ gates, a mode with global connected total-energy FWHM
 at most two grid intervals and global energy peak at the inclusive radius
 `r <= 0.5` returns `BAD_INTERIOR_UNRESOLVED_ENVELOPE`, unless a gate-specific
 continuum-extremum match satisfies both `ext_dr <= 0.02` and
-`0 <= ext_df_gap <= 0.04`. Candidate extrema are centered in the inclusive
+`0.001 < ext_df_gap <= 0.04`. The lower comparison is strict: equality
+at 0.1% fails the exception; the 4% upper comparison stays inclusive. Clearance
+is divided by mode frequency. There is no added minimum-width floor.
+`ext_df_gap_min_inclusive` is recorded in grouped features and as
+`interior_envelope_ext_df_gap_min_inclusive` in shot/per-n summaries. Frozen
+v5-v7 presets retain the original inclusive zero lower bound. For legacy
+calibration, `--interior_envelope_ext_df_gap_min_inclusive` restores the
+inclusive comparison at the chosen `--interior_envelope_ext_df_gap_min`.
+Candidate extrema are centered in the inclusive
 interval `0.03 <= r <= 0.50`; this search is separate from the experimental RF
 extremum feature and therefore does not change RF checkpoint semantics. The
 connected FWHM is local to the tallest unsmoothed `W(r)` component, so the
