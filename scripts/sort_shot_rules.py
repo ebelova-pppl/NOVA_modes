@@ -99,6 +99,12 @@ from tae_rule_engine import (  # noqa: E402
     NearAxisGridOscillationConfig,
     evaluate_mode,
 )
+from continuum_noise import (  # noqa: E402
+    ContinuumNoiseThresholds,
+    DEFAULT_TOP2_MIN,
+    DEFAULT_LOCAL_MIN,
+    DEFAULT_RADIAL_LENGTH_MIN,
+)
 from tae_rule_config import (  # noqa: E402
     PRODUCTION_RULE_CONFIG_NAME,
     load_rule_run_configuration,
@@ -204,6 +210,10 @@ SHOT_SUMMARY_FIELDS = [
     "axis_energy_amplitude_min",
     "axis_energy_r_max",
     "axis_energy_fraction_min",
+    "extended_continuum_noise_gate_enabled",
+    "continuum_noise_top2_min",
+    "continuum_noise_local_min",
+    "continuum_noise_radial_length_min",
     "grid_scale_spike_gate_enabled",
     "grid_scale_spike_amplitude_min",
     "grid_scale_spike_width_max_grid",
@@ -278,6 +288,10 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--axis_energy_r_max",
         "--axis_energy_fraction_min",
         "--disable_axis_energy_concentration",
+        "--continuum_noise_top2_min",
+        "--continuum_noise_local_min",
+        "--continuum_noise_radial_length_min",
+        "--disable_extended_continuum_noise",
         "--grid_scale_amplitude_min",
         "--grid_scale_width_max_grid",
         "--grid_scale_high_r_cutoff_r",
@@ -939,6 +953,7 @@ def build_summary(
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
     axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
+    continuum_noise_config: ContinuumNoiseThresholds | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -957,6 +972,7 @@ def build_summary(
 ) -> dict[str, Any]:
     axis_config = axis_artifact_config or AxisArtifactConfig()
     axis_energy_config = axis_energy_concentration_config or AxisEnergyConcentrationConfig()
+    noise_config = continuum_noise_config or ContinuumNoiseThresholds()
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
     near_axis_oscillation_config = (
@@ -1078,6 +1094,10 @@ def build_summary(
         "similarity_threshold": SIMILARITY_THRESHOLD,
         "radial_location_tolerance": RADIAL_LOCATION_TOLERANCE,
         "radial_width_tolerance": RADIAL_WIDTH_TOLERANCE,
+        "extended_continuum_noise_gate_enabled": noise_config.enabled,
+        "continuum_noise_top2_min": noise_config.top2_min,
+        "continuum_noise_local_min": noise_config.local_min,
+        "continuum_noise_radial_length_min": noise_config.radial_length_min,
         "axis_energy_concentration_gate_enabled": axis_energy_config.enabled,
         "axis_energy_amplitude_r_max": axis_energy_config.amplitude_r_max,
         "axis_energy_amplitude_min": axis_energy_config.amplitude_min,
@@ -1191,6 +1211,7 @@ def _summary_by_n(
     rel_freq_tol: float,
     axis_artifact_config: AxisArtifactConfig | None = None,
     axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
+    continuum_noise_config: ContinuumNoiseThresholds | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -1253,6 +1274,7 @@ def _summary_by_n(
             rel_freq_tol=rel_freq_tol,
             axis_artifact_config=axis_artifact_config,
             axis_energy_concentration_config=axis_energy_concentration_config,
+            continuum_noise_config=continuum_noise_config,
             grid_scale_spike_config=grid_scale_spike_config,
             grid_scale_packet_config=grid_scale_packet_config,
             near_axis_grid_oscillation_config=(
@@ -1428,6 +1450,9 @@ def run_shot(
     axis_energy_amplitude_min: float | None = DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN,
     axis_energy_r_max: float = DEFAULT_AXIS_ENERGY_R_MAX,
     axis_energy_fraction_min: float | None = DEFAULT_AXIS_ENERGY_FRACTION_MIN,
+    continuum_noise_top2_min: float | None = DEFAULT_TOP2_MIN,
+    continuum_noise_local_min: float = DEFAULT_LOCAL_MIN,
+    continuum_noise_radial_length_min: float = DEFAULT_RADIAL_LENGTH_MIN,
     grid_scale_amplitude_min: float | None = DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
     grid_scale_width_max_grid: float | None = DEFAULT_GRID_SCALE_WIDTH_MAX_GRID,
     grid_scale_high_r_cutoff_r: float = DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
@@ -1519,6 +1544,9 @@ def run_shot(
     if rule_survivor_policy not in RULE_SURVIVOR_POLICIES:
         allowed = ", ".join(sorted(RULE_SURVIVOR_POLICIES))
         raise ValueError(f"rule_survivor_policy must be one of: {allowed}")
+    noise_config = ContinuumNoiseThresholds(
+        continuum_noise_top2_min, continuum_noise_local_min, continuum_noise_radial_length_min
+    )
     axis_energy_config = AxisEnergyConcentrationConfig(
         amplitude_r_max=axis_energy_amplitude_r_max,
         amplitude_min=axis_energy_amplitude_min,
@@ -1629,6 +1657,7 @@ def run_shot(
             high2=None if feature_data is None else feature_data.high2,
             axis_artifact_config=axis_config,
             axis_energy_concentration_config=axis_energy_config,
+            continuum_noise_config=noise_config,
             grid_scale_spike_config=grid_config,
             grid_scale_packet_config=packet_config,
             near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1680,6 +1709,7 @@ def run_shot(
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
         axis_energy_concentration_config=axis_energy_config,
+        continuum_noise_config=noise_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
         near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1707,6 +1737,7 @@ def run_shot(
         rel_freq_tol=rel_freq_tol,
         axis_artifact_config=axis_config,
         axis_energy_concentration_config=axis_energy_config,
+        continuum_noise_config=noise_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
         near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1838,6 +1869,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     ):
         parser.add_argument("--" + flag, type=float, default=default,
                             help=f"{help_text} (default: {default:g})")
+    parser.add_argument("--continuum_noise_top2_min", type=float, default=DEFAULT_TOP2_MIN,
+                        help="Minimum continuum-side HF energy / full-domain top-two harmonic energy")
+    parser.add_argument("--continuum_noise_local_min", type=float, default=DEFAULT_LOCAL_MIN,
+                        help="Minimum HF / raw energy in the same outside-gap region")
+    parser.add_argument("--continuum_noise_radial_length_min", type=float, default=DEFAULT_RADIAL_LENGTH_MIN,
+                        help="Minimum effective HF extent in normalized radius, on any native grid")
+    parser.add_argument("--disable_extended_continuum_noise", action="store_true",
+                        help="Disable the extended continuum noise decision; retain diagnostic measurements")
     parser.add_argument(
         "--disable_axis_energy_concentration", action="store_true",
         help="Disable joint near-axis amplitude/energy rejection, retaining measurements",
@@ -2348,6 +2387,10 @@ def main() -> None:
         axis_amplitude_min=(
             None if args.disable_axis_artifact else args.axis_amplitude_min
         ),
+        continuum_noise_top2_min=(None if args.disable_extended_continuum_noise
+                                  else args.continuum_noise_top2_min),
+        continuum_noise_local_min=args.continuum_noise_local_min,
+        continuum_noise_radial_length_min=args.continuum_noise_radial_length_min,
         axis_energy_amplitude_r_max=args.axis_energy_amplitude_r_max,
         axis_energy_amplitude_min=(None if args.disable_axis_energy_concentration
                                    else args.axis_energy_amplitude_min),
@@ -2470,6 +2513,13 @@ def main() -> None:
     summary = result.summary
     print(f"Shot: {summary['shot']}")
     print(f"Discovered modes: {summary['n_total_files']}")
+    print(
+        "Extended continuum noise gate: "
+        f"enabled={summary['extended_continuum_noise_gate_enabled']} "
+        f"top2_min={summary['continuum_noise_top2_min']} "
+        f"local_min={summary['continuum_noise_local_min']} "
+        f"radial_length_min={summary['continuum_noise_radial_length_min']}"
+    )
     print(
         "Frequency routing: "
         f"tae_like={summary['n_tae_like']} mixed={summary['n_mixed']} "

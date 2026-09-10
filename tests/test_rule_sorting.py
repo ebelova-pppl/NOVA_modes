@@ -496,7 +496,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v21")
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v22")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -3126,12 +3126,12 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v9")
+        self.assertEqual(configuration.name, "tae_rules_production_v10")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "e5d3ae4bac8cea9b9606a7e6337180e205f9294ea56529ec4a25f0a55d2f6bf7",
+            "51932bc9d402a99e6b015cbb72cca11e42a175f7edd46315246d6b965860843e",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3145,6 +3145,9 @@ class WorkflowOutputTests(unittest.TestCase):
                 "axis_energy_amplitude_min": 0.5,
                 "axis_energy_r_max": 0.05,
                 "axis_energy_fraction_min": 0.5,
+                "continuum_noise_top2_min": 0.01,
+                "continuum_noise_local_min": 0.2,
+                "continuum_noise_radial_length_min": 0.04,
                 "axis_r_ax": 0.03,
                 "axis_amplitude_min": 0.2,
                 "axis_width_max_grid": 10.0,

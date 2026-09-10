@@ -24,6 +24,12 @@ from mode_features import (  # noqa: E402
     get_feature_schema_version,
 )
 from tae_rule_io import empty_rule_row, stable_json  # noqa: E402
+from continuum_noise import (  # noqa: E402
+    BAD_EXTENDED_CONTINUUM_NOISE,
+    ContinuumNoiseThresholds,
+    empty_continuum_noise_features,
+    extract_continuum_noise_features,
+)
 
 
 DEFAULT_AXIS_R_AX = 0.03
@@ -83,7 +89,8 @@ PREVIOUS_RULESET_VERSION = (
     LEGACY_RULESET_VERSION.removesuffix("-v18") + "-smooth-crossing-window-v19"
 )
 CLEARANCE_RULESET_VERSION = PREVIOUS_RULESET_VERSION.removesuffix("-v19") + "-extremum-clearance-v20"
-RULESET_VERSION = CLEARANCE_RULESET_VERSION.removesuffix("-v20") + "-axis-energy-concentration-v21"
+AXIS_ENERGY_RULESET_VERSION = CLEARANCE_RULESET_VERSION.removesuffix("-v20") + "-axis-energy-concentration-v21"
+RULESET_VERSION = AXIS_ENERGY_RULESET_VERSION.removesuffix("-v21") + "-extended-continuum-noise-v22"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_AXIS_ENERGY_CONCENTRATION = "BAD_AXIS_ENERGY_CONCENTRATION"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
@@ -100,7 +107,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v21"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v22"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -1071,6 +1078,7 @@ def empty_rule_features(
     ) = None,
     continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
     axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
+    continuum_noise_config: ContinuumNoiseThresholds | None = None,
 ) -> dict[str, Any]:
     """Return the complete rule-feature schema with unavailable values as null."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -1100,6 +1108,7 @@ def empty_rule_features(
             ),
         },
         "numerical_structure_features": {
+            "extended_continuum_noise": empty_continuum_noise_features(continuum_noise_config),
             "grid_scale_spike": empty_grid_scale_spike_features(
                 grid_config.width_max_grid,
                 high_r_cutoff_r=grid_config.high_r_cutoff_r,
@@ -1169,6 +1178,7 @@ def grouped_rule_features(
     interior_harmonic_incoherence_features: Mapping[str, Any],
     continuum_crossing_tail_features: Mapping[str, Any],
     axis_energy_concentration_features: Mapping[str, Any],
+    continuum_noise_features: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
@@ -1183,6 +1193,7 @@ def grouped_rule_features(
             ),
         },
         "numerical_structure_features": {
+            "extended_continuum_noise": dict(continuum_noise_features),
             "grid_scale_spike": dict(grid_scale_spike_features),
             "grid_scale_packet": dict(grid_scale_packet_features),
             "near_axis_grid_oscillation": dict(
@@ -2753,6 +2764,7 @@ def evaluate_mode(
         InteriorHarmonicIncoherenceConfig | None
     ) = None,
     continuum_crossing_tail_config: ContinuumCrossingTailConfig | None = None,
+    continuum_noise_config: ContinuumNoiseThresholds | None = None,
 ) -> RuleResult:
     """Extract named features and evaluate one valid, preprocessed TAE mode."""
     axis_config = axis_artifact_config or AxisArtifactConfig()
@@ -2776,6 +2788,7 @@ def evaluate_mode(
     )
     path = str(preprocessed_row.get("path", ""))
     tail_config = continuum_crossing_tail_config or ContinuumCrossingTailConfig()
+    noise_config = continuum_noise_config or ContinuumNoiseThresholds()
     mode_key = str(preprocessed_row.get("mode_key", ""))
     shot = str(preprocessed_row.get("shot", ""))
     fingerprint = str(preprocessed_row.get("input_fingerprint", ""))
@@ -2814,6 +2827,7 @@ def evaluate_mode(
                 incoherence_config,
                 tail_config,
                 axis_energy_config,
+                noise_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -2931,6 +2945,7 @@ def evaluate_mode(
                 mode, feature_status["crossing_records"], config=tail_config
             ),
             extract_axis_energy_concentration_features(mode, config=axis_energy_config),
+            extract_continuum_noise_features(mode, frequency, low2, high2, config=noise_config),
         )
     except Exception as exc:
         return RuleResult(
@@ -2955,6 +2970,7 @@ def evaluate_mode(
                 incoherence_config,
                 tail_config,
                 axis_energy_config,
+                noise_config,
             ),
             processing_status="INVALID",
             diagnostic_message=f"{type(exc).__name__}: {exc}",
@@ -3183,6 +3199,14 @@ def evaluate_mode(
             frequency=frequency, input_fingerprint=fingerprint, gap_region=gap_region,
             decision="BAD", primary_reason=BAD_AXIS_ENERGY_CONCENTRATION,
             triggered_rules=(BAD_AXIS_ENERGY_CONCENTRATION,), features=features,
+        )
+
+    if features["numerical_structure_features"]["extended_continuum_noise"]["candidate_found"]:
+        return RuleResult(
+            path=path, mode_key=mode_key, shot=shot, ntor=ntor,
+            frequency=frequency, input_fingerprint=fingerprint, gap_region=gap_region,
+            decision="BAD", primary_reason=BAD_EXTENDED_CONTINUUM_NOISE,
+            triggered_rules=(BAD_EXTENDED_CONTINUUM_NOISE,), features=features,
         )
 
     # Not rejected is not equivalent to GOOD. Positive templates and later

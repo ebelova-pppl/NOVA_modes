@@ -1,0 +1,2 @@
+mode_key,input_fingerprint,before,after,reason,hf_out_top2_ratio,hf_out_local_fraction,hf_out_radial_length
+nstxuE204186A01t020/N10/egn10w.1271E+02,65b9f2f0d8ee0c5ec666be39bb648b85b43c6052b8a1f5b8fa2200a93756407d,GOOD,BAD,BAD_EXTENDED_CONTINUUM_NOISE,0.028755287241603606,0.35310780353482535,0.07448404177883827

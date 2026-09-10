@@ -34,7 +34,8 @@ statistics.
 
 Deterministic calculations from raw mode and continuum data are allowed. They
 include `W(r)`, radial energy integrals, continuum sign-change crossings,
-crossing energy, and geometric proximity to continuum extrema. These are
+crossing energy, native-grid continuum-side high-pass energy and normalized
+radial participation, and geometric proximity to continuum extrema. These are
 measurements, not model predictions.
 
 ## Read the policy

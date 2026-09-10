@@ -1,0 +1,2 @@
+shot,mode_key,input_fingerprint,rules_decision,rules_reason,rf_cnn_decision,p_rf_good,p_cnn_good,rf_cnn_tier
+nstxuE204186A01t020,nstxuE204186A01t020/N10/egn10w.1271E+02,65b9f2f0d8ee0c5ec666be39bb648b85b43c6052b8a1f5b8fa2200a93756407d,GOOD,NO_GOOD_TEMPLATE,BAD,0.37666666666666665,6.487627906834567e-28,silver_bad

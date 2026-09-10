@@ -80,6 +80,8 @@ class EaeRoutingTests(unittest.TestCase):
         for key in ("axis_energy_amplitude_min", "axis_energy_fraction_min"):
             self.assertIsNone(old_kwargs.pop(key))
             self.assertEqual(new_kwargs.pop(key), 0.5)
+        self.assertIsNone(old_kwargs.pop("continuum_noise_top2_min"))
+        self.assertEqual(new_kwargs.pop("continuum_noise_top2_min"), 0.01)
         self.assertEqual(old_kwargs, new_kwargs)
         self.assertEqual(
             classify_gap_region(0.1, 0.1, fraction_direct_eae_threshold=0), "mixed"

@@ -1,0 +1,2 @@
+mode_key,input_fingerprint,training_label,gate_candidate,before,after,reason
+nstxuE204669M03t025/N10/egn10w.1295E+02,f1d09a00e421ac89348335ccdcf35c9037e98bb511a3e97758006c1468709934,bad,True,GOOD,BAD,BAD_EXTENDED_CONTINUUM_NOISE

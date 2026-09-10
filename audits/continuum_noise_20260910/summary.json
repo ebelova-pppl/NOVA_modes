@@ -1,0 +1,2013 @@
+{
+  "status": "experimental; production gate disabled",
+  "candidate_thresholds": {
+    "top2_min": 0.01,
+    "local_min": 0.2,
+    "radial_min": 8
+  },
+  "measurement_receipts": {
+    "training": {
+      "schema_version": "continuum-side-noise-v1",
+      "cohort": "training",
+      "gate_enabled": false,
+      "mode_list_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+      "baseline_sha256": "0138af1ce09c6405bdd53b9370f4b5c30cd752a0ae5d5eb41a83bb7ecf1d94e2",
+      "input_validity_sha256": "0809ed5dbcc546f78586f3cff4795bdbeb42bac0e914776c3145d2ed55bf51cf",
+      "continuum_preprocessing_version": "datcon-monotonic-tail-v1",
+      "source_sha256": {
+        "src/continuum_noise.py": "d3af0c839fed98943e3731fbb208e6b16336a115ae95abb1b02480f5e8bba62e",
+        "scripts/audit_continuum_noise.py": "0ea4787a23c90de305b860a696498d39b9bca97d488e888064e7a99b0dea52e1",
+        "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+        "src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+        "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+        "scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b",
+        "src/input_validity.py": "01ac8d455ac1d46795793f105c921944bbb32144038e36f7502a90df605e14f7"
+      },
+      "counts": {
+        "MEASURED": 2363,
+        "ROUTED_EAE": 26,
+        "INVALID": 1
+      },
+      "n_radial": {
+        "201": 2363
+      },
+      "measured_label_counts": {
+        "good": 575,
+        "bad": 1788
+      },
+      "n_resolution_ineligible": 0,
+      "baseline_fingerprints_verified": 2390,
+      "n_input_modes": 2390,
+      "measurements_sha256": "eedf9108b213e31aa2858c37151800295838c89d4814cb61487712d94c10125a",
+      "receipt_note": "Integrity receipt added after completed measurement; original source hashes retained."
+    },
+    "batch": {
+      "schema_version": "continuum-side-noise-v1",
+      "cohort": "batch_survivors",
+      "gate_enabled": false,
+      "mode_list_sha256": "0df3baa9286eb56310a6b21945d7c5d7e92f018b8eca588bc7f3237c0022e5ba",
+      "baseline_sha256": null,
+      "input_validity_sha256": "0809ed5dbcc546f78586f3cff4795bdbeb42bac0e914776c3145d2ed55bf51cf",
+      "continuum_preprocessing_version": "datcon-monotonic-tail-v1",
+      "source_sha256": {
+        "src/continuum_noise.py": "d3af0c839fed98943e3731fbb208e6b16336a115ae95abb1b02480f5e8bba62e",
+        "scripts/audit_continuum_noise.py": "0ea4787a23c90de305b860a696498d39b9bca97d488e888064e7a99b0dea52e1",
+        "src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+        "src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+        "src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+        "scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b",
+        "src/input_validity.py": "01ac8d455ac1d46795793f105c921944bbb32144038e36f7502a90df605e14f7"
+      },
+      "counts": {
+        "MEASURED": 949
+      },
+      "n_radial": {
+        "201": 949
+      },
+      "measured_label_counts": {
+        "": 949
+      },
+      "n_resolution_ineligible": 0,
+      "baseline_fingerprints_verified": 949,
+      "n_input_modes": 949,
+      "measurements_sha256": "8453cd2e245270082551eec10403e6a83ce9c3799821543d922f4a140399a921",
+      "receipt_note": "Integrity receipt added after completed measurement; original source hashes retained."
+    }
+  },
+  "sweep_receipt": {
+    "schema_version": "continuum-side-noise-v1",
+    "measurements_sha256": {
+      "outputs/review_continuum_noise_20260910/training/measurements.jsonl": "eedf9108b213e31aa2858c37151800295838c89d4814cb61487712d94c10125a",
+      "outputs/review_continuum_noise_20260910/batch/measurements.jsonl": "8453cd2e245270082551eec10403e6a83ce9c3799821543d922f4a140399a921"
+    },
+    "source_sha256": {
+      "src/continuum_noise.py": "d3af0c839fed98943e3731fbb208e6b16336a115ae95abb1b02480f5e8bba62e",
+      "scripts/audit_continuum_noise.py": "8ab7646b0701367290f4156a2e1f1f1cb39bcb33d2a37178bfca3a5b6179b84a"
+    },
+    "thresholds": [
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.05,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.1,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.15,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.2,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.25,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.3,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.35,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.005,
+        "local_min": 0.4,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.05,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.1,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.15,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.2,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.25,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.3,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.35,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.01,
+        "local_min": 0.4,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.05,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.1,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.15,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.2,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.25,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.3,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.35,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.015,
+        "local_min": 0.4,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.05,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.1,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.15,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.2,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.25,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.3,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.35,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.02,
+        "local_min": 0.4,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.05,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.1,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.15,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.2,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.25,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.3,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.35,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.025,
+        "local_min": 0.4,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.05,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.1,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.15,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.2,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.25,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.3,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.35,
+        "radial_min": 16.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 2.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 4.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 6.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 8.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 10.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 12.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 14.0
+      },
+      {
+        "top2_min": 0.03,
+        "local_min": 0.4,
+        "radial_min": 16.0
+      }
+    ]
+  },
+  "n_threshold_combinations": 384,
+  "n_newly_flagged": 2,
+  "training_label_csv_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a"
+}

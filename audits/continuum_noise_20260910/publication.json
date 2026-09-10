@@ -1,0 +1,353 @@
+[
+  {
+    "shot": "nstxuE202806A02t025",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE202806A02t025",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE202806A02t025",
+    "new": {
+      "files": 18,
+      "tree_sha256": "d33edff5f1c5442ffa3f0b7060a515fdfe4faca7a165b26249fdaae09f3219ca"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "c3bf89e86415541d5e9a75cdeb4617e2f7b3bbe5e87ad2e4e3e9d3f3b2136d8b"
+    }
+  },
+  {
+    "shot": "nstxuE203609A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203609A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE203609A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "083c8b7177161745e2cb1286e8c06db45c032b2df6a0ffd4462024014cc9d426"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "db851a4bb710c479badd2f883dff4388f01a0ad790e1ed10d4485c77ce593f88"
+    }
+  },
+  {
+    "shot": "nstxuE203963A01t025",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203963A01t025",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE203963A01t025",
+    "new": {
+      "files": 18,
+      "tree_sha256": "4621aa152b11dc580b0639a0f0b1211bf7874d14db0cc685491dd9e345fe8969"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "88a40a58dd4d5cab32f9040cedf64b5b5cd97207663addf58a54f51155ee9191"
+    }
+  },
+  {
+    "shot": "nstxuE204707A04t030",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204707A04t030",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204707A04t030",
+    "new": {
+      "files": 18,
+      "tree_sha256": "f8bae6532e2ba9b31bea88ae5e081f4cbef76af62e26d4b6e501631223a6ef21"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "56f647ecc30b8281d96ae524d004dbf39964ff008be68011c480538aa60e84a5"
+    }
+  },
+  {
+    "shot": "nstxuE204954A01t022",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204954A01t022",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204954A01t022",
+    "new": {
+      "files": 18,
+      "tree_sha256": "f70a93dd39194ef1e91af0d8a56461811d7f8acbce93becc4b9597872af8511d"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "925dce3895dbc6505f7e25774d138a51a8570eaa563de1d91ecef3d791645cb2"
+    }
+  },
+  {
+    "shot": "nstxuE205035A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205035A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE205035A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "3d83b9e457cc8e099ba3dae5739008538d8e86ff004d3f8841cc3f58e886a1bd"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "1d1aab76c5c333302cea3c10b4d89aeb2d24f62554a0d8f17df831e9e0128979"
+    }
+  },
+  {
+    "shot": "nstxuE205045A01t022",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205045A01t022",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE205045A01t022",
+    "new": {
+      "files": 18,
+      "tree_sha256": "0436a224e31fe8bd5d6c3cc159bbf92780f83a6939651453d1a8c865cb2e6adb"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "11006b6bab14687bd484968f68d5f6624a97ff094e1bf0455f412ebea5f6d92f"
+    }
+  },
+  {
+    "shot": "nstxuE205054A01t037",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205054A01t037",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE205054A01t037",
+    "new": {
+      "files": 18,
+      "tree_sha256": "4f162b8f7d2eb70d18a7de432745a47fc50d4f4e9fad2211f05d4f3e5c0fdbdb"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "f9fb63dddb3ac0a22610623ac21f492b124038e36398477be8aae5d2ef478e8d"
+    }
+  },
+  {
+    "shot": "nstxuE205057A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205057A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE205057A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "15b92374675fee47e21c155b0d281dae6a18e2e6702487814bd2e44916b6b873"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "c652dc2deef30d0866778124c0381768cc3d3ded9bb8a3ea387b1e6afcbb76f0"
+    }
+  },
+  {
+    "shot": "nstxuG121123K34",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K34",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG121123K34",
+    "new": {
+      "files": 18,
+      "tree_sha256": "4eb7c12466e2cabfe79085b33067b476f1698a70e75625dfa9923962efa80f3c"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "61b863c5d066eac1d3e93250fb0ebe3784f69454bd21f3c72724f4ad1a35d023"
+    }
+  },
+  {
+    "shot": "nstxuG121123K70",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123K70",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG121123K70",
+    "new": {
+      "files": 18,
+      "tree_sha256": "39e70057065e3a5fcff86942f4985e33ba2d8417b68062ddbd1f8b289234a429"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "f9729dc36923709eeb8cc2262cd5fc293369bf08ce97557865b1238c08301964"
+    }
+  },
+  {
+    "shot": "nstxuG121123N80",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123N80",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG121123N80",
+    "new": {
+      "files": 18,
+      "tree_sha256": "e0685a736c3960576f79dc51729dd6484d5984faa95092a5b79d3feaad6bd168"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "8d8b199512f7153c39fd893dbcbc2ec5947f9aaad3020b7222f5e2594b65ff83"
+    }
+  },
+  {
+    "shot": "nstxuG142301E72",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301E72",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG142301E72",
+    "new": {
+      "files": 18,
+      "tree_sha256": "cb11154ed66eb797a583427b5b403453b00e708ece893803bcea7d673ceda5c7"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "be75c0c595706dc76db617af9e26a162b5f40ac6d825a401e269605d17f0604b"
+    }
+  },
+  {
+    "shot": "nstxuG142301H56",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301H56",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG142301H56",
+    "new": {
+      "files": 18,
+      "tree_sha256": "6999cd2e1f812a1f1cfacf642f4bbbd79f649ecc5b071418a0e2ecbed8154bab"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "a254200a1c51169b0e61ca702e6a1e7ceeeeca345cc8b9369db21104e5c883c2"
+    }
+  },
+  {
+    "shot": "nstxuG142301V21",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301V21",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG142301V21",
+    "new": {
+      "files": 18,
+      "tree_sha256": "12f55f6916bbd14b6c9accc19cdcfaf0df29e1082fa4beaf0dc232a0e13e5b23"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "133a75850c2fe7b031d3d7bd4f82a7055dbc0ff80fc8d434cabbfe60d7bf3a85"
+    }
+  },
+  {
+    "shot": "nstxuE205040A01t016",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205040A01t016",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE205040A01t016",
+    "new": {
+      "files": 18,
+      "tree_sha256": "d975e7092d8ca3a91bbc7ca8c2904be9e8e50629ee9b0ad9c25bf1410c341123"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "67ecb00fec83da4fbca572090927f612f6e37f701da8223e03efc4ef3b7b1f23"
+    }
+  },
+  {
+    "shot": "nstxuE204944A01t017",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204944A01t017",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204944A01t017",
+    "new": {
+      "files": 18,
+      "tree_sha256": "3a030c5690447b476b141681bd04b372937e1046f94c7c08833313a6442943e4"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "d907c52f971616d87a3d4015b831d1f2e60a59d6484f170c4355ef212b21fb80"
+    }
+  },
+  {
+    "shot": "nstxuE204708F03t017",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204708F03t017",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204708F03t017",
+    "new": {
+      "files": 18,
+      "tree_sha256": "a1f7d73591ed6886d0d211e0dd62b5bfa8810872270223c7ca8091a3a15b7905"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "0b83b1908040cac1d98f7f9a2d230f0cb8c1138d992a5db83410f3dff8a08774"
+    }
+  },
+  {
+    "shot": "nstxuE204645A16t015",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204645A16t015",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204645A16t015",
+    "new": {
+      "files": 18,
+      "tree_sha256": "df2ba240dff1b7c011ecc88b05d408e7f6f1b6fc8f3f33a6f70c7b7386aaf073"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "87194f78660170a66f13e4b29d8f9b325e7ebe50ec49d4e9406b7e278346e54c"
+    }
+  },
+  {
+    "shot": "nstxuE203262A04t018",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203262A04t018",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE203262A04t018",
+    "new": {
+      "files": 18,
+      "tree_sha256": "3dd7c42ad255399d9b216a66af63d27517844f5fc37d3c1a64f1e10ec93f647f"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "769ab26ef0838a2d8950f195fd50ba10e7ad4d19cf5af625a2700b64cedc5b2d"
+    }
+  },
+  {
+    "shot": "nstxuE204621A03t030",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204621A03t030",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204621A03t030",
+    "new": {
+      "files": 18,
+      "tree_sha256": "0c7b70f3d7f474ec3311554269e5f9c196610b790a96bc06de3d43f3c38b04eb"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "2026f418361de85bfb0e62b13f281a44329911d6d019b305a61e0eadd04e2d57"
+    }
+  },
+  {
+    "shot": "nstxuE205017A01t025",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205017A01t025",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE205017A01t025",
+    "new": {
+      "files": 18,
+      "tree_sha256": "2342bad5aada6f35b747241c27ec12d7015bb5fd60b08dad33e105a3bdeb371e"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "5818fa4a0c495c59b32b1381248164143c6f975546d20d98776695003e77cffe"
+    }
+  },
+  {
+    "shot": "nstxuE204186A01t020",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204186A01t020",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuE204186A01t020",
+    "new": {
+      "files": 18,
+      "tree_sha256": "13bceba8790b502e43dc7a72e95e0269abeee434990c78006fe77e10fbceb9a7"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "b5ad2de4e5781b817221d9917e47cf24325bfd212f1f9a20252ab47eb47649e6"
+    }
+  },
+  {
+    "shot": "nstxuG133964R06",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG133964R06",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG133964R06",
+    "new": {
+      "files": 18,
+      "tree_sha256": "9fe16d98d52c5cb141876ffcedd64d9818e06b91eb80150add628fdf2bd32dda"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "2dbd690dc2499c9a573773c2a08467c53d28f3086447454583f241ee3fdc7eaf"
+    }
+  },
+  {
+    "shot": "nstxuG142301C50",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301C50",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG142301C50",
+    "new": {
+      "files": 18,
+      "tree_sha256": "d12952c7c59725e8e722275954845514f616b911c179c2f0b65d87c8b8e6be38"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "b9a531b0aa5adf8c45aab25856cf8075b8e855a0c19d4c27306d9ab7eefe75cd"
+    }
+  },
+  {
+    "shot": "nstxuG142301L94",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301L94",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG142301L94",
+    "new": {
+      "files": 18,
+      "tree_sha256": "a2786d31ef43372e33e63818d20462516e96e5268f34d34c4c87fd9196bf1989"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "b12ad2011c72eb064f320f2c306630584b1893d591eb85e672eabf38dbcf48d8"
+    }
+  },
+  {
+    "shot": "nstxuG142301U84",
+    "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301U84",
+    "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_continuum_noise_v10_20260910/nstxuG142301U84",
+    "new": {
+      "files": 18,
+      "tree_sha256": "946917ac0672a7bb4ed3137546595a7f42f3e2a096ab34184c2e613dc5216c16"
+    },
+    "old": {
+      "files": 18,
+      "tree_sha256": "2f6d06da506b83652ea85750a3f187c2d4df9d0bd91bafa5a5c73ca093d4a66b"
+    }
+  }
+]

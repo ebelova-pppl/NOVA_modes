@@ -1,7 +1,156 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-09)
+### Project state (current snapshot, updated 2026-09-10)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-10 C50/N1 recalculation and ranking discussion
+
+- The user reports that C50/N1 is being recalculated and the upstream
+  collaborator believes the n=1 problem is fixed. This explains the missing
+  raw N1 eigenmode files during the v10 regeneration. The corrected inputs
+  have not yet been checked here; retain the C50/N1 exclusion until the new
+  eigenmode structures and continuum alignment have been reviewed.
+- The user proposes replacing RF p_good in duplicate representative ranking
+  with either normalized gate severity or Pareto dominance (no worse on every
+  gate severity, strictly better on at least one). This is a design discussion;
+  production selection still uses RF ranking after deterministic acceptance.
+- Read-only inventory of current v10 outputs: 155 frequency clusters contain
+  multiple GOOD modes (346 members), but only six existing structurally matched
+  duplicate groups have multiple members, all pairs (12 modes / six drops).
+  One pair is E202806A02t025 N6; five are E204645A16t015 N7/N8. These provide
+  a compact initial comparison set. Broader testing must include all close
+  clusters because the current greedy structure grouping depends on rank order.
+
+## 2026-09-10 adopted extended continuum noise gate (v10)
+
+- Added the user-approved separate final `BAD_EXTENDED_CONTINUUM_NOISE` gate.
+  Inclusive cuts in the same connected outside-gap region are top-two ratio
+  >=0.01, local HF fraction >=0.20, and effective radial length >=0.04.
+  Length is `N_r,eff/(nr-1)` (eight effective points at nr=201). The signed
+  native high-pass operator remains `diff(xi,2)/4`; weighted energy sums and
+  extent are normalized in radius. Every supported native nr>=3 is evaluated.
+  Harmonic participation remains audit-only; four-flip rules are unchanged.
+- Production preset v10 pins ruleset/features v22. Frozen v5-v9 presets disable
+  the new decision while retaining current audit fields. Existing BAD reasons
+  retain precedence. Gate evidence is under
+  `numerical_structure_features.extended_continuum_noise`; shot/per-n summaries
+  record state and all three cuts. The v2 diagnostic schema replaces the v1
+  experimental resolution restriction; old v1 caches must be remeasured for
+  the current calibration CLI (`--radial-length-min`).
+- Verified all 2,390 training entries against v9 with matching input
+  fingerprints and unchanged original noise measurements. The gate flags
+  zero of 575 GOOD labels and 87 BAD labels; 86 were already rejected and
+  E204669M03t025 N10/1295 is the only new training rejection. Training decisions
+  are GOOD-label 542 GOOD / 33 BAD, and BAD-label 24 GOOD / 1,764 BAD /
+  26 EAE / one INVALID. No training labels changed.
+- Regenerated the 27 rules shots: 4,187 evaluated TAE/mixed modes, 14,358 EAE,
+  and 707 INVALID. All prior feature values and existing BAD reasons match;
+  only E204186A01t020 N10/1271 changes GOOD to BAD. GOOD totals are 948 before
+  deduplication and 942 selected. No RF-ranking fallback occurred. All
+  evaluated training/batch modes are nr=201; synthetic 51/101/201/401 cases
+  and a production nr=101 fixture verify the native-grid/length behavior.
+- Source inventory changed independently: all remaining 65 C50/N1 files that
+  were already registry-excluded INVALID are now absent from the raw directory.
+  Their old fingerprinted rows are listed in `newly_absent_invalid_inputs.csv`;
+  eight other C50/N1 files were already absent at v9. Current rules inputs
+  total 19,252, down from 19,317 solely because of these absent INVALID files.
+  The C50/N1 exclusion stays active; no raw input was modified by this work.
+- Rules vs RF-CNN disagreements decrease 227 -> 226, removing only N10/1271.
+  The current list is `audits/continuum_noise_20260910/current_disagreements.csv`;
+  retained rows match the previous list exactly. RF/CNN features, weights,
+  scores, and exports remain unchanged.
+- Published all 27 verified v10 rules outputs under the existing `sort_outputs/`
+  root. Previous trees are preserved in `before_continuum_noise_v10_20260910/`;
+  the publication receipt verifies all old/new hashes and unchanged RF-CNN
+  output trees. Compact receipts and changed rows are versionable under
+  `audits/continuum_noise_20260910/`; full runtime products remain ignored.
+- All 185 repository tests pass. README, script inventory, and both relevant
+  project skills now describe v10 and its auditable native-grid gate.
+- Calibration is documented in `audits/continuum_noise_20260910/README.md`.
+  The following section records the earlier experimental v1 stage and has
+  been superseded by this adoption.
+
+## 2026-09-10 experimental continuum-side noise implementation and calibration
+
+- The user approved a signed second-difference diagnostic, `h=diff(xi,2)/4`,
+  accumulated in outside-TAE-gap regions, with full-domain top-two harmonic
+  energy normalization to limit dilution in edge-localized modes. Implemented
+  reusable `src/continuum_noise.py` and `scripts/audit_continuum_noise.py`.
+  Candidate rejection requires explicit thresholds and is separate from the
+  production sorter. Frozen v9 rules and all saved classifications remain
+  unchanged; the existing four-consecutive-flip requirement is retained.
+- Each connected above-upper/below-lower region is independent. Complete
+  stencils must lie wholly in that region. Unknown continuum samples split
+  regions; crossing/unknown-neighbor stencil energies are recorded separately.
+  Energies use consistent native trapezoidal node weights; regional raw sums
+  do not interpolate crossing endpoints. Numerators include all harmonics;
+  denominator ranks the two strongest full-domain harmonic energies without
+  adjacency constraints. Effective harmonic participation is audit-only.
+- Measured all 2,390 training entries: 2,363 TAE/mixed (575 GOOD, 1,788 BAD),
+  26 EAE, one INVALID. Separately measured all 949 current batch GOOD modes.
+  Every input fingerprint matches its v9 baseline and every measured mode is
+  nr=201. Measurements at other native resolutions remain available, with
+  explicit warnings and no hypothetical rejection outside nr=201.
+- Swept 384 combinations. Proposed cuts for review are inclusive
+  `hf_out_top2_ratio>=0.01`, `hf_out_local_fraction>=0.20`, and
+  `hf_out_radial_extent>=8` in the same region. They flag no training GOOD
+  labels and 87 training BAD labels (86 already rejected plus E204669M03t025
+  N10/1295). Only E204186A01t020 N10/1271 is newly flagged among batch survivors.
+  Its metrics are 0.0287553 / 0.353108 / 14.8968; the additional training BAD
+  has 0.0210407 / 0.960208 / 14.3714. At the same local/radial cuts, lowering
+  the top-two cutoff to 0.005 also flags a training GOOD and two other batch
+  survivors. These are non-blind calibration results, not independent accuracy.
+- Nine focused tests pass, including analytic responses, masks, participation,
+  inclusive thresholds, resolution handling, and CLI/fingerprint integrity.
+  Curated evidence and usage are in `audits/continuum_noise_20260910/`;
+  full measurements and figures are ignored under
+  `outputs/review_continuum_noise_20260910/`. README and script inventory updated.
+  Next: review the candidate thresholds and the additional training BAD
+  example before deciding whether to add the gate to production sorting.
+
+## 2026-09-09 E204186 N10/1271 inner oscillatory survivor diagnosis
+
+- Non-blind inspection of `nstxuE204186A01t020/N10/egn10w.1271E+02`
+  confirms an irregular signed-harmonic packet below r=0.2. Reloading the
+  native nr=201 input reproduces its saved fingerprint, every v21 feature,
+  and the REVIEW verdict promoted to production GOOD. No gate was skipped.
+- The strongest width-qualified signed spike is h=29 at r=0.175:
+  amplitude 0.183968 and half-maximum width 0.722560 grid intervals. Its
+  width qualifies, but amplitude is below the grid-scale gate's 0.30 cut.
+  The short-packet gate also finds no five-sample window with three turns
+  whose adjacent steps are all at least 0.20, even with its amplitude cut
+  removed in an exploratory calculation.
+- At the current strict r<0.1 oscillation limit, A_peak=0.066335 <0.10;
+  the strongest eligible run has seven consecutive flips and Q_s=0.276334
+  <0.30. Extending the radius to r<0.2 alone still passes. The stronger
+  h=29 run at r=0.170–0.185 has Q_s=0.372473 but only three consecutive
+  sign flips, below the required four. Expanding the radius and reducing
+  the flip count to three would reject this example. The user rejected that
+  proposal, recalling too many false negatives in earlier three-flip tests.
+  Retain the four-flip requirement; this single-mode exploration does not
+  establish acceptable batch/training impact for the combined change.
+- Only 1.2822% of total radial energy lies inside r<=0.2. The sole continuum
+  crossing is farther out at r=0.304158 with K_c=0.055895, so the local
+  crossing-tail gate does not detect the remote inner packet.
+- Follow-up RF diagnosis reproduces the saved p_GOOD=0.376667 with the
+  active checkpoint: 187/300 trees vote BAD. CNN's saved p_GOOD is
+  6.49e-28; the fusion rejects as `silver_bad` because both scores are <0.4.
+  An additive decomposition of parent-to-child class-fraction changes along
+  the actual RF paths identifies `delta2_eff=0.0617625` as the strongest
+  negative contribution (-0.414567), followed by signed second-difference
+  roughness `mean_abs_d2_mode=0.00200860` (-0.026900). Other features offset
+  much of that penalty. This is a path decomposition, not a causal test or
+  a transferable rejection threshold. `delta2_eff` is the energy-weighted
+  distance outside the TAE band in squared-frequency units; 88.56% of its
+  numerator comes from r<0.2, and all from inside the upper crossing.
+  The explanation JSON and per-tree branch CSV are saved with the runtime
+  diagnostics below. No model or feature calculation was changed.
+- Signed-profile/continuum plot, native inner samples, and diagnostic JSON
+  are ignored runtime artifacts under `outputs/review_inner_packet_20260909/`.
+  Production settings, saved classifications, and training labels are
+  unchanged. This remains a known missed rejection. Any further inner-packet
+  proposal must respect the retained four-flip requirement and earlier
+  false-negative concern.
 
 ## 2026-09-09 adopted axis energy concentration gate (v9)
 

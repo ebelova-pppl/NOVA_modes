@@ -243,6 +243,29 @@ Continue to inspect summed `W(r)` and signed-harmonic packets as supporting
 evidence. Integrated near-axis energy can strengthen a BAD decision, but small
 integrated energy does not rescue a narrow individual-harmonic spike.
 
+## Extended continuum-side grid-scale noise
+
+Distributed noise can carry appreciable energy while each harmonic remains
+below a peak-amplitude or consecutive-flip cutoff. Inspect signed native
+second differences `h=diff(xi,2)/4` within each connected outside-TAE-gap
+region, keeping a crossing-straddling stencil separate. Smooth outside-gap
+structure should have low high-pass energy; a small isolated spike should
+have small effective radial extent.
+
+Production v10 adds `BAD_EXTENDED_CONTINUUM_NOISE`: in the same connected
+above-upper or below-lower region, require HF energy / full-domain top-two
+harmonic energy >=0.01, HF / local raw energy >=0.20, and effective radial
+length >=0.04. The numerator includes all harmonics; radial quadrature weights
+are used consistently. Length is `N_r,eff/(nr-1)` with participation
+`N_r,eff=(sum e_i)^2/sum e_i^2`. The high-pass operator intentionally remains
+grid-relative, while the extent uses normalized radius. Every supported native
+nr>=3 is evaluated. Harmonic participation is evidence, not an additional cut.
+
+These are non-blind calibrated morphology cuts; the training and 27-shot audit
+is in `audits/continuum_noise_20260910/README.md`. Do not expose that labeled
+audit during a blind review. Existing four-flip and other BAD gates retain
+their criteria and precedence.
+
 ## Dominant near-axis energy
 
 The user-approved 2026-09-09 extension distinguishes a large axis bump on an

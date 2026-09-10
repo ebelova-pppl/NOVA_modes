@@ -22,13 +22,13 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v9.yaml`. It pins the v21
+The preset is `configs/rules/tae_rules_production_v10.yaml`. It pins the v22
 ruleset and routing values, enables gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
-gates, the continuum crossing-tail gate, and the final axis-energy gate. It explicitly disables
+gates, the continuum crossing-tail gate, the axis-energy gate, and the final extended continuum noise gate. It explicitly disables
 exact-point continuum gate 3.
 
-Production v9 retains the v7 exception: it excuses a violating gate-4 window only when the same crossing
+Production v10 retains the v7 exception: it excuses a violating gate-4 window only when the same crossing
 has strict `A_cross < 0.2 AND K_c < 0.1`, on nr=201. Interpolate each signed
 harmonic to the crossing before taking its magnitude, then maximize over
 harmonics. K uses the shared unscaled second-difference calculation with an
@@ -42,11 +42,11 @@ Configure it with `--cross_window_exception_amplitude_max`,
 `--cross_window_exception_calibrated_n_radial`, or disable it with
 `--disable_cross_window_exception` in the calibration CLI. Named v5/v6
 configurations explicitly disable the exception and preserve old decisions,
-while new exports use the v21 audit schema. Exact older exports require their
+while new exports use the v22 audit schema. Exact older exports require their
 historical checkout. The exception never skips the rejection gate on other
 resolutions; the original window criteria remain active there.
 
-Production-v9 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
+Production-v10 routes `fraction_below_upper2 < 0.2` directly to EAE-like,
 regardless of signed_delta. Equality uses the existing branches: EAE also
 requires fraction <0.4 and signed_delta <-0.1; fraction >0.5 is TAE-like;
 remaining cases are mixed and stay on the TAE side. All entry points share
@@ -138,7 +138,7 @@ defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v21 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v22 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -510,7 +510,7 @@ reports to clear stale warnings. No resampling or automatic abort is implied.
 
 ## Axis energy concentration rejection
 
-The final production-v9 gate is `axis_energy_concentration`, with reason
+The gate introduced in production v9 is `axis_energy_concentration`, with reason
 `BAD_AXIS_ENERGY_CONCENTRATION`. Keep every earlier BAD primary reason.
 Reject only when both strict conditions hold:
 
@@ -542,6 +542,49 @@ The corresponding calibration flags use those four `--axis_energy_*` names;
 `--disable_axis_energy_concentration` disables rejection while retaining
 measurements. Frozen v5-v8 presets explicitly disable this added gate and
 retain their earlier decisions while emitting current audit metadata.
+
+## Extended continuum noise rejection
+
+The final production-v10 gate is `extended_continuum_noise`, with reason
+`BAD_EXTENDED_CONTINUUM_NOISE`. All three inclusive conditions must hold in
+one connected above-upper or below-lower TAE-gap region:
+
+```text
+hf_out_top2_ratio >= 0.01
+AND hf_out_local_fraction >= 0.20
+AND hf_out_radial_length >= 0.04
+```
+
+Use shared `src/continuum_noise.py`. Compute signed `diff(xi,2)/4` on the native
+profile before masking. Only stencils whose three samples belong to the same
+outside-gap region contribute. Equality with a boundary is in-gap; unknown,
+negative or reversed continuum bounds split regions. Crossing-straddling and
+unknown-neighbor stencil energies are separate audit evidence. No smoothing,
+resampling, or division by dr**2 is used.
+
+All energies use native trapezoidal node weights. Regional raw energy is the
+sum over weighted outside nodes, without interpolated crossing endpoints.
+The numerator retains all harmonics. The reference is full-domain integrated
+energy of the two strongest individual harmonics, with stable lower-index
+ties and no adjacency requirement; its ratio may exceed one. Local fraction
+uses raw energy of the same outside region. Effective radial length is
+`N_r,eff/(nr-1)`, where `N_r,eff=(sum e_i)^2/sum e_i^2`. At nr=201, length 0.04
+is eight effective points. Harmonic participation is audit-only.
+
+Evaluate every supported native nr>=3; this gate has no nr=201 restriction.
+Only the high-pass operator is intentionally grid-relative. Synthetic native
+51/101/201/401 checks verify the length criterion; empirical calibration used
+nr=201. Preserve the existing four-consecutive-flip gate and all earlier BAD
+primary reasons. Record every region, denominator, stencil status, cut, and
+qualifying witness under `numerical_structure_features.extended_continuum_noise`.
+
+Frozen v5-v9 presets explicitly disable this new gate. The calibration CLI
+accepts `--continuum_noise_top2_min`, `--continuum_noise_local_min`,
+`--continuum_noise_radial_length_min`, and `--disable_extended_continuum_noise`.
+Disabled gates retain measurements. Shot/per-n summaries record all three
+cuts and enable state. `audit_continuum_noise.py` provides independent measure
+and explicit sweep commands; its v2 schema requires fresh measurements when
+moving from old v1 caches. See `audits/continuum_noise_20260910/README.md`.
 
 ## Honor known invalid input scopes
 

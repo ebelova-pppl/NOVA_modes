@@ -150,6 +150,7 @@ class CrossingTailTests(unittest.TestCase):
         self.assertFalse(short["resolution_eligible"])
 
     def test_engine_rejection_disable_and_earlier_reason_precedence(self):
+        from continuum_noise import ContinuumNoiseThresholds
         mode = mode_with_tail()
         r = np.linspace(0, 1, mode.shape[1])
         row = {
@@ -189,7 +190,8 @@ class CrossingTailTests(unittest.TestCase):
         disabled = evaluate_mode(
             row,
             **kwargs,
-            continuum_crossing_tail_config=ContinuumCrossingTailConfig(k_min=None)
+            continuum_crossing_tail_config=ContinuumCrossingTailConfig(k_min=None),
+            continuum_noise_config=ContinuumNoiseThresholds(top2_min=None),
         )
         self.assertEqual(disabled.primary_reason, NO_GOOD_TEMPLATE)
         kwargs["continuum_crossing_window_config"] = ContinuumCrossingWindowConfig()

@@ -29,6 +29,9 @@ Shared scripts / features:
 - `scripts/tae_rule_engine.py`
 - `scripts/sort_shot_rules.py`
 - `scripts/audit_training_provenance.py`
+- `src/continuum_noise.py` and `scripts/audit_continuum_noise.py` — continuum-side
+  noise gate and threshold calibration; see the
+  [2026-09-10 calibration](audits/continuum_noise_20260910/README.md).
 
 Training-data provenance:
 
@@ -61,13 +64,32 @@ Known invalid inputs (2026-09-09):
 - NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
   should refer to eigenmode calculations, not stability calculations.
 
-Production rules v9 (2026-09-09):
+Production rules v10 (2026-09-10):
+
+- `BAD_EXTENDED_CONTINUUM_NOISE` is a separate final gate. A connected
+  above-upper or below-lower TAE-gap region must satisfy all three inclusive
+  cuts: HF energy / full-domain top-two harmonic energy **>=0.01**,
+  HF / local raw energy **>=0.20**, and effective radial length **>=0.04**.
+- The high-pass operator remains the native-grid signed second difference
+  divided by four. Energies use radial quadrature weights; effective length
+  is `N_r,eff/(nr-1)`. The gate runs on every supported native grid without
+  resampling. At nr=201, length 0.04 is eight effective radial points.
+- Frozen v5-v9 presets disable this gate. Current v10 uses ruleset/features
+  v22 and records full regional evidence under
+  `numerical_structure_features.extended_continuum_noise`. Earlier BAD reasons
+  keep precedence. See the [calibration and adoption audit](audits/continuum_noise_20260910/README.md).
+- Verified against all training entries and the 27-shot batch: no GOOD training
+  label is newly rejected; the additional rejections are training BAD
+  E204669M03t025 N10/1295 and batch E204186A01t020 N10/1271. Rules/RF–CNN
+  disagreements decrease from 227 to 226. All 185 tests pass.
+
+Retained axis-energy rule (adopted in v9, 2026-09-09):
 
 - New `axis_energy_concentration` gate: reject as
   `BAD_AXIS_ENERGY_CONCENTRATION` when **both** maximum absolute harmonic
   amplitude inside `r<=0.015` exceeds 0.5 and more than 50% of integrated
   all-harmonic radial energy lies inside `r<=0.05`. No width or local-peak
-  condition is imposed. The gate runs last, preserving all earlier BAD
+  condition is imposed. The gate preserves all earlier BAD
   reasons, and evaluates every native radial resolution. See the
   [axis-energy audit](audits/axis_amplitude_20260909/README.md).
 - Frozen v5-v8 presets explicitly disable this new gate. New exports record
@@ -84,14 +106,14 @@ Production rules v9 (2026-09-09):
   the clearance lower comparison includes equality.
 
 - `sort_shot_mixed.py --method rules` now uses
-  `configs/rules/tae_rules_production_v9.yaml` (ruleset/features v21).
+  `configs/rules/tae_rules_production_v10.yaml` (ruleset/features v22).
   Each offending continuum-crossing window is excused only when its
   interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
   its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
   crossing must qualify; all other rejection gates still apply.
 - V5/v6 configuration files remain frozen and explicitly disable the smooth-crossing
   exception when loaded. Their decisions remain supported; new exports use
-  the current v21 audit schema. RF/CNN feature columns and weights are unchanged.
+  the current v22 audit schema. RF/CNN feature columns and weights are unchanged.
 - The earlier smooth-crossing impact audit recovered 19 modes in the 27-shot batch and two
   labeled GOOD training modes, with no newly accepted labeled BAD training
   modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
@@ -201,7 +223,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v9`
+  `--method rules` path loads the immutable `tae_rules_production_v10`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -220,7 +242,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v9` configuration automatically:
+`tae_rules_production_v10` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -381,7 +403,7 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v9.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v10.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -394,7 +416,7 @@ named configuration is selected. It also records the `accept-as-good-v1`
 survivor policy that promotes pass-all-gates `REVIEW` rows to production
 `GOOD` before manual overrides and duplicate processing.
 
-Production v9 retains v6 routing: `fraction_below_upper2 < 0.2` goes directly
+Production v10 retains v6 routing: `fraction_below_upper2 < 0.2` goes directly
 to EAE-like, regardless of `signed_delta`. It retains v7's approved gate-4
 exception and tightens the interior extremum clearance as described above.
 The fraction counts mode energy where the upper TAE
@@ -415,7 +437,7 @@ python scripts/sort_shot_rules.py \
 ```
 
 Both paths reuse the `sort_shot_mixed.py` input validation and TAE/EAE/mixed
-routing conventions. The shared engine implements eleven ordered BAD decisions;
+routing conventions. The shared engine implements twelve ordered BAD decisions;
 production-v5 enables nine of them and disables exact-point continuum gate 3.
 The decisions reject a calibrated narrow local maximum at `r <= 0.03`
 (`BAD_AXIS_SPIKE`), a large unresolved
@@ -479,7 +501,7 @@ harmonics on the side opposite the global energy peak. K is the unscaled
 signed second-difference norm divided by the local amplitude norm, over
 complete stencil centers within ±4 native intervals of that crossing.
 Other resolutions retain measurements but do not fire this gate. The gate
-preserves the preceding primary reasons. The axis-energy gate follows it. Details and calibration
+preserves the preceding primary reasons. The axis-energy gate and extended continuum noise gate follow it. Details and calibration
 controls are in `scripts/README.md`; older frozen presets remain unchanged.
 
 If an evaluated TAE-side mode has `nr != 201`, the interior harmonic-incoherence
@@ -497,7 +519,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v21`; the near-axis group records the independent
+`tae-rule-features-grouped-v22`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The

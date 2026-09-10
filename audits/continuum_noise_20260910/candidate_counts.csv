@@ -1,0 +1,3 @@
+cohort,top2_min,local_min,radial_min,eligible_modes,good_modes,bad_modes,unlabeled_modes,good_survivors,bad_survivors,unlabeled_survivors,flagged_modes,good_flagged,bad_flagged,unlabeled_flagged,good_survivors_flagged,bad_survivors_flagged,unlabeled_survivors_flagged
+batch_survivors,0.01,0.2,8.0,949,0,0,949,0,0,949,1,0,0,1,0,0,1
+training,0.01,0.2,8.0,2363,575,1788,0,542,25,0,87,0,87,0,0,1,0

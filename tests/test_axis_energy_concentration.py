@@ -137,7 +137,7 @@ class AxisEnergyTests(unittest.TestCase):
             ]
         )
 
-    def test_canonical_v9_rejects_long_shoulder_v8_preserves_survivor(self):
+    def test_current_canonical_rejects_long_shoulder_v8_preserves_survivor(self):
         for version in (5, 6, 7, 8):
             old = load_rule_run_configuration(f"tae_rules_production_v{version}")
             self.assertIsNone(old.run_kwargs["axis_energy_amplitude_min"])
@@ -174,6 +174,8 @@ class AxisEnergyTests(unittest.TestCase):
             prior = json.loads(old.final_rows[0]["rule_features"])
             f["boundary_features"].pop("axis_energy_concentration")
             prior["boundary_features"].pop("axis_energy_concentration")
+            f["numerical_structure_features"].pop("extended_continuum_noise")
+            prior["numerical_structure_features"].pop("extended_continuum_noise")
             self.assertEqual(f, prior)
             for s in (new.summary,):
                 self.assertTrue(s["axis_energy_concentration_gate_enabled"])
