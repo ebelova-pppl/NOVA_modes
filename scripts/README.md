@@ -44,7 +44,7 @@ diagnosis. No new classifier feature or morphology gate is introduced.
 The standard commands apply the registry automatically, for example:
 
 ```text
-python scripts/sort_shot_mixed.py --method rules --shot_dir /path/to/SHOT --rf_model models/nova_mode_classifier.joblib --out_dir /path/to/output
+python scripts/sort_shot_mixed.py --method rules --shot_dir /path/to/SHOT --out_dir /path/to/output
 ```
 
 ## CNN model scripts
@@ -981,18 +981,18 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v10` configuration. A rejection gate produces automatic
+`tae_rules_production_v11` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
 `accept-as-good-v1` workflow policy then promotes that survivor to final GOOD.
 Fingerprint-matched manual overrides are applied after this automatic policy.
-Final-GOOD modes proceed to duplicate handling. The production command supplies
-`--rf_model` to rank representatives in close-frequency, structurally matched
-groups. Without a usable RF checkpoint, all members of each affected cluster
-are retained and the fallback is reported; that safe fallback is useful for
-audits but is not the intended deduplicated production result. This method
-never loads a CNN.
+Final-GOOD modes proceed to duplicate handling. Production v11 ranks
+frequency/structure representatives by lowest `overall_rule_severity`, breaking
+exact ties by mode key. No model checkpoint is loaded. Missing enabled-gate
+severity retains every affected cluster member and reports the fallback.
+Frozen v5-v10 presets retain RF p_good ranking and require a checkpoint for
+deduplication; classifier-free severity columns are still emitted.
 
 The explicit legacy `--method rf-cnn` path requires both `--rf_model` and
 `--cnn_model`. It preserves the existing RF/CNN probabilities, fusion tiers,
@@ -1012,10 +1012,10 @@ Close-frequency duplicate handling enforces the frequency threshold pairwise
 against the candidate representative before structure metrics can merge two
 modes. This avoids chained clusters where several adjacent modes are close but
 the first and last mode are separated by more than `--rel_freq_tol`. The
-production rules recipe supplies a compatible RF checkpoint so the resolver
-can retain the highest-RF representative in each structurally matched group.
-If RF is omitted, rules mode retains all affected members rather than making
-an unranked drop. Legacy RF+CNN mode continues to rank with `p_avg`.
+production v11 recipe uses severity to order the existing greedy resolver.
+Changing rank can change representatives and, for non-transitive similarity
+relationships, group membership. Frequency and structural matching criteria
+remain unchanged. Legacy RF+CNN mode continues to rank with `p_avg`.
 
 The main outputs are:
 
@@ -1130,7 +1130,6 @@ default. Keeping it explicit in saved commands makes provenance clearer:
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
-  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
@@ -1142,9 +1141,7 @@ setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
 setenv NOVA_SORT_OUT /path/to/output_dir
 ```
 
-The RF checkpoint in this production command is a duplicate ranker only; it
-does not participate in deterministic rule decisions. Omit it only for an
-explicit no-deduplication audit or fallback run.
+Production v11 needs no RF checkpoint, including for duplicate ranking.
 
 To run the explicit legacy RF+CNN method on Flux:
 
@@ -1166,7 +1163,6 @@ At NERSC, Bash syntax applies. A production rules run is:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/nstx_135388 \
-  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/sort_outputs/nstx_135388
 ```
 
@@ -1267,6 +1263,52 @@ these overrides. Shot/per-n summaries record gate state and all three cuts.
 See [`audits/continuum_noise_20260910/README.md`](../audits/continuum_noise_20260910/README.md)
 for calibration and adoption evidence. The four-consecutive-flip gate is unchanged.
 
+## Normalized gate severity
+
+`src/rule_severity.py` adds `severity_features` to grouped rule schema v23.
+The v22 rejection ruleset is unchanged. Severity is a dimensionless margin
+relative to the configured cuts, not p_good or an uncertainty probability.
+For a large-is-bad condition use value/threshold; for a small-is-bad width use
+threshold/max(width,1e-12), in the gate's native width units. Combine AND by
+minimum and OR by maximum, then maximize over candidates. Components in an
+AND expression always belong to the same peak, crossing, window, or region,
+except the existing near-axis gate's explicitly independent mode amplitude.
+
+CSV outputs include one `gate_severity_BAD_*` column for each of the twelve
+gates, plus `overall_rule_severity=max(enabled gate severities)`,
+`rule_margin=1-overall_rule_severity`, `nearest_gate`, `severity_complete`,
+`severity_schema_version`, and `severity_config_sha256`. Named runs also
+record `rule_configuration_name` and `rule_configuration_sha256` per row.
+The nested report includes original values, thresholds, comparison operators,
+component ratios, the severity witness, and the actual fired flag of every
+gate, including gates after the first BAD reason.
+
+Severity 1 is the threshold surface. Inclusive gates can fire **at 1**;
+strict gates fire above 1. Preserve existing numerical tolerances and trust
+`fired` for the exact decision. No severity is clipped to 1. A zero severity
+may indicate an absent categorical prerequisite or zero measured defect;
+`status` distinguishes this from disabled or unavailable evidence. Disabled
+gates are null and excluded from the overall value. Unknown enabled-gate
+severity makes overall severity/margin null, rather than rewarding missing
+data. Normalization against a nonpositive configurable cut is undefined.
+
+Geometry, true crossings, minimum flip counts, and approved physical
+exceptions remain prerequisites. The crossing-window severity uses the
+**window maxima**, not the interpolated point amplitude used by its smooth
+exception. Each excused crossing is excluded before the regional maximum.
+The interior-envelope exception is honored whenever its geometric conditions
+qualify. The extended-noise gate uses top-two energy ratio, local fraction,
+and radial length; harmonic participation remains audit-only. The packet
+margin uses the kth strongest opposite-sign turn's smaller adjacent step:
+this measures weak packets continuously while preserving the required number
+of turns. Axis/signed-spike margins include subthreshold local peaks, using
+candidate geometry collected by the existing extractors.
+
+See [the severity audit](../audits/rule_severity_20260910/README.md) for formulas
+and the representative comparison. Shot-level margin distributions should be
+compared using the same configuration and with missing-coverage counts; they
+measure proximity to our cuts rather than calibrated shot quality.
+
 ## Deterministic rule sorting: production and calibration interfaces
 
 The shared deterministic implementation comprises
@@ -1280,12 +1322,11 @@ For production runs:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
-  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v10.yaml`, stored as strict
+`configs/rules/tae_rules_production_v11.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
 current v22 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
@@ -1303,7 +1344,7 @@ gate thresholds, and these gate states:
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v10 identity.
+config-owned threshold or gate override to retain the production-v11 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
@@ -1323,7 +1364,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v10` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v11` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1345,7 +1386,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v22`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v23`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1617,7 +1658,7 @@ python scripts/sort_shot_rules.py --shot_dir /path/to/shot --out_dir /path/to/au
 ```
 
 Frozen v5/v6 configurations remain supported and explicitly disable the
-exception. They preserve their prior decisions while emitting current v22
+exception. They preserve their prior decisions while emitting current v23
 audit metadata; exact historical exports require the earlier checkout.
 On nr!=201 the original window gate remains fully active. This exception
 does not add a skipped rejection gate to resolution warnings.
@@ -1820,7 +1861,7 @@ Calibration options are `--axis_energy_amplitude_r_max` (0.015),
 `--axis_energy_fraction_min` (0.5). `--disable_axis_energy_concentration`
 disables the decision while preserving its measurements. Named v5-v8
 presets explicitly disable the gate and retain their earlier decisions;
-new exports still use the v22 audit schema. Shot/per-n summaries record
+new exports still use the v23 audit schema. Shot/per-n summaries record
 `axis_energy_concentration_gate_enabled` and all four `axis_energy_*` values.
 For example, a conservative calibration run retaining only its evidence is:
 
@@ -1898,7 +1939,6 @@ automatic survivor policy:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
-  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output \
   --manual_overrides /path/to/manual_overrides.csv
 ```
@@ -1913,17 +1953,16 @@ override file used.
 
 ### Final-GOOD production deduplication
 
-The production `sort_shot_mixed.py --method rules` recipe passes
-`--rf_model /path/to/model.joblib` so close-frequency, structurally matched
-final-GOOD modes are reduced to RF-ranked representatives. RF `p_good` becomes
-`duplicate_rank_score` with source `rf_p_good`; it cannot change rule, manual,
-or final decisions. Only final GOOD modes are scored. A missing/unloadable
-checkpoint retains every member of each affected close-frequency cluster with
-`SKIPPED_NO_RF_CHECKPOINT`. A scoring failure for one member retains that whole
-cluster with `SKIPPED_RF_SCORING_FAILED`. CNN models are never loaded or run by
-this workflow. Omitting RF remains supported for conservative audit runs,
-including `sort_shot_rules.py`, but intentionally skips production
-deduplication.
+Production v11 uses the lowest `overall_rule_severity` within the existing
+frequency/structure matching procedure. Exact ties use portable mode key order.
+`duplicate_rank_score` is the nonnegative severity (lower is preferred), with
+`duplicate_rank_source=rule_severity` and `LOWEST_OVERALL_RULE_SEVERITY` as the
+selection reason. Gate/manual/final decisions remain unchanged. No RF or CNN
+model is loaded. Missing enabled-gate severity retains the affected cluster
+with `SKIPPED_SEVERITY_UNAVAILABLE`; shot summaries report the ranking method,
+complete/unavailable severity counts, and duplicate-processing status.
+Frozen v5-v10 presets retain `rf_p_good` ranking, requiring `--rf_model` to
+deduplicate; missing/scoring-failed RF checkpoints keep their old fallbacks.
 
 ---
 

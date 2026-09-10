@@ -15,6 +15,9 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping, Sequence
 
 
+from rule_severity import SEVERITY_FIELDS
+
+
 RULE_OUTPUT_FIELDS = [
     "path",
     "mode_key",
@@ -38,6 +41,9 @@ RULE_OUTPUT_FIELDS = [
     "rule_triggered_rules",
     "rule_version",
     "rule_features",
+    *SEVERITY_FIELDS,
+    "rule_configuration_name",
+    "rule_configuration_sha256",
     "rule_survivor_policy",
     "rule_survivor_accepted",
     "manual_decision",

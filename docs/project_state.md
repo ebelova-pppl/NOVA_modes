@@ -3,6 +3,48 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-10 normalized severity and rules-only representative ranking (v11)
+
+- Implemented first-class normalized gate severity in shared `src/rule_severity.py`.
+  Every rule output has per-gate severity columns, overall maximum, margin,
+  nearest gate, completeness, severity schema/hash, and named configuration
+  identity. Grouped schema v23 retains component ratios, values/cuts, witnesses,
+  enabled/status fields and every gate's real fired flag. The rejection ruleset
+  stays v22; all thresholds, exceptions and primary-reason precedence stay fixed.
+- Categorical prerequisites and exceptions are honored. AND combines min at the
+  same candidate and OR/candidate selection uses max. Width is threshold/width;
+  large-is-bad components use value/threshold. Severity 1 is the threshold
+  surface; inclusive gates can fire at equality, strict gates cannot. Existing
+  comparison tolerances and fired flags remain authoritative. No clipping or
+  probability interpretation. Disabled gates are excluded; unknown enabled
+  severity makes overall severity/margin unavailable. Component normalization
+  against a zero configurable threshold is explicitly undefined.
+- Production v11 chooses the smallest overall severity, then portable mode key
+  for exact ties, using the same greedy frequency/structure resolver. It does
+  not load RF/CNN models. Frozen v5-v10 presets retain RF p_good ranking; the
+  explicit legacy RF-CNN backend is unchanged. Missing severity keeps the
+  affected cluster with a recorded fallback. This implements the user's request
+  for a simple numerical ranker without a Pareto-selection subsystem.
+- All 191 tests pass. The 27-shot regression reproduces all 4,187 previous
+  TAE/mixed labels and feature values exactly: 3,239 BAD / 948 GOOD before
+  deduplication. All enabled severity diagnostics are complete. Six duplicates
+  are still removed, leaving 942 representatives; two pairs change their
+  selected member, both in E204645A16t015: N7/4782 -> 4975 (severity 0.706380
+  -> 0.620590), N8/5971 -> 5775 (0.599677 -> 0.567800). Their nearest gate is
+  BAD_GRID_SCALE_SPIKE. The 226 rules/RF-CNN disagreements stay unchanged.
+- Published all 27 verified v11 rules outputs under the existing `sort_outputs/`
+  root. Previous outputs are preserved in `before_rule_severity_v11_20260910/`.
+  Publication verified the installed outputs, v10 backups and unchanged RF-CNN
+  output trees; the receipt is `audits/rule_severity_20260910/publication.json`.
+- Eight recalculated C50/N1 files appeared during this run; all remain under
+  the known-invalid-input exclusion pending alignment review. Input count is
+  19,260. The inventory changes are recorded separately from ranking changes.
+- Full runtime exports, the combined severity CSV and logs are ignored under
+  `outputs/review_rule_severity_v11_20260910/`. Versionable evidence is in
+  `audits/rule_severity_20260910/`: definitions, changed choices, per-shot
+  coverage/distributions, and verification receipts. README, scripts README
+  and the project sorting skill document v11 and model-free usage.
+
 ## 2026-09-10 C50/N1 recalculation and ranking discussion
 
 - The user reports that C50/N1 is being recalculated and the upstream
@@ -12,8 +54,9 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
   eigenmode structures and continuum alignment have been reviewed.
 - The user proposes replacing RF p_good in duplicate representative ranking
   with either normalized gate severity or Pareto dominance (no worse on every
-  gate severity, strictly better on at least one). This is a design discussion;
-  production selection still uses RF ranking after deterministic acceptance.
+  gate severity, strictly better on at least one). At this discussion stage,
+  production selection used RF ranking after deterministic acceptance;
+  the v11 adoption above supersedes that policy.
 - Read-only inventory of current v10 outputs: 155 frequency clusters contain
   multiple GOOD modes (346 members), but only six existing structurally matched
   duplicate groups have multiple members, all pairs (12 modes / six drops).

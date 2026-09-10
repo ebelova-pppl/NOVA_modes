@@ -176,6 +176,9 @@ SHOT_SUMMARY_FIELDS = [
     "n_final_good",
     "n_good_removed_as_duplicates",
     "duplicate_processing_status",
+    "duplicate_rank_method",
+    "n_severity_complete",
+    "n_severity_unavailable",
     "n_manual_override_rows",
     "n_modes_manually_inspected",
     "n_overrides_applied",
@@ -635,8 +638,12 @@ def deduplicate_final_good(
     rel_freq_tol: float,
     rf_loader: Callable[[str | Path], Any] | None = None,
     rf_scorer: Callable[[Any, str], tuple[Any, ...]] | None = None,
+    rank_method: str = "rf_p_good",
 ) -> DuplicateResult:
     """Apply existing frequency/structure clustering only to final GOOD rows."""
+    if rank_method not in {"rf_p_good", "rule_severity"}:
+        raise ValueError("rank_method must be rf_p_good or rule_severity")
+    use_severity = rank_method == "rule_severity"
     good_rows = [row for row in rows if row.get("final_decision") == "GOOD"]
     if not good_rows:
         return DuplicateResult(
@@ -669,7 +676,7 @@ def deduplicate_final_good(
     classifier = None
     unavailable_message = ""
     has_close_cluster = any(len(cluster) > 1 for _n, _index, cluster in frequency_clusters)
-    if not has_close_cluster:
+    if not has_close_cluster or use_severity:
         unavailable_message = ""
     elif rf_model_path is None:
         unavailable_message = "no RF checkpoint was supplied"
@@ -686,7 +693,7 @@ def deduplicate_final_good(
             )
 
     build_mode_dict = resolve_cluster = None
-    if classifier is not None and has_close_cluster:
+    if (classifier is not None or use_severity) and has_close_cluster:
         # Reuse the established structure calculations and representative
         # selection only after a usable RF checkpoint is available.
         from sort_shot import build_mode_dict as existing_build_mode_dict
@@ -717,7 +724,7 @@ def deduplicate_final_good(
             continue
 
         saw_close_cluster = True
-        if classifier is None:
+        if classifier is None and not use_severity:
             records.append(
                 _fallback_cluster_record(
                     cluster,
@@ -738,13 +745,21 @@ def deduplicate_final_good(
         assert rf_scorer is not None
         for member in cluster:
             try:
-                score_result = rf_scorer(classifier, str(member["path"]))
-                score = float(score_result[0])
-                mode = score_result[1]
-                omega = float(score_result[2])
-                ntor_scored = int(score_result[4])
+                if use_severity:
+                    from nova_mode_loader import load_mode_from_nova
+                    source = member["row"]
+                    if str(source.get("severity_complete", "")).lower() != "true":
+                        raise ValueError("enabled gate severity is unavailable")
+                    score = float(source["overall_rule_severity"])
+                    mode, omega, _gamma, ntor_scored = load_mode_from_nova(member["path"])
+                else:
+                    score_result = rf_scorer(classifier, str(member["path"]))
+                    score = float(score_result[0])
+                    mode = score_result[1]
+                    omega = float(score_result[2])
+                    ntor_scored = int(score_result[4])
                 if not math.isfinite(score):
-                    raise ValueError(f"non-finite RF p_good {score}")
+                    raise ValueError(f"non-finite {rank_method} rank {score}")
                 score_by_path[str(member["path"])] = score
                 scored_modes.append(
                     build_mode_dict(
@@ -752,7 +767,7 @@ def deduplicate_final_good(
                         shot=str(member["row"]["shot"]),
                         ntor=ntor_scored,
                         omega=omega,
-                        score=score,
+                        score=-score if use_severity else score,
                         mode=mode,
                         dm_band=1,
                         center_power=2.0,
@@ -762,7 +777,7 @@ def deduplicate_final_good(
                 )
             except Exception as exc:
                 scoring_error = (
-                    f"RF scoring failed for {member['mode_key']}: "
+                    f"{rank_method} ranking failed for {member['mode_key']}: "
                     f"{type(exc).__name__}: {exc}"
                 )
                 break
@@ -774,13 +789,15 @@ def deduplicate_final_good(
                     cluster,
                     ntor=ntor,
                     cluster_index=cluster_index,
-                    status="SKIPPED_RF_SCORING_FAILED",
+                    status="SKIPPED_SEVERITY_UNAVAILABLE" if use_severity else "SKIPPED_RF_SCORING_FAILED",
                     diagnostic_message=scoring_error,
-                    selection_reason="RETAIN_ALL_RF_SCORING_FAILED",
+                    selection_reason="RETAIN_ALL_SEVERITY_UNAVAILABLE" if use_severity else "RETAIN_ALL_RF_SCORING_FAILED",
                 )
             )
             continue
 
+        if use_severity:
+            scored_modes.sort(key=lambda m: "/".join(Path(m["path"]).parts[-3:]))
         kept, type_groups = resolve_cluster(
             scored_modes,
             rel_freq_tol=rel_freq_tol,
@@ -817,17 +834,20 @@ def deduplicate_final_good(
                     "type_group": group_index,
                     "retained_mode_key": representative_key,
                     "duplicate_rank_score": score_by_path[path],
-                    "duplicate_rank_source": "rf_p_good",
-                    "selection_reason": "HIGHEST_RF_P_GOOD_WITHIN_MATCHED_MODE_TYPE",
+                    "duplicate_rank_source": rank_method,
+                    "selection_reason": ("LOWEST_OVERALL_RULE_SEVERITY" if use_severity
+                                         else "HIGHEST_RF_P_GOOD_WITHIN_MATCHED_MODE_TYPE"),
                 }
             )
         records.append(
             {
                 "ntor": ntor,
                 "cluster_index": cluster_index,
-                "status": "PROCESSED_RF",
+                "status": "PROCESSED_RULE_SEVERITY" if use_severity else "PROCESSED_RF",
                 "diagnostic_message": (
-                    "representatives selected by highest RF p_good under the "
+                    ("representatives selected by lowest overall rule severity under the "
+                     if use_severity else "representatives selected by highest RF p_good under the ")
+                    +
                     "preserved frequency and structural-similarity procedure"
                 ),
                 "members": record_members,
@@ -835,13 +855,13 @@ def deduplicate_final_good(
         )
 
     if saw_scoring_failure:
-        status = "COMPLETED_WITH_RF_SCORING_FALLBACK"
+        status = "COMPLETED_WITH_SEVERITY_FALLBACK" if use_severity else "COMPLETED_WITH_RF_SCORING_FALLBACK"
     elif unavailable_message and saw_close_cluster:
         status = "SKIPPED_NO_RF_CHECKPOINT"
     elif not saw_close_cluster:
         status = "NO_CLOSE_FREQUENCY_CLUSTERS"
     else:
-        status = "COMPLETED_RF"
+        status = "COMPLETED_RULE_SEVERITY" if use_severity else "COMPLETED_RF"
     return DuplicateResult(
         selected_paths=frozenset(selected_paths),
         cluster_records=tuple(records),
@@ -944,6 +964,7 @@ def build_summary(
     shot: str,
     selected_paths: frozenset[str],
     duplicate_status: str,
+    duplicate_rank_method: str = "rule_severity",
     override_audit: OverrideAudit,
     override_sha256: str,
     fraction_tae_threshold: float,
@@ -1069,6 +1090,9 @@ def build_summary(
         "n_final_good": len(selected_paths),
         "n_good_removed_as_duplicates": final_good_before - len(selected_paths),
         "duplicate_processing_status": duplicate_status,
+        "duplicate_rank_method": duplicate_rank_method,
+        "n_severity_complete": sum(row.get("severity_complete") is True for row in rule_rows),
+        "n_severity_unavailable": sum(row.get("severity_complete") is not True for row in rule_rows),
         "n_manual_override_rows": override_audit.supplied_rows,
         "n_modes_manually_inspected": override_audit.inspected_rows,
         "n_overrides_applied": override_audit.applied,
@@ -1203,6 +1227,7 @@ def _summary_by_n(
     shot: str,
     selected_paths: frozenset[str],
     duplicate_status: str,
+    duplicate_rank_method: str = "rule_severity",
     override_sha256: str,
     fraction_tae_threshold: float,
     fraction_eae_threshold: float,
@@ -1265,6 +1290,7 @@ def _summary_by_n(
             shot=shot,
             selected_paths=n_selected,
             duplicate_status=duplicate_status,
+            duplicate_rank_method=duplicate_rank_method,
             override_audit=n_audit,
             override_sha256=override_sha256,
             fraction_tae_threshold=fraction_tae_threshold,
@@ -1435,6 +1461,7 @@ def run_shot(
     *,
     manual_overrides: str | Path | None = None,
     rf_model: str | Path | None = None,
+    duplicate_rank_method: str = "rule_severity",
     n_min: int = 1,
     n_max: int = 10,
     pattern: str = "egn*",
@@ -1675,6 +1702,9 @@ def run_shot(
         key = str(source_row["mode_key"])
         preliminary_rows.append(rule_by_key.get(key, dict(source_row)))
 
+    for row in preliminary_rows:
+        row["rule_configuration_name"] = rule_configuration_name
+        row["rule_configuration_sha256"] = rule_configuration_sha256
     override_path = Path(manual_overrides).expanduser() if manual_overrides else None
     if override_path is not None:
         overrides = load_manual_overrides(override_path)
@@ -1690,6 +1720,7 @@ def run_shot(
     duplicate_result = deduplicate_final_good(
         final_rows,
         rf_model_path=rf_model,
+        rank_method=duplicate_rank_method,
         rel_freq_tol=rel_freq_tol,
     )
     final_rows = apply_duplicate_result(final_rows, duplicate_result)
@@ -1700,6 +1731,7 @@ def run_shot(
         shot=preprocess.shot,
         selected_paths=duplicate_result.selected_paths,
         duplicate_status=duplicate_result.status,
+        duplicate_rank_method=duplicate_rank_method,
         override_audit=override_audit,
         override_sha256=override_digest,
         fraction_tae_threshold=fraction_tae_threshold,
@@ -1729,6 +1761,7 @@ def run_shot(
         shot=preprocess.shot,
         selected_paths=duplicate_result.selected_paths,
         duplicate_status=duplicate_result.status,
+        duplicate_rank_method=duplicate_rank_method,
         override_sha256=override_digest,
         fraction_tae_threshold=fraction_tae_threshold,
         fraction_eae_threshold=fraction_eae_threshold,
@@ -2375,6 +2408,7 @@ def main() -> None:
         args.out_dir,
         manual_overrides=args.manual_overrides,
         rf_model=args.rf_model,
+        duplicate_rank_method=getattr(args, "duplicate_rank_method", "rule_severity"),
         n_min=args.n_min,
         n_max=args.n_max,
         pattern=args.pattern,

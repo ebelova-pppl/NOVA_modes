@@ -213,7 +213,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--rf_model",
         help=(
             "RF classifier .joblib path. Required for --method rf-cnn; under "
-            "rules it is optional and used only for duplicate ranking."
+            "rules v11 does not need it; frozen older presets use it for duplicate ranking."
         ),
     )
     ap.add_argument(

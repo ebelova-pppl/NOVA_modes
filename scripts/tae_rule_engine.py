@@ -24,6 +24,9 @@ from mode_features import (  # noqa: E402
     get_feature_schema_version,
 )
 from tae_rule_io import empty_rule_row, stable_json  # noqa: E402
+from rule_severity import (
+    empty_severity_features, extract_rule_severities, severity_columns,
+)
 from continuum_noise import (  # noqa: E402
     BAD_EXTENDED_CONTINUUM_NOISE,
     ContinuumNoiseThresholds,
@@ -107,7 +110,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v22"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v23"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -124,6 +127,7 @@ RULE_FEATURE_GROUP_NAMES = (
     "crossing_records",
     "extremum_features",
     "boundary_features",
+    "severity_features",
 )
 
 
@@ -1099,6 +1103,7 @@ def empty_rule_features(
         continuum_crossing_window_config or ContinuumCrossingWindowConfig()
     )
     return {
+        "severity_features": empty_severity_features(),
         "feature_schema_version": RULE_FEATURE_SCHEMA_VERSION,
         "source_feature_schema_version": RULE_FEATURE_SOURCE_SCHEMA_VERSION,
         "rf_standard_features": {name: None for name in RF_FEATURE_NAMES},
@@ -1182,6 +1187,7 @@ def grouped_rule_features(
 ) -> dict[str, Any]:
     """Organize shared RF31 measurements and deterministic rule evidence."""
     return {
+        "severity_features": empty_severity_features(),
         "feature_schema_version": RULE_FEATURE_SCHEMA_VERSION,
         "source_feature_schema_version": RULE_FEATURE_SOURCE_SCHEMA_VERSION,
         "rf_standard_features": {
@@ -1347,6 +1353,7 @@ def extract_grid_scale_spike_features(
     high_r_width_max_grid: float | None = (
         DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID
     ),
+    severity_candidates: list | None = None,
 ) -> dict[str, Any]:
     """Find the strongest signed local lobe within its radial width limit.
 
@@ -1413,6 +1420,10 @@ def extract_grid_scale_spike_features(
             )
             if candidate_width_limit is None:
                 continue
+            if severity_candidates is not None:
+                severity_candidates.append(dict(amplitude=float(abs(profile[peak_index])),
+                    width_grid=width_grid, width_limit=candidate_width_limit,
+                    harmonic_index=harmonic_index, peak_r=peak_r))
             width_tolerance = 64.0 * np.finfo(float).eps * max(
                 1.0, candidate_width_limit
             )
@@ -1467,6 +1478,7 @@ def extract_grid_scale_packet_features(
     min_large_turns: int = DEFAULT_GRID_SCALE_PACKET_MIN_LARGE_TURNS,
     window_span_grid: int = DEFAULT_GRID_SCALE_PACKET_WINDOW_SPAN_GRID,
     peak_r_max: float | None = DEFAULT_GRID_SCALE_PACKET_PEAK_R_MAX,
+    severity_candidates: list | None = None,
 ) -> dict[str, Any]:
     """Find repeated large turning points on one signed harmonic.
 
@@ -1525,6 +1537,29 @@ def extract_grid_scale_packet_features(
     n_samples = config.window_span_grid + 1
     for harmonic_index, profile in enumerate(mode_array):
         profile_steps = np.diff(profile)
+        if severity_candidates is not None and config.enabled:
+            # At least k large turns is equivalent to the kth strongest signed
+            # turn exceeding the step threshold. This also measures weak turns.
+            windows = np.lib.stride_tricks.sliding_window_view(profile, n_samples)
+            steps = np.diff(windows, axis=1)
+            strengths = np.where(steps[:, :-1] * steps[:, 1:] < 0,
+                                 np.minimum(abs(steps[:, :-1]), abs(steps[:, 1:])), 0.)
+            kth = np.sort(strengths, axis=1)[:, -config.min_large_turns]
+            offsets = np.argmax(abs(windows), axis=1)
+            starts = np.arange(len(windows))
+            peaks = abs(windows[starts, offsets])
+            valid = kth > 0
+            if config.peak_r_max is not None:
+                valid &= radial_grid[starts + offsets] <= config.peak_r_max + radius_tolerance
+            choices = starts[valid]
+            if choices.size:
+                margins = np.minimum(peaks[choices] / max(config.amplitude_min, 1e-12),
+                                     kth[choices] / max(config.step_min, 1e-12))
+                j = int(choices[np.argmax(margins)])
+                severity_candidates.append(dict(amplitude=float(peaks[j]), turn_step=float(kth[j]),
+                    harmonic_index=harmonic_index, window_start_index=j,
+                    required_turns=config.min_large_turns,
+                    opposing_turns=int(np.count_nonzero(strengths[j]))))
         large_steps = (
             np.abs(profile_steps) >= config.step_min - step_tolerance
         )
@@ -1860,6 +1895,7 @@ def extract_axis_artifact_features(
     r_ax: float = DEFAULT_AXIS_R_AX,
     amplitude_min: float | None = None,
     width_max_grid: float | None = None,
+    severity_candidates: list | None = None,
 ) -> dict[str, Any]:
     """Select the strongest width-qualified local peak in the axis window.
 
@@ -1941,6 +1977,9 @@ def extract_axis_artifact_features(
                     is_local_max=True,
                 )
             )
+
+    if severity_candidates is not None:
+        severity_candidates.extend(local_candidates)
 
     window = absolute_mode[:, axis_indices]
     fallback_harmonic, fallback_window_index = np.unravel_index(
@@ -2359,6 +2398,7 @@ def extract_interior_unresolved_envelope_features(
     *,
     total_energy_features: Mapping[str, Any],
     config: InteriorUnresolvedEnvelopeConfig | None = None,
+    severity_context: dict | None = None,
 ) -> dict[str, Any]:
     """Combine shared total-W evidence with a gate-specific extremum match.
 
@@ -2455,6 +2495,8 @@ def extract_interior_unresolved_envelope_features(
         )
         and ext_df_gap <= resolved.ext_df_gap_max + ext_df_tolerance
     )
+    if severity_context is not None:
+        severity_context["interior_exception"] = exception_qualified
     result["extremum_exception_applied"] = bool(
         candidate_found is True and exception_qualified
     )
@@ -2742,6 +2784,7 @@ class RuleResult:
                 "diagnostic_message": self.diagnostic_message,
             }
         )
+        row.update(severity_columns(self.features["severity_features"]))
         return row
 
 
@@ -2833,23 +2876,27 @@ def evaluate_mode(
             diagnostic_message=f"{type(exc).__name__}: {exc}",
         )
 
+    severity_candidates = dict(axis=[], grid=[], packet=[], interior_exception=False)
     try:
         if mode is None or low2 is None or high2 is None:
             raise ValueError("mode, low2, and high2 arrays are required")
         axis_features = extract_axis_artifact_features(
             mode,
+            severity_candidates=severity_candidates["axis"],
             r_ax=axis_config.r_ax,
             amplitude_min=axis_config.axis_amplitude_min,
             width_max_grid=axis_config.axis_width_max_grid,
         )
         grid_scale_features = extract_grid_scale_spike_features(
             mode,
+            severity_candidates=severity_candidates["grid"],
             width_max_grid=grid_config.width_max_grid,
             high_r_cutoff_r=grid_config.high_r_cutoff_r,
             high_r_width_max_grid=grid_config.high_r_width_max_grid,
         )
         grid_scale_packet_features = extract_grid_scale_packet_features(
             mode,
+            severity_candidates=severity_candidates["packet"],
             amplitude_min=packet_config.amplitude_min,
             step_min=packet_config.step_min,
             min_large_turns=packet_config.min_large_turns,
@@ -2920,6 +2967,7 @@ def evaluate_mode(
                 frequency,
                 low2,
                 high2,
+                severity_context=severity_candidates,
                 total_energy_features=edge_features,
                 config=interior_config,
             )
@@ -2976,110 +3024,45 @@ def evaluate_mode(
             diagnostic_message=f"{type(exc).__name__}: {exc}",
         )
 
+    gate_flags = {}
     amplitude_min = axis_config.axis_amplitude_min
     width_max_grid = axis_config.axis_width_max_grid
-    if (
+    gate_flags[BAD_AXIS_SPIKE] = bool(
         amplitude_min is not None
         and width_max_grid is not None
-        and axis_features["axis_candidate_found"]
-        and axis_features["axis_peak_is_local_max"]
-        and axis_features["axis_peak"] >= amplitude_min
-        and axis_features["axis_halfmax_width_grid"] <= width_max_grid
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_AXIS_SPIKE,
-            triggered_rules=(BAD_AXIS_SPIKE,),
-            features=features,
-        )
+        and axis_features['axis_candidate_found']
+        and axis_features['axis_peak_is_local_max']
+        and (axis_features['axis_peak'] >= amplitude_min)
+        and (axis_features['axis_halfmax_width_grid'] <= width_max_grid)
+    )
 
-    if (
+    gate_flags[BAD_GRID_SCALE_SPIKE] = bool(
         grid_config.enabled
-        and grid_scale_features["grid_scale_candidate_found"]
-        and grid_scale_features["grid_scale_peak"] >= grid_config.amplitude_min
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_GRID_SCALE_SPIKE,
-            triggered_rules=(BAD_GRID_SCALE_SPIKE,),
-            features=features,
-        )
+        and grid_scale_features['grid_scale_candidate_found']
+        and (grid_scale_features['grid_scale_peak'] >= grid_config.amplitude_min)
+    )
 
-    if (
+    gate_flags[BAD_GRID_SCALE_PACKET] = bool(
         packet_config.enabled
-        and grid_scale_packet_features["grid_scale_packet_candidate_found"]
-        and grid_scale_packet_features["grid_scale_packet_peak"]
-        >= packet_config.amplitude_min
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_GRID_SCALE_PACKET,
-            triggered_rules=(BAD_GRID_SCALE_PACKET,),
-            features=features,
-        )
+        and grid_scale_packet_features['grid_scale_packet_candidate_found']
+        and (grid_scale_packet_features['grid_scale_packet_peak'] >= packet_config.amplitude_min)
+    )
 
-    if (
+    gate_flags[BAD_NEAR_AXIS_GRID_OSCILLATION] = bool(
         near_axis_oscillation_config.enabled
-        and near_axis_grid_oscillation_features["candidate_found"]
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_NEAR_AXIS_GRID_OSCILLATION,
-            triggered_rules=(BAD_NEAR_AXIS_GRID_OSCILLATION,),
-            features=features,
-        )
+        and near_axis_grid_oscillation_features['candidate_found']
+    )
 
     n_cross = named_features["n_cross"]
     w_star_max = named_features["W_star_max"]
     w_cross_threshold = crossing_config.w_cross_threshold
-    if (
+    gate_flags[BAD_CONT_CROSS] = bool(
         w_cross_threshold is not None
         and n_cross is not None
-        and n_cross > 0.0
-        and w_star_max is not None
-        and w_star_max > w_cross_threshold
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_CONT_CROSS,
-            triggered_rules=(BAD_CONT_CROSS,),
-            features=features,
-        )
+        and (n_cross > 0.0)
+        and (w_star_max is not None)
+        and (w_star_max > w_cross_threshold)
+    )
 
     cross_window_amplitude = cross_window_features["cross_window_A_max"]
     cross_window_w = cross_window_features["cross_window_W_max"]
@@ -3093,121 +3076,70 @@ def evaluate_mode(
         and cross_window_w is not None
         and cross_window_w >= cross_window_config.w_min
     )
-    if (
+    gate_flags[BAD_CONT_CROSS_WINDOW] = bool(
         cross_window_config.enabled
         and n_cross is not None
-        and n_cross > 0.0
-        and cross_window_features["cross_window_candidate_found"]
+        and (n_cross > 0.0)
+        and cross_window_features['cross_window_candidate_found']
         and (amplitude_hit or energy_hit)
-        and not cross_window_exception_features["all_violations_exempted"]
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_CONT_CROSS_WINDOW,
-            triggered_rules=(BAD_CONT_CROSS_WINDOW,),
-            features=features,
-        )
+        and (not cross_window_exception_features['all_violations_exempted'])
+    )
 
     edge_width_max_grid = edge_config.edge_width_max_grid
-    if (
+    gate_flags[BAD_EDGE_SPIKE] = bool(
         edge_width_max_grid is not None
-        and edge_features["edge_energy_peak_in_window"]
-        and edge_features["edge_energy_halfmax_width_grid"] is not None
-        and edge_features["edge_energy_halfmax_width_grid"]
-        <= edge_width_max_grid
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_EDGE_SPIKE,
-            triggered_rules=(BAD_EDGE_SPIKE,),
-            features=features,
-        )
+        and edge_features['edge_energy_peak_in_window']
+        and (edge_features['edge_energy_halfmax_width_grid'] is not None)
+        and (edge_features['edge_energy_halfmax_width_grid'] <= edge_width_max_grid)
+    )
 
-    if (
+    gate_flags[BAD_INTERIOR_UNRESOLVED_ENVELOPE] = bool(
         interior_config.enabled
-        and interior_envelope_features["candidate_found"]
-        and not interior_envelope_features["extremum_exception_applied"]
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_INTERIOR_UNRESOLVED_ENVELOPE,
-            triggered_rules=(BAD_INTERIOR_UNRESOLVED_ENVELOPE,),
-            features=features,
-        )
+        and interior_envelope_features['candidate_found']
+        and (not interior_envelope_features['extremum_exception_applied'])
+    )
 
-    if (
+    gate_flags[BAD_INTERIOR_HARMONIC_INCOHERENCE] = bool(
         incoherence_config.enabled
-        and interior_incoherence_features["candidate_found"]
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_INTERIOR_HARMONIC_INCOHERENCE,
-            triggered_rules=(BAD_INTERIOR_HARMONIC_INCOHERENCE,),
-            features=features,
-        )
+        and interior_incoherence_features['candidate_found']
+    )
 
-    if (
+    gate_flags[BAD_CONTINUUM_CROSSING_TAIL] = bool(
         tail_config.enabled
-        and features["crossing_features"]["continuum_crossing_tail"]["candidate_found"]
-    ):
-        return RuleResult(
-            path=path,
-            mode_key=mode_key,
-            shot=shot,
-            ntor=ntor,
-            frequency=frequency,
-            input_fingerprint=fingerprint,
-            gap_region=gap_region,
-            decision="BAD",
-            primary_reason=BAD_CONTINUUM_CROSSING_TAIL,
-            triggered_rules=(BAD_CONTINUUM_CROSSING_TAIL,),
-            features=features,
-        )
+        and features['crossing_features']['continuum_crossing_tail']['candidate_found']
+    )
 
     # Append the gate so existing BAD primary reasons retain precedence.
-    if features["boundary_features"]["axis_energy_concentration"]["candidate_found"]:
-        return RuleResult(
-            path=path, mode_key=mode_key, shot=shot, ntor=ntor,
-            frequency=frequency, input_fingerprint=fingerprint, gap_region=gap_region,
-            decision="BAD", primary_reason=BAD_AXIS_ENERGY_CONCENTRATION,
-            triggered_rules=(BAD_AXIS_ENERGY_CONCENTRATION,), features=features,
-        )
+    gate_flags[BAD_AXIS_ENERGY_CONCENTRATION] = bool(
+        features['boundary_features']['axis_energy_concentration']['candidate_found']
+    )
 
-    if features["numerical_structure_features"]["extended_continuum_noise"]["candidate_found"]:
-        return RuleResult(
-            path=path, mode_key=mode_key, shot=shot, ntor=ntor,
-            frequency=frequency, input_fingerprint=fingerprint, gap_region=gap_region,
-            decision="BAD", primary_reason=BAD_EXTENDED_CONTINUUM_NOISE,
-            triggered_rules=(BAD_EXTENDED_CONTINUUM_NOISE,), features=features,
-        )
+    gate_flags[BAD_EXTENDED_CONTINUUM_NOISE] = bool(
+        features['numerical_structure_features']['extended_continuum_noise']['candidate_found']
+    )
+
+    severity_configs = {
+        BAD_AXIS_SPIKE: axis_config,
+        BAD_GRID_SCALE_SPIKE: grid_config,
+        BAD_GRID_SCALE_PACKET: packet_config,
+        BAD_NEAR_AXIS_GRID_OSCILLATION: near_axis_oscillation_config,
+        BAD_CONT_CROSS: crossing_config,
+        BAD_CONT_CROSS_WINDOW: cross_window_config,
+        BAD_EDGE_SPIKE: edge_config,
+        BAD_INTERIOR_UNRESOLVED_ENVELOPE: interior_config,
+        BAD_INTERIOR_HARMONIC_INCOHERENCE: incoherence_config,
+        BAD_CONTINUUM_CROSSING_TAIL: tail_config,
+        BAD_AXIS_ENERGY_CONCENTRATION: axis_energy_config,
+        BAD_EXTENDED_CONTINUUM_NOISE: noise_config,
+    }
+    features["severity_features"] = extract_rule_severities(
+        features, severity_configs, severity_candidates, gate_flags)
+    for reason, fired in gate_flags.items():
+        if fired:
+            return RuleResult(
+                path=path, mode_key=mode_key, shot=shot, ntor=ntor,
+                frequency=frequency, input_fingerprint=fingerprint, gap_region=gap_region,
+                decision="BAD", primary_reason=reason, triggered_rules=(reason,), features=features)
 
     # Not rejected is not equivalent to GOOD. Positive templates and later
     # ordered gates remain to be implemented.

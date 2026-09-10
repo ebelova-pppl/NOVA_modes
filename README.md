@@ -64,6 +64,20 @@ Known invalid inputs (2026-09-09):
 - NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
   should refer to eigenmode calculations, not stability calculations.
 
+Production v11: normalized gate severity and rules-only ranking (2026-09-10):
+
+- Every gate now reports its normalized severity, component ratios, and actual
+  fired flag. CSV outputs expose `gate_severity_BAD_*`, `overall_rule_severity`,
+  `rule_margin=1-overall_rule_severity`, and `nearest_gate`, with configuration
+  hashes. These are threshold margins, not calibrated probabilities.
+- The lowest overall severity selects frequency/structure duplicate
+  representatives; exact ties use the mode key. No RF checkpoint is needed.
+  Classification gates, thresholds, and exceptions are unchanged. Frozen v5-v10
+  configurations retain their RF ranking policy.
+- Preset v11 retains the v22 rejection ruleset and uses grouped feature schema
+  v23 with `severity_features`. See the
+  [severity audit and definitions](audits/rule_severity_20260910/README.md).
+
 Production rules v10 (2026-09-10):
 
 - `BAD_EXTENDED_CONTINUUM_NOISE` is a separate final gate. A connected
@@ -106,14 +120,14 @@ Retained axis-energy rule (adopted in v9, 2026-09-09):
   the clearance lower comparison includes equality.
 
 - `sort_shot_mixed.py --method rules` now uses
-  `configs/rules/tae_rules_production_v10.yaml` (ruleset/features v22).
+  `configs/rules/tae_rules_production_v11.yaml` (ruleset v22 / feature schema v23).
   Each offending continuum-crossing window is excused only when its
   interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
   its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
   crossing must qualify; all other rejection gates still apply.
 - V5/v6 configuration files remain frozen and explicitly disable the smooth-crossing
   exception when loaded. Their decisions remain supported; new exports use
-  the current v22 audit schema. RF/CNN feature columns and weights are unchanged.
+  the current v23 audit schema. RF/CNN feature columns and weights are unchanged.
 - The earlier smooth-crossing impact audit recovered 19 modes in the 27-shot batch and two
   labeled GOOD training modes, with no newly accepted labeled BAD training
   modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
@@ -223,7 +237,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v10`
+  `--method rules` path loads the immutable `tae_rules_production_v11`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -232,33 +246,32 @@ Current best models
   the engine verdict `rule_decision=REVIEW` and
   `rule_primary_reason=NO_GOOD_TEMPLATE`, then the audited
   `accept-as-good-v1` workflow policy promotes it to final `GOOD`. Manual
-  overrides are applied after that policy. The production command supplies the
-  active RF checkpoint to rank representatives and remove close-frequency,
-  structurally matched duplicates. RF cannot change rule decisions, and no
-  CNN is loaded by the rules method.
+  overrides are applied after that policy. The production command chooses the
+  lowest-severity representative among close-frequency, structurally matched
+  duplicates, with no model checkpoint required.
 
 ## Sort new NSTX-U shots on Flux (no training)
 
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v10` configuration automatically:
+`tae_rules_production_v11` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
 all gates passed     -> rule REVIEW/NO_GOOD_TEMPLATE
                      -> final GOOD by accept-as-good-v1
 manual overrides     -> applied to the automatic final decision
-final GOOD           -> RF-ranked frequency/structure deduplication
+final GOOD           -> severity-ranked frequency/structure deduplication
 ```
 
 The promotion is a workflow policy, not a positive rule-engine template. Both
 the preliminary rule verdict and the audited promotion source remain in the
-outputs. Rules mode never loads a CNN. The standard production recipe supplies
-`--rf_model` only to rank representatives within final-GOOD close-frequency,
-structurally matched groups. Omitting it is supported as a conservative audit
-fallback, but retains all affected cluster members and therefore does not
-produce the intended deduplicated production list.
+outputs. Production v11 ranks duplicates by lowest overall rule severity,
+with the mode key breaking exact ties. No RF or CNN checkpoint is needed.
+Missing enabled-gate severity retains the affected frequency cluster and
+reports `SKIPPED_SEVERITY_UNAVAILABLE`. Frozen v5-v10 configurations retain
+the previous RF ranking and its missing-model fallback.
 
 Default Flux shell is usually `tcsh`:
 
@@ -317,7 +330,6 @@ setenv SHOT_NAME nstxu_example_shot
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
-  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
@@ -328,7 +340,6 @@ export SHOT_NAME=nstxu_example_shot
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
-  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
@@ -346,7 +357,7 @@ precondition for direct CLI commands.
 
 Most useful outputs for the default rules method:
 
-- `good_tae_final.csv` — final GOOD TAE-like representatives after RF-ranked
+- `good_tae_final.csv` — final GOOD TAE-like representatives after severity-ranked
   frequency/structure deduplication.
   Includes `rad_loc` and `rad_width` for comparing the mode location/width
   with beam-ion density profiles before launching NOVA-C growth-rate runs.
@@ -399,11 +410,10 @@ commands:
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
-  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v10.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v11.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -519,7 +529,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v22`; the near-axis group records the independent
+`tae-rule-features-grouped-v23`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The
@@ -578,17 +588,14 @@ python scripts/label_modes_fast.py /path/to/shot \
 python scripts/sort_shot_mixed.py \
   --method rules \
   --shot_dir /path/to/shot \
-  --rf_model models/nova_mode_classifier.joblib \
   --out_dir /path/to/rule_sort_output \
   --manual_overrides /path/to/manual_overrides.csv
 ```
 
 An override is applied only while its SHA-256 input fingerprint matches the
-current mode and corresponding `datcon#` contents. The production
-`--rf_model` is used only to rank representatives inside final-GOOD
-close-frequency, structurally matched groups. If it is absent, unloadable, or
-fails on one cluster member, every affected cluster member is retained and the
-fallback is reported. This path never loads or runs a CNN model.
+current mode and corresponding `datcon#` contents. Production duplicate
+ranking uses overall rule severity, after all classification and override
+steps. Missing severity retains the affected cluster with an explicit fallback.
 
 ## Typical workflow (hand labeling, (re-)training, checks etc)
 
@@ -607,7 +614,7 @@ fallback is reported. This path never loads or runs a CNN model.
 - Run `sort_shot_mixed.py --method rules` for the canonical production pass:
   it routes EAE-like modes away, applies the frozen rejection rules, promotes
   rule survivors under `accept-as-good-v1`, applies manual overrides, and
-  uses RF only to select representatives among frequency/structure duplicates.
+  uses lowest overall rule severity to select frequency/structure representatives.
 - Run `sort_shot_mixed.py --method rf-cnn` with both model checkpoints only
   when the legacy combined RF+CNN decision path is required. Raw,
   straightened, and hybrid CNN checkpoints are supported through the shared

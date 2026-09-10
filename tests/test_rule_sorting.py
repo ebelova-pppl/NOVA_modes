@@ -496,7 +496,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v22")
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v23")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -2926,7 +2926,7 @@ class MixedSorterMethodIntegrationTests(unittest.TestCase):
             self.assertEqual(first.summary["n_final_good"], 2)
             self.assertEqual(
                 first.summary["duplicate_processing_status"],
-                "SKIPPED_NO_RF_CHECKPOINT",
+                "COMPLETED_WITH_SEVERITY_FALLBACK",
             )
             self.assertFalse(first.summary["continuum_crossing_gate_enabled"])
 
@@ -2942,7 +2942,7 @@ class MixedSorterMethodIntegrationTests(unittest.TestCase):
             self.assertEqual(len(clusters), 2)
             self.assertEqual(
                 {row["cluster_status"] for row in clusters},
-                {"SKIPPED_NO_RF_CHECKPOINT"},
+                {"SKIPPED_SEVERITY_UNAVAILABLE"},
             )
             self.assertEqual(
                 {row["action"] for row in clusters},
@@ -3126,12 +3126,12 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v10")
+        self.assertEqual(configuration.name, "tae_rules_production_v11")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "51932bc9d402a99e6b015cbb72cca11e42a175f7edd46315246d6b965860843e",
+            "da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3145,6 +3145,7 @@ class WorkflowOutputTests(unittest.TestCase):
                 "axis_energy_amplitude_min": 0.5,
                 "axis_energy_r_max": 0.05,
                 "axis_energy_fraction_min": 0.5,
+                "duplicate_rank_method": "rule_severity",
                 "continuum_noise_top2_min": 0.01,
                 "continuum_noise_local_min": 0.2,
                 "continuum_noise_radial_length_min": 0.04,

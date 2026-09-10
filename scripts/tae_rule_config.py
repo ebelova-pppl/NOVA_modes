@@ -34,12 +34,13 @@ from tae_eae_features import validate_routing_thresholds
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_DIR = REPO_ROOT / "configs" / "rules"
-RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v10"
-PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v10"
+RULE_CONFIG_SCHEMA_VERSION = "tae-rule-run-config-v11"
+PRODUCTION_RULE_CONFIG_NAME = "tae_rules_production_v11"
 PRODUCTION_RULE_CONFIG_SHA256 = (
-    "51932bc9d402a99e6b015cbb72cca11e42a175f7edd46315246d6b965860843e"
+    "da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da"
 )
 FROZEN_CONFIGURATION_SHA256 = {
+    "tae_rules_production_v10": "51932bc9d402a99e6b015cbb72cca11e42a175f7edd46315246d6b965860843e",
     "tae_rules_production_v9": "e5d3ae4bac8cea9b9606a7e6337180e205f9294ea56529ec4a25f0a55d2f6bf7",
     "tae_rules_production_v8": "86436a3486cd2d3bd9fd8a16d3af51f2127cb0325017de392ae7d1d36d8647e0",
     "tae_rules_production_v7": "10980f26b800d597de343e7d1fde173d5b749c56b9b15c5d98f3e8ac03a16429",
@@ -145,6 +146,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     schema_version = _string(document, "schema_version", context="configuration")
     if schema_version not in {
         RULE_CONFIG_SCHEMA_VERSION,
+        "tae-rule-run-config-v10",
         "tae-rule-run-config-v9",
         "tae-rule-run-config-v8",
         "tae-rule-run-config-v7",
@@ -153,12 +155,13 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     }:
         raise ValueError(
             f"unsupported rule configuration schema {schema_version!r}; "
-            f"expected {RULE_CONFIG_SCHEMA_VERSION!r}, v9, v8, v7, v6, or v5"
+            f"expected {RULE_CONFIG_SCHEMA_VERSION!r}, v10, v9, v8, v7, v6, or v5"
         )
     name = _string(document, "name", context="configuration")
     rule_set_version = _string(document, "rule_set_version", context="configuration")
     expected_ruleset = {
         RULE_CONFIG_SCHEMA_VERSION: RULESET_VERSION,
+        "tae-rule-run-config-v10": RULESET_VERSION,
         "tae-rule-run-config-v9": AXIS_ENERGY_RULESET_VERSION,
         "tae-rule-run-config-v8": CLEARANCE_RULESET_VERSION,
         "tae-rule-run-config-v7": PREVIOUS_RULESET_VERSION,
@@ -212,8 +215,12 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
 
     deduplication = _mapping(document["deduplication"], context="deduplication")
     _require_exact_keys(
-        deduplication, {"rel_freq_tol"}, context="deduplication"
+        deduplication, {"rel_freq_tol"} | ({"rank_method"} if schema_version == RULE_CONFIG_SCHEMA_VERSION else set()), context="deduplication"
     )
+    rank_method = (_string(deduplication, "rank_method", context="deduplication")
+                   if schema_version == RULE_CONFIG_SCHEMA_VERSION else "rf_p_good")
+    if rank_method not in {"rule_severity", "rf_p_good"}:
+        raise ValueError("deduplication.rank_method must be rule_severity or rf_p_good")
     rel_freq_tol = _float(deduplication, "rel_freq_tol", context="deduplication")
     if rel_freq_tol <= 0.0:
         raise ValueError("deduplication.rel_freq_tol must be positive")
@@ -231,16 +238,16 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         "interior_harmonic_incoherence",
         "continuum_crossing_tail",
     }
-    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v9"}:
+    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10", "tae-rule-run-config-v9"}:
         gate_names.add("axis_energy_concentration")
-    if schema_version == RULE_CONFIG_SCHEMA_VERSION:
+    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10"}:
         gate_names.add("extended_continuum_noise")
     _require_exact_keys(gates, gate_names, context="gates")
     # Older frozen configurations never inherit the newly enabled gate.
     axis_energy_config = AxisEnergyConcentrationConfig(
         amplitude_min=None, energy_fraction_min=None
     )
-    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v9"}:
+    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10", "tae-rule-run-config-v9"}:
         context = "gates.axis_energy_concentration"
         axis_energy = _mapping(gates["axis_energy_concentration"], context=context)
         _require_exact_keys(axis_energy, {
@@ -257,7 +264,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         axis_energy_config = AxisEnergyConcentrationConfig(**axis_energy_values)
 
     noise_config = ContinuumNoiseThresholds(top2_min=None)
-    if schema_version == RULE_CONFIG_SCHEMA_VERSION:
+    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10"}:
         context = "gates.extended_continuum_noise"
         noise = _mapping(gates["extended_continuum_noise"], context=context)
         _require_exact_keys(noise, {"enabled", "top2_min", "local_min", "radial_length_min"}, context=context)
@@ -417,7 +424,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
         {"enabled", "half_width_grid", "amplitude_min", "w_min"}
         | (
             {"smooth_exception"}
-            if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v9", "tae-rule-run-config-v8", "tae-rule-run-config-v7"}
+            if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10", "tae-rule-run-config-v9", "tae-rule-run-config-v8", "tae-rule-run-config-v7"}
             else set()
         ),
         context="gates.continuum_crossing_window",
@@ -433,7 +440,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     )
     window_w = _float(window, "w_min", context="gates.continuum_crossing_window")
     exception_kwargs = {"exception_amplitude_max": None, "exception_k_max": None}
-    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v9", "tae-rule-run-config-v8", "tae-rule-run-config-v7"}:
+    if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10", "tae-rule-run-config-v9", "tae-rule-run-config-v8", "tae-rule-run-config-v7"}:
         context = "gates.continuum_crossing_window.smooth_exception"
         exception = _mapping(window["smooth_exception"], context=context)
         _require_exact_keys(
@@ -500,7 +507,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
             "ext_dr_max",
             "ext_df_gap_min",
             "ext_df_gap_max",
-        } | ({"ext_df_gap_min_inclusive"} if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v9", "tae-rule-run-config-v8"} else set()),
+        } | ({"ext_df_gap_min_inclusive"} if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10", "tae-rule-run-config-v9", "tae-rule-run-config-v8"} else set()),
         context="gates.interior_unresolved_envelope",
     )
     interior_enabled = _bool(
@@ -530,7 +537,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     # Frozen v5-v7 use the inclusive lower comparison, including tangency.
     interior_ext_df_min_inclusive = (
         _bool(interior, "ext_df_gap_min_inclusive", context="gates.interior_unresolved_envelope")
-        if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v9", "tae-rule-run-config-v8"} else True
+        if schema_version in {RULE_CONFIG_SCHEMA_VERSION, "tae-rule-run-config-v10", "tae-rule-run-config-v9", "tae-rule-run-config-v8"} else True
     )
     InteriorUnresolvedEnvelopeConfig(
         peak_r_max=interior_peak_r,
@@ -619,6 +626,7 @@ def load_rule_run_configuration(value: str | Path) -> RuleRunConfiguration:
     )
 
     run_kwargs = {
+        "duplicate_rank_method": rank_method,
         "continuum_noise_top2_min": noise_config.top2_min,
         "continuum_noise_local_min": noise_config.local_min,
         "continuum_noise_radial_length_min": noise_config.radial_length_min,
