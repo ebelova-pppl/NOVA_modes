@@ -38,6 +38,12 @@ class InputValidityTests(unittest.TestCase):
         self.assertIn("CONTINUUM_MODE_MISMATCH", registry.diagnostic(SHOT, 1))
         self.assertIsNone(registry.diagnostic(SHOT, 2))
         self.assertIsNone(registry.diagnostic(SHOT + "_new", 1))
+        for confirmed in (
+            "nstx_135388", "nstxuG142301W29", "nstxuG142301Y93", "nstxuG121123B12"
+        ):
+            self.assertIn("CONTINUUM_MODE_MISMATCH", registry.diagnostic(confirmed, 1))
+            self.assertIsNone(registry.diagnostic(confirmed, 2))
+            self.assertIsNone(registry.diagnostic(confirmed + "_new", 1))
         for n in (1, 10, 11):
             self.assertIn(
                 "SUSPECT_EIGENMODE_STRUCTURE", registry.diagnostic(WHOLE_SHOT, n)

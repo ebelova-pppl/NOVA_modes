@@ -7,6 +7,14 @@ Main context files:
 - `docs/project_state.md` — current project state and model status
 - `scripts/README.md` — detailed script inventory and usage notes
 
+**Further production sorting is paused (2026-09-10)** while DiTw
+continuum/eigenmode consistency is reviewed and affected inputs corrected.
+The [remaining-database N1/N2 audit](audits/n1_database_alignment_20260910/README.md)
+scanned the other 159 shots and provides an
+[all-200 N1 status table](audits/n1_database_alignment_20260910/all_200_n1_status.csv).
+New candidates require adjudication; current confirmed input exclusions remain
+unchanged. A diagnostic scan does not mark a shot as production-sorted.
+
 Current canonical pipelines:
 - `scripts/split_tae_eae.py`
 - `scripts/rf_train_classify.py`
@@ -29,6 +37,9 @@ Shared scripts / features:
 - `scripts/tae_rule_engine.py`
 - `scripts/sort_shot_rules.py`
 - `scripts/audit_training_provenance.py`
+- `audits/n1_training_alignment_20260910/check_alignment.py` — compare datcon
+  crossings against frequency-matched NOVA singularity logs; see the
+  [training N1 alignment screen](audits/n1_training_alignment_20260910/README.md).
 - `src/continuum_noise.py` and `scripts/audit_continuum_noise.py` — continuum-side
   noise gate and threshold calibration; see the
   [2026-09-10 calibration](audits/continuum_noise_20260910/README.md).
@@ -63,6 +74,11 @@ Known invalid inputs (2026-09-09):
   are reviewed. See the [R06 audit](audits/r06_input_validity_20260909/README.md).
 - NOVA calculates eigenfrequencies and eigenmode structure; these diagnostics
   should refer to eigenmode calculations, not stability calculations.
+- On 2026-09-10 the user also confirmed the N1 continuum/mode mismatch in
+  `nstx_135388`, `nstxuG142301W29`, `nstxuG142301Y93` and `nstxuG121123B12`.
+  Their N1 scopes are registry-excluded; 63 BAD-labeled training rows are
+  archived out of the active list. See the [training confirmation](audits/n1_training_alignment_20260910/README.md)
+  and [27-shot pilot alignment screen](audits/n1_pilot_alignment_20260910/README.md).
 
 Production v11: normalized gate severity and rules-only ranking (2026-09-10):
 
@@ -177,7 +193,9 @@ Data format summary
   `$NOVA_DATA` when possible, for example
   `nstx_120113/N5/egn05w.1234E+02,good`. The current canonical/default
   good/bad training list is `training_labels/tae_like_train.csv`. It contains
-  2,390 modes from 14 shots, with 575 GOOD and 1,815 BAD labels. Q62 is
+  2,327 modes from 14 shots, with 575 GOOD and 1,752 BAD labels. The 63
+  user-confirmed invalid N1 rows from 135388/W29/Y93/B12 are archived in
+  `audits/n1_training_alignment_20260910/suspended_training_n1.csv`. Q62 is
   suspended because a whole-shot visual audit indicates that its upper
   continuum boundary may be incorrect. The complete 2,639-row reviewed
   15-shot snapshot, including the preserved 249 Q62 labels, remains in
@@ -201,6 +219,8 @@ Model families
 - `scripts/cnn_hybrid.py` - CNN + scalar features (continuum + physics-informed inputs)
 
 Current best models
+- Existing checkpoints retain their earlier 2,390-row training provenance;
+  they have not been retrained on the current 2,327-row active list.
 - Active expanded-set models live at `models/nova_mode_classifier.joblib` and
   `models/nova_cnn_raw.pt`. The 2026-08-28 refresh used the then-current canonical
   `training_labels/tae_like_train.csv`: 2,390 rows from 14 shots, with 576

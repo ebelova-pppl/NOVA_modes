@@ -1,0 +1,81 @@
+{
+  "schema": "pilot-n1-alignment-review-v1",
+  "created_utc": "2026-09-10T21:01:23.358161+00:00",
+  "shot_count": 27,
+  "stable_modes": 2541,
+  "stable_n1_modes": 1451,
+  "stable_n2_modes": 1090,
+  "group_errors": {
+    "nstxuG142301C50/N1": "nstxuG142301C50/N1: input changed during the audit; rerun"
+  },
+  "mode_nr": [
+    "201"
+  ],
+  "input_errors": 0,
+  "primary_review_modes": 27,
+  "review_mode_count": 44,
+  "continuum_repair_checks": {
+    "nstxuG121123K34": {
+      "region": ".03 <= r < .75",
+      "changed_samples": 0
+    },
+    "nstxuG121123K70": {
+      "region": "whole datcon",
+      "changed_samples": 0
+    },
+    "nstxuG142301E72": {
+      "region": ".03 <= r < .75",
+      "changed_samples": 0
+    },
+    "nstxuG142301L94": {
+      "region": ".03 <= r < .75",
+      "changed_samples": 0
+    },
+    "nstxuG142301U84": {
+      "region": ".03 <= r < .75",
+      "changed_samples": 0
+    }
+  },
+  "training_confirmation": {
+    "confirmed_shots": [
+      "nstx_135388",
+      "nstxuG121123B12",
+      "nstxuG142301W29",
+      "nstxuG142301Y93"
+    ],
+    "ntor": 1,
+    "archived_training_rows": 63,
+    "archived_validity": {
+      "bad": 63
+    },
+    "training_before_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+    "training_after_sha256": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "archived_rows_sha256": "ae77c3a85e4247272a2ceca565e68e94e567dcf3d055cd9353a1dbf045cd7948",
+    "registry_before_sha256": "0809ed5dbcc546f78586f3cff4795bdbeb42bac0e914776c3145d2ed55bf51cf",
+    "registry_after_sha256": "2b3507afcc29fd2a3cf60e8e6885cacf043061b5f46df13b1e2a05427865d407",
+    "active_rows_before": 2390,
+    "active_rows_after": 2327,
+    "unchanged_retained_rows": true
+  },
+  "runtime_metadata_sha256": "eb91230523fe38fda1ec55cfb6204f4e1ab9e2a867fa1f8ed68723f321f935cd",
+  "tests": "Eight input-validity and log-alignment tests passed.",
+  "no_new_pilot_exclusions": true,
+  "external_outputs_regenerated": false,
+  "source_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/n1_pilot_alignment_20260910/check_pilots.py": "265b5a2cdfaa473c19a6c94524bc181b11bea3e8d326489b14f66435376e4174",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/n1_training_alignment_20260910/check_alignment.py": "26935823dd8ef8fbebf7faae358cc538498834bd19181cc320e38c592850dd3f",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+    "/p/hym/ebelova/NOVA/NOVA_modes/configs/known_invalid_inputs.csv": "2b3507afcc29fd2a3cf60e8e6885cacf043061b5f46df13b1e2a05427865d407",
+    "audits/n1_training_alignment_20260910/render_evidence.py": "6e66a3fa41278986aefeae2e691490b553509e506989cf30dc729feac7f562d5"
+  },
+  "artifact_sha256": {
+    "pilot_n1_summary.csv": "c6cf03f12c8f11ccf87545af8ded1a796c55f9d9d8012e5e5e2bdb2be400cdec",
+    "pilot_n2_control_summary.csv": "cda7f5a190a519f449403b3f6ccad8e3fe6ae35c28c67fdf5c9132c38bc192eb",
+    "figure_modes.csv": "9294195641373344ba5496534070af1335e9838f21b338982c5f6c5176dbdd10",
+    "review_crossings.csv": "b0753b8b1e47024a87a695933d6f948f57848a92cde5ceaffb3384cefe1c9810",
+    "check_pilots.py": "265b5a2cdfaa473c19a6c94524bc181b11bea3e8d326489b14f66435376e4174",
+    "review_modes.csv": "b54d41cdeee8d5f0b6ebf3b421ab9e07adfb6f569e9714ddd95723e7b0e6782d"
+  }
+}

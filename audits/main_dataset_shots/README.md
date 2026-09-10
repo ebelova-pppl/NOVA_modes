@@ -37,7 +37,23 @@ remain unchanged. Previous rules exports are retained under
 already user-approved GOOD modes. Earlier repair and pilot tables remain
 historical; the checked membership and training labels are unchanged.
 
-The active list contains 14 training shots and 2,390 labels. Q62 is marked
+The active list now contains 14 training shots and 2,327 labels (575 GOOD,
+1,752 BAD). On 2026-09-10 the user confirmed N1 continuum/mode mismatch in
+135388, W29, Y93 and B12; their 63 BAD rows are archived out of active
+training, and their N1 scopes are registry-excluded on future sorting runs.
+Main/G inventories retain the other-n training membership and updated counts.
+See the [confirmation](../n1_training_alignment_20260910/README.md) and
+[27-shot diagnostic follow-up](../n1_pilot_alignment_20260910/README.md).
+
+Further production sorting is paused as of 2026-09-10 while continuum/eigenmode
+consistency is reviewed and affected inputs corrected. The
+[remaining-database audit](../n1_database_alignment_20260910/README.md) scanned
+N1/N2 in the other 159 shots; its
+[all-200 N1 table](../n1_database_alignment_20260910/all_200_n1_status.csv)
+combines that scan with the earlier training/pilot snapshots. New candidate
+flags are diagnostic, not confirmed registry exclusions. This audit does not
+change `post_training_checked` or the sorting statuses in this inventory.
+Q62 is marked
 `suspended_training_q62`, not as an active training shot: its 249 reviewed
 rows remain in the v3 snapshot, but it is excluded from the active list while
 its upper continuum is considered suspect.

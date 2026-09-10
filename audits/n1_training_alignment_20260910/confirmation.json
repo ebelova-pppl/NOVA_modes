@@ -1,0 +1,21 @@
+{
+  "confirmed_shots": [
+    "nstx_135388",
+    "nstxuG121123B12",
+    "nstxuG142301W29",
+    "nstxuG142301Y93"
+  ],
+  "ntor": 1,
+  "archived_training_rows": 63,
+  "archived_validity": {
+    "bad": 63
+  },
+  "training_before_sha256": "0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a",
+  "training_after_sha256": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+  "archived_rows_sha256": "ae77c3a85e4247272a2ceca565e68e94e567dcf3d055cd9353a1dbf045cd7948",
+  "registry_before_sha256": "0809ed5dbcc546f78586f3cff4795bdbeb42bac0e914776c3145d2ed55bf51cf",
+  "registry_after_sha256": "2b3507afcc29fd2a3cf60e8e6885cacf043061b5f46df13b1e2a05427865d407",
+  "active_rows_before": 2390,
+  "active_rows_after": 2327,
+  "unchanged_retained_rows": true
+}

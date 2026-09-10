@@ -62,8 +62,12 @@ For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
 
 The current canonical/default good/bad training list is
-`training_labels/tae_like_train.csv`. It contains 2,390 rows from 14 shots,
-with 575 GOOD and 1,815 BAD labels. Q62 is suspended pending correction of its
+`training_labels/tae_like_train.csv`. It contains 2,327 rows from 14 shots,
+with 575 GOOD and 1,752 BAD labels. The user-confirmed N1 exclusions in
+135388/W29/Y93/B12 account for 63 archived BAD rows in
+`audits/n1_training_alignment_20260910/suspended_training_n1.csv`.
+Existing RF/CNN checkpoints retain their earlier training provenance.
+Q62 is suspended pending correction of its
 suspect upper continuum boundary; its 249 reviewed rows remain preserved in
 the complete 15-shot `training_labels/tae_like_v3.csv` snapshot. Older
 four-shot TAE-only and mixed TAE/EAE lists are archived under
@@ -1199,6 +1203,28 @@ are not lost.
 ---
 
 ## Extended continuum noise gate and calibration
+
+For a separate input-consistency check, the
+[training N1 alignment audit](../audits/n1_training_alignment_20260910/README.md)
+compares shared-loader continuum crossings with singularity radii in
+frequency-matched NOVA `out_go`/`out_go_prev` records. It records missing/empty
+or conflicting logs and compares N2 controls without changing mode labels,
+rules, or input exclusions. The README provides scan, plot and viewer commands.
+The [27-shot pilot follow-up](../audits/n1_pilot_alignment_20260910/README.md)
+reuses the same measurements, adds explicit handling of live recalculations,
+and records the new candidates for user review. Only the four user-confirmed
+training N1 scopes have been added to the input registry.
+
+**Further production sorting is paused** pending input-consistency review and
+correction. The [remaining-database audit](../audits/n1_database_alignment_20260910/README.md)
+scans the other 159 inventory shots with N1/N2 controls, using
+`audits/n1_database_alignment_20260910/check_database.py`. It preserves missing,
+incomplete and changing-input cases, and reuses snapshots only after checking
+source hashes and file inventories. The new scan contains 11,716 modes, all
+nr=201, and 21 priority shot candidates. Its all-200 table includes the earlier
+training/pilot snapshots with explicit provenance. No new rules, labels or
+validity exclusions are applied by this audit. Commands and review lists are
+in its README; `post_training_checked` retains its production-sorting meaning.
 
 `audit_continuum_noise.py` measures signed `h=diff(mode,n=2)/4` energy in
 each connected outside-TAE-gap region using shared preprocessing and

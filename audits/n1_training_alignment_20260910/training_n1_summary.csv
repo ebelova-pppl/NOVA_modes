@@ -1,0 +1,15 @@
+shot,ntor,n_modes,n_matched,n_no_frequency_match,n_incomplete_or_conflicting,n_input_errors,n_modes_with_matched_interior_crossings,n_interior_crossings,median_signed_grid,median_abs_grid,fraction_abs_gt_2,fraction_positive,p90_abs_grid,interpretation
+nstx_120113,1,38,1,37,0,0,1,1,1.0436719133031458,1.0436719133031458,0.0,1.0,1.0436719133031458,LIMITED_LOG_COVERAGE: 37/38 training modes lack matching log frequency; three plotted examples show structure near crossings.
+nstx_135388,1,36,36,0,0,0,30,41,3.782510782698467,4.898831560582928,0.926829268292683,0.6829268292682927,7.094686098104747,PRIORITY_REVIEW: repeated lower-boundary mismatch; sampled upper-boundary crossings can align.
+nstx_141711,1,11,10,1,0,0,10,10,-1.8350657264064152,1.8350657264064152,0.5,0.0,9.973465236708435,SECONDARY_REVIEW: modest systematic inward offsets plus one crossing with no nearby logged singularity.
+nstxuE202855A01t020,1,6,0,0,0,0,0,0,,,,,,NO_TRAINING_CROSSINGS: all six training modes and matching logs have no crossings/singularities.
+nstxuE204669M03t025,1,32,28,0,0,0,28,28,0.5545727633818692,0.5545727633818692,0.0,1.0,1.0141165694030692,NO_SYSTEMATIC_OFFSET_FOUND: all 28 informative training crossings within two grid intervals; four modes have no crossings.
+nstxuE205052A01t022,1,34,31,0,0,0,31,31,1.21971452401059,1.21971452401059,0.03225806451612903,0.967741935483871,1.2659261273994027,NO_SYSTEMATIC_OFFSET_FOUND: 30/31 informative training crossings within two grid intervals; three modes have no crossings.
+nstxuG121123B12,1,2,2,0,0,0,2,4,-60.01993503222112,60.01993503222112,1.0,0.0,103.8579032313603,"SPARSE_SUSPICIOUS: two N1 training modes; N2 also shows large discrepancies, so issue is not isolated to N1."
+nstxuG121123J38,1,9,9,0,0,0,0,0,,,,,,NO_INTERIOR_TRAINING_CROSSINGS: nine matched modes; crowded outer crossings excluded from primary screen.
+nstxuG121123K51,1,0,0,0,0,0,0,0,,,,,,NO_N1_TRAINING_MODES
+nstxuG133964S31,1,0,0,0,0,0,0,0,,,,,,NO_N1_TRAINING_MODES
+nstxuG142301H47,1,1,0,0,0,0,0,0,,,,,,SPARSE_LOG_CONTINUUM_DISAGREEMENT: one N1 training mode; zero logged singularities but one datcon crossing.
+nstxuG142301W29,1,14,14,0,0,0,14,16,5.954747124274196,6.488474568334168,1.0,0.875,67.77646142752958,PRIORITY_REVIEW: all 14 upper-boundary crossings shifted outwards by 5.12-10.96 grid intervals.
+nstxuG142301Y93,1,11,11,0,0,0,11,22,2.4583485230065816,5.485785187959708,0.9545454545454546,0.5909090909090909,7.251472508362821,PRIORITY_REVIEW: repeated offsets on inner and outer branches; signed average can cancel.
+nstxu_204202,1,0,0,0,0,0,0,0,,,,,,NO_N1_TRAINING_MODES_OR_RAW_MODES

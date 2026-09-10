@@ -3,6 +3,149 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-10 production sorting paused for database-wide N1 audit
+
+- The user requested checking the rest of DiTw before further rules sorting.
+  Pause additional production sorting while continuum/eigenmode consistency
+  is being audited and affected inputs corrected. Diagnostic scans remain active.
+- The 200-shot inventory contains 159 shots beyond the 14 active training
+  shots and 27 pilots. The new audit reuses the same signed-mode/continuum
+  loaders and frequency-matched log comparison, including N2 controls, per-group
+  fingerprints and resumable snapshots. No new rejection rule or automatic
+  validity exclusion is being introduced.
+- Completed the remaining 159-shot N1/N2 scan: 318 groups, no group/input
+  errors, 11,716 modes (6,404 N1 / 5,312 N2), all nr=201. Reverified 12,376
+  source hashes after plotting. Shared continuum preprocessing changes zero
+  samples at 0.03<=r<0.75 across all 313 populated groups, so it does not
+  cause the interior offsets. Twelve focused tests pass, including cache
+  invalidation and live-inventory changes.
+- New priority review: 13 G shots with repeated TAE-side discrepancies
+  (Q62, R42, B37, B85, D46, E55, E77, F62, F83, K79, L89, M32, U85),
+  six sparse G candidates (N22, N75, U37, E34, F66, S94), and two E shots.
+  E202806A02t045/N1/3772,4129 has sharp structure near logged r~0.43-0.63,
+  far from datcon upper crossings r~0.18-0.22; N2 also lacks correspondence.
+  E205059A01t025 has a smaller repeated upper-branch offset: 48 crossings
+  outward by 1.45-3.44 intervals, 35 exceeding two; three lower crossings align.
+  These are review candidates, not new user-confirmed invalid inputs.
+- R48/U27 need additional branch/EAE-side review: all-raw comparison counts
+  reveal more discrepancies than their small TAE-side subsets. Other secondary
+  cases include local extra crossing pairs absent from logs, modest subset
+  offsets, and incomplete/missing logs. E203655F01t017 has seven incomplete
+  TAE-side N1 log blocks out of eight modes; M21 has 97/99 unmatched raw N1
+  frequencies and 242 incomplete N2 records. No usable comparison is not a pass.
+  N2 can also be affected: N75 41/41, R42 48/55, F62 37/50 interior TAE-side
+  comparisons exceed two intervals. Nearest-log distance does not identify
+  a branch; missing counterparts must not be described as measured translations.
+- Compact evidence in [the database audit](../audits/n1_database_alignment_20260910/README.md):
+  159-shot N1/N2 summaries, 21 priority shots, 87 selected review modes and
+  235 crossing rows. The all-200 table combines these new results with the
+  earlier 14 training/27 pilot snapshots and records cohort/root/time; it is
+  not a fresh live scan of all 200. Runtime mode tables, snapshots, hashes and
+  45 plot pages are ignored under `outputs/review_n1_database_alignment_20260910/`.
+- No further sorting, model refresh, training edits or new registry exclusions.
+  Main inventory `post_training_checked` flags retain their sorting meaning.
+  Next: user adjudication, paired upstream input/log correction, and repeat
+  alignment checks before production sorting resumes. C50 remains excluded
+  pending a stable corrected run and review.
+
+## 2026-09-10 clarification of the two E-shot alignment flags
+
+- Rechecked exact saved inputs and signed profiles for E204707A04t030
+  N1/4123 and E204944A01t017 N1/1659, with neighboring modes. No systematic
+  N1 shift was found in the 12 E shots with usable interior comparisons;
+  five other E shots supplied no usable interior comparison.
+- 4123 is marginal: logged radius 0.565 versus datcon 0.575223 gives
+  2.045 intervals, while the nearby sharp signed-profile feature is at
+  0.570. Neighboring 4112/4133 offsets are 1.10/1.95 intervals.
+- 1659's main crossing at 0.690451 matches logged 0.685 within 1.09
+  intervals. A shallow continuum dip produces an extra crossing pair at
+  0.746120/0.755657, absent from the log; the mode has sharp structure near
+  0.755. The 12.22-interval nearest-log metric compares different features
+  and is not evidence that the same resonance shifted. The local dip is
+  unchanged by continuum preprocessing. Cause of the log/continuum discrepancy
+  remains unresolved. Original numerical audit rows are retained; explanatory
+  notes and two additional plot pages are saved. No rules or exclusions changed.
+
+## 2026-09-10 confirmed training N1 exclusions and pilot alignment follow-up
+
+- User confirmed N1 continuum/mode mismatch in nstx_135388, G142301W29,
+  G142301Y93 and G121123B12. Added exact shot/N1 exclusions to the shared
+  known-invalid registry. Archived their 63 active training rows, all previously
+  BAD, unchanged in `audits/n1_training_alignment_20260910/suspended_training_n1.csv`.
+  Active list is now 2,327 rows, 575 GOOD / 1,752 BAD, across the same 14 shots;
+  all other rows are byte-preserved. Main/G inventory counts and notes updated.
+  Existing models and v1/v2 training-shot exports retain their historical
+  provenance; this diagnostic task did not retrain or regenerate them.
+- Applied the same log screen to all 27 pilot shots with N2 controls. Stable
+  results contain 2,541 modes (1,451 N1 / 1,090 N2), all nr=201. C50/N1 changed
+  during both attempts; its group is explicitly inconclusive and excluded from
+  numerical comparison. Other 53 groups completed, saved independently.
+- New priority N1 review: K34 24/24 interior TAE-side crossings beyond two
+  intervals (16 modes); U84 20/22 (11 modes). Signed-profile samples support
+  displaced structure. Sparse candidates E72 4/4 (two modes) and L94 2/2
+  (two modes) also look suspicious. K70 has no interior crossings but 8/11
+  outer crossings beyond two intervals at r=0.888–0.965. No repair samples
+  change in the primary region for the four candidates, or anywhere in K70.
+- Across 12 E shots with informative N1 comparisons, 167/169 interior
+  crossings lie within two intervals. Exceptions: E204707A04t030 N1/4123
+  at 2.045 intervals, E204944A01t017 N1/1659 at 12.22 near r=0.746. These
+  are isolated findings, not evidence of a repeated shot-wide shift.
+- H56/N1 has inconsistent declared/printed singularity counts in all 384
+  raw matched records (78 TAE-side); partial radii excluded. N80's eight
+  TAE-side N1 modes lack exact-frequency logs. Plots expose these limitations.
+  N2 also warrants review in some G cases (K34 28/40, K70 8/8, V21 5/5
+  beyond two intervals); N2 is not assumed correct. No new pilot exclusions
+  applied. C50/N1 and whole-shot R06 exclusions remain active.
+- Eight focused input-validity/log-comparison tests pass. Compact pilot
+  evidence is in `audits/n1_pilot_alignment_20260910/`: 27-shot summaries,
+  44 review modes, 66 crossing rows, plot selections and receipt. Full
+  coverage/hashes/group snapshots and seven plot pages stay ignored under
+  `outputs/review_n1_pilot_alignment_20260910/`. The renderer now covers
+  r=0..1 and explicitly omits/labels incomplete or missing log evidence.
+- Next: user adjudication of K34/U84, sparse E72/L94 and outer K70; investigate
+  H56 logs and obtain matching N80 records; recheck C50 after recalculation.
+
+## 2026-09-10 training N1 continuum / eigenmode-log alignment screen
+
+- Added a separate read-only audit under `audits/n1_training_alignment_20260910/`.
+  Match binary omega squared to NOVA `out_go`/`out_go_prev` frequencies within
+  relative 1e-12; compare shared-loader datcon crossings to the nearest logged
+  singularity. Check completeness/conflicts and retain explicit empty/missing
+  log statuses. Primary region is 0.03<=r<0.75; two grid intervals (0.01 at
+  nr=201) are a review tolerance, not a new validity gate. Nearest matching
+  does not identify a continuum branch; signed means can hide opposite offsets.
+- Scanned canonical `data_mixed` N1/N2 inputs in all 14 active training shots,
+  with logs from live DiTw: 990 N1 + 577 N2 modes, all nr=201. Among 194 N1
+  training rows, 142 have nonempty matching logs, 14 have matching empty lists,
+  and 38 lack exact-frequency records. 127 modes supply 153 interior crossings.
+  Every training mode with a nonempty matched N1 log equals the live mode bytes.
+- Priority review: 135388 has 38/41 training interior crossings beyond two
+  intervals (30 informative modes), W29 16/16 (14 modes), Y93 21/22 (11 modes).
+  Signed-profile examples independently show sharp structure near log radii
+  displaced from datcon crossings. 135388's lower branch is affected while
+  sampled upper crossings align; this is not necessarily a constant radial
+  translation. W29's 14 outer upper crossings are 5.12–10.96 intervals outward.
+- Secondary/sparse evidence: 141711 has 5/10 beyond two intervals; both B12
+  N1 training modes show large discrepancies; H47's single N1 training mode
+  has a crossing despite zero logged singularities. N2 discrepancies in B12,
+  H47, W29, J38 and K51 mean that some issues may extend beyond N1. N2 itself
+  is not assumed valid. The cause and scope of any invalidation remain unadjudicated.
+- E204669M03t025 has 0/28 crossings beyond two intervals; E205052A01t022 1/31.
+  120113 has only one of 38 training frequencies in the available logs; three
+  plotted training examples align visually, but coverage remains limited.
+  E202855's six training modes have no crossings, J38 no interior crossings,
+  and K51/S31/204202 no N1 training rows. Missing evidence is not a pass.
+- The current continuum repair changes no interior samples in any of the
+  13 populated N1 directories. Four focused tests pass; no parsing conflicts,
+  incomplete matched blocks or input errors occur in the scan. Compact summaries,
+  153 crossing rows, a 61-mode review list and provenance receipt are versionable;
+  full hashes/coverage, logs and eight plot pages remain ignored under
+  `outputs/review_n1_training_alignment_20260910/`. No training labels, registry
+  exclusions, production code or external sorting outputs changed. C50/N1 stays
+  excluded pending separate review of its recalculated inputs.
+- Next: user review of the priority branches and corresponding NOVA inputs;
+  extend the log screen to other database shots after adjudicating these cases.
+
 ## 2026-09-10 normalized severity and rules-only representative ranking (v11)
 
 - Implemented first-class normalized gate severity in shared `src/rule_severity.py`.
@@ -1658,8 +1801,9 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 - Active version-controlled training list:
     - canonical active list: `training_labels/tae_like_train.csv`
     - derived from the preserved `training_labels/tae_like_v3.csv` snapshot
-      by excluding all 249 Q62 rows and applying the N9/3737 correction above
-    - 2390 labeled TAE-like modes: 575 `good`, 1815 `bad`
+      by excluding all 249 Q62 rows, applying the N9/3737 correction above,
+      and suspending the 63 confirmed invalid N1 rows from 135388/W29/Y93/B12
+    - 2327 labeled TAE-like modes: 575 `good`, 1752 `bad`
     - 14 active training shots; Q62 is suspended pending correction of its
       upper continuum boundary
     - `configs/paths/nova_paths.nersc.sh`,
