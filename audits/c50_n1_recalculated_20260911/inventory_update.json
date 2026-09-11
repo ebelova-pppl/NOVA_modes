@@ -1,0 +1,18 @@
+[
+  {
+    "path": "audits/main_dataset_shots/shot_status.csv",
+    "changed_rows": [
+      "nstxuG142301C50"
+    ],
+    "sha256_before": "872a04f0884d6c2ec43607a16c6c3eaba26d73f5415e74d662f02346f7de3fee",
+    "sha256_after": "330d1d1e04de03c7220101974c28d891a91f9aff41d1530068e85f4050af21f2"
+  },
+  {
+    "path": "audits/main_dataset_shots/g_shot_status.csv",
+    "changed_rows": [
+      "nstxuG142301C50"
+    ],
+    "sha256_before": "d003fa5c3842a73707ac24b952771d760c93dfda90ea4721b3dd6d1467ce8c44",
+    "sha256_after": "372311fbae16b6a2509346ea1b1f2ab52479c99bd7ed89ccb45c94a178d50431"
+  }
+]

@@ -14,16 +14,22 @@ post-training cases for rules-versus-RF-CNN comparison.
   sampled with seed 20260908 and compared using frozen v5 plus the active
   RF/raw-CNN models. Its candidate pools, one preflight replacement, input
   provenance, and comparison results are stored in that compact audit.
+- `../pilot12_v11_20260910/selection.csv` records twelve additional E shots,
+  seed 20260910, selected using N1/N2 alignment evidence while problem inputs
+  are recalculated. Both methods completed and their outputs are installed;
+  the new audit contains 144 disagreements among 1,817 TAE-side modes.
 - `active_training_shot=yes` means the shot occurs in the canonical
   `training_labels/tae_like_train.csv` list. The three label-count columns
   are derived from that file.
 - `post_training_checked=yes` is intentionally narrower: it marks only new
   cases already run and compared with both `rules` and `rf-cnn`. The complete
-  inventory currently marks 27 post-training cases: the original E case and
+  inventory currently marks 39 post-training cases: the original E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
-  and the twelve fresh v5 cases completed on 2026-09-08.
+  the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
+  completed with v11 and RF/raw-CNN on 2026-09-10. Checked denotes completed
+  processing/comparison; the latest disagreements still await visual review.
 
-All 27 checked cases were subsequently regenerated with v6 routing and the
+All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
 RF-CNN exports are current in the user-selected output roots, with previous
 shot directories retained under `before_continuum_tail_20260908/` in each
@@ -45,8 +51,13 @@ Main/G inventories retain the other-n training membership and updated counts.
 See the [confirmation](../n1_training_alignment_20260910/README.md) and
 [27-shot diagnostic follow-up](../n1_pilot_alignment_20260910/README.md).
 
-Further production sorting is paused as of 2026-09-10 while continuum/eigenmode
-consistency is reviewed and affected inputs corrected. The
+The full-database rollout is paused as of 2026-09-10 while continuum/eigenmode
+consistency is reviewed and affected inputs corrected. A subsequent
+user-authorized twelve-shot comparison is complete on previously unchecked
+E shots with usable N1/N2 alignment evidence;
+`../pilot12_v11_20260910/` records this limited resumption, verified output
+installation and the exact twelve inventory rows changed. Unresolved input
+scopes remain on hold. The
 [remaining-database audit](../n1_database_alignment_20260910/README.md) scanned
 N1/N2 in the other 159 shots; its
 [all-200 N1 table](../n1_database_alignment_20260910/all_200_n1_status.csv)
@@ -74,13 +85,22 @@ the next large-G candidate, `nstxuG142301U84`, replaced it. Active training
 counts include the previously requested N9/3737 label correction.
 
 On 2026-09-09 the user invalidated all 73 C50 N1 modes for a confirmed
-continuum/eigenmode inconsistency. The shared input-validity registry enforces
+continuum/eigenmode inconsistency. The shared input-validity registry enforced
 that scope in both sorting methods. Both C50 exports were refreshed with
 checked backups under `before_c50_n1_invalid_20260909/`; N2–N10 rows are
 unchanged. That comparison had **232 disagreements** at
 `../c50_n1_alignment_20260909/current_disagreements.csv`. This subset exclusion
 does not change the 27-shot checked membership. NOVA calculates eigenfrequencies
 and eigenmode structure; the diagnostic log is an eigenmode-calculation log.
+
+On 2026-09-11 the user accepted the recalculated 18-mode C50/N1 set and
+its registry exclusion was removed. The production rules output was
+regenerated: 10 N1 EAE-like and 8 N1 TAE-like BAD, with all 538 N2–N10
+rows exactly unchanged. The preceding rules output is backed up under
+`before_c50_n1_restored_20260911/`. Both inventory notes record the resolution;
+checked membership remains 39. C50 RF-CNN output and existing disagreement
+lists still describe historical inputs. See the
+[correction review](../c50_n1_recalculated_20260911/README.md).
 
 Later on 2026-09-09 the user invalidated the whole `nstxuG133964R06` shot:
 poor eigenmode structures throughout and spectra peaking at the largest

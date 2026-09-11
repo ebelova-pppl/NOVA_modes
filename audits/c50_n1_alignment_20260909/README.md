@@ -1,6 +1,9 @@
 # C50 N1 continuum / eigenmode-run inconsistency, 2026-09-09
 
-**Status: user-approved INVALID for all 73 C50 n=1 modes.**
+**Historical status: user-approved INVALID for the original 73 C50 n=1 modes.**
+On 2026-09-11 the user accepted the recalculated 18-mode N1 set and the
+registry exclusion was removed. See the [correction review](../c50_n1_recalculated_20260911/README.md).
+The measurements and invalidation receipts below describe the original inputs.
 
 Terminology correction: NOVA calculates eigenfrequencies and eigenmode
 structure. The earlier description of its run as a stability calculation

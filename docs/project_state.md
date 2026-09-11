@@ -1,7 +1,81 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-10)
+### Project state (current snapshot, updated 2026-09-11)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-11 recalculated C50/N1 accepted by user
+
+- The user reports C50/N1 has been recalculated and requested a rules rerun
+  or a raw mode list for inspection. Created the frequency-ordered,
+  unlabeled [current N1 list](../audits/c50_n1_recalculated_20260911/current_n1_modes.csv)
+  covering all 18 files now in DiTw, without gap routing.
+- All 18 load with finite signed structure and eigenfrequency, ntor=1,
+  nr=201 and 25 stored harmonics. The shared continuum loader and viewer CSV
+  reader succeed. Source inventory and hashes were stable during the check.
+- Eight files match the mode/continuum fingerprints in the last installed
+  rules snapshot; ten filenames are new since that partial-run snapshot.
+  None reuses a filename from the original 73-mode invalidated set, whose
+  filenames are all absent now. Evidence and viewer command are in
+  [the review-list README](../audits/c50_n1_recalculated_20260911/README.md).
+- The user subsequently confirmed: "Now C50/N1 Looks ok to me."
+  Rechecked all 18 reviewed mode/continuum fingerprints and removed only the
+  C50/N1 registry exclusion. The four other N1 exclusions and whole-shot R06
+  exclusion remain active. This accepts the corrected inputs for normal
+  classification; it does not label every eigenmode GOOD.
+- The existing input-validity tests now use still-excluded B12 as their
+  per-N fixture and explicitly check C50/N1 is cleared. All four tests pass.
+- Regenerated C50 with production v11 and separately ran the requested
+  `sort_shot_rules.py` calibration on N1 using the same configuration.
+  All 18 N1 inputs are valid: 10 EAE-like and 8 TAE-like, of which seven
+  fail `BAD_AXIS_SPIKE` and N1/5347 fails `BAD_CONT_CROSS_WINDOW`.
+  Calibration and production routing/gates agree; no N1 TAE survivor.
+- Published the verified rules output to the existing C50 `sort_outputs/`
+  directory, preserving its predecessor under `before_c50_n1_restored_20260911/`.
+  All 538 N2–N10 audit rows are exactly unchanged. The whole shot now has
+  556 inputs, 202 TAE-side BAD, 354 EAE-like, no INVALID, no final GOOD,
+  complete severity reports and no resolution warnings. Inputs remained
+  stable throughout the run. See the review audit's classification CSV and
+  restoration verification/publication receipts.
+- Both shot inventories record the resolved C50/N1 scope; checked membership
+  remains 39. RF-CNN exports and disagreement lists retain their historical
+  inputs; this refresh reran only rules. Other problem scopes remain on hold.
+
+## 2026-09-10 limited comparison resumes while N1 recalculations continue
+
+- The user authorized another twelve-shot rules versus RF-CNN comparison
+  while the N1 problem cases are recalculated. This supersedes the blanket
+  pause for this selected batch; unresolved input scopes remain on hold.
+- Select previously unchecked E shots with distinct discharge numbers absent
+  from training and the earlier pilots. Require usable N1 and N2 comparisons,
+  no interior offsets beyond the audit tolerance across either TAE-side or
+  all-raw cohorts, complete matching log coverage, and no interior crossings
+  in empty-log modes. Exclude entire E discharge series containing a new
+  priority N1 case, known invalid/suspended inputs, and existing output paths.
+- Completed `audits/pilot12_v11_20260910/`: seed 20260910 draws two high,
+  four low and six medium-size shots from 27 eligible time slices / 16 unseen
+  E discharges. All 6,697 N1-N10 inputs passed shared preflight, all nr=201,
+  with no invalid files or replacements. N1/N2 mode/continuum/log bytes still
+  match the alignment audit. No gate, model or label tuning was performed.
+- All 24 rules-v11 / RF-raw-CNN runs completed and passed paired coverage,
+  routing, scalar, fingerprint and score checks. Every rule severity is
+  complete; no resolution/ranking fallback or inference warning occurred.
+  Both methods route 1,817 modes to the TAE side and 4,880 to EAE-like.
+  Rules retain 699 GOOD before deduplication / 694 final; AI retains 767 / 762.
+- The new list has 144 disagreements (7.93%): 106 rules-BAD/AI-GOOD and
+  38 rules-GOOD/AI-BAD. Standalone comparisons at p_good>=0.5 give 150
+  rules-vs-RF and 163 rules-vs-CNN disagreements. These are unadjudicated
+  agreement statistics, conditional on the E-shot input-consistency screen.
+- Installed and tree-hash verified all 24 new shot folders in the previously
+  requested `sort_outputs/` and `sort_outputs_ai/` roots. Existing folders
+  were not replaced. Exactly twelve main-inventory E rows are now checked,
+  increasing checked membership from 27 to 39; all other rows, the G-only
+  inventory, training list, invalid registry and model files are unchanged.
+  Compact evidence is in [the new pilot audit](../audits/pilot12_v11_20260910/README.md);
+  full staged exports/preflight tables/logs are ignored under
+  `outputs/review_pilot12_v11_20260910/`.
+- Next: user inspection of the new disagreement list and some agreements
+  before extending sorting further. N1 recalculations and unresolved input
+  scopes remain on hold.
 
 ## 2026-09-10 production sorting paused for database-wide N1 audit
 

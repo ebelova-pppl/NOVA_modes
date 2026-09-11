@@ -19,10 +19,14 @@ canonical `training_labels/tae_like_train.csv` in the same checkout.
 
 `make_tae_like_list.py`, `sort_shot_rules.py`, and both methods of
 `sort_shot_mixed.py` use the shared `src/input_validity.py` registry reader.
-`configs/known_invalid_inputs.csv` currently invalidates `nstxuG142301C50/N1`
-for continuum/eigenmode mismatch, and the whole `nstxuG133964R06` shot after
+`configs/known_invalid_inputs.csv` excludes N1 in `nstx_135388`,
+`nstxuG121123B12`, `nstxuG142301W29` and `nstxuG142301Y93` for
+continuum/eigenmode mismatch, and the whole `nstxuG133964R06` shot after
 the user's visual assessment of poor eigenmode structures and some spectra
 peaking at the largest retained poloidal harmonic (cause unconfirmed).
+The recalculated C50/N1 inputs were accepted by the user on 2026-09-11 and
+their exclusion removed; subsequent runs route and classify them normally.
+See the [C50 correction review](../audits/c50_n1_recalculated_20260911/README.md).
 It matches the exact shot basename; `ntor` is a positive integer for one n,
 or `*` for every n in a whole shot, including files added later. Whole-shot
 entries take precedence if a per-n entry also exists. Relocating the data
@@ -1215,8 +1219,12 @@ reuses the same measurements, adds explicit handling of live recalculations,
 and records the new candidates for user review. Only the four user-confirmed
 training N1 scopes have been added to the input registry.
 
-**Further production sorting is paused** pending input-consistency review and
-correction. The [remaining-database audit](../audits/n1_database_alignment_20260910/README.md)
+**The full-database rollout remains paused** pending input-consistency review
+and correction. The user-authorized [new twelve-shot comparison](../audits/pilot12_v11_20260910/README.md)
+on E shots selected using N1/N2 audit evidence is complete: 6,697 inputs,
+all nr=201, and 144 disagreements among 1,817 TAE-side modes. Both output sets
+are installed and checked membership is now 39. Unresolved input scopes
+remain on hold. The [remaining-database audit](../audits/n1_database_alignment_20260910/README.md)
 scans the other 159 inventory shots with N1/N2 controls, using
 `audits/n1_database_alignment_20260910/check_database.py`. It preserves missing,
 incomplete and changing-input cases, and reuses snapshots only after checking

@@ -7,13 +7,20 @@ Main context files:
 - `docs/project_state.md` — current project state and model status
 - `scripts/README.md` — detailed script inventory and usage notes
 
-**Further production sorting is paused (2026-09-10)** while DiTw
+**The full-database rollout remains paused (2026-09-10)** while DiTw
 continuum/eigenmode consistency is reviewed and affected inputs corrected.
+A user-authorized twelve-shot rules/RF-CNN comparison is now complete on
+previously unchecked E shots with usable N1/N2 alignment evidence:
+6,697 inputs, all nr=201, and 144 disagreements among 1,817 TAE-side modes.
+See the [new pilot](audits/pilot12_v11_20260910/README.md). Checked membership
+is now 39; unresolved input scopes remain on hold.
 The [remaining-database N1/N2 audit](audits/n1_database_alignment_20260910/README.md)
 scanned the other 159 shots and provides an
 [all-200 N1 status table](audits/n1_database_alignment_20260910/all_200_n1_status.csv).
-New candidates require adjudication; current confirmed input exclusions remain
-unchanged. A diagnostic scan does not mark a shot as production-sorted.
+New candidates require adjudication. C50/N1 was recalculated and accepted by
+the user on September 11; its exclusion has been removed. Other confirmed
+input exclusions remain active. A diagnostic scan does not mark a shot as
+production-sorted.
 
 Current canonical pipelines:
 - `scripts/split_tae_eae.py`
@@ -54,7 +61,7 @@ Plotting:
 - `viz/view_modes_csv.py`
 - `viz/plot_straightened_mode.py`
 
-Known invalid inputs (2026-09-09):
+Input validity (updated 2026-09-11):
 
 - `configs/known_invalid_inputs.csv` records user-approved shot/ntor exclusions;
   `ntor=*` excludes a whole shot across all n.
@@ -62,11 +69,12 @@ Known invalid inputs (2026-09-09):
   routing or classification, retain them in `rejected_modes.csv`, and report
   `n_known_invalid_inputs` in shot/per-n summaries. Diagnostics include the
   issue, reviewer, evidence, and registry hash.
-- All 73 `nstxuG142301C50/N1` modes are INVALID because eigenmode structure
-  does not correspond to the continuum. The exact scope stays excluded on
-  reruns until corrected inputs are reviewed and the registry entry removed.
-  Raw files remain readable for diagnosis. See the
-  [C50 audit](audits/c50_n1_alignment_20260909/README.md).
+- The original 73 `nstxuG142301C50/N1` modes were invalidated for
+  continuum/eigenmode mismatch. The user accepted the recalculated 18-mode
+  set on 2026-09-11, clearing its registry exclusion. These inputs now undergo
+  normal routing and morphology rules. See the
+  [C50 correction review](audits/c50_n1_recalculated_20260911/README.md);
+  the [original audit](audits/c50_n1_alignment_20260909/README.md) is historical.
 - All 610 `nstxuG133964R06` modes are INVALID after the user's visual review:
   poor eigenmode structures throughout, with spectra peaking at the largest
   retained poloidal harmonic in some modes. The cause is unconfirmed. Both

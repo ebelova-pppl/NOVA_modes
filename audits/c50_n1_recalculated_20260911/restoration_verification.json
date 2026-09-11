@@ -1,0 +1,75 @@
+{
+  "verified_at_utc": "2026-09-11T04:53:20.775108+00:00",
+  "reviewer": "user",
+  "review_statement": "Now C50/N1 Looks ok to me.",
+  "scope": "C50/N1 input validity cleared after upstream recalculation; morphology gates still apply",
+  "reviewed_n1_csv_sha256": "faed5268035e1c29250281c79433b15deaeec3d3cf22de14f2f72b8cdfdabaa5",
+  "n1_classifications_csv_sha256": "31c6fa6a205ad5b718d25fa0b6476964b732e39c059ca84185c174b8b193da43",
+  "run_inputs_json": "outputs/review_c50_n1_restored_20260911/run_inputs.json",
+  "run_inputs_json_sha256": "b09672bea0af9178fdd75eb6f34a7af6c696e4832d8a4d5a2ad622012a9e173b",
+  "rule_configuration_sha256": "da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da",
+  "registry_sha256": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+  "remaining_registry_exclusions": 5,
+  "n_modes": 556,
+  "n1_modes": 18,
+  "n2_n10_rows_exactly_unchanged": 538,
+  "n1_gap_counts": {
+    "tae_like": 8,
+    "eae_like": 10
+  },
+  "n1_rule_primary_reasons": {
+    "BAD_AXIS_SPIKE": 7,
+    "BAD_CONT_CROSS_WINDOW": 1
+  },
+  "input_inventory_and_fingerprints_unchanged": true,
+  "calibration_and_production_n1_routing_and_gates_match": true,
+  "all_nr_201": true,
+  "no_resolution_warnings": true,
+  "all_tae_side_severities_complete": true,
+  "input_validity_tests_passed": 4,
+  "old_rules_tree": {
+    "files": 18,
+    "tree_sha256": "46470324e0796341741428b6049638942f504324cdc2eb06e63b12ae5fe26d0b"
+  },
+  "old_ai_tree": {
+    "files": 14,
+    "tree_sha256": "5aa46c99311e447bae48e424c7a1852e1a6073bb9258bbf56e9d193f22f24395"
+  },
+  "verified_rules_tree": {
+    "files": 18,
+    "tree_sha256": "aee30b8b9db53a0d25213d2e237301af56f145f80b644e8b99a7d4234207c6d2"
+  },
+  "verified_calibration_tree": {
+    "files": 18,
+    "tree_sha256": "5a801191631588545991ac8a770844820924f80cd849f67f245692abbe352c93"
+  },
+  "ai_output_status": "Historical, unchanged; C50/N1 RF-CNN was not regenerated in this rules-only task",
+  "summaries": {
+    "rules": {
+      "n_total_files": "556",
+      "n_invalid": "0",
+      "n_tae_like": "193",
+      "n_mixed": "9",
+      "n_eae_like": "354",
+      "n_final_good": "0",
+      "n_final_bad": "202",
+      "n_final_review": "0",
+      "n_severity_complete": "202",
+      "duplicate_processing_status": "SKIPPED_NO_GOOD_MODES",
+      "rule_survivor_policy": "accept-as-good-v1"
+    },
+    "calibration_n1": {
+      "n_total_files": "18",
+      "n_invalid": "0",
+      "n_tae_like": "8",
+      "n_mixed": "0",
+      "n_eae_like": "10",
+      "n_final_good": "0",
+      "n_final_bad": "8",
+      "n_final_review": "0",
+      "n_severity_complete": "8",
+      "duplicate_processing_status": "SKIPPED_NO_GOOD_MODES",
+      "rule_survivor_policy": "review"
+    }
+  }
+}

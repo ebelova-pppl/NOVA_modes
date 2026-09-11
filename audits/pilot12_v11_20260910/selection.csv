@@ -1,0 +1,13 @@
+shot,shot_family,E_series,input_modes,size_bin,stratum_rank,selection_status,notes
+nstxuE205055A01t022,NSTX-U E,205055,1017,high,1,completed,
+nstxuE203656A02t030,NSTX-U E,203656,947,high,2,completed,
+nstxuE204678M01t017,NSTX-U E,204678,302,low,1,completed,
+nstxuE205042A01t022,NSTX-U E,205042,259,low,3,completed,
+nstxuE202947A03t015,NSTX-U E,202947,188,low,4,completed,
+nstxuE202926A03t025,NSTX-U E,202926,330,low,5,completed,
+nstxuE204636A01t020,NSTX-U E,204636,648,medium,2,completed,
+nstxuE203653A02t025,NSTX-U E,203653,406,medium,3,completed,
+nstxuE203981A01t025,NSTX-U E,203981,692,medium,4,completed,
+nstxuE204955F02t017,NSTX-U E,204955,680,medium,5,completed,
+nstxuE202944A02t021,NSTX-U E,202944,670,medium,8,completed,
+nstxuE203655F01t025,NSTX-U E,203655,558,medium,11,completed,

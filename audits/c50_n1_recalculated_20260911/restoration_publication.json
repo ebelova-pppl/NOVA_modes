@@ -1,0 +1,15 @@
+{
+  "published_at_utc": "2026-09-11T04:54:04.990576+00:00",
+  "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301C50",
+  "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_c50_n1_restored_20260911/nstxuG142301C50",
+  "verified_installed_tree": {
+    "files": 18,
+    "tree_sha256": "aee30b8b9db53a0d25213d2e237301af56f145f80b644e8b99a7d4234207c6d2"
+  },
+  "verified_backup_tree": {
+    "files": 18,
+    "tree_sha256": "46470324e0796341741428b6049638942f504324cdc2eb06e63b12ae5fe26d0b"
+  },
+  "verification_json_sha256": "dd8f5b95bc8c7f46ffe9e99e1e6e8f38be8e509decf62646037ac2b217ad805c",
+  "ai_output_unchanged": true
+}

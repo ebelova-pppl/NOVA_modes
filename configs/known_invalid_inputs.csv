@@ -1,5 +1,4 @@
 shot,ntor,issue_id,reason,reviewer,review_date,evidence
-nstxuG142301C50,1,CONTINUUM_MODE_MISMATCH,User invalidated all n=1 modes because eigenmode structure does not correspond to the continuum; paired upstream correction and review required.,user,2026-09-09,audits/c50_n1_alignment_20260909/README.md
 nstxuG133964R06,*,SUSPECT_EIGENMODE_STRUCTURE,User invalidated the whole shot after visually finding poor eigenmode structures throughout and poloidal harmonic spectra peaking at the largest retained m in some modes; cause unconfirmed; corrected inputs and review required.,user,2026-09-09,audits/r06_input_validity_20260909/README.md
 nstx_135388,1,CONTINUUM_MODE_MISMATCH,User confirmed the n=1 continuum/eigenmode resonance-location mismatch; corrected paired inputs and review required.,user,2026-09-10,audits/n1_training_alignment_20260910/README.md
 nstxuG121123B12,1,CONTINUUM_MODE_MISMATCH,User confirmed the n=1 continuum/eigenmode resonance-location mismatch; corrected paired inputs and review required.,user,2026-09-10,audits/n1_training_alignment_20260910/README.md

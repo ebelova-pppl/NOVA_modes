@@ -1,0 +1,86 @@
+{
+  "seed": 20260910,
+  "quotas": [
+    [
+      "high",
+      2
+    ],
+    [
+      "low",
+      4
+    ],
+    [
+      "medium",
+      6
+    ]
+  ],
+  "created_utc": "2026-09-10T22:24:46.671163+00:00",
+  "source_commit": "9ef0ed0301de42cec823be4f668629c2b4dd98e2",
+  "selection_method": "Shuffled sorted size strata; high then low then medium; unique unseen E discharges; no model scores consulted.",
+  "input_data_root": "/p/nstxdigtwin/energetic_particles/nova/DiTw",
+  "rules_output_root": "/p/hym/ebelova/NOVA/sort_outputs",
+  "ai_output_root": "/p/hym/ebelova/NOVA/sort_outputs_ai",
+  "source_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/configs/rules/tae_rules_production_v11.yaml": "da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/pilot12_v11_20260910/run_pilot.py": "f58621cc0191813905d63146fcb306bcb5138247d33dd1c61397fb44bdc3bef1",
+    "/p/hym/ebelova/NOVA/NOVA_modes/models/nova_mode_classifier.joblib": "b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c",
+    "/p/hym/ebelova/NOVA/NOVA_modes/models/nova_cnn_raw.pt": "872909ebd382a560d3cb9ed9b323034ac0d4fedd87ea3a93d31ca104d1044c7e",
+    "/p/hym/ebelova/NOVA/NOVA_modes/training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "/p/hym/ebelova/NOVA/NOVA_modes/configs/known_invalid_inputs.csv": "2b3507afcc29fd2a3cf60e8e6885cacf043061b5f46df13b1e2a05427865d407",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/cont_features.py": "32bbdb82d63c4c4d333e930335927573b7eb50f6ef67138a3a992c7ad50db27b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/continuum_noise.py": "4456203e61330b9069cb73f6336d2cdb54e233e7eb0ed1a43c1cf538ff6b7719",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/input_validity.py": "01ac8d455ac1d46795793f105c921944bbb32144038e36f7502a90df605e14f7",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/mode_csv.py": "c6a7955a400d140dcd8569632c1dea7912d26b5bbf64dd925d8f13b95e4e605e",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/mode_features.py": "b611cdd8f06111c3621d0e3063c804115582f60876fdb60269975918c309404b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/mode_transform.py": "42b75fe7a3e3a23a944fab65e92ebd35d20e7d114c8798ba6b629b3a4c257c31",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/path_utils.py": "a641b479d3446c75528157905eeedccc3c8d4a8d4be46e28a9f213129b2d0352",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/paths.py": "d91b4c55853ec1b919466c72398b146baf675d273302495c523186b929ec1ab0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/rule_severity.py": "748637b3df250e41b89edcb26bff0acd0b5beea25743784e17c01d1d328d9698",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/tae_eae_features.py": "4604dfed38b73aa0762ce275176cb625f08b436e12efc0fe1565c4cc2a3e8348",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/_repo_bootstrap.py": "c8c2606b13516da822171f0ba0345390ab3848c964476c109ff7206ea87e92f9",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/audit_continuum_noise.py": "e80f53f7d97f5e670c3341dabfbba297ac6bc6197d95dbd894150f4378f38558",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/audit_training_provenance.py": "8f1f68c7f0537965c32b397e84ed07b1a9ca4aaa679bdd0155de130105fc45c0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/cnn_classify.py": "a84356cd751f6e8a6d9cac434d1d5c470e407754b29f2fe1f623c8bc952cf9b7",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/cnn_hybrid.py": "b834b1bd9ddf58dcca9b0fba71c7e65761c8146d74a61f9064e2447d4ceaa835",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/cnn_infer_common.py": "8f35d26ee8f278367b9e5724b33e15a7c89df083716fd5a33f0ec22454b7a0f0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/cnn_raw.py": "d634f5a7b29dc0b196f180d40b017d4afd51aa57689c36c863afe888e2b2ce45",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/cnn_raw_classify.py": "748e9ddf39d0f48d075f3f223f4002a0505c6d36c937f0c0c92edcdb7c056775",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/cnn_straightened.py": "2379e2bf354d5683a26dd0312244dfd6a86863be38a2b08e199d4840be5ef1f6",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/label_modes_fast.py": "0755b28de874f26a8f063acdadaa2b6bc317446a6bdc797ed599c70daefd12b1",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/rf_oof_check.py": "c313fa59ddfcc84c96bb57d461ffe43b08608bd1c69897bf1134554255cae745",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/rf_train_classify.py": "0cb9aa0828a7292e6904c24ee943ac54e34e2bbdb0dfc300cfbeed9733c618a7",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/run_loso_10.py": "72f3e7844a1676ad6ad2c673126a1ca215f2a2955e8cb5173fb9e793c7b908df",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/sort_shot.py": "76d3920633b8aa9d3df1d174ab6aa76724163c2a429c7250318f730e73e3f7bf",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/sort_shot_mixed.py": "967a3d8224420c1f20750359e7c67aa3adf1d8588853373a4a3a659452158dba",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/sort_shot_rules.py": "650c1ec1491e6b55da7c864b8c47aed9319d4f899a15f0e260407d8d39ab725b",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/split_tae_eae.py": "3da696bf8d66716f754ff63603c1281a38f2d0c54deca467786db03b3731efff",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/tae_rule_config.py": "04bbe91b29b8f172f9f8526e7a31b668f0e725f2908ec609baea51ee37b31b52",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/tae_rule_engine.py": "a51268478f9bd91f0d0200275f4643b0832dc9014032b2572049c99747d7a23e",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/tae_rule_io.py": "a124f3f5476e421c89444cb9376024927fbb3e701e92b80def71b6133697660c",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/torch_runtime.py": "9ff34d5d8007a288b4425bbfb3ee229bf23179c116a6cc6eed00accc9486e093"
+  },
+  "inventory_before_sha256": "95d990046415cbc36ee73fb2c64d362abd555d580cc58928669907e1179942e9",
+  "alignment_evidence_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/n1_database_alignment_20260910/database_n1_summary.csv": "66ca29e1e6428b6029f6a37b4d9072268a01e6dcb028018e455cf180f3ddc5c3",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/n1_database_alignment_20260910/database_n2_control_summary.csv": "f59a032b8026c513a15159192639690b7d39891ccad018239c71de4ced0455b0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/n1_database_alignment_20260910/receipt.json": "174ad669b555c39c166fec1e5934471f7c466e1c2cb1ddd652afdd60836aa957"
+  },
+  "configuration_sha256": "da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da",
+  "continuum_preprocessing_version": "datcon-monotonic-tail-v1",
+  "cnn_kind": "cnn_raw",
+  "device": "cpu",
+  "rf_cnn_policy": "unchanged canonical defaults",
+  "model_refresh": false,
+  "runtime_environment": {
+    "python": "3.11.15 (main, Mar 11 2026, 17:20:07) [GCC 14.3.0]",
+    "executable": "/p/hym/conda_envs/nova-perlmutter/bin/python",
+    "numpy": "2.1.2",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.0",
+    "torch": "2.8.0+cu128",
+    "yaml": "6.0.1",
+    "joblib": "1.5.3"
+  }
+}

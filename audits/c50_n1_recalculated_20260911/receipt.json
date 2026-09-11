@@ -1,0 +1,34 @@
+{
+  "created_at_utc": "2026-09-11T04:44:57.565276+00:00",
+  "purpose": "Unlabeled viewer list of current C50/N1 inputs after reported recalculation; no sorting or alignment adjudication",
+  "shot": "nstxuG142301C50",
+  "data_root": "/p/nstxdigtwin/energetic_particles/nova/DiTw",
+  "n_current": 18,
+  "nr_counts": {
+    "201": 18
+  },
+  "nhar_counts": {
+    "25": 18
+  },
+  "comparison_to_last_rules": {
+    "unchanged_inputs": 8,
+    "new_filename": 10
+  },
+  "last_rules_csv": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301C50/all_modes_rules.csv",
+  "last_rules_csv_sha256": "9f8a048d43631dc8c2285803eff424b99397b0292c2071a7ac7bdc2fbca7b3e3",
+  "last_rules_csv_mtime_utc": "2026-09-10T20:03:18.519625+00:00",
+  "last_rules_n1_count": 8,
+  "last_rules_paths_no_longer_present": [],
+  "original_invalidated_csv": "audits/c50_n1_alignment_20260909/invalidated_modes.csv",
+  "original_invalidated_csv_sha256": "831e754bc7ebf4763d9f1b87dd3b32cd173c7a350bc77e8530c183d1af76b7ba",
+  "original_invalidated_count": 73,
+  "current_filenames_in_original_list": 0,
+  "original_filenames_no_longer_present": 73,
+  "datcon1_sha256": "6503ce37cc4a14ab173523697d24604d0e87247bef41e0fc6b9ef41d436fda13",
+  "known_invalid_registry_sha256": "2b3507afcc29fd2a3cf60e8e6885cacf043061b5f46df13b1e2a05427865d407",
+  "known_invalid_exclusion": "unchanged; corrected C50/N1 inputs awaiting user review",
+  "source_inventory_and_hashes_stable_during_check": true,
+  "validation": "All modes load with finite signed structure and eigenfrequency, ntor=1, nr=201; shared continuum loader succeeds",
+  "viewer_reader_verified_unlabeled_count": 18,
+  "current_n1_modes_csv_sha256": "faed5268035e1c29250281c79433b15deaeec3d3cf22de14f2f72b8cdfdabaa5"
+}

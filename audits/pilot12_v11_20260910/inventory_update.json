@@ -1,0 +1,24 @@
+{
+  "created_utc": "2026-09-10T22:34:28.238280+00:00",
+  "inventory_before_sha256": "95d990046415cbc36ee73fb2c64d362abd555d580cc58928669907e1179942e9",
+  "inventory_after_sha256": "872a04f0884d6c2ec43607a16c6c3eaba26d73f5415e74d662f02346f7de3fee",
+  "checked_before": 27,
+  "checked_after": 39,
+  "changed_shots": [
+    "nstxuE202926A03t025",
+    "nstxuE202944A02t021",
+    "nstxuE202947A03t015",
+    "nstxuE203653A02t025",
+    "nstxuE203655F01t025",
+    "nstxuE203656A02t030",
+    "nstxuE203981A01t025",
+    "nstxuE204636A01t020",
+    "nstxuE204678M01t017",
+    "nstxuE204955F02t017",
+    "nstxuE205042A01t022",
+    "nstxuE205055A01t022"
+  ],
+  "all_other_rows_unchanged": true,
+  "selection_after_sha256": "eb19414f5df9a9eabd9c43e241ec195a011c4ae4ba2966d96adfbb605d724eb5",
+  "publication_sha256": "4e898142382ff3b3c7c0d61d5ff03c8d5c98812b4b9c916df74c5e7e6425e8b8"
+}

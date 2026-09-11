@@ -20,7 +20,7 @@ from sort_shot_rules import apply_manual_overrides, run_configured_shot
 from sort_shot_mixed import parse_args, run_rf_cnn_method
 
 
-SHOT = "nstxuG142301C50"
+SHOT = "nstxuG121123B12"
 WHOLE_SHOT = "nstxuG133964R06"
 
 
@@ -35,6 +35,8 @@ def fixture(root):
 class InputValidityTests(unittest.TestCase):
     def test_registry_exact_scope_and_malformed_policy_fail(self):
         registry = load_input_validity_registry()
+        # Corrected C50/N1 was visually accepted by the user on 2026-09-11.
+        self.assertIsNone(registry.diagnostic("nstxuG142301C50", 1))
         self.assertIn("CONTINUUM_MODE_MISMATCH", registry.diagnostic(SHOT, 1))
         self.assertIsNone(registry.diagnostic(SHOT, 2))
         self.assertIsNone(registry.diagnostic(SHOT + "_new", 1))
@@ -52,6 +54,10 @@ class InputValidityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "registry.csv"
             original = REGISTRY_PATH.read_text()
+            whole_shot_row = next(
+                line for line in original.splitlines()
+                if line.startswith(WHOLE_SHOT + ",*,")
+            )
             for text in [
                 "wrong,header\n",
                 original + original.splitlines()[1] + "\n",
@@ -66,7 +72,7 @@ class InputValidityTests(unittest.TestCase):
             # A per-n entry cannot narrow an existing whole-shot exclusion.
             path.write_text(
                 original
-                + original.splitlines()[2]
+                + whole_shot_row
                 .replace(",*,", ",1,")
                 .replace(",SUSPECT_EIGENMODE_STRUCTURE,", ",SPECIFIC_ISSUE,")
                 + "\n"

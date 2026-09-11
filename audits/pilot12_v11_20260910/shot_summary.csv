@@ -1,0 +1,13 @@
+shot,shot_family,size_bin,input_modes,eae_side,tae_side,rules_good,ai_good,rules_final,ai_final,disagreements,rules_bad_ai_good,rules_good_ai_bad,rules_vs_rf,rules_vs_cnn
+nstxuE205055A01t022,NSTX-U E,high,1017,862,155,67,70,66,69,5,4,1,4,8
+nstxuE203656A02t030,NSTX-U E,high,947,801,146,38,40,38,40,10,6,4,12,36
+nstxuE204678M01t017,NSTX-U E,low,302,137,165,72,70,70,68,10,4,6,11,7
+nstxuE205042A01t022,NSTX-U E,low,259,175,84,25,28,25,28,9,6,3,9,8
+nstxuE202947A03t015,NSTX-U E,low,188,81,107,58,68,58,68,14,12,2,14,14
+nstxuE202926A03t025,NSTX-U E,low,330,199,131,49,52,49,52,5,4,1,5,7
+nstxuE204636A01t020,NSTX-U E,medium,648,528,120,48,33,48,33,15,0,15,19,28
+nstxuE203653A02t025,NSTX-U E,medium,406,261,145,81,91,81,91,12,11,1,11,9
+nstxuE203981A01t025,NSTX-U E,medium,692,527,165,78,87,78,87,11,10,1,11,13
+nstxuE204955F02t017,NSTX-U E,medium,680,490,190,59,72,58,71,13,13,0,14,7
+nstxuE202944A02t021,NSTX-U E,medium,670,510,160,38,53,38,53,15,15,0,15,9
+nstxuE203655F01t025,NSTX-U E,medium,558,309,249,86,103,85,102,25,21,4,25,17
