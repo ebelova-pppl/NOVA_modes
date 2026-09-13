@@ -9,13 +9,14 @@ import hashlib
 import json
 import math
 
-SCHEMA_VERSION = "rule-severity-v1"
+SCHEMA_VERSION = "rule-severity-v2"
 GATE_NAMES = (
     "BAD_AXIS_SPIKE", "BAD_GRID_SCALE_SPIKE", "BAD_GRID_SCALE_PACKET",
     "BAD_NEAR_AXIS_GRID_OSCILLATION", "BAD_CONT_CROSS", "BAD_CONT_CROSS_WINDOW",
     "BAD_EDGE_SPIKE", "BAD_INTERIOR_UNRESOLVED_ENVELOPE",
     "BAD_INTERIOR_HARMONIC_INCOHERENCE", "BAD_CONTINUUM_CROSSING_TAIL",
     "BAD_AXIS_ENERGY_CONCENTRATION", "BAD_EXTENDED_CONTINUUM_NOISE",
+    "BAD_DISTRIBUTED_HARMONIC_NOISE",
 )
 SEVERITY_FIELDS = [*("gate_severity_" + gate for gate in GATE_NAMES),
                    "overall_rule_severity", "rule_margin", "nearest_gate",
@@ -157,6 +158,18 @@ def extract_rule_severities(features, configs, candidates, fired):
          "radial_length": q(r["hf_out_radial_length"], c.radial_length_min)},
         dict(region_id=r["region_id"], side=r["side"], r_start=r["r_start"], r_end=r["r_end"]))
         for r in f["records"] if r["hf_out_energy"] > 0])
+    c = configs["BAD_DISTRIBUTED_HARMONIC_NOISE"]
+    f = features["numerical_structure_features"]["distributed_harmonic_noise"]
+    r = f["witness"]
+    # Participation selects the population. The witness already maximizes
+    # the joint margin of the three cuts across all windows.
+    add("BAD_DISTRIBUTED_HARMONIC_NOISE", [] if r is None else [(
+        {"top2_ratio": q(r["hf_top2_ratio"], c.top2_min, comparison=">"),
+         "window_fraction": q(r["hf_window_fraction"], c.local_min, comparison=">"),
+         "radial_length": q(r["effective_length"], c.radial_length_min, comparison=">")}, r)],
+        unavailable="UNSUPPORTED_RESOLUTION" if not f["resolution_eligible"] else None)
+    gates["BAD_DISTRIBUTED_HARMONIC_NOISE"]["population_selection"] = dict(
+        nhf_min=c.nhf_min, comparison=">=", window_dr=c.window_dr)
     # Explicit zero-HF regions cannot satisfy positive production cuts.
     unknown = [g for g in GATE_NAMES if gates[g]["enabled"] and gates[g]["severity"] is None]
     known = [g for g in GATE_NAMES if gates[g]["enabled"] and gates[g]["severity"] is not None]

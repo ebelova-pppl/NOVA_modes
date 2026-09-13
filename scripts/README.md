@@ -2,6 +2,18 @@ This document consolidates scripts related to various models and methods used in
 
 # Scripts README
 
+Production v12 adds `BAD_DISTRIBUTED_HARMONIC_NOISE`, a continuum-independent
+branch using HF/full-domain top-two-harmonic energy>0.5%, HF/whole-window
+energy>5%, L_eff>0.03 and simultaneous N_hf>=4 in width-0.05 windows. All
+conditions refer to one window and the same selected HF centers. The
+[adoption audit](../audits/distributed_harmonic_noise_20260913/adoption/README.md)
+records implementation, regression checks, and regenerated pilot outputs.
+The existing continuum-side noise gate retains its earlier thresholds.
+All 39 checked rules shot exports have been regenerated with verified v11
+backups. The [current latest-12 disagreement list](../audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
+has 143 entries; N10/3470 is the only removed disagreement. The historical
+lists and user review annotations remain intact.
+
 CSV input note: the shared mode-list readers accept either plain data rows or
 an optional header row. Recognized path headers are `path`, `filepath`, and
 `mode_path`; recognized label headers are `label`, `validity`, `class`, `target`,
@@ -989,7 +1001,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v11` configuration. A rejection gate produces automatic
+`tae_rules_production_v12` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1299,8 +1311,10 @@ for calibration and adoption evidence. The four-consecutive-flip gate is unchang
 
 ## Normalized gate severity
 
-`src/rule_severity.py` adds `severity_features` to grouped rule schema v23.
-The v22 rejection ruleset is unchanged. Severity is a dimensionless margin
+`src/rule_severity.py` exports `severity_features` in grouped rule schema v24
+with severity schema v2, including the distributed-harmonic noise branch.
+V11 introduced severity without changing its v22 rejection ruleset; v12 adds
+the distributed-harmonic gate. Severity is a dimensionless margin
 relative to the configured cuts, not p_good or an uncertainty probability.
 For a large-is-bad condition use value/threshold; for a small-is-bad width use
 threshold/max(width,1e-12), in the gate's native width units. Combine AND by
@@ -1360,9 +1374,9 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v11.yaml`, stored as strict
+`configs/rules/tae_rules_production_v12.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v22 ruleset, routing thresholds, relative-frequency tolerance, all
+current v23 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
@@ -1373,12 +1387,13 @@ gate thresholds, and these gate states:
   harmonic-incoherence score (`BAD_INTERIOR_HARMONIC_INCOHERENCE`),
   crossing-tail gate (`BAD_CONTINUUM_CROSSING_TAIL`), axis-energy
   gate (`BAD_AXIS_ENERGY_CONCENTRATION`), and final extended continuum noise
-  gate (`BAD_EXTENDED_CONTINUUM_NOISE`);
+  gate (`BAD_EXTENDED_CONTINUUM_NOISE`), followed by the continuum-independent
+  distributed-harmonic gate (`BAD_DISTRIBUTED_HARMONIC_NOISE`);
 - disabled: gate 3 (`BAD_CONT_CROSS`), while retaining its frozen latent
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v11 identity.
+config-owned threshold or gate override to retain the production-v12 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
@@ -1398,7 +1413,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v11` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v12` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1409,7 +1424,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-extended-continuum-noise-v22`
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-extended-continuum-noise-distributed-harmonic-noise-v23`
 ruleset implements twelve ordered BAD decisions, treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
@@ -1420,7 +1435,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v23`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v24`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1895,7 +1910,7 @@ Calibration options are `--axis_energy_amplitude_r_max` (0.015),
 `--axis_energy_fraction_min` (0.5). `--disable_axis_energy_concentration`
 disables the decision while preserving its measurements. Named v5-v8
 presets explicitly disable the gate and retain their earlier decisions;
-new exports still use the v23 audit schema. Shot/per-n summaries record
+new exports still use the v24 audit schema. Shot/per-n summaries record
 `axis_energy_concentration_gate_enabled` and all four `axis_energy_*` values.
 For example, a conservative calibration run retaining only its evidence is:
 

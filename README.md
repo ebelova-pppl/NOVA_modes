@@ -50,6 +50,12 @@ Shared scripts / features:
 - `src/continuum_noise.py` and `scripts/audit_continuum_noise.py` — continuum-side
   noise gate and threshold calibration; see the
   [2026-09-10 calibration](audits/continuum_noise_20260910/README.md).
+- The adopted continuum-independent distributed-harmonic noise branch uses the
+  same full-domain top-two-harmonic energy reference. The
+  [training and 39-shot pilot audit](audits/distributed_harmonic_noise_20260913/top2_pilot39/README.md)
+  flags no GOOD training labels and only N10/3470 among pilot survivors;
+  production v12 enables this branch. See the
+  [adoption receipt](audits/distributed_harmonic_noise_20260913/adoption/README.md).
 
 Training-data provenance:
 
@@ -87,6 +93,26 @@ Input validity (updated 2026-09-11):
   Their N1 scopes are registry-excluded; 63 BAD-labeled training rows are
   archived out of the active list. See the [training confirmation](audits/n1_training_alignment_20260910/README.md)
   and [27-shot pilot alignment screen](audits/n1_pilot_alignment_20260910/README.md).
+
+Production v12: distributed harmonic noise (2026-09-13):
+
+- Adds `BAD_DISTRIBUTED_HARMONIC_NOISE` after all existing gates. In one
+  width-0.05 radial window, centers with simultaneous HF participation
+  `N_hf>=4` must jointly satisfy **HF/top-two energy>0.005**, **HF/whole-window
+  raw energy>0.05**, and **effective length>0.03**. There is no continuum mask.
+- Native signed second differences divided by four and quadrature are shared
+  with the existing continuum-side gate. All harmonics remain in the numerator;
+  the reference is the two largest full-domain individual harmonic energies.
+  The old gate retains its settings. Frozen v5-v11 disable the added branch.
+- All 206 repository tests pass. The 39 checked rules exports were regenerated
+  and installed with verified v11 backups. Only N10/3470 changes in the pilot;
+  no GOOD training label triggers the new gate. The
+  [current latest-12 disagreement list](audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
+  has 143 entries, down from the original 144. AI exports are unchanged.
+- Grouped features v24 and severity schema v2 record the same-window witness,
+  component ratios, selected centers, settings and resolution status. The
+  new severity contributes to overall severity and representative ranking.
+  A window too small for a native stencil produces an explicit warning.
 
 Production v11: normalized gate severity and rules-only ranking (2026-09-10):
 
@@ -144,14 +170,14 @@ Retained axis-energy rule (adopted in v9, 2026-09-09):
   the clearance lower comparison includes equality.
 
 - `sort_shot_mixed.py --method rules` now uses
-  `configs/rules/tae_rules_production_v11.yaml` (ruleset v22 / feature schema v23).
+  `configs/rules/tae_rules_production_v12.yaml` (ruleset v23 / feature schema v24).
   Each offending continuum-crossing window is excused only when its
   interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
   its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
   crossing must qualify; all other rejection gates still apply.
 - V5/v6 configuration files remain frozen and explicitly disable the smooth-crossing
   exception when loaded. Their decisions remain supported; new exports use
-  the current v23 audit schema. RF/CNN feature columns and weights are unchanged.
+  the current v24 audit schema. RF/CNN feature columns and weights are unchanged.
 - The earlier smooth-crossing impact audit recovered 19 modes in the 27-shot batch and two
   labeled GOOD training modes, with no newly accepted labeled BAD training
   modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
@@ -265,7 +291,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v11`
+  `--method rules` path loads the immutable `tae_rules_production_v12`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -283,7 +309,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v11` configuration automatically:
+`tae_rules_production_v12` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -441,7 +467,7 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v11.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v12.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -557,7 +583,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v23`; the near-axis group records the independent
+`tae-rule-features-grouped-v24`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The

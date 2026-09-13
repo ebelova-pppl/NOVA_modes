@@ -1,7 +1,167 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-11)
+### Project state (current snapshot, updated 2026-09-13)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-13 pilot follow-up: E202926A03t025 N3/1151 and N4/3735
+
+- Fresh production-v12 single-mode calibration reproduces saved features
+  exactly, with matching live input fingerprints and nr=201. Both fail only
+  `BAD_INTERIOR_UNRESOLVED_ENVELOPE`, unchanged from v11; no noise or crossing
+  gate fires. Energy FWHM is 1.668/1.755 grid intervals at r=0.180/0.445.
+- Matched extrema are the upper minimum at r=0.180 and lower maximum at
+  r=0.440. Radial matching passes, but relative frequency clearances of
+  0.007107%/0.048405% fail the exception's strict >0.1% floor. Dominant
+  signed-amplitude lobes are wider (2.817/3.028 intervals), explaining part
+  of the difference from the visual impression. N4 has substantial outer
+  structure; this energy-peak width does not measure whole-mode extent.
+- [Pair diagnostic notes](../audits/pilot12_v11_20260910/pair_1151_3735_review_20260913.md)
+  preserve evidence and the inspected figure location. No gate, label, or
+  installed production output changed; physical adjudication remains open.
+
+## 2026-09-13 production v12: distributed harmonic noise adopted
+
+- User approved the calibrated continuum-independent branch. Added shared
+  `src/distributed_harmonic_noise.py` and reason `BAD_DISTRIBUTED_HARMONIC_NOISE`
+  after all earlier gates. In one width-0.05 window, select simultaneous
+  N_hf>=4 centers and require strict HF/full-domain top-two energy>0.005,
+  HF/whole-window raw energy>0.05, and L_eff>0.03 on that same population.
+- Both noise gates share native signed diff/4 and quadrature through
+  `src/continuum_noise.py`; existing outside-gap measurements/settings stay
+  unchanged. The new gate stores a compact joint witness, component ratios,
+  selected centers/participation/energies, window counts and resolution status.
+- Canonical rules now load frozen `tae_rules_production_v12` (ruleset v23,
+  grouped features v24, severity schema v2). New gate severity participates
+  in overall severity, margin and duplicate ranking. Frozen v5-v11 disable
+  this addition; v11 retains its original severity ranking. Both entry points
+  expose the shared calibration/configuration and audit fields.
+- Native grids with no complete stencil in the requested window report
+  WINDOW_UNRESOLVED, an explicit resolution warning and unavailable enabled
+  severity. No silent nr-based skip or resampling. Empirical calibration is
+  nr=201; synthetic nearby-grid checks cover 101/201/401.
+- All **206 repository tests pass**, including same-window/population checks,
+  simultaneous versus sequential packets, strict equality and severity,
+  full-window denominator, native grids, frozen presets, CLI conflicts,
+  earlier-gate precedence and coarse-grid warnings. The sorting skill and
+  collaborator READMEs have been updated. [Adoption evidence](../audits/distributed_harmonic_noise_20260913/adoption/README.md)
+  tracks regeneration and verification of all 39 checked rules outputs.
+- Completed full integration verification and published all **39 v12 rules
+  exports** to the existing `sort_outputs` root, preserving hash-verified
+  backups in `before_distributed_noise_v12_20260913/`. Every RF-CNN export tree
+  is unchanged. The canonical outputs contain 25,967 inputs: 6,012 TAE-side,
+  19,248 EAE, 707 INVALID; no resolution/ranking fallback. All prior pilot
+  feature values, routing and input fingerprints match v11 exactly.
+- The integrated branch matches every calibration flag and joint-witness
+  metric. Pilot change is only E205042A01t022 N10/3470 GOOD->BAD, severity
+  1.29401. Training change is only BAD-labeled J38 N8/2222 GOOD->BAD; zero
+  of 575 GOOD labels trigger the added gate. Thirty-five BAD labels trigger
+  it (33 already BAD, one corrected survivor, one EAE-routed). No labels change.
+- Final pilot GOOD counts are 1,646 before deduplication / 1,635 representatives;
+  no representative changes except removal of N10/3470. Matched rules/RF-CNN
+  disagreements decrease 370->369 over 6,004 usable comparisons; recalculated
+  C50/N1's eight TAE modes lack current AI classifications and are excluded.
+  Latest 12-shot disagreements decrease 144->143. [Current latest-12 list](../audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
+  and the complete current/delta lists are in the adoption audit. Historical
+  disagreement and Elena review files are preserved. Checked membership stays
+  39 and the full-database rollout remains paused for outstanding input repairs.
+
+## 2026-09-13 pilot follow-up: E204678M01t017 N9/1081
+
+- User queried the retained narrow mode and crossing near r=0.5. A fresh
+  production-v11 single-mode calibration reproduces all saved rule features
+  exactly; raw mode/continuum fingerprint matches. Signed-lobe FWHM=1.167
+  grid intervals misses the <=1 spike cut. Energy FWHM=1.053 intervals,
+  but peak r=0.555 lies beyond the narrow-envelope gate's r<=0.5 scope.
+- The upper crossing is r=0.502668; window amplitude=0.204943<0.25 and
+  normalized radial energy=0.038822<0.05. No smooth exception was applied.
+  K=1.32014 is large, but tail/top-two energy=0.3942% is below 3.5%.
+- A supplemental wider extremum search locates the upper minimum at r=0.55:
+  ext_dr=0.005 and ext_df_gap=0.0807%, below the exception's strict 0.1%
+  clearance floor. Current radial scope omits this minimum. This is a
+  coverage/threshold limitation; wider coverage remains a calibration question.
+  [Diagnostic notes](../audits/pilot12_v11_20260910/n9_1081_review_20260913.md)
+  preserve evidence; no gates, labels or saved production outputs changed.
+- User decided to leave N9/1081 and its gates unchanged for now.
+
+## 2026-09-13 pilot follow-up: N10/3470 and N5/2352
+
+- Fresh production-v11 single-mode calibration reproduces both saved feature
+  objects exactly, with matching live input fingerprints and nr=201. User
+  queried retained E205042A01t022/N10/3470 for multi-harmonic near-axis noise
+  and rejected E202947A03t015/N5/2352 for an apparently smooth structure.
+- N10/3470 has visible noise. Its strongest qualifying run has six flips
+  but step_l2=0.265873<0.3; crossing-window W=0.0474106<0.05. K=1.80509
+  is large but tail/top-two energy=2.99554%<3.5%. Outside-gap high-pass
+  ratios=0.457151%<1%, 18.3854%<20%, and effective length=0.0154131<0.04.
+- N5/2352 has a smooth main body and a smaller sharp signed feature at
+  r=0.160 near the crossing r=0.1572415. Window amplitude=0.223970<0.25,
+  but W=0.0624994>0.05 fires BAD_CONT_CROSS_WINDOW. Exact-crossing amplitude
+  0.0838964 is low; K=1.93674 blocks the smooth exception. Raw signed
+  profiles show the feature in stored harmonics 21/22.
+- [Pair diagnostic notes](../audits/pilot12_v11_20260910/pair_3470_2352_review_20260913.md)
+  preserve the measurements and figure location. This explains existing
+  decisions; no gates, labels or production outputs changed.
+- Follow-up: N10 eligible high-pass energy is 94.35% concentrated at
+  r=0.055/0.060/0.065, giving 3.083 effective centers and L_eff=0.01541.
+  Post-crossing r>=0.075 is inside-gap and excluded from this diagnostic.
+  Harmonic-incoherence score is only 0.01137 versus strict >0.1: its whole
+  r<=0.5 averaging and adjacent-active-pair coherence emphasize the main
+  rows 32/33 (87.10% of core energy). Isolated active rows 58/67 do not enter
+  the coherence component. Exact formulas/settings are appended to the notes.
+- Unrestricted HF comparison: N10/3470 L_eff grows to 0.06067 and HF/top-two
+  to 3.6343%, but HF/total falls to 3.164%, so the current >=20% roughness
+  requirement still prevents rejection. At r<=0.1 without the gap mask,
+  length=0.03947, HF/top-two=1.1405%, local HF fraction=14.50%.
+  Localizing the incoherence calculation to r<=0.1 gives C=0.812 and existing
+  score=0.03468; the unweighted local shape factor is 0.5063, but is a new,
+  uncalibrated statistic. A local shape check plus a separate reference-energy
+  condition is a possible calibration direction; no gate changes adopted.
+- User proposed an additional continuum-independent branch based on simultaneous
+  high-pass harmonic participation. Exploratory native-window scans on this
+  pair support the distinction: N10 N_hf~7–14 in the noisy region versus
+  ~1.7 at its main peak; N5's crossing feature has N_hf~1.9. With illustrative
+  N_hf>=3 and width 0.06, N10 window 0.055–0.115 contains qualifying HF/total
+  energy=1.107%, HF/top-two=1.272%, HF/window-raw=8.510%, and L_eff=0.04346.
+  N5's strongest corresponding window has negligible HF energy and L_eff=0.005.
+  All metrics use one window and the same qualifying HF population. The new
+  branch needs separate training calibration (the old 20% local cut misses
+  N10); no production branch or labels changed. Scan evidence is linked from
+  the pair notes. The proposed OR branch would not reverse N5's existing BAD.
+- Initial trial used width=0.05, N_hf>=4, HF/total>0.5%, HF/window>5%, and
+  confirmed L_eff>0.03 (initial 0.3 was a typo). The exact candidate was
+  audited on all 2,327 active training labels and both pilot examples.
+  Zero of 575 GOOD labels flag; 19 BAD labels flag (18 already rule-BAD,
+  one EAE-routed), so no training-rule survivor is newly rejected. One
+  previously invalid BAD K51 input remains INVALID; no unexpected errors;
+  all measured inputs nr=201 and baseline fingerprints verified.
+- The candidate flags N10/3470: witness 0.065–0.115, nine qualifying centers,
+  HF/total=0.9488%, HF/window=7.4911%, L_eff=0.03882. It does not flag N5/2352,
+  whose existing crossing-window BAD would remain. This initial audit used
+  total mode energy in error; the user clarified that the previously agreed
+  full-domain top-two-harmonic reference should determine the global cut.
+  [Candidate calibration](../audits/distributed_harmonic_noise_20260913/README.md)
+  preserves the reusable prototype, compact candidate lists and receipts.
+  Simultaneous/sequential packets, amplitude scaling and previous pair-window
+  results were checked. This is calibration evidence; production is unchanged.
+- Corrected the global cut to **HF/full-domain top-two-harmonic energy>0.5%**,
+  retaining N_hf>=4, HF/whole-window raw energy>5%, L_eff>0.03, and width=0.05.
+  Rechecked all active training labels and the 6,012 TAE-side modes in all
+  39 checked pilot shots against current installed v11 baselines. No GOOD
+  training label flags (0/575). Thirty-five BAD labels flag: 33 already BAD,
+  one EAE-routed, and currently accepted J38 N8/2222. Its edge window
+  r=0.93–0.98 has HF/top-two=1.028% versus HF/total=0.148%, illustrating the
+  dilution correction. Top-two reference flags 16 more BAD labels than total.
+- Pilot: 92 flags, comprising 91 already BAD and **only N10/3470** among
+  1,647 current GOOD modes. No further pilot survivor changes. N10's same
+  window has HF/top-two=1.090%; N5/2352 retains its existing crossing BAD.
+  The closest GOOD training witness is 135388 N3/4934: length=0.02817<0.03
+  is the limiting cut. All 8,338 measured inputs have nr=201, fingerprints
+  match, and there are no unexpected errors. Pilot EAE/INVALID rows are
+  explicitly excluded. Top-two shares/indices match the saved shared
+  production features for all 6,012 pilot modes; original total-reference
+  training flags reproduce exactly. [Corrected calibration and review lists](../audits/distributed_harmonic_noise_20260913/top2_pilot39/README.md)
+  preserve compact evidence; full measurements remain ignored. The prototype
+  now defaults to top-two energy. Production rules and saved outputs are unchanged.
 
 ## 2026-09-11 recalculated C50/N1 accepted by user
 

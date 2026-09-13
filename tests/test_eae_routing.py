@@ -82,6 +82,8 @@ class EaeRoutingTests(unittest.TestCase):
             self.assertEqual(new_kwargs.pop(key), 0.5)
         self.assertIsNone(old_kwargs.pop("continuum_noise_top2_min"))
         self.assertEqual(new_kwargs.pop("continuum_noise_top2_min"), 0.01)
+        self.assertIsNone(old_kwargs.pop("distributed_noise_top2_min"))
+        self.assertEqual(new_kwargs.pop("distributed_noise_top2_min"), 0.005)
         self.assertEqual(old_kwargs.pop("duplicate_rank_method"), "rf_p_good")
         self.assertEqual(new_kwargs.pop("duplicate_rank_method"), "rule_severity")
         self.assertEqual(old_kwargs, new_kwargs)

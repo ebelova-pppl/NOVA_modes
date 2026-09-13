@@ -21,11 +21,12 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v11.yaml`. It pins the v22
-rejection ruleset and routing values, and uses grouped audit schema v23. It
+The preset is `configs/rules/tae_rules_production_v12.yaml`. It pins the v23
+rejection ruleset and routing values, and uses grouped audit schema v24 with
+severity schema v2. It
 enables gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
-gates, the continuum crossing-tail gate, the axis-energy gate, and the final extended continuum noise gate. It explicitly disables
+gates, the continuum crossing-tail gate, the axis-energy gate, the extended continuum noise gate, and the final distributed harmonic noise gate. It explicitly disables
 exact-point continuum gate 3.
 
 Production v11 retains the v7 exception: it excuses a violating gate-4 window only when the same crossing
@@ -42,7 +43,7 @@ Configure it with `--cross_window_exception_amplitude_max`,
 `--cross_window_exception_calibrated_n_radial`, or disable it with
 `--disable_cross_window_exception` in the calibration CLI. Named v5/v6
 configurations explicitly disable the exception and preserve old decisions,
-while new exports use the v23 audit schema. Exact older exports require their
+while new exports use the v24 audit schema. Exact older exports require their
 historical checkout. The exception never skips the rejection gate on other
 resolutions; the original window criteria remain active there.
 
@@ -137,7 +138,7 @@ defaults are `peak_r_max=0.5`, `width_max_grid=2`, `ext_dr_max=0.02`, and
 `REVIEW` with `NO_GOOD_TEMPLATE` for modes not rejected by any gate. Only the
 production `accept-as-good-v1` workflow policy promotes those survivors.
 
-For every valid TAE-side mode, `rule_features` uses the grouped v23 schema. Keep
+For every valid TAE-side mode, `rule_features` uses the grouped v24 schema. Keep
 the production RF 22 in `rf_standard_features`, the six crossing summaries in
 `crossing_features` together with crossing-window amplitude and energy audit
 evidence, individual lower/upper crossings in `crossing_records`, and match
@@ -584,13 +585,39 @@ cuts and enable state. `audit_continuum_noise.py` provides independent measure
 and explicit sweep commands; its v2 schema requires fresh measurements when
 moving from old v1 caches. See `audits/continuum_noise_20260910/README.md`.
 
+## Distributed harmonic noise rejection
+
+Production v12 adds `BAD_DISTRIBUTED_HARMONIC_NOISE` after every earlier
+rejection gate. Use shared `src/distributed_harmonic_noise.py` and the native
+quadrature/high-pass helper shared with `src/continuum_noise.py`. Scan closed
+width-0.05 windows without a continuum mask. Select centers with simultaneous
+`N_hf>=4`; only complete three-point stencils inside that window are eligible.
+The same selected population must satisfy strict HF/full-domain top-two-harmonic
+energy>0.005, HF/whole-window raw energy>0.05, and effective radial length>0.03.
+Retain all harmonics in the numerator. Never pool separate windows or use total
+mode energy as the global rejection denominator.
+
+Save the compact strongest joint witness and selected centers under
+`numerical_structure_features.distributed_harmonic_noise`. Severity is the
+minimum of the three normalized energy/length cuts, maximized across windows;
+participation selects the population first. Include its severity in overall
+margin and representative ranking. Frozen v5-v11 disable this branch, while
+v11 retains severity ranking. Calibration flags are `--distributed_noise_nhf_min`,
+`--distributed_noise_top2_min`, `--distributed_noise_local_min`,
+`--distributed_noise_radial_length_min`, `--distributed_noise_window_dr`, and
+`--disable_distributed_harmonic_noise`. Disabled gates retain diagnostics.
+A window unable to fit a native stencil gives an explicit resolution warning
+and unavailable enabled severity; empirical calibration is nr=201. See the
+[adoption audit](../../../audits/distributed_harmonic_noise_20260913/adoption/README.md).
+
 ## Honor known invalid input scopes
 
 Before gap routing, both canonical sorting methods and `make_tae_like_list.py`
 apply `configs/known_invalid_inputs.csv` through shared `src/input_validity.py`.
-The registry excludes `nstxuG142301C50/N1` for `CONTINUUM_MODE_MISMATCH`
-and the whole `nstxuG133964R06` shot for `SUSPECT_EIGENMODE_STRUCTURE`,
-covering both TAE and EAE frequency ranges. R06 records the user's visual
+Read the current registry for confirmed N1 `CONTINUUM_MODE_MISMATCH` scopes
+and the whole `nstxuG133964R06` exclusion for `SUSPECT_EIGENMODE_STRUCTURE`,
+covering both TAE and EAE frequency ranges. Recalculated C50/N1 was accepted
+on September 11 and its exclusion removed. R06 records the user's visual
 assessment of poor structures throughout and some spectra peaking at the
 largest retained poloidal harmonic; its cause is unconfirmed. Match the exact
 shot basename: a positive integer `ntor` covers one n, while `ntor=*` covers
@@ -657,7 +684,7 @@ fallbacks. Confirm `duplicate_rank_method` and severity coverage in summaries.
 ## Gate severity and margin outputs
 
 Use `src/rule_severity.py`; do not invent a probability from its output.
-Grouped schema v23 contains `severity_features` with every gate's component
+Grouped schema v24 contains `severity_features` with every gate's component
 values, thresholds, ratios, actual fired flag, witness, and enabled/status
 metadata. Flat CSV columns include `gate_severity_BAD_*`,
 `overall_rule_severity`, `rule_margin`, `nearest_gate`, `severity_complete`,

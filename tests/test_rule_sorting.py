@@ -10,6 +10,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+from distributed_harmonic_noise import DistributedNoiseThresholds
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -325,6 +326,7 @@ def evaluate_incoherence_only(
             interior_config or InteriorUnresolvedEnvelopeConfig(width_max_grid=None)
         ),
         interior_harmonic_incoherence_config=incoherence_config,
+        distributed_noise_config=DistributedNoiseThresholds(top2_min=None),
     )
 
 
@@ -496,7 +498,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v23")
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v24")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -3126,12 +3128,12 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v11")
+        self.assertEqual(configuration.name, "tae_rules_production_v12")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da",
+            "6cec796ae20bac12f2f66bd18ac20a14d9e502aa64453c6f2b5ad10f7b54f925",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3146,6 +3148,11 @@ class WorkflowOutputTests(unittest.TestCase):
                 "axis_energy_r_max": 0.05,
                 "axis_energy_fraction_min": 0.5,
                 "duplicate_rank_method": "rule_severity",
+                "distributed_noise_nhf_min": 4.0,
+                "distributed_noise_top2_min": 0.005,
+                "distributed_noise_local_min": 0.05,
+                "distributed_noise_radial_length_min": 0.03,
+                "distributed_noise_window_dr": 0.05,
                 "continuum_noise_top2_min": 0.01,
                 "continuum_noise_local_min": 0.2,
                 "continuum_noise_radial_length_min": 0.04,

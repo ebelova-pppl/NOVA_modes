@@ -1,0 +1,2 @@
+path,label,mode_key,shot,input_fingerprint,rules_decision,rules_reason,rf_cnn_decision,p_rf_good,p_cnn_good
+nstxuE205042A01t022/N10/egn10w.3470E+01,bad,nstxuE205042A01t022/N10/egn10w.3470E+01,nstxuE205042A01t022,4ae64e472b05e560dd3952293c842428f9a8cad3870fd6928a84c133c5464a8e,BAD,BAD_DISTRIBUTED_HARMONIC_NOISE,BAD,0.22666666666666666,0.2838783860206604

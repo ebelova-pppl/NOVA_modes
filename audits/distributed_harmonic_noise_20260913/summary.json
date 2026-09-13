@@ -1,0 +1,56 @@
+{
+  "completed_at_utc": "2026-09-13T06:55:16.053998+00:00",
+  "production_gate_enabled": false,
+  "threshold_semantics": "N_hf >= nhf_min; other three cuts strictly >; all in one window",
+  "cuts": {
+    "nhf_min": 4,
+    "hf_total_min": 0.005,
+    "hf_window_min": 0.05,
+    "effective_length_min": 0.03,
+    "window_dr": 0.05
+  },
+  "window_policy": "native windows; complete stencils inside; raw denominator includes all window nodes with native full-domain trapezoidal node weights",
+  "training_rows": 2327,
+  "training_labels": {
+    "good": 575,
+    "bad": 1752
+  },
+  "statuses": {
+    "MEASURED": 2328,
+    "INVALID": 1
+  },
+  "nr_counts": {
+    "201": 2328
+  },
+  "flagged_training_labels": {
+    "bad": 19
+  },
+  "flagged_baseline_decisions": {
+    "BAD": 18,
+    "ROUTED_EAE": 1
+  },
+  "newly_rejected_training_labels": {},
+  "sources_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/audits/distributed_harmonic_noise_20260913/scan_proposal.py": "2283f452de9b12a047582a3129d4c9a891471937eb8a749b72a4b84fc04a251f",
+    "/p/hym/ebelova/NOVA/NOVA_modes/training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "/p/hym/ebelova/NOVA/NOVA_modes/outputs/review_continuum_noise_v10_20260910/training_comparison.csv": "7d3d0515a187e0dea3fcdbe721c7c1412e282f85bf7c74082ab7b4c1ec38a4af",
+    "/p/hym/ebelova/NOVA/NOVA_modes/configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/nova_mode_loader.py": "405bf47b5097eb0904b87465dfb1db241cf06686859507e4ef4f37184b1a19e0",
+    "/p/hym/ebelova/NOVA/NOVA_modes/src/continuum_noise.py": "4456203e61330b9069cb73f6336d2cdb54e233e7eb0ed1a43c1cf538ff6b7719",
+    "/p/hym/ebelova/NOVA/NOVA_modes/scripts/make_tae_like_list.py": "b58baef115faa7467d72ae58fa6eeba359ff700a95043270763473ff993a403b"
+  },
+  "measurements_sha256": "8c906a35053062b7b80df6f39afc00596cd8c404991a330d953fa4af3652ab80",
+  "errors": [],
+  "checks": {
+    "simultaneous_vs_sequential_harmonics": true,
+    "amplitude_scale_invariance": true,
+    "previous_exploratory_window_results_match": true
+  },
+  "runtime_directory": "outputs/review_distributed_harmonic_noise_20260913",
+  "proposed_reason": "BAD_DISTRIBUTED_HARMONIC_NOISE",
+  "excluded_input_note": "One pre-existing INVALID BAD-labeled training row (K51 N4/8769, nonfinite metadata); all 575 GOOD and 1751 other BAD inputs measured. The raw diagnostic also measures 26 EAE-routed BAD-labeled inputs, whose production routing is unchanged.",
+  "curated_csv_sha256": {
+    "flagged_training.csv": "390fe5e7b1c0ecfe3afdbff355ffd9dc958f29e8bf577e05eb8213bf3954ddb4",
+    "pilot_examples.csv": "28c0e3ebd09e4b60f14a8f79877dba91d8b9047201e8054b384200a0458b2c88"
+  }
+}

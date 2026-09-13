@@ -1,0 +1,16 @@
+{
+  "command": "python -m unittest discover -s tests -p 'test_*.py'",
+  "tests": 206,
+  "result": "PASS",
+  "skill_validation": "PASS",
+  "runtime_log": "outputs/review_distributed_noise_v12_20260913/tests.log",
+  "log_sha256": "c4e9fcc02b0d894c308cd0869585163ec4f494d49655fe2f38c30a4a7535c407",
+  "changed_checks_sha256": {
+    "tests/test_distributed_harmonic_noise.py": "f0d84b0983d794e7f85366e258e87c6a834c6407a8f6a49dbca2fa21d3c609e6",
+    "tests/test_rule_sorting.py": "f28777ee21ec3e2d299ccecdb969e2cdd1eedae45382b3ce7f0926ea54a79390",
+    "tests/test_eae_routing.py": "b3350e36b70e2b42184a038dfb15e17b6f61dac7e303ec1c8236b9149d9a4dc2",
+    "tests/test_axis_energy_concentration.py": "25c65128203031da98be19007591c8f831cb28455369e4719e43471223e1cd1b",
+    ".agents/skills/sort-tae-like-modes/SKILL.md": "90c064396fe03d5f654d6323ab1ae163b09dc40d64cafcf6c82c7c3bd5600612"
+  },
+  "environment_note": "Scientific Python with existing temporary test dependencies; missing PyYAML supplied from the installed system package into the temporary dependency directory."
+}

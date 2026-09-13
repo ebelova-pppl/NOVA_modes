@@ -99,6 +99,10 @@ from tae_rule_engine import (  # noqa: E402
     NearAxisGridOscillationConfig,
     evaluate_mode,
 )
+from distributed_harmonic_noise import DistributedNoiseThresholds
+
+DISTRIBUTED_NOISE_DEFAULTS = DistributedNoiseThresholds()
+
 from continuum_noise import (  # noqa: E402
     ContinuumNoiseThresholds,
     DEFAULT_TOP2_MIN,
@@ -213,6 +217,14 @@ SHOT_SUMMARY_FIELDS = [
     "axis_energy_amplitude_min",
     "axis_energy_r_max",
     "axis_energy_fraction_min",
+    "distributed_harmonic_noise_gate_enabled",
+    "distributed_noise_nhf_min",
+    "distributed_noise_top2_min",
+    "distributed_noise_local_min",
+    "distributed_noise_radial_length_min",
+    "distributed_noise_window_dr",
+    "distributed_noise_resolution_eligible_count",
+    "distributed_noise_resolution_ineligible_count",
     "extended_continuum_noise_gate_enabled",
     "continuum_noise_top2_min",
     "continuum_noise_local_min",
@@ -295,6 +307,13 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--continuum_noise_local_min",
         "--continuum_noise_radial_length_min",
         "--disable_extended_continuum_noise",
+        "--disable_distributed_harmonic_noise",
+        "--distributed_noise_nhf_min",
+        "--distributed_noise_top2_min",
+        "--distributed_noise_local_min",
+        "--distributed_noise_radial_length_min",
+        "--distributed_noise_window_dr",
+
         "--grid_scale_amplitude_min",
         "--grid_scale_width_max_grid",
         "--grid_scale_high_r_cutoff_r",
@@ -975,6 +994,7 @@ def build_summary(
     axis_artifact_config: AxisArtifactConfig | None = None,
     axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
     continuum_noise_config: ContinuumNoiseThresholds | None = None,
+    distributed_noise_config: DistributedNoiseThresholds | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -994,6 +1014,7 @@ def build_summary(
     axis_config = axis_artifact_config or AxisArtifactConfig()
     axis_energy_config = axis_energy_concentration_config or AxisEnergyConcentrationConfig()
     noise_config = continuum_noise_config or ContinuumNoiseThresholds()
+    distributed_config = distributed_noise_config or DISTRIBUTED_NOISE_DEFAULTS
     grid_config = grid_scale_spike_config or GridScaleSpikeConfig()
     packet_config = grid_scale_packet_config or GridScalePacketConfig()
     near_axis_oscillation_config = (
@@ -1031,6 +1052,7 @@ def build_summary(
                 "numerical_structure_features",
                 "interior_harmonic_incoherence",
             ),
+            ("distributed_noise", "numerical_structure_features", "distributed_harmonic_noise"),
             ("continuum_crossing_tail", "crossing_features", "continuum_crossing_tail"),
             (
                 "continuum_crossing_window_exception",
@@ -1118,6 +1140,14 @@ def build_summary(
         "similarity_threshold": SIMILARITY_THRESHOLD,
         "radial_location_tolerance": RADIAL_LOCATION_TOLERANCE,
         "radial_width_tolerance": RADIAL_WIDTH_TOLERANCE,
+        "distributed_harmonic_noise_gate_enabled": distributed_config.enabled,
+        "distributed_noise_nhf_min": distributed_config.nhf_min,
+        "distributed_noise_top2_min": distributed_config.top2_min,
+        "distributed_noise_local_min": distributed_config.local_min,
+        "distributed_noise_radial_length_min": distributed_config.radial_length_min,
+        "distributed_noise_window_dr": distributed_config.window_dr,
+        "distributed_noise_resolution_eligible_count": resolution_counts["distributed_noise_eligible"],
+        "distributed_noise_resolution_ineligible_count": resolution_counts["distributed_noise_ineligible"],
         "extended_continuum_noise_gate_enabled": noise_config.enabled,
         "continuum_noise_top2_min": noise_config.top2_min,
         "continuum_noise_local_min": noise_config.local_min,
@@ -1237,6 +1267,7 @@ def _summary_by_n(
     axis_artifact_config: AxisArtifactConfig | None = None,
     axis_energy_concentration_config: AxisEnergyConcentrationConfig | None = None,
     continuum_noise_config: ContinuumNoiseThresholds | None = None,
+    distributed_noise_config: DistributedNoiseThresholds | None = None,
     grid_scale_spike_config: GridScaleSpikeConfig | None = None,
     grid_scale_packet_config: GridScalePacketConfig | None = None,
     near_axis_grid_oscillation_config: NearAxisGridOscillationConfig | None = None,
@@ -1301,6 +1332,7 @@ def _summary_by_n(
             axis_artifact_config=axis_artifact_config,
             axis_energy_concentration_config=axis_energy_concentration_config,
             continuum_noise_config=continuum_noise_config,
+            distributed_noise_config=distributed_noise_config,
             grid_scale_spike_config=grid_scale_spike_config,
             grid_scale_packet_config=grid_scale_packet_config,
             near_axis_grid_oscillation_config=(
@@ -1345,6 +1377,7 @@ def resolution_warning_records(
         for gate, group in (
             ("interior_harmonic_incoherence", "numerical_structure_features"),
             ("continuum_crossing_tail", "crossing_features"),
+            ("distributed_harmonic_noise", "numerical_structure_features"),
         ):
             evidence = features.get(group, {}).get(gate, {})
             if (
@@ -1354,7 +1387,10 @@ def resolution_warning_records(
                 warnings.append({
                     **{field: row.get(field, "") for field in
                        ("mode_key", "path", "input_fingerprint", "nr", "rule_decision", "final_decision")},
-                    "gate": gate, "required_nr": evidence["calibrated_n_radial"],
+                    "gate": gate,
+                    "required_nr": (f">={evidence['minimum_n_radial']}"
+                                    if gate == "distributed_harmonic_noise"
+                                    else evidence["calibrated_n_radial"]),
                 })
     return warnings
 
@@ -1377,7 +1413,8 @@ def resolution_warning_text(
         counts = Counter(str(row["nr"]) for row in rows)
         observed = ", ".join(f"nr={nr}: {count}" for nr, count in sorted(counts.items()))
         lines.append(
-            f"  {gate}: NOT APPLIED to {len(rows)} mode(s); requires nr={required}; {observed}."
+            f"  {gate}: NOT APPLIED to {len(rows)} mode(s); requires "
+            f"nr{required if str(required).startswith('>=') else '=' + str(required)}; {observed}."
         )
     lines.append("Other enabled gates still run; sorting continues without resampling mode profiles.")
     if summary["rule_survivor_policy"] == RULE_SURVIVOR_POLICY_ACCEPT:
@@ -1477,6 +1514,11 @@ def run_shot(
     axis_energy_amplitude_min: float | None = DEFAULT_AXIS_ENERGY_AMPLITUDE_MIN,
     axis_energy_r_max: float = DEFAULT_AXIS_ENERGY_R_MAX,
     axis_energy_fraction_min: float | None = DEFAULT_AXIS_ENERGY_FRACTION_MIN,
+    distributed_noise_nhf_min: float = DISTRIBUTED_NOISE_DEFAULTS.nhf_min,
+    distributed_noise_top2_min: float | None = DISTRIBUTED_NOISE_DEFAULTS.top2_min,
+    distributed_noise_local_min: float = DISTRIBUTED_NOISE_DEFAULTS.local_min,
+    distributed_noise_radial_length_min: float = DISTRIBUTED_NOISE_DEFAULTS.radial_length_min,
+    distributed_noise_window_dr: float = DISTRIBUTED_NOISE_DEFAULTS.window_dr,
     continuum_noise_top2_min: float | None = DEFAULT_TOP2_MIN,
     continuum_noise_local_min: float = DEFAULT_LOCAL_MIN,
     continuum_noise_radial_length_min: float = DEFAULT_RADIAL_LENGTH_MIN,
@@ -1571,6 +1613,13 @@ def run_shot(
     if rule_survivor_policy not in RULE_SURVIVOR_POLICIES:
         allowed = ", ".join(sorted(RULE_SURVIVOR_POLICIES))
         raise ValueError(f"rule_survivor_policy must be one of: {allowed}")
+    distributed_config = DistributedNoiseThresholds(
+        nhf_min=distributed_noise_nhf_min,
+        top2_min=distributed_noise_top2_min,
+        local_min=distributed_noise_local_min,
+        radial_length_min=distributed_noise_radial_length_min,
+        window_dr=distributed_noise_window_dr,
+    )
     noise_config = ContinuumNoiseThresholds(
         continuum_noise_top2_min, continuum_noise_local_min, continuum_noise_radial_length_min
     )
@@ -1685,6 +1734,7 @@ def run_shot(
             axis_artifact_config=axis_config,
             axis_energy_concentration_config=axis_energy_config,
             continuum_noise_config=noise_config,
+            distributed_noise_config=distributed_config,
             grid_scale_spike_config=grid_config,
             grid_scale_packet_config=packet_config,
             near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1742,6 +1792,7 @@ def run_shot(
         axis_artifact_config=axis_config,
         axis_energy_concentration_config=axis_energy_config,
         continuum_noise_config=noise_config,
+        distributed_noise_config=distributed_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
         near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1771,6 +1822,7 @@ def run_shot(
         axis_artifact_config=axis_config,
         axis_energy_concentration_config=axis_energy_config,
         continuum_noise_config=noise_config,
+        distributed_noise_config=distributed_config,
         grid_scale_spike_config=grid_config,
         grid_scale_packet_config=packet_config,
         near_axis_grid_oscillation_config=near_axis_oscillation_config,
@@ -1902,6 +1954,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     ):
         parser.add_argument("--" + flag, type=float, default=default,
                             help=f"{help_text} (default: {default:g})")
+    for key, help_text in (
+        ("nhf_min", "Inclusive minimum simultaneous high-pass harmonic participation"),
+        ("top2_min", "Strict minimum HF / full-domain top-two-harmonic energy ratio"),
+        ("local_min", "Strict minimum HF / raw energy of the whole radial window"),
+        ("radial_length_min", "Strict minimum effective radial length of the same qualifying HF population"),
+        ("window_dr", "Maximum width of the closed radial window, without a continuum mask"),
+    ):
+        default = getattr(DISTRIBUTED_NOISE_DEFAULTS, key)
+        parser.add_argument("--distributed_noise_" + key, type=float, default=default,
+                            help=f"{help_text} (default: {default:g})")
+    parser.add_argument("--disable_distributed_harmonic_noise", action="store_true",
+                        help="Disable distributed-harmonic noise rejection, retaining diagnostics")
     parser.add_argument("--continuum_noise_top2_min", type=float, default=DEFAULT_TOP2_MIN,
                         help="Minimum continuum-side HF energy / full-domain top-two harmonic energy")
     parser.add_argument("--continuum_noise_local_min", type=float, default=DEFAULT_LOCAL_MIN,
@@ -2421,6 +2485,12 @@ def main() -> None:
         axis_amplitude_min=(
             None if args.disable_axis_artifact else args.axis_amplitude_min
         ),
+        distributed_noise_nhf_min=args.distributed_noise_nhf_min,
+        distributed_noise_local_min=args.distributed_noise_local_min,
+        distributed_noise_radial_length_min=args.distributed_noise_radial_length_min,
+        distributed_noise_window_dr=args.distributed_noise_window_dr,
+        distributed_noise_top2_min=(None if args.disable_distributed_harmonic_noise
+                                    else args.distributed_noise_top2_min),
         continuum_noise_top2_min=(None if args.disable_extended_continuum_noise
                                   else args.continuum_noise_top2_min),
         continuum_noise_local_min=args.continuum_noise_local_min,
@@ -2547,6 +2617,10 @@ def main() -> None:
     summary = result.summary
     print(f"Shot: {summary['shot']}")
     print(f"Discovered modes: {summary['n_total_files']}")
+    print("Distributed harmonic noise gate: "
+          f"enabled={summary['distributed_harmonic_noise_gate_enabled']} "
+          + " ".join(f"{key}={summary['distributed_noise_' + key]}"
+                     for key in ("nhf_min", "top2_min", "local_min", "radial_length_min", "window_dr")))
     print(
         "Extended continuum noise gate: "
         f"enabled={summary['extended_continuum_noise_gate_enabled']} "

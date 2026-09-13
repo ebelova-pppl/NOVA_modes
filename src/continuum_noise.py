@@ -53,6 +53,24 @@ def _participation(energy):
     return float(1 / np.sum((energy / total) ** 2)) if total > 0 else None
 
 
+def native_high_pass_energy(mode):
+    """Shared native quadrature and signed /4 high pass for both noise gates."""
+    A = np.asarray(mode, dtype=float)
+    if A.ndim != 2 or A.shape[0] < 1 or A.shape[1] < 3 or not np.isfinite(A).all():
+        raise ValueError("noise diagnostics require finite [harmonic, radius] arrays with nr>=3")
+    peak = float(np.max(np.abs(A)))
+    A = A / peak if peak > 0 else A
+    nr = A.shape[1]
+    weights = np.full(nr, 1.0 / (nr - 1))
+    weights[[0, -1]] *= 0.5
+    raw_energy = A * A * weights
+    harmonic_energy = np.sum(raw_energy, axis=1)
+    top2_indices = np.argsort(-harmonic_energy, kind="stable")[:2]
+    hf = np.zeros_like(A)
+    hf[:, 1:-1] = (A[:, 2:] - 2 * A[:, 1:-1] + A[:, :-2]) / 4
+    return raw_energy, hf * hf, weights, top2_indices
+
+
 def measure_continuum_noise(mode, omega, low2, high2):
     """Return per-region measurements on the full native, uniform radial grid.
 
@@ -74,18 +92,11 @@ def measure_continuum_noise(mode, omega, low2, high2):
         raise ValueError("continuum noise requires at least three radial samples")
     if omega <= 0 or not np.isfinite(omega * omega):
         raise ValueError("continuum noise requires positive finite squared frequency")
-    peak = float(np.max(np.abs(A)))
-    A = A / peak if peak > 0 else A
-    weights = np.full(nr, 1.0 / (nr - 1))
-    weights[[0, -1]] *= 0.5
-    raw_energy = A * A * weights
+    raw_energy, hf_power, weights, top2_indices = native_high_pass_energy(A)
     harmonic_energy = np.sum(raw_energy, axis=1)
     total = float(np.sum(harmonic_energy))
-    top2_indices = np.argsort(-harmonic_energy, kind="stable")[:2]
     top2 = float(np.sum(harmonic_energy[top2_indices]))
-    hf = np.zeros_like(A)
-    hf[:, 1:-1] = (A[:, 2:] - 2 * A[:, 1:-1] + A[:, :-2]) / 4
-    hf_energy = hf * hf * weights
+    hf_energy = hf_power * weights
     valid = np.isfinite(low) & np.isfinite(high) & (low >= 0) & (high >= low)
     side = np.zeros(nr, dtype=np.int8)
     side[valid & (omega * omega < low)] = -1

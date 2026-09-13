@@ -1,0 +1,2 @@
+path,mode_key,training_label,input_fingerprint,before,after,reason,candidate
+nstxuG121123J38/N8/egn08w.2222E+02,nstxuG121123J38/N8/egn08w.2222E+02,bad,86232338eee6d31cd067ff815ffc67a1a4541446f5841a1986a12154d6463d8e,GOOD,BAD,BAD_DISTRIBUTED_HARMONIC_NOISE,True
