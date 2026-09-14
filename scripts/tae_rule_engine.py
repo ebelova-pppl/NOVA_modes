@@ -27,6 +27,7 @@ from tae_rule_io import empty_rule_row, stable_json  # noqa: E402
 from rule_severity import (
     empty_severity_features, extract_rule_severities, severity_columns,
 )
+from envelope_footprint import measure_envelope_footprint, footprint_exception_qualifies
 from distributed_harmonic_noise import (
     BAD_DISTRIBUTED_HARMONIC_NOISE, DistributedNoiseThresholds,
     empty_distributed_noise_features, extract_distributed_noise_features,
@@ -69,6 +70,8 @@ DEFAULT_CROSS_WINDOW_EXCEPTION_HALF_WIDTH_GRID = 4
 DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL = 201
 DEFAULT_EDGE_R_MIN = 0.97
 DEFAULT_EDGE_WIDTH_MAX_GRID = 10.0
+DEFAULT_EDGE_SECONDARY_PEAK_ENERGY_MIN = 0.5
+DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX = 0.9
 DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX = 0.5
 DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID = 2.0
 DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MIN = 0.03
@@ -76,6 +79,9 @@ DEFAULT_INTERIOR_ENVELOPE_EXTREMUM_R_MAX = 0.50
 DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX = 0.02
 DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN = 0.001
 DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX = 0.04
+DEFAULT_INTERIOR_FOOTPRINT_SPIKES_FRACTION_MAX = 0.5
+DEFAULT_INTERIOR_FOOTPRINT_LOCAL_HF_FRACTION_MAX = 0.05
+DEFAULT_INTERIOR_FOOTPRINT_WINDOW_DR = 0.05
 DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX = 0.5
 DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN = 0.005
 DEFAULT_INTERIOR_HARMONIC_MAX_LAG_GRID = 5
@@ -98,7 +104,8 @@ PREVIOUS_RULESET_VERSION = (
 CLEARANCE_RULESET_VERSION = PREVIOUS_RULESET_VERSION.removesuffix("-v19") + "-extremum-clearance-v20"
 AXIS_ENERGY_RULESET_VERSION = CLEARANCE_RULESET_VERSION.removesuffix("-v20") + "-axis-energy-concentration-v21"
 CONTINUUM_NOISE_RULESET_VERSION = AXIS_ENERGY_RULESET_VERSION.removesuffix("-v21") + "-extended-continuum-noise-v22"
-RULESET_VERSION = CONTINUUM_NOISE_RULESET_VERSION.removesuffix("-v22") + "-distributed-harmonic-noise-v23"
+DISTRIBUTED_NOISE_RULESET_VERSION = CONTINUUM_NOISE_RULESET_VERSION.removesuffix("-v22") + "-distributed-harmonic-noise-v23"
+RULESET_VERSION = DISTRIBUTED_NOISE_RULESET_VERSION.removesuffix("-v23") + "-secondary-edge-energy-peaks-footprint-exception-v25"
 BAD_AXIS_SPIKE = "BAD_AXIS_SPIKE"
 BAD_AXIS_ENERGY_CONCENTRATION = "BAD_AXIS_ENERGY_CONCENTRATION"
 BAD_GRID_SCALE_SPIKE = "BAD_GRID_SCALE_SPIKE"
@@ -115,7 +122,7 @@ RULE_FEATURE_EXTRACTION_FAILED = "RULE_FEATURE_EXTRACTION_FAILED"
 RULE_FEATURE_NAMES = tuple(
     get_feature_names(include_crossing_features=True, include_extremum_features=True)
 )
-RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v24"
+RULE_FEATURE_SCHEMA_VERSION = "tae-rule-features-grouped-v26"
 RULE_FEATURE_SOURCE_SCHEMA_VERSION = get_feature_schema_version(
     include_crossing_features=True,
     include_extremum_features=True,
@@ -491,10 +498,12 @@ class ContinuumCrossingWindowConfig:
 
 @dataclass(frozen=True)
 class EdgeArtifactConfig:
-    """Thresholds for the narrow global-energy edge-spike rejection gate."""
+    """Thresholds for narrow global and significant secondary energy peaks."""
 
     r_edge_min: float = DEFAULT_EDGE_R_MIN
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID
+    secondary_peak_energy_min: float | None = DEFAULT_EDGE_SECONDARY_PEAK_ENERGY_MIN
+    secondary_peak_body_r_max: float = DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.r_edge_min) or not 0.0 <= self.r_edge_min < 1.0:
@@ -506,6 +515,13 @@ class EdgeArtifactConfig:
             raise ValueError(
                 "edge_width_max_grid must be null or a finite nonnegative number"
             )
+        if self.secondary_peak_energy_min is not None and (
+            not math.isfinite(self.secondary_peak_energy_min)
+            or not 0.0 < self.secondary_peak_energy_min <= 1.0
+        ):
+            raise ValueError("secondary_peak_energy_min must be null or in (0, 1]")
+        if not math.isfinite(self.secondary_peak_body_r_max) or not 0.0 < self.secondary_peak_body_r_max <= 1.0:
+            raise ValueError("secondary_peak_body_r_max must be finite and in (0, 1]")
 
     @property
     def enabled(self) -> bool:
@@ -525,8 +541,17 @@ class InteriorUnresolvedEnvelopeConfig:
     ext_df_gap_min: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MIN
     ext_df_gap_max: float = DEFAULT_INTERIOR_ENVELOPE_EXT_DF_GAP_MAX
     ext_df_gap_min_inclusive: bool = False
+    footprint_spikes_fraction_max: float | None = DEFAULT_INTERIOR_FOOTPRINT_SPIKES_FRACTION_MAX
+    footprint_local_hf_fraction_max: float = DEFAULT_INTERIOR_FOOTPRINT_LOCAL_HF_FRACTION_MAX
+    footprint_window_dr: float = DEFAULT_INTERIOR_FOOTPRINT_WINDOW_DR
 
     def __post_init__(self) -> None:
+        for name in ("footprint_spikes_fraction_max", "footprint_local_hf_fraction_max", "footprint_window_dr"):
+            value = getattr(self, name)
+            if value is None and name == "footprint_spikes_fraction_max":
+                continue
+            if not math.isfinite(value) or not 0 < value <= 1:
+                raise ValueError(f"{name} must be finite and in (0, 1]")
         if not isinstance(self.ext_df_gap_min_inclusive, bool):
             raise ValueError("ext_df_gap_min_inclusive must be a boolean")
         if not math.isfinite(self.peak_r_max) or not 0.0 <= self.peak_r_max <= 1.0:
@@ -954,10 +979,13 @@ def empty_near_axis_grid_oscillation_features(
 
 def empty_edge_artifact_features(
     r_edge_min: float = DEFAULT_EDGE_R_MIN,
+    body_r_max: float = DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX,
 ) -> dict[str, Any]:
     """Return the stable edge-artifact feature shape with null measurements."""
     return {
         "r_edge_min": r_edge_min,
+        "edge_body_r_max": body_r_max,
+        "edge_body_amplitude_max": None,
         "edge_energy_peak": None,
         "edge_energy_peak_r": None,
         "edge_energy_peak_in_window": None,
@@ -966,6 +994,7 @@ def empty_edge_artifact_features(
         "edge_energy_halfmax_inner_edge_r": None,
         "edge_energy_halfmax_outer_edge_r": None,
         "edge_energy_component_touches_boundary": None,
+        "edge_energy_local_peaks": [],
         "edge_harmonic_peak": None,
         "edge_harmonic_peak_harmonic_index": None,
         "edge_harmonic_peak_r": None,
@@ -1005,6 +1034,14 @@ def empty_interior_unresolved_envelope_features(
         "ext_df_gap": None,
         "ext_energy_frac": None,
         "extremum_exception_applied": None,
+        "footprint_exception": {
+            "enabled": resolved.footprint_spikes_fraction_max is not None,
+            "spikes_fraction_max": resolved.footprint_spikes_fraction_max,
+            "local_hf_fraction_max": resolved.footprint_local_hf_fraction_max,
+            "window_dr": resolved.footprint_window_dr,
+            "status": "NOT_APPLICABLE", "qualified": False, "applied": False,
+            "spikes_fraction": None, "local_hf_fraction": None,
+        },
     }
 
 
@@ -2295,17 +2332,21 @@ def extract_edge_artifact_features(
     mode: np.ndarray,
     *,
     r_edge_min: float = DEFAULT_EDGE_R_MIN,
+    body_r_max: float = DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX,
 ) -> dict[str, Any]:
     """Measure a narrow edge-localized total-energy envelope and its harmonic.
 
-    The decision evidence uses the global peak of normalized radial energy
-    ``sum_m |mode_m(r)|^2``. The strongest individual harmonic in the inclusive
+    Record global and local peaks of normalized radial energy
+    ``sum_m |mode_m(r)|^2``. Preserve the global fields for the interior gate.
+    The strongest individual harmonic in the inclusive
     edge window is retained separately for audit because physical edge modes
     can contain narrow harmonics while their total envelope remains resolved.
     All half-maximum edges are searched over the complete radial grid.
     """
     if not math.isfinite(r_edge_min) or not 0.0 <= r_edge_min < 1.0:
         raise ValueError("edge r_edge_min must be finite and in [0, 1)")
+    if not math.isfinite(body_r_max) or not 0.0 < body_r_max <= 1.0:
+        raise ValueError("edge body_r_max must be finite and in (0, 1]")
     mode_array = np.asarray(mode, dtype=float)
     if mode_array.ndim != 2 or mode_array.shape[0] < 1 or mode_array.shape[1] < 2:
         raise ValueError(
@@ -2324,7 +2365,10 @@ def extract_edge_artifact_features(
     energy_peak_raw = float(radial_energy[energy_peak_index])
     energy_peak_r = float(radial_grid[energy_peak_index])
 
-    result = empty_edge_artifact_features(float(r_edge_min))
+    result = empty_edge_artifact_features(float(r_edge_min), body_r_max)
+    # Native index division avoids linspace roundoff at the strict cutoff.
+    body_mask = np.arange(n_radial, dtype=float) / (n_radial - 1) < body_r_max
+    result["edge_body_amplitude_max"] = float(np.max(np.abs(mode_array[:, body_mask])))
     result.update(
         {
             "edge_energy_peak": 1.0 if energy_peak_raw > 0.0 else 0.0,
@@ -2355,6 +2399,23 @@ def extract_edge_artifact_features(
                 ),
             }
         )
+        for index, _, _ in _signed_local_extrema(normalized_energy):
+            if radial_grid[index] < r_edge_min - radial_tolerance:
+                continue
+            left, right, dr, grid_width, touches = _signed_halfmax_component(
+                normalized_energy, peak_index=index, radial_grid=radial_grid)
+            result["edge_energy_local_peaks"].append({
+                "peak_index": index,
+                "peak_r": float(radial_grid[index]),
+                "peak_energy_fraction": float(normalized_energy[index]),
+                "peak_amplitude": float(np.max(np.abs(mode_array[:, index]))),
+                "halfmax_width_r": dr,
+                "halfmax_width_grid": grid_width,
+                "halfmax_inner_edge_r": left,
+                "halfmax_outer_edge_r": right,
+                "component_touches_boundary": touches,
+                "is_global_peak": index == energy_peak_index,
+            })
 
     # Reversing the radial axis lets the established inclusive axis-window
     # measurement audit the strongest individual harmonic near r=1.
@@ -2504,8 +2565,18 @@ def extract_interior_unresolved_envelope_features(
         )
         and ext_df_gap <= resolved.ext_df_gap_max + ext_df_tolerance
     )
+    footprint = result["footprint_exception"]
+    if not footprint["enabled"]:
+        footprint["status"] = "DISABLED"
+    elif candidate_found is True:
+        footprint.update(measure_envelope_footprint(
+            mode, window_dr=resolved.footprint_window_dr,
+            width_max_grid=resolved.width_max_grid, peak_r_max=resolved.peak_r_max))
+        footprint["qualified"] = footprint_exception_qualifies(
+            footprint, resolved.footprint_spikes_fraction_max, resolved.footprint_local_hf_fraction_max)
+        footprint["applied"] = footprint["qualified"] and not exception_qualified
     if severity_context is not None:
-        severity_context["interior_exception"] = exception_qualified
+        severity_context["interior_exception"] = exception_qualified or footprint["qualified"]
     result["extremum_exception_applied"] = bool(
         candidate_found is True and exception_qualified
     )
@@ -2929,6 +3000,7 @@ def evaluate_mode(
         edge_features = extract_edge_artifact_features(
             mode,
             r_edge_min=edge_config.r_edge_min,
+            body_r_max=edge_config.secondary_peak_body_r_max,
         )
         named_features, feature_status = compute_named_features_for_mode(
             mode,
@@ -3106,11 +3178,19 @@ def evaluate_mode(
         and (edge_features['edge_energy_halfmax_width_grid'] is not None)
         and (edge_features['edge_energy_halfmax_width_grid'] <= edge_width_max_grid)
     )
+    if edge_config.enabled and edge_config.secondary_peak_energy_min is not None:
+        gate_flags[BAD_EDGE_SPIKE] |= any(
+            peak["peak_energy_fraction"] >= edge_config.secondary_peak_energy_min
+            and peak["halfmax_width_grid"] <= edge_width_max_grid
+            and peak["peak_amplitude"] > edge_features["edge_body_amplitude_max"]
+            for peak in edge_features["edge_energy_local_peaks"]
+        )
 
     gate_flags[BAD_INTERIOR_UNRESOLVED_ENVELOPE] = bool(
         interior_config.enabled
         and interior_envelope_features['candidate_found']
         and (not interior_envelope_features['extremum_exception_applied'])
+        and (not interior_envelope_features['footprint_exception']['qualified'])
     )
 
     gate_flags[BAD_INTERIOR_HARMONIC_INCOHERENCE] = bool(

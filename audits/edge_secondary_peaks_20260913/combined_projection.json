@@ -1,0 +1,13 @@
+{
+  "definition": "Same local total-energy peak: r>=0.97, own-half-maximum FWHM<=10 native intervals, W_peak/W_global_max>=0.5, max harmonic amplitude at peak>=0.3 of global amplitude, and peak/background amplitude contrast>=3; background median(max_h abs(xi_h)) on r>=0.9.",
+  "pilot39": 2,
+  "latest12": 2,
+  "training_good": 0,
+  "training_bad": 0,
+  "pending_envelope": 0,
+  "cached_inputs_sha256": {
+    "peaks.json": "62cc63a8508c5fa5769167bfcdb5e39140516d61c4f3389b35354cd744f43f1d",
+    "measurements.csv": "aea98964a8e2a3e78879f1c38e402211bc20ebfb586d24ee10b7069a8983806a",
+    "summary.json": "a5edac3dcc9830b7fd43bd1909ea3ed86f1d70a1a547cbed69bde1fb8a23bf41"
+  }
+}

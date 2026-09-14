@@ -1,5 +1,19 @@
 This document consolidates scripts related to various models and methods used in our project. Each section serves as a guide to the corresponding scripts, including their functionality and usage.
 
+Production v13 extends `BAD_EDGE_SPIKE` to secondary total-energy peaks
+at least half the global W maximum. Radius>=0.97 and own-FWHM<=10 intervals
+are unchanged. Secondary peaks also require max_h |xi_h(r_peak)| to exceed
+the maximum amplitude over all harmonics at strict r<0.9. The original global
+branch is unchanged. It also enables the accepted interior-envelope exception
+with strict F_spikes<50% and Q_local<5% in width-0.05 peak windows. Features
+are grouped v26; older named presets retain the global-only edge gate and
+disable the footprint exception. The [v13 regeneration](../audits/morphology_v13_20260913/README.md)
+records the 39-shot regression and refreshed disagreement lists.
+All 39 reviewed rules outputs are installed with verified v12 backups. There
+are six label changes; the latest twelve have 141 disagreements, with only
+E203655F01t025 N3/1987 newly added. The adoption audit includes additions and
+removals separately so previously reviewed cases need not be checked again.
+
 # Scripts README
 
 Production v12 adds `BAD_DISTRIBUTED_HARMONIC_NOISE`, a continuum-independent
@@ -10,7 +24,7 @@ conditions refer to one window and the same selected HF centers. The
 records implementation, regression checks, and regenerated pilot outputs.
 The existing continuum-side noise gate retains its earlier thresholds.
 All 39 checked rules shot exports have been regenerated with verified v11
-backups. The [current latest-12 disagreement list](../audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
+backups. The [v12 latest-12 disagreement list](../audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
 has 143 entries; N10/3470 is the only removed disagreement. The historical
 lists and user review annotations remain intact.
 
@@ -1001,7 +1015,7 @@ Both methods:
   method-specific diagnostics.
 
 The default `--method rules` path loads the frozen
-`tae_rules_production_v12` configuration. A rejection gate produces automatic
+`tae_rules_production_v13` configuration. A rejection gate produces automatic
 BAD. A mode passing all enabled gates retains the scientifically conservative
 engine result `rule_decision=REVIEW` and
 `rule_primary_reason=NO_GOOD_TEMPLATE`; the separately audited
@@ -1311,7 +1325,7 @@ for calibration and adoption evidence. The four-consecutive-flip gate is unchang
 
 ## Normalized gate severity
 
-`src/rule_severity.py` exports `severity_features` in grouped rule schema v24
+`src/rule_severity.py` exports `severity_features` in grouped rule schema v26
 with severity schema v2, including the distributed-harmonic noise branch.
 V11 introduced severity without changing its v22 rejection ruleset; v12 adds
 the distributed-harmonic gate. Severity is a dimensionless margin
@@ -1374,9 +1388,9 @@ python scripts/sort_shot_mixed.py \
 ```
 
 The version-controlled configuration is
-`configs/rules/tae_rules_production_v12.yaml`, stored as strict
+`configs/rules/tae_rules_production_v13.yaml`, stored as strict
 JSON-compatible YAML so loading requires no additional package. It pins the
-current v23 ruleset, routing thresholds, relative-frequency tolerance, all
+current v25 ruleset, routing thresholds, relative-frequency tolerance, all
 gate thresholds, and these gate states:
 
 - enabled: gates 1 (`BAD_AXIS_SPIKE`), 2 (`BAD_GRID_SCALE_SPIKE`), 2b
@@ -1393,7 +1407,7 @@ gate thresholds, and these gate states:
   threshold `W_star_max > 0.03` for possible future comparison.
 
 Rules mode loads this configuration by default and does not permit a
-config-owned threshold or gate override to retain the production-v12 identity.
+config-owned threshold or gate override to retain the production-v13 identity.
 `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`
 record `rule_configuration_name`, `rule_configuration_schema_version`,
 `rule_configuration_sha256`, `continuum_preprocessing_version`, and the audited `accept-as-good-v1` survivor
@@ -1413,7 +1427,7 @@ python scripts/sort_shot_rules.py \
 
 In this interface, modes that pass every gate remain final REVIEW. To audit
 the exact frozen gate configuration without production promotion, add
-`--rule_config tae_rules_production_v12` to the `sort_shot_rules.py` command.
+`--rule_config tae_rules_production_v13` to the `sort_shot_rules.py` command.
 
 `scripts/make_tae_like_list.py` also exposes an importable
 `preprocess_shot()` interface and a standalone preprocessing CLI. Before any
@@ -1424,7 +1438,7 @@ list with `gap_region=mixed`; valid EAE-like modes are routed without a rule
 decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
-`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-extended-continuum-noise-distributed-harmonic-noise-v23`
+`tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-extended-continuum-noise-distributed-harmonic-noise-secondary-edge-energy-peaks-footprint-exception-v25`
 ruleset implements twelve ordered BAD decisions, treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
@@ -1435,7 +1449,7 @@ feature values use JSON `null`.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
-object. Its rule-facing schema is `tae-rule-features-grouped-v24`, with
+object. Its rule-facing schema is `tae-rule-features-grouped-v26`, with
 `source_feature_schema_version=rf_all_crossings_extremum_energy_31_v2`. The
 groups are:
 
@@ -1466,7 +1480,9 @@ groups are:
   `axis_peak_harmonic_index`, `axis_peak_r`, `axis_peak_is_local_max`, connected
   half-maximum width in normalized radius and grid intervals, outer edge, and
   whether the component includes `r=0`;
-- `boundary_features.edge_artifact`: the global normalized total-energy peak
+- `boundary_features.edge_artifact`: `edge_energy_local_peaks` records each
+  edge W maximum, its fraction of global max(W), radius and full connected
+  half-maximum geometry. The existing global fields remain unchanged: peak
   radius, inclusive edge-window status, connected full-grid half-maximum edges
   and widths, and outer-boundary touch status, plus the strongest individual
   edge harmonic's peak, zero-based stored harmonic index, local-maximum status,
@@ -1720,16 +1736,26 @@ calibrated configuration is:
 edge_artifact:
   r_edge_min: 0.97
   edge_width_max_grid: 10
+  secondary_peak_energy_min: 0.5
+  secondary_peak_body_r_max: 0.9
 ```
 
-After both continuum-crossing gates, a mode whose global energy peak is at
-`r >= r_edge_min` and whose connected energy FWHM is no greater than
-`edge_width_max_grid` returns `BAD` with `BAD_EDGE_SPIKE`. Both half-maximum
-edges are found on the complete radial grid. The strongest individual harmonic
+After both continuum-crossing gates, a global or secondary local peak of
+W=sum_h |xi_h|^2 with W_peak>=0.5*max(W), at `r >= r_edge_min`, and connected
+energy FWHM no greater than `edge_width_max_grid` returns `BAD` with
+`BAD_EDGE_SPIKE`. Width is measured at half of that peak's own height. Both half-maximum
+edges are found on the complete radial grid. Secondary peaks additionally
+require `max_h |xi_h(r_peak)| > max_{h,r<0.9} |xi_h(r)|`, using a strict
+amplitude comparison and strict body-radius cutoff. The numerator is taken
+at that W peak, not from a neighboring window. `edge_body_amplitude_max`
+and each local peak's `peak_amplitude` preserve the evidence; severity includes
+the amplitude/body component. The original global branch keeps its earlier
+conditions. The strongest individual harmonic
 within the same inclusive edge window is recorded for audit, but does not fire
 this gate alone because physical edge-localized modes can contain narrow
 shear-localized harmonics within a broader total envelope. Override the
-settings with `--edge_r_min` and `--edge_width_max_grid`, or use
+settings with `--edge_r_min`, `--edge_width_max_grid`, and
+`--edge_secondary_peak_energy_min`, and `--edge_secondary_peak_body_r_max`, or use
 `--disable_edge_artifact` to retain the measurements without applying the
 decision. Shot and per-`n` summaries record enable state and thresholds for all
 existing BAD decisions.
@@ -1747,6 +1773,11 @@ interior_unresolved_envelope:
   ext_df_gap_min: 0.001
   ext_df_gap_min_inclusive: false
   ext_df_gap_max: 0.04
+  footprint_exception:
+    enabled: true
+    spikes_fraction_max: 0.5
+    local_hf_fraction_max: 0.05
+    window_dr: 0.05
 ```
 
 After the axis, signed-spike, packet, crossing, crossing-window, and edge
@@ -1775,6 +1806,39 @@ the settings with `--interior_envelope_peak_r_max`,
 `--interior_envelope_ext_df_gap_max`; use
 `--disable_interior_unresolved_envelope` to retain evidence without applying
 the decision.
+
+Production v13 adds an independent smoothness/footprint exception to this
+gate: `F_spikes < 0.50 AND Q_local < 0.05`. F_spikes is integrated W in the
+union of disjoint regions above **half the global W maximum**, selecting
+regions no wider than the configured two native intervals with peak r<=0.5,
+divided by full-domain integrated W. Endpoints are interpolated and partial
+cells are included. This measures energy concentration, not peak amplitude.
+
+Q_local is the largest high-pass/raw-energy ratio in windows of nominal
+width 0.05 centered on the global W peak and each selected region's peak.
+Use the shared signed `diff2(xi)/4` operator without a continuum mask;
+only stencils wholly inside the same window contribute. The denominator
+integrates all raw W in that window with trapezoidal endpoint weights.
+Both thresholds are strict, and all other gates retain their decisions.
+An unresolved window or zero mode energy cannot grant the exception.
+Evidence, bounds, thresholds and exemption flags are recorded under
+`resolution_features.interior_unresolved_envelope.footprint_exception`.
+An exempted interior gate has zero severity; other gate severities still
+determine the overall score and duplicate selection.
+
+For calibration, use `--interior_envelope_footprint_spikes_fraction_max`,
+`--interior_envelope_footprint_local_hf_fraction_max`,
+`--interior_envelope_footprint_window_dr`, or
+`--disable_interior_envelope_footprint_exception`. These values belong to
+the configuration when a named preset is selected. Frozen v5-v12 disable
+the exception. Example:
+
+```text
+python scripts/sort_shot_rules.py --shot_dir /path/to/shot --out_dir /path/to/audit --disable_interior_envelope_footprint_exception
+```
+
+See the [calibration definitions](../audits/envelope_footprint_20260913/README.md)
+and [full v13 regression](../audits/morphology_v13_20260913/README.md).
 
 The interior harmonic gate measures incoherent activity in the interior without
 claiming that its physical cause is random noise:
@@ -1910,7 +1974,7 @@ Calibration options are `--axis_energy_amplitude_r_max` (0.015),
 `--axis_energy_fraction_min` (0.5). `--disable_axis_energy_concentration`
 disables the decision while preserving its measurements. Named v5-v8
 presets explicitly disable the gate and retain their earlier decisions;
-new exports still use the v24 audit schema. Shot/per-n summaries record
+new exports still use the v26 audit schema. Shot/per-n summaries record
 `axis_energy_concentration_gate_enabled` and all four `axis_energy_*` values.
 For example, a conservative calibration run retaining only its evidence is:
 

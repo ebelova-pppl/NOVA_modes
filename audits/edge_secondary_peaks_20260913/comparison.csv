@@ -1,0 +1,9 @@
+scenario,training_good,training_bad,pilot39,latest12,pending_envelope
+all_peaks,153,10,603,204,0
+W_peak_ge_0.05,17,1,99,61,0
+W_peak_ge_0.10,11,0,69,45,0
+W_peak_ge_0.25,5,0,37,24,0
+W_peak_ge_0.50,1,0,14,9,0
+A_ge_0.3_contrast_ge_3,1,0,6,4,0
+A_ge_0.3_contrast_ge_3_width_le_4,1,0,6,4,0
+A_ge_0.3_contrast_ge_4,0,0,0,0,0

@@ -50,6 +50,8 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL,
     DEFAULT_EDGE_R_MIN,
     DEFAULT_EDGE_WIDTH_MAX_GRID,
+    DEFAULT_EDGE_SECONDARY_PEAK_ENERGY_MIN,
+    DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX,
     DEFAULT_GRID_SCALE_AMPLITUDE_MIN,
     DEFAULT_GRID_SCALE_HIGH_R_CUTOFF_R,
     DEFAULT_GRID_SCALE_HIGH_R_WIDTH_MAX_GRID,
@@ -70,6 +72,9 @@ from tae_rule_engine import (  # noqa: E402
     DEFAULT_INTERIOR_ENVELOPE_EXT_DR_MAX,
     DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
     DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID,
+    DEFAULT_INTERIOR_FOOTPRINT_SPIKES_FRACTION_MAX,
+    DEFAULT_INTERIOR_FOOTPRINT_LOCAL_HF_FRACTION_MAX,
+    DEFAULT_INTERIOR_FOOTPRINT_WINDOW_DR,
     DEFAULT_INTERIOR_HARMONIC_ACTIVE_CORE_ENERGY_FRACTION_MIN,
     DEFAULT_INTERIOR_HARMONIC_CALIBRATED_N_RADIAL,
     DEFAULT_INTERIOR_HARMONIC_CORE_R_MAX,
@@ -261,7 +266,13 @@ SHOT_SUMMARY_FIELDS = [
     "edge_artifact_gate_enabled",
     "edge_artifact_r_min",
     "edge_artifact_width_max_grid",
+    "edge_artifact_secondary_peak_energy_min",
+    "edge_artifact_secondary_peak_body_r_max",
     "interior_envelope_gate_enabled",
+    "interior_envelope_footprint_exception_enabled",
+    "interior_envelope_footprint_spikes_fraction_max",
+    "interior_envelope_footprint_local_hf_fraction_max",
+    "interior_envelope_footprint_window_dr",
     "interior_envelope_peak_r_max",
     "interior_envelope_width_max_grid",
     "interior_envelope_extremum_r_min",
@@ -343,8 +354,14 @@ RULE_CONFIG_OVERRIDE_OPTIONS = frozenset(
         "--disable_cross_window_exception",
         "--edge_r_min",
         "--edge_width_max_grid",
+        "--edge_secondary_peak_energy_min",
+        "--edge_secondary_peak_body_r_max",
         "--disable_edge_artifact",
         "--interior_envelope_peak_r_max",
+        "--interior_envelope_footprint_spikes_fraction_max",
+        "--interior_envelope_footprint_local_hf_fraction_max",
+        "--interior_envelope_footprint_window_dr",
+        "--disable_interior_envelope_footprint_exception",
         "--interior_envelope_width_max_grid",
         "--interior_envelope_extremum_r_min",
         "--interior_envelope_extremum_r_max",
@@ -1213,7 +1230,13 @@ def build_summary(
         "edge_artifact_gate_enabled": edge_config.enabled,
         "edge_artifact_r_min": edge_config.r_edge_min,
         "edge_artifact_width_max_grid": edge_config.edge_width_max_grid,
+        "edge_artifact_secondary_peak_energy_min": edge_config.secondary_peak_energy_min,
+        "edge_artifact_secondary_peak_body_r_max": edge_config.secondary_peak_body_r_max,
         "interior_envelope_gate_enabled": interior_config.enabled,
+        "interior_envelope_footprint_exception_enabled": interior_config.footprint_spikes_fraction_max is not None,
+        "interior_envelope_footprint_spikes_fraction_max": interior_config.footprint_spikes_fraction_max,
+        "interior_envelope_footprint_local_hf_fraction_max": interior_config.footprint_local_hf_fraction_max,
+        "interior_envelope_footprint_window_dr": interior_config.footprint_window_dr,
         "interior_envelope_peak_r_max": interior_config.peak_r_max,
         "interior_envelope_width_max_grid": interior_config.width_max_grid,
         "interior_envelope_extremum_r_min": interior_config.extremum_r_min,
@@ -1565,6 +1588,11 @@ def run_shot(
     cross_window_exception_calibrated_n_radial: int = DEFAULT_CROSS_WINDOW_EXCEPTION_CALIBRATED_N_RADIAL,
     edge_r_min: float = DEFAULT_EDGE_R_MIN,
     edge_width_max_grid: float | None = DEFAULT_EDGE_WIDTH_MAX_GRID,
+    edge_secondary_peak_energy_min: float | None = DEFAULT_EDGE_SECONDARY_PEAK_ENERGY_MIN,
+    edge_secondary_peak_body_r_max: float = DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX,
+    interior_envelope_footprint_spikes_fraction_max: float | None = DEFAULT_INTERIOR_FOOTPRINT_SPIKES_FRACTION_MAX,
+    interior_envelope_footprint_local_hf_fraction_max: float = DEFAULT_INTERIOR_FOOTPRINT_LOCAL_HF_FRACTION_MAX,
+    interior_envelope_footprint_window_dr: float = DEFAULT_INTERIOR_FOOTPRINT_WINDOW_DR,
     interior_envelope_peak_r_max: float = DEFAULT_INTERIOR_ENVELOPE_PEAK_R_MAX,
     interior_envelope_width_max_grid: float | None = (
         DEFAULT_INTERIOR_ENVELOPE_WIDTH_MAX_GRID
@@ -1668,10 +1696,15 @@ def run_shot(
         exception_calibrated_n_radial=cross_window_exception_calibrated_n_radial,
     )
     edge_config = EdgeArtifactConfig(
+        secondary_peak_body_r_max=edge_secondary_peak_body_r_max,
+        secondary_peak_energy_min=edge_secondary_peak_energy_min,
         r_edge_min=edge_r_min,
         edge_width_max_grid=edge_width_max_grid,
     )
     interior_config = InteriorUnresolvedEnvelopeConfig(
+        footprint_spikes_fraction_max=interior_envelope_footprint_spikes_fraction_max,
+        footprint_local_hf_fraction_max=interior_envelope_footprint_local_hf_fraction_max,
+        footprint_window_dr=interior_envelope_footprint_window_dr,
         peak_r_max=interior_envelope_peak_r_max,
         width_max_grid=interior_envelope_width_max_grid,
         extremum_r_min=interior_envelope_extremum_r_min,
@@ -2256,7 +2289,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=float,
         default=DEFAULT_EDGE_R_MIN,
         help=(
-            "Inclusive normalized radius at which a global energy peak is "
+            "Inclusive normalized radius at which a qualifying energy peak is "
             f"edge-localized for BAD_EDGE_SPIKE (default: {DEFAULT_EDGE_R_MIN})"
         ),
     )
@@ -2270,6 +2303,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--edge_secondary_peak_energy_min",
+        type=float,
+        default=DEFAULT_EDGE_SECONDARY_PEAK_ENERGY_MIN,
+        help="Minimum secondary W peak / global W maximum for the edge gate (default: 0.5)",
+    )
+    parser.add_argument(
+        "--edge_secondary_peak_body_r_max",
+        type=float,
+        default=DEFAULT_EDGE_SECONDARY_PEAK_BODY_R_MAX,
+        help="Secondary edge peak amplitude must exceed max amplitude at strict r below this cutoff (default: 0.9)",
+    )
+    parser.add_argument(
         "--disable_edge_artifact",
         action="store_true",
         help=(
@@ -2277,6 +2322,17 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
             "the BAD_EDGE_SPIKE decision gate"
         ),
     )
+    parser.add_argument("--interior_envelope_footprint_spikes_fraction_max", type=float,
+                        default=DEFAULT_INTERIOR_FOOTPRINT_SPIKES_FRACTION_MAX,
+                        help="Excuse the interior gate only below this integrated narrow-peak energy fraction (default: 0.5)")
+    parser.add_argument("--interior_envelope_footprint_local_hf_fraction_max", type=float,
+                        default=DEFAULT_INTERIOR_FOOTPRINT_LOCAL_HF_FRACTION_MAX,
+                        help="Excuse the interior gate only below this HF/raw fraction in every peak window (default: 0.05)")
+    parser.add_argument("--interior_envelope_footprint_window_dr", type=float,
+                        default=DEFAULT_INTERIOR_FOOTPRINT_WINDOW_DR,
+                        help="Full radial width of footprint smoothness windows (default: 0.05)")
+    parser.add_argument("--disable_interior_envelope_footprint_exception", action="store_true",
+                        help="Disable only the footprint/smoothness exception; keep the interior gate active")
     parser.add_argument(
         "--interior_envelope_peak_r_max",
         type=float,
@@ -2562,9 +2618,14 @@ def main() -> None:
         cross_window_exception_half_width_grid=args.cross_window_exception_half_width_grid,
         cross_window_exception_calibrated_n_radial=args.cross_window_exception_calibrated_n_radial,
         edge_r_min=args.edge_r_min,
+        edge_secondary_peak_energy_min=args.edge_secondary_peak_energy_min,
+        edge_secondary_peak_body_r_max=args.edge_secondary_peak_body_r_max,
         edge_width_max_grid=(
             None if args.disable_edge_artifact else args.edge_width_max_grid
         ),
+        interior_envelope_footprint_spikes_fraction_max=(None if args.disable_interior_envelope_footprint_exception else args.interior_envelope_footprint_spikes_fraction_max),
+        interior_envelope_footprint_local_hf_fraction_max=args.interior_envelope_footprint_local_hf_fraction_max,
+        interior_envelope_footprint_window_dr=args.interior_envelope_footprint_window_dr,
         interior_envelope_peak_r_max=args.interior_envelope_peak_r_max,
         interior_envelope_width_max_grid=(
             None

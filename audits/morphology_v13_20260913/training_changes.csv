@@ -1,0 +1,2 @@
+path,mode_key,training_label,input_fingerprint,before,after,before_reason,reason,footprint_exception_applied
+nstxuE204669M03t025/N4/egn04w.1691E+02,nstxuE204669M03t025/N4/egn04w.1691E+02,good,f5b0e23454fdb0e7a774b9be8b6dd9d445cdefeecba9ea5686147f5210443f4c,GOOD,BAD,NO_GOOD_TEMPLATE,BAD_EDGE_SPIKE,False

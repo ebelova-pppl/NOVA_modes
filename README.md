@@ -7,6 +7,11 @@ Main context files:
 - `docs/project_state.md` — current project state and model status
 - `scripts/README.md` — detailed script inventory and usage notes
 
+The [current 39-shot disagreement review](audits/pilot39_v13_review_20260913/README.md)
+contains 365 rules/RF-CNN disagreements, split by direction, with an editable
+review copy for proposed manual overrides. Review precedes the accepted-TAE
+export for group distribution; the remaining database is deferred.
+
 **The full-database rollout remains paused (2026-09-10)** while DiTw
 continuum/eigenmode consistency is reviewed and affected inputs corrected.
 A user-authorized twelve-shot rules/RF-CNN comparison is now complete on
@@ -94,6 +99,29 @@ Input validity (updated 2026-09-11):
   archived out of the active list. See the [training confirmation](audits/n1_training_alignment_20260910/README.md)
   and [27-shot pilot alignment screen](audits/n1_pilot_alignment_20260910/README.md).
 
+Production v13: smoothness/footprint exception and secondary edge peaks (2026-09-13):
+
+The existing `BAD_EDGE_SPIKE` now also checks secondary peaks of
+`W(r)=sum_h |xi_h(r)|^2` with W_peak>=0.5*max(W). The location threshold
+remains r>=0.97 and the connected full-grid FWHM limit remains 10 intervals,
+measured at half of each peak's own height. A secondary peak must also have
+max_h |xi_h(r_peak)| strictly greater than max_{h,r<0.9} |xi_h(r)|.
+This amplitude condition does not affect the original global-peak branch.
+The interior-envelope gate also gains the accepted exception: narrow
+half-global-W regions contain **F_spikes<50%** of integrated mode energy,
+and **Q_local<5%** in every tested peak window of width 0.05. Both cuts are
+strict. Other gates can still reject the mode. The shared calculation is in
+`src/envelope_footprint.py`; unresolved windows cannot grant the exception.
+The global measurements used by the interior gate remain intact. Frozen
+v5-v12 preserve their prior decisions. This is production config v13,
+ruleset v25, grouped feature schema v26 and severity schema v2. The
+[v13 regression and regeneration](audits/morphology_v13_20260913/README.md)
+records the installed outputs and refreshed disagreement lists.
+All 39 reviewed rules shots are installed with v12 backups: three modes become
+GOOD and three become BAD. The [current latest-12 disagreement list](audits/morphology_v13_20260913/latest12_disagreements.csv)
+has 141 entries; [only one disagreement is new](audits/morphology_v13_20260913/latest12_disagreements_added.csv).
+All 214 tests pass; training labels and RF-CNN exports are unchanged.
+
 Production v12: distributed harmonic noise (2026-09-13):
 
 - Adds `BAD_DISTRIBUTED_HARMONIC_NOISE` after all existing gates. In one
@@ -107,7 +135,7 @@ Production v12: distributed harmonic noise (2026-09-13):
 - All 206 repository tests pass. The 39 checked rules exports were regenerated
   and installed with verified v11 backups. Only N10/3470 changes in the pilot;
   no GOOD training label triggers the new gate. The
-  [current latest-12 disagreement list](audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
+  [v12 latest-12 disagreement list](audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
   has 143 entries, down from the original 144. AI exports are unchanged.
 - Grouped features v24 and severity schema v2 record the same-window witness,
   component ratios, selected centers, settings and resolution status. The
@@ -170,14 +198,14 @@ Retained axis-energy rule (adopted in v9, 2026-09-09):
   the clearance lower comparison includes equality.
 
 - `sort_shot_mixed.py --method rules` now uses
-  `configs/rules/tae_rules_production_v12.yaml` (ruleset v23 / feature schema v24).
+  `configs/rules/tae_rules_production_v13.yaml` (ruleset v25 / feature schema v26).
   Each offending continuum-crossing window is excused only when its
   interpolated signed-harmonic amplitude satisfies `A_cross < 0.2` and
   its native-grid roughness satisfies `K_c < 0.1`, on nr=201. Every offending
   crossing must qualify; all other rejection gates still apply.
 - V5/v6 configuration files remain frozen and explicitly disable the smooth-crossing
   exception when loaded. Their decisions remain supported; new exports use
-  the current v24 audit schema. RF/CNN feature columns and weights are unchanged.
+  the current v26 audit schema. RF/CNN feature columns and weights are unchanged.
 - The earlier smooth-crossing impact audit recovered 19 modes in the 27-shot batch and two
   labeled GOOD training modes, with no newly accepted labeled BAD training
   modes. See [the exception audit](audits/cross_window_exception_20260909/README.md).
@@ -291,7 +319,7 @@ Current best models
 - Previous four-shot RF/CNN checkpoints have been archived under
   `models/old_4shots_models/`.
 - `sort_shot_mixed.py` is the canonical production orchestrator. Its default
-  `--method rules` path loads the immutable `tae_rules_production_v12`
+  `--method rules` path loads the immutable `tae_rules_production_v13`
   configuration; `--method rf-cnn` preserves the older RF-leaning fusion
   policy as an explicit legacy option. The rule and AI decision engines stay
   separate while sharing validation, routing, output, and duplicate-removal
@@ -309,7 +337,7 @@ Current best models
 For a user who only wants to sort new NOVA output, do **not** train new
 models. Run the canonical `scripts/sort_shot_mixed.py` workflow once per shot.
 The default method is deterministic rules and loads the frozen
-`tae_rules_production_v12` configuration automatically:
+`tae_rules_production_v13` configuration automatically:
 
 ```text
 rejection gate fired -> BAD
@@ -467,7 +495,7 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/rule_sort_output
 ```
 
-`configs/rules/tae_rules_production_v12.yaml` pins the routing values, ruleset,
+`configs/rules/tae_rules_production_v13.yaml` pins the routing values, ruleset,
 gate enable states, and thresholds calibrated and audited non-blindly on the
 14 active shots and the held-out pilot review. Gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope gate, the interior
@@ -514,9 +542,11 @@ least four strictly consecutive sign flips with mode-level
 with `W_star_max > 0.03` (`BAD_CONT_CROSS`). A second crossing gate rejects when an
 inclusive ±2-grid neighborhood of any true crossing has individual-harmonic
 absolute amplitude at least `0.25` or peak-normalized radial energy at least
-`0.05` (`BAD_CONT_CROSS_WINDOW`). The edge gate rejects a global total-energy
-peak at `r >= 0.97` whose FWHM is no greater than 10 grid intervals
-(`BAD_EDGE_SPIKE`). The following gate rejects a global total-energy envelope with
+`0.05` (`BAD_CONT_CROSS_WINDOW`). The edge gate rejects a global or secondary
+total-energy peak with W>=0.5*max(W), at `r >= 0.97`, whose own FWHM is no greater than 10 grid intervals
+(`BAD_EDGE_SPIKE`). Secondary peaks additionally require their largest
+harmonic amplitude to exceed the maximum amplitude anywhere at strict r<0.9.
+The following gate rejects a global total-energy envelope with
 connected FWHM no greater than two grid intervals and peak at `r <= 0.5`, unless
 the peak is aligned with a gate-specific inner continuum extremum within
 `ext_dr <= 0.02` and `0.001 < ext_df_gap <= 0.04`
@@ -583,7 +613,7 @@ summaries, crossing-window amplitude and energy evidence, raw crossing records,
 three continuum-extremum measurements, axis/edge boundary measurements,
 separate unresolved-interior-envelope evidence, and the components of the
 interior harmonic-incoherence score. Its grouped audit schema is
-`tae-rule-features-grouped-v24`; the near-axis group records the independent
+`tae-rule-features-grouped-v26`; the near-axis group records the independent
 mode-level amplitude maximum and complete strongest single-harmonic sign-flip
 run evidence. The inherited participation summaries remain scalar
 energy-weighted evidence rather than an unweighted pointwise maximum. The
@@ -591,8 +621,8 @@ interior-envelope search uses extrema
 through `r=0.50` without changing the experimental RF feature definition,
 which retains its established `r<=0.40` search.
 Half-maximum boundary widths use the complete radial grid, not only their
-search windows. The edge decision uses the global normalized total-energy
-envelope; the strongest individual edge harmonic is recorded for audit but
+search windows. The edge decision checks significant local peaks of the
+normalized total-energy envelope; the strongest individual edge harmonic is recorded for audit but
 does not fire the gate alone. NOVA radius and mode amplitude are already
 normalized; harmonic identifiers are reported as zero-based stored indices
 without inferring a physical poloidal-`m` offset. This reuses the calculations

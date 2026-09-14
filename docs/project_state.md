@@ -3,6 +3,160 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-13 refreshed 39-shot disagreements for manual review
+
+- User requests the complete 39-shot disagreement lists, with manual
+  corrections to be reviewed before assembling the accepted TAE list for
+  group distribution. The remaining database is explicitly deferred.
+- [Current review package](../audits/pilot39_v13_review_20260913/README.md)
+  was rebuilt from installed v13 rules and saved RF-CNN exports: **365 / 6,004**
+  paired TAE-side disagreements, comprising **218 rules-BAD/AI-GOOD** and
+  **147 rules-GOOD/AI-BAD**. Separate p>=0.5 comparisons give **399 vs RF** and
+  **721 vs CNN**. All 365 match the preceding verified v13 list exactly.
+  Relative to v12 there is one addition (E203655F01t025 N3/1987) and five removals.
+- `disagreements_elena.csv` is a new editable worksheet with blank
+  `manual_decision`/`manual_reason` columns. Prior lists and annotations are
+  preserved. Existing fingerprinted `--manual_overrides` supports GOOD/BAD/
+  REVIEW final decisions while preserving automatic rule evidence; no
+  manual overrides or training-label changes were applied in this refresh.
+- Rechecked raw fingerprints for all 6,012 evaluated modes and matching
+  frequency, grid and routing in every paired row. Eight corrected C50/N1
+  modes lack current AI classifications and are listed separately. Source
+  output hashes are stable. Per-shot lists and the full comparison are under
+  ignored `outputs/review_pilot39_v13_20260913/`.
+- Next: user adjudicates desired changes; apply confirmed overrides, rerun
+  affected rules shots, then assemble the deduplicated accepted TAE list.
+  The current baseline has 1,646 GOOD modes and 1,635 representatives. No
+  group distribution or additional shot processing has taken place.
+
+## 2026-09-13 production v13: accepted footprint exception and edge refinement
+
+- User now authorizes activation and rerunning the reviewed cases. This
+  supersedes the earlier deferral recorded below. All 39 checked rules shots
+  are regenerated, verified and installed; the full-database rollout remains
+  on hold.
+- Added the shared native-grid `src/envelope_footprint.py` calculation and
+  interior-envelope exception with strict F_spikes<0.50 and Q_local<0.05
+  in nominal width-0.05 peak windows. It reproduces all 41 calibration rows.
+  The existing continuum-extremum exception and all other gates remain
+  active; an unavailable smoothness window cannot grant the new exception.
+- Includes the final secondary-edge condition below: same local W peak
+  has W>=50% of the global maximum, r>=0.97, own-FWHM<=10 intervals and
+  amplitude strictly greater than max over all harmonics at r<0.9.
+  The original global-edge branch is preserved.
+- Final unreleased-v13 configuration SHA256 is
+  `5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919`.
+  Ruleset v25, grouped features v26, severity schema v2; frozen v5-v12
+  retain their configurations and decisions. Canonical production and
+  conservative calibration CLIs use the shared implementation.
+- **214 repository tests pass**, including strict exception boundaries,
+  unresolved native windows, disjoint energy regions with overlapping
+  windows, precedence of other gates, and prior edge/legacy regression.
+  Full output/training verification and installation receipts are in
+  [the v13 adoption audit](../audits/morphology_v13_20260913/README.md).
+- Verified all 25,967 inputs: 6,012 rule-evaluated (nr=201), 19,248 routed EAE
+  and 707 invalid. Fingerprints, routing and unrelated gate features and
+  severities are unchanged; no resolution warnings or ranking fallbacks.
+  Three BAD->GOOD: E202926A03t025 N3/1151 and N4/3735, G142301L94 N9/2746.
+  Three GOOD->BAD: E203655F01t025 N2/2035 and N3/1987, E205057A01t020 N4/1444.
+  No primary-reason-only changes or additional representative swaps.
+  N7/8319 remains BAD. Total GOOD remains 1,646 before deduplication and
+  1,635 selected representatives.
+- Fresh full 2,327-row training regression has only the known edge conflict:
+  GOOD-labeled E204669M03t025 N4/1691 becomes BAD. Footprint adds no training
+  survivors; the main training list is unchanged. All RF-CNN export trees
+  are unchanged. Rules/RF-CNN disagreements decline 369->365 / 6,004 pairs;
+  latest twelve 143->141. Only new disagreement: E203655F01t025 N3/1987.
+  [Latest-12 additions only](../audits/morphology_v13_20260913/latest12_disagreements_added.csv)
+  and [full current list](../audits/morphology_v13_20260913/latest12_disagreements.csv)
+  preserve the historical review lists and annotations.
+- Installed outputs and backups match verified tree hashes. The prior v12
+  exports are retained in `sort_outputs/before_morphology_v13_20260913/`.
+  README, scripts README and the sorting skill document the adopted rules.
+
+## 2026-09-13 earlier v13 refinement: secondary peak must exceed the mode body
+
+- User considers N2/2035 and the refined edge gate completed and accepted;
+  continue the latest twelve-shot review without batch regeneration.
+- User adds a strict amplitude requirement to the secondary edge branch:
+  max_h |xi_h(r_peak)| > max_{h,r<0.9} |xi_h(r)|. The numerator is measured
+  at the same local W peak that satisfies W_peak>=0.5*max(W), r>=0.97 and
+  own-FWHM<=10 intervals. No median or neighborhood amplitude is used.
+  Equality passes this branch; the original global-energy-peak branch is
+  unchanged. Body and peak amplitudes and the strict severity component
+  are recorded alongside the W peak geometry.
+- Refined the still-uncommitted v13 configuration before any batch export;
+  no additional preset was created. Current v13 SHA256 is
+  `8778c722bf88162e2f5cca2a9483a7e7f91976e79bcbd5c2445f6f78bfa025eb`.
+  The initial energy-only v13 audit below retains its earlier hash/results
+  as historical evidence. Frozen v5-v12 settings and decisions remain intact.
+- Fresh measurements of all 15 previously changing modes preserve 11 of
+  the 14 pilot GOOD modes. Only E203655F01t025 N2/2035 (amplitude/body=3.632),
+  N3/1987 (1.015), and E205057A01t020 N4/1444 (1.164) remain new pilot
+  rejections; two are in the latest twelve. Training GOOD-labeled
+  E204669M03t025 N4/1691 still conflicts (1.220). This stricter conjunction
+  cannot add new rejections outside the preceding complete survivor audit.
+  [All 15 before/after measurements](../audits/edge_secondary_peaks_20260913/body_amplitude_comparison.csv)
+  preserve fingerprints and amplitudes. All 39 installed rules CSVs remain
+  unchanged. **211 repository tests pass**, including strict amplitude
+  equality, all-harmonic body maximum, exact r=0.9 exclusion and the original
+  global branch. No batch regeneration or training-label edits.
+
+## 2026-09-13 pilot follow-up: E204955F02t017 N7/8319
+
+- Fresh current-v13 single-mode evaluation reproduces all saved v12 non-edge
+  diagnostic groups exactly and verifies the same raw input fingerprint.
+  Only `BAD_INTERIOR_UNRESOLVED_ENVELOPE` fires. Global W peaks at r=0.155;
+  full connected energy FWHM=1.87888254 grid intervals (r=0.15201302--0.16140743),
+  below the <=2 cutoff. The strongest signed harmonic has FWHM=2.21778179
+  intervals, explaining the difference between amplitude and energy widths.
+- The peak aligns exactly with the upper continuum minimum (ext_dr=0),
+  but relative frequency clearance=0.0007601784 (0.0760178%) fails the
+  strict >0.1% extremum exception. There are no detected continuum crossings.
+  Frequency=2.88426220; upper boundary at the peak=2.88645475.
+- The provisionally accepted footprint/smoothness exception would also leave
+  this mode rejected: Q_local=4.17396% passes its <5% cut, but the narrow
+  half-maximum component contains F_spikes=71.5893% of integrated energy,
+  exceeding the <50% requirement. These fresh morphology values reproduce
+  the existing footprint audit. Stored arrays have nr=201.
+- Native signed profiles, W, widths and continuum were inspected in
+  `outputs/review_n7_8319_20260913/profiles_and_widths.png`; the adjacent
+  `verification.json` preserves measurements and fingerprint checks.
+  No gate or label changed, and the installed shot CSV remains unchanged.
+
+## 2026-09-13 initial v13: significant secondary edge-energy peaks
+
+- User set aside the local amplitude/contrast proposal and authorized a
+  focused correction to `BAD_EDGE_SPIKE`: a secondary total-energy peak
+  with W_peak>=0.5*max(W) gets the same existing r>=0.97 and connected
+  FWHM<=10-grid-interval cuts as the global peak. W=sum_h |xi_h|^2; the
+  50% cut is a peak-height fraction, not an integrated energy fraction.
+  Width uses half of each candidate's own height on the complete native
+  grid. No amplitude, contrast, or new radial cut is added.
+- Shared extraction records all edge W maxima and their widths; the original
+  global-peak fields remain intact for the interior-envelope gate. Severity
+  includes the secondary candidates with their energy and width components.
+  All other gate settings, routing and representative selection policy are
+  unchanged. Frozen v5-v12 retain their old edge decisions. Default rules
+  now use `tae_rules_production_v13`, ruleset v24, grouped features v25,
+  severity v2; configuration SHA256
+  `16feaf3030fa3bac2a2991bf1ebe4566478aeab17a699db135753c6845afa397`.
+- Fresh single-mode v12/v13 comparison confirms E203655F01t025 N2/2035
+  changes from REVIEW to BAD_EDGE_SPIKE: secondary r=0.975, W fraction
+  0.690130, own energy FWHM=3.311990 intervals. All other diagnostic groups
+  reproduce exactly. Evidence is in
+  `outputs/review_secondary_edge_adoption_20260913/verification.json`.
+  The prior W>=0.5 audit projects 14 newly rejected pilot GOOD (9 latest
+  twelve) and one training GOOD-label conflict, E204669M03t025 N4/1691;
+  these labels have not been independently changed.
+- All **209 repository tests pass**. Tests cover the half-energy equality,
+  inclusive radius and width, full-grid
+  geometry, weak secondary peaks, legacy/disabled behavior, severity, and
+  unchanged v12/v13 non-edge settings. Batch regeneration remains deferred;
+  the 39 installed shot exports are still v12. The interior-envelope exception
+  remains provisionally accepted and unimplemented. The amplitude/contrast
+  experiments below are historical and are not pending production changes.
+
 ## 2026-09-13 pilot follow-up: E202926A03t025 N3/1151 and N4/3735
 
 - Fresh production-v12 single-mode calibration reproduces saved features
@@ -18,6 +172,115 @@ Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good�
 - [Pair diagnostic notes](../audits/pilot12_v11_20260910/pair_1151_3735_review_20260913.md)
   preserve evidence and the inspected figure location. No gate, label, or
   installed production output changed; physical adjudication remains open.
+- Follow-up: user proposes footprint/energy concentration and smoothness to
+  distinguish acceptable peaks from the original unresolved examples. A
+  diagnostic-only exception, narrow-region energy fraction<50% AND local
+  signed HF/raw energy<5% in width-0.05 peak windows, recovers N3/1151 and
+  N4/3735 while retaining both original Y93 rejections. Significant narrow
+  regions are accumulated without overlap; every peak window must be smooth.
+- Against the verified v12 baseline, all 34 pilot modes rejected only by
+  this gate were freshly measured, plus every potentially changing training
+  row and comparison controls (41 total). Complete pilot features reproduce
+  exactly and fingerprints are stable. Of 39 shots, only one additional
+  candidate is recovered: L94 N9/2746, requiring visual adjudication. No
+  decision changes among 2,327 active training entries; the full baseline
+  was reused with fresh checks of all potentially changing rows. No gate
+  adopted or output relabeled. [Candidate definitions, comparison and review list](../audits/envelope_footprint_20260913/README.md)
+  preserve thresholds, a nearby sweep and scientific limitations.
+- User subsequently **provisionally accepted** the F_spikes<50%, Q_local<5%,
+  width-0.05 exception and requested finishing the latest twelve-shot review
+  before rerunning the shots. Keep this as a pending production change;
+  current v12 code and saved classifications remain unchanged. This is not
+  individual adjudication of the additional L94 N9/2746 candidate.
+
+## 2026-09-13 pilot follow-up: E203655F01t025 N2/2035
+
+- Fresh v12 single-mode calibration reproduces all saved features exactly,
+  with matching raw mode/continuum fingerprint and nr=201. It remains REVIEW
+  by the gates and GOOD under the installed production survivor policy.
+- The global energy peak is at r=0.965, with W FWHM=1.328 intervals. It lies
+  one grid interval inside the edge gate's r>=0.97 applicability cutoff;
+  that gate does not independently reject the secondary peak at r=0.975.
+  The closest signed-spike candidate has amplitude 0.529484 at r=0.970,
+  but width=0.798416 exceeds the high-r cutoff of 0.75. Overall severity
+  0.939360 is nearest BAD_GRID_SCALE_SPIKE. The interior envelope/packet
+  gates do not cover this radius.
+- Native datcon2 ends at r=0.99: upper frequency=4.608591 is still above
+  mode frequency=4.511448. Continuum is unavailable at r=0.995 and 1;
+  no edge crossing is supported by the supplied samples. The loader has
+  not altered any supplied lower/upper values. Only the low-amplitude upper
+  crossing at r=0.152772 is detected. No continuum extrapolation is applied.
+- [Diagnostic notes and figure location](../audits/pilot12_v11_20260910/n2_2035_review_20260913.md)
+  document the edge-cutoff and spike-width limitations for the ongoing review.
+  No additional gate change, label edit, or batch regeneration was performed.
+- User emphasizes peak amplitude relative to the rest of the edge structure.
+  Diagnostic peak/background contrast confirms 4.31 for the strongest peak
+  using median(max_h |xi_h|) over r=0.9–1 (background=0.23218), rising to
+  4.62–4.83 for broader outer intervals. The r=0.975 peak has contrast 3.39.
+  Narrow signed width plus strong contrast and appreciable mode-normalized
+  amplitude is a possible edge-spike refinement. Definitions/cuts remain
+  uncalibrated; this single-mode follow-up does not rerun or relabel shots.
+- Follow-up audit of every local W maximum at r>=0.97: N2/2035's secondary
+  peak has W/global-max-W=0.69013 and own-half-height width=3.31199 intervals,
+  so it would fire the existing <=10 width cut if checked independently.
+  That half-height component connects across the valley to the primary peak;
+  it differs from the individual harmonic's 1.446-interval amplitude width.
+- Fresh read-only measurements of 1,646 pilot GOOD, 565 training survivors
+  and three pending interior-exception recoveries (2,214 native nr=201
+  modes) show that unrestricted local-energy-peak rejection is too broad:
+  603 new pilot BAD (204 latest-12), 153 GOOD-label and 10 BAD-label training
+  rejections. A W>=half-global-maximum floor still gives 14 pilot changes
+  and one GOOD-label training conflict. Saved inputs/exports remain verified.
+- An illustrative joint requirement on the same peak—W>=half global maximum,
+  amplitude>=0.3, contrast>=3 to median(max_h |xi_h|) over r>=0.9, with
+  existing r>=0.97 and width<=10—selects only E203655F01t025 N2/2035 and
+  N3/1213, with no training decision changes. The N3 mode needs review.
+  All three pending interior-exception recoveries are unaffected. No edge
+  change is adopted and no shot sorting/deduplication was rerun. [Definitions,
+  impacts and candidate lists](../audits/edge_secondary_peaks_20260913/README.md)
+  preserve the comparison and the two GOOD-label conflicts of simpler cuts.
+- Latest proposal replaces the W-peak requirement with individual signed
+  harmonic extrema: amplitude>=0.7 AND P_edge>=3 AND narrow signed FWHM,
+  all at the same main or secondary peak. User requested comparing <=1.5
+  and <=2 grid intervals. Fresh measurements of the same 2,214 nr=201
+  survivors show substantial radius/width sensitivity: at strict r>0.9,
+  these cuts newly reject 47/183 pilot GOOD (20/79 latest twelve) and
+  7/56 training GOOD labels, plus 2/4 training BAD labels. At r>0.95 the
+  respective counts are 7/16 pilot, 1/3 training GOOD and 1/1 training BAD.
+  These are conflicts with current labels, not adjudicated false rejections.
+- At strict r>0.97 both widths select only N2/2035, via the independent
+  r=0.975 signed peak: amplitude=0.787882, P_edge=3.393365,
+  width=1.445691 intervals. Its primary r=0.965 signed peak is 1.163304
+  intervals wide. No pending interior-envelope recovery is affected.
+- The fixed median(max_h |xi_h|) over r>=0.9 can inflate contrast for modes
+  that decay before r=0.95: inspected GOOD-labeled 135388 N8/5708 has
+  amplitude=0.791274 at r=0.920 but background=0.001390 (P_edge=569.24).
+  GOOD-labeled 141711 N3/5246 remains a conflict at r>0.95/width<=1.5.
+  Prefer the more conservative 1.5 width in further review; the radius and
+  background definition need adjudication before adoption. [Signed-peak
+  comparison, review candidates and verification](../audits/edge_secondary_peaks_20260913/signed_harmonics.md)
+  preserve this audit. All saved output/source fingerprints remain checked;
+  no gate, label, ranking or installed shot output changed.
+- User clarifies the background should be measured in a window around each
+  candidate peak and sets **peak r>=0.95 inclusive**. The preceding statistic
+  was a median over fixed r>=0.9 and included all peak samples. A fresh local
+  audit compares total window widths 0.05/0.10, with and without removing
+  the tested signed-lobe FWHM interval from the background samples. Windows
+  may extend below r=0.95 and are clipped to the native boundary. Other
+  peaks remain; no estimated peak shape or whole harmonic is subtracted.
+- With window=0.05 and tested-lobe exclusion, amplitude>=0.7, P_edge>=3 and
+  signed width<=1.5 newly reject 8 pilot GOOD (6 latest twelve), one training
+  GOOD label (141711 N3/5246) and one training BAD label. Width<=2 changes
+  these to 16 pilot (8 latest twelve), 6 training GOOD and one training BAD.
+  N2/2035's r=0.965/0.975 peaks independently qualify: local contrasts
+  3.59452/3.20903 with exclusion, 3.36083/3.04368 without it. The latter test
+  still includes the primary peak in the secondary peak's background window.
+  All 2,214 nr=201 inputs were remeasured with verified fingerprints, and no
+  pending interior-envelope recovery is affected. [Local definitions,
+  comparisons and review list](../audits/edge_secondary_peaks_20260913/local_background.md)
+  preserve the audit. The peak radius is user-specified; local window width,
+  exclusion and final edge-gate adoption remain provisional. No production
+  gate, label, ranking or installed output changed.
 
 ## 2026-09-13 production v12: distributed harmonic noise adopted
 

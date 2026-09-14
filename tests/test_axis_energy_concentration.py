@@ -178,6 +178,8 @@ class AxisEnergyTests(unittest.TestCase):
             prior["numerical_structure_features"].pop("extended_continuum_noise")
             f["numerical_structure_features"].pop("distributed_harmonic_noise")
             prior["numerical_structure_features"].pop("distributed_harmonic_noise")
+            f["resolution_features"]["interior_unresolved_envelope"].pop("footprint_exception")
+            prior["resolution_features"]["interior_unresolved_envelope"].pop("footprint_exception")
             f.pop("severity_features")
             prior.pop("severity_features")
             self.assertEqual(f, prior)

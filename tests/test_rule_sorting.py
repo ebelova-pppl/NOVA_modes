@@ -498,7 +498,7 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual(
             features["feature_schema_version"], RULE_FEATURE_SCHEMA_VERSION
         )
-        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v24")
+        self.assertEqual(RULE_FEATURE_SCHEMA_VERSION, "tae-rule-features-grouped-v26")
         self.assertEqual(
             set(features) - set(RULE_FEATURE_METADATA_NAMES),
             set(RULE_FEATURE_GROUP_NAMES),
@@ -1750,6 +1750,88 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertAlmostEqual(features["edge_energy_peak_r"], 0.5)
         self.assertAlmostEqual(features["edge_harmonic_peak"], 0.5)
         self.assertAlmostEqual(features["edge_harmonic_peak_r"], 0.98)
+
+    def test_secondary_edge_energy_peak_uses_inclusive_half_maximum_and_radius(self):
+        radial_grid = np.linspace(0.0, 1.0, 201)
+        for peak_index, amplitude, rejected in ((194, 1.0, True), (194, 0.999, False), (193, 1.0, False)):
+            with self.subTest(peak_index=peak_index, amplitude=amplitude):
+                mode = np.zeros_like(self.mode)
+                # Global W=4; two edge harmonics each contribute W=1.
+                # The body itself uses many smaller harmonics.
+                mode = np.zeros((17, 201))
+                mode[:16] = 0.5 * np.exp(-((radial_grid - 0.5) / 0.08) ** 2)
+                mode[:16, 180:] = 0
+                mode[15:17, peak_index-2:peak_index+3] = amplitude * np.array([0.4, 0.8, 1., 0.8, 0.4])
+                result = evaluate_mode(self.base, mode=mode,
+                    low2=np.full(201, 0.25), high2=np.full(201, 2.25))
+                edge = result.features["boundary_features"]["edge_artifact"]
+                self.assertEqual(result.primary_reason == BAD_EDGE_SPIKE, rejected)
+                self.assertAlmostEqual(edge["edge_energy_peak_r"], 0.5)
+                self.assertAlmostEqual(result.features["resolution_features"][
+                    "interior_unresolved_envelope"]["energy_peak_r"], 0.5)
+                severity = result.features["severity_features"]["gates"][BAD_EDGE_SPIKE]
+                self.assertEqual(severity["fired"], rejected)
+                self.assertEqual(severity["severity"] >= 1, rejected)
+
+    def test_secondary_edge_peak_full_width_and_legacy_disable(self):
+        radial_grid = np.linspace(0.0, 1.0, 201)
+        mode = np.zeros((9, 201))
+        mode[:8] = 0.5 * np.exp(-((radial_grid - 0.5) / 0.08) ** 2)
+        mode[:8, 180:] = 0
+        mode[8, 192:197] = [0.4, 0.8, 1., 0.8, 0.4]
+        peak = extract_edge_artifact_features(mode)["edge_energy_local_peaks"][0]
+        width = peak["halfmax_width_grid"]
+        self.assertLess(peak["halfmax_inner_edge_r"], 0.97)
+        for config, rejected in (
+            (EdgeArtifactConfig(edge_width_max_grid=width), True),
+            (EdgeArtifactConfig(edge_width_max_grid=width - 1e-6), False),
+            (EdgeArtifactConfig(secondary_peak_energy_min=None), False),
+            (EdgeArtifactConfig(edge_width_max_grid=None), False),
+        ):
+            with self.subTest(config=config):
+                result = evaluate_mode(self.base, mode=mode,
+                    low2=np.full(201, 0.25), high2=np.full(201, 2.25),
+                    edge_artifact_config=config)
+                self.assertEqual(result.primary_reason == BAD_EDGE_SPIKE, rejected)
+
+    def test_production_v13_changes_only_secondary_edge_peak_setting(self):
+        old = dict(load_rule_run_configuration("tae_rules_production_v12").run_kwargs)
+        new = dict(load_rule_run_configuration("tae_rules_production_v13").run_kwargs)
+        self.assertIsNone(old.pop("edge_secondary_peak_energy_min"))
+        self.assertEqual(new.pop("edge_secondary_peak_energy_min"), 0.5)
+        self.assertIsNone(old.pop("interior_envelope_footprint_spikes_fraction_max"))
+        self.assertEqual(new.pop("interior_envelope_footprint_spikes_fraction_max"), 0.5)
+        self.assertEqual(old, new)
+
+    def test_secondary_edge_amplitude_must_strictly_exceed_body_max(self):
+        r = np.arange(201) / 200
+        for body_amplitude, rejected in ((0.79, True), (0.8, False), (0.81, False)):
+            with self.subTest(body_amplitude=body_amplitude):
+                mode = np.zeros((5, 201))
+                mode[:3] = body_amplitude * np.exp(-((r - 0.5) / 0.08) ** 2)
+                mode[:3, 180:] = 0
+                mode[3:, 192:197] = [0.32, 0.64, 0.8, 0.64, 0.32]
+                result = evaluate_mode(self.base, mode=mode,
+                    low2=np.full(201, 0.25), high2=np.full(201, 2.25))
+                self.assertEqual(result.primary_reason == BAD_EDGE_SPIKE, rejected)
+                severity = result.features["severity_features"]["gates"][BAD_EDGE_SPIKE]
+                self.assertEqual(severity["fired"], rejected)
+                self.assertAlmostEqual(severity["components"]["amplitude_over_body"]["ratio"], 0.8/body_amplitude)
+
+    def test_edge_body_max_excludes_exact_radius_and_uses_all_harmonics(self):
+        mode = np.zeros((3, 201))
+        mode[0, 178] = -0.6
+        mode[1, 179] = 0.7
+        mode[2, 180] = 1.0
+        features = extract_edge_artifact_features(mode)
+        self.assertEqual(features["edge_body_amplitude_max"], 0.7)
+        # An empty-amplitude body must not suppress the original global edge gate.
+        mode[:] = 0
+        mode[0, 192:197] = [0.4, 0.8, 1., 0.8, 0.4]
+        result = evaluate_mode(self.base, mode=mode,
+            low2=np.full(201, 0.25), high2=np.full(201, 2.25))
+        self.assertEqual(result.primary_reason, BAD_EDGE_SPIKE)
+        self.assertTrue(result.features["severity_features"]["complete"])
 
     def test_cont_cross_gate_precedes_edge_gate(self):
         mode = np.zeros_like(self.mode)
@@ -3128,12 +3210,12 @@ class WorkflowOutputTests(unittest.TestCase):
             sha256_file(REPO_ROOT / "configs/rules/tae_rules_production_v4.yaml"),
             "ddefb105a8faac4d4050eda1636966d28dd6217c9af50305c7ae974c6666985b",
         )
-        self.assertEqual(configuration.name, "tae_rules_production_v12")
+        self.assertEqual(configuration.name, "tae_rules_production_v13")
         self.assertEqual(configuration.schema_version, RULE_CONFIG_SCHEMA_VERSION)
         self.assertEqual(configuration.rule_set_version, RULESET_VERSION)
         self.assertEqual(
             configuration.sha256,
-            "6cec796ae20bac12f2f66bd18ac20a14d9e502aa64453c6f2b5ad10f7b54f925",
+            "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919",
         )
         self.assertEqual(
             dict(configuration.run_kwargs),
@@ -3182,6 +3264,11 @@ class WorkflowOutputTests(unittest.TestCase):
                 "cross_window_exception_calibrated_n_radial": 201,
                 "edge_r_min": 0.97,
                 "edge_width_max_grid": 10.0,
+                "edge_secondary_peak_energy_min": 0.5,
+                "edge_secondary_peak_body_r_max": 0.9,
+                "interior_envelope_footprint_spikes_fraction_max": 0.5,
+                "interior_envelope_footprint_local_hf_fraction_max": 0.05,
+                "interior_envelope_footprint_window_dr": 0.05,
                 "interior_envelope_peak_r_max": 0.5,
                 "interior_envelope_width_max_grid": 2.0,
                 "interior_envelope_extremum_r_min": 0.03,

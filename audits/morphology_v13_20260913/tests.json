@@ -1,0 +1,7 @@
+{
+  "command": "python -m unittest discover -s tests",
+  "tests": 214,
+  "status": "passed",
+  "log_sha256": "51b3c3355b366a46af469bb4dc6e6b6b599896fd50ad5d35defeb7959313aafb",
+  "validation": "Strict boundaries, native-window availability, disjoint energy integrals, integrated exception and rejection precedence, frozen presets, secondary-edge amplitude/body behavior."
+}

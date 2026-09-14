@@ -1,0 +1,2 @@
+path,label,mode_key,shot,input_fingerprint,rules_decision,rules_reason,rf_cnn_decision,p_rf_good,p_cnn_good
+nstxuE203655F01t025/N3/egn03w.1987E+02,bad,nstxuE203655F01t025/N3/egn03w.1987E+02,nstxuE203655F01t025,6d4bd6a767bcd3206bc2208125e85bb992c2f2b592b374e1ae7a97b9f5d9f9fc,BAD,BAD_EDGE_SPIKE,GOOD,0.8733333333333333,0.02370789460837841

@@ -21,8 +21,8 @@ python scripts/sort_shot_mixed.py \
   --out_dir /path/to/sort-output
 ```
 
-The preset is `configs/rules/tae_rules_production_v12.yaml`. It pins the v23
-rejection ruleset and routing values, and uses grouped audit schema v24 with
+The preset is `configs/rules/tae_rules_production_v13.yaml`. It pins the v25
+rejection ruleset and routing values, and uses grouped audit schema v26 with
 severity schema v2. It
 enables gates 1, 2, 2b, the near-axis
 grid-oscillation gate, 4, 5, the interior-envelope and harmonic-incoherence
@@ -43,7 +43,7 @@ Configure it with `--cross_window_exception_amplitude_max`,
 `--cross_window_exception_calibrated_n_radial`, or disable it with
 `--disable_cross_window_exception` in the calibration CLI. Named v5/v6
 configurations explicitly disable the exception and preserve old decisions,
-while new exports use the v24 audit schema. Exact older exports require their
+while new exports use the v26 audit schema. Exact older exports require their
 historical checkout. The exception never skips the rejection gate on other
 resolutions; the original window criteria remain active there.
 
@@ -369,8 +369,18 @@ THEN BAD_EDGE_SPIKE
 AND stop evaluating later decision gates
 ```
 
+Production v13 also checks secondary local W peaks. For the same peak require
+W_peak>=0.5*max(W), r>=0.97, connected FWHM<=10 intervals at half its own
+height, and max_h |xi_h(r_peak)| strictly greater than max_{h,r<0.9}|xi_h(r)|.
+Measure width on the complete radial grid. Do not use a local median or
+neighboring-window amplitude. Preserve the original global branch and its
+measurements for the interior-envelope gate. Older presets retain the original
+edge decision. The per-peak geometry, peak/body amplitudes and compound
+severity are saved for audit.
+
 This gate runs only after `BAD_CONT_CROSS_WINDOW`. Override its settings with
-`--edge_r_min` and `--edge_width_max_grid`; use `--disable_edge_artifact` to
+`--edge_r_min`, `--edge_width_max_grid`, `--edge_secondary_peak_energy_min`
+and `--edge_secondary_peak_body_r_max`; use `--disable_edge_artifact` to
 retain both envelope and harmonic audit measurements without applying the
 decision. The edge threshold is inclusive. Shot and per-`n` summaries record
 the enable state and exact threshold for every BAD decision.
@@ -386,6 +396,7 @@ AND NOT (
   AND ext_dr <= 0.02
   AND 0.001 < ext_df_gap <= 0.04
 )
+AND NOT (F_spikes < 0.50 AND Q_local < 0.05)
 THEN BAD_INTERIOR_UNRESOLVED_ENVELOPE
 AND stop evaluating later decision gates
 ```
@@ -414,6 +425,23 @@ settings with `--interior_envelope_peak_r_max`,
 `--interior_envelope_ext_df_gap_max`; use
 `--disable_interior_unresolved_envelope` to retain evidence without applying
 the decision.
+
+Production v13 enables the additional smoothness/footprint exception;
+frozen v5-v12 disable it. Use the shared `src/envelope_footprint.py`
+calculation. F_spikes integrates W over the union of disjoint regions above
+half the global W maximum, selecting regions <=2 native intervals with peak
+r<=0.5, divided by full-domain integrated W. Q_local is the largest signed
+`diff2(xi)/4` energy/raw-energy ratio in width-0.05 windows centered on the
+global W peak and each selected region's peak. Require complete stencils
+inside each window and integrate all raw W there, with trapezoidal endpoint
+weights. Both cuts are strict. All other gates remain active; unresolved
+windows cannot grant the exception. Grouped features record status, bounds,
+thresholds, measurements and applicability; an exempted gate has zero severity.
+For calibration use `--interior_envelope_footprint_spikes_fraction_max`,
+`--interior_envelope_footprint_local_hf_fraction_max`,
+`--interior_envelope_footprint_window_dr`, or
+`--disable_interior_envelope_footprint_exception`. See
+`audits/morphology_v13_20260913/README.md` for adoption and regression evidence.
 
 The interior harmonic-incoherence gate measures the stored array
 without inferring physical poloidal-mode numbers. For `r_i <= 0.5`, define

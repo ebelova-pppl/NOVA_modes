@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "modes": 41,
+  "comparison": "All original audit columns, including fingerprints, baseline decisions and measurements; numerical rtol=1e-12, atol=1e-15.",
+  "original_sha256": "234869c726ac5b68236a738c631e1542c347845871f595e0667dd0eee1fbc06f",
+  "reproduction_sha256": "234869c726ac5b68236a738c631e1542c347845871f595e0667dd0eee1fbc06f",
+  "audit_source_sha256": "07485f18679d7478e43925e5fec947fea76f8e84f2758a2c60dda2808f70c967",
+  "shared_source_sha256": "9f3204ba656320cae6f0dc049e24de72116ac14468801ceab1bf5753126e8e99"
+}

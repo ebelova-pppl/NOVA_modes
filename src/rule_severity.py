@@ -122,9 +122,18 @@ def extract_rule_severities(features, configs, candidates, fired):
         bool(r["exception_conditions_pass"]) for r in f["records"])
     c = configs["BAD_EDGE_SPIKE"]
     f = features["boundary_features"]["edge_artifact"]
-    add("BAD_EDGE_SPIKE", [] if not f["edge_energy_peak_in_window"] else [(
+    rows = [] if not f["edge_energy_peak_in_window"] else [(
         {"width": q(f["edge_energy_halfmax_width_grid"], c.edge_width_max_grid,
-                    small_is_bad=True, comparison="<=")}, {"peak_r": f["edge_energy_peak_r"]})])
+                    small_is_bad=True, comparison="<=")}, {"peak_r": f["edge_energy_peak_r"]})]
+    if c.secondary_peak_energy_min is not None:
+        rows.extend(({
+            "peak_energy_fraction": q(p["peak_energy_fraction"], c.secondary_peak_energy_min),
+            "amplitude_over_body": q(p["peak_amplitude"],
+                                     max(f["edge_body_amplitude_max"], 1e-12), comparison=">"),
+            "width": q(p["halfmax_width_grid"], c.edge_width_max_grid,
+                       small_is_bad=True, comparison="<="),
+        }, p) for p in f["edge_energy_local_peaks"] if not p["is_global_peak"])
+    add("BAD_EDGE_SPIKE", rows)
     c = configs["BAD_INTERIOR_UNRESOLVED_ENVELOPE"]
     f = features["resolution_features"]["interior_unresolved_envelope"]
     applicable = (f["energy_peak_r"] is not None and f["energy_peak_r"] <= c.peak_r_max + 64 * math.ulp(1.)
