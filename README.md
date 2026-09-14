@@ -7,10 +7,12 @@ Main context files:
 - `docs/project_state.md` — current project state and model status
 - `scripts/README.md` — detailed script inventory and usage notes
 
-The [current 39-shot disagreement review](audits/pilot39_v13_review_20260913/README.md)
-contains 365 rules/RF-CNN disagreements, split by direction, with an editable
-review copy for proposed manual overrides. Review precedes the accepted-TAE
-export for group distribution; the remaining database is deferred.
+The [completed 39-shot disagreement review](audits/pilot39_manual_review_20260914/README.md)
+applies Elena's 17 manual corrections (9 BAD->GOOD, 8 GOOD->BAD), preserving
+her reasons and the automatic rule evidence. Updated outputs contain
+1,647 final GOOD modes and [1,636 accepted TAE representatives](audits/pilot39_manual_review_20260914/accepted_tae_modes.csv)
+after deduplication. The remaining 348 AI disagreements were reviewed and
+kept as labeled. The remaining database is deferred.
 
 **The full-database rollout remains paused (2026-09-10)** while DiTw
 continuum/eigenmode consistency is reviewed and affected inputs corrected.

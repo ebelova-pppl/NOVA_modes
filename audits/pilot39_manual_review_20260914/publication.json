@@ -1,0 +1,72 @@
+{
+  "status": "installed",
+  "installed": [
+    {
+      "shot": "nstxuE202947A03t015",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE202947A03t015",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE202947A03t015"
+    },
+    {
+      "shot": "nstxuE203653A02t025",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203653A02t025",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE203653A02t025"
+    },
+    {
+      "shot": "nstxuE203655F01t025",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203655F01t025",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE203655F01t025"
+    },
+    {
+      "shot": "nstxuE203656A02t030",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE203656A02t030",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE203656A02t030"
+    },
+    {
+      "shot": "nstxuE204621A03t030",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204621A03t030",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE204621A03t030"
+    },
+    {
+      "shot": "nstxuE204636A01t020",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204636A01t020",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE204636A01t020"
+    },
+    {
+      "shot": "nstxuE204645A16t015",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204645A16t015",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE204645A16t015"
+    },
+    {
+      "shot": "nstxuE204707A04t030",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204707A04t030",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE204707A04t030"
+    },
+    {
+      "shot": "nstxuE204955F02t017",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE204955F02t017",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE204955F02t017"
+    },
+    {
+      "shot": "nstxuE205040A01t016",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205040A01t016",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE205040A01t016"
+    },
+    {
+      "shot": "nstxuE205057A01t020",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE205057A01t020",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuE205057A01t020"
+    },
+    {
+      "shot": "nstxuG121123N80",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG121123N80",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuG121123N80"
+    },
+    {
+      "shot": "nstxuG142301H56",
+      "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuG142301H56",
+      "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_manual_review_20260914/nstxuG142301H56"
+    }
+  ],
+  "unchanged_rules_shots": 26,
+  "unchanged_ai_shots": 39
+}

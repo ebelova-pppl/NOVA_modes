@@ -1,5 +1,15 @@
 This document consolidates scripts related to various models and methods used in our project. Each section serves as a guide to the corresponding scripts, including their functionality and usage.
 
+Elena completed the 39-shot disagreement review on 2026-09-14. The
+[manual-review audit](../audits/pilot39_manual_review_20260914/README.md)
+records 17 approved overrides across 13 regenerated and installed shot outputs,
+with unchanged production v13 rules. The collection now has 1,647 final GOOD
+modes and 1,636 selected TAE representatives. Use `final_decision` or the
+accepted-mode manifest for curated selections; original rule decisions and
+reasons remain available. Future reruns of affected shots must explicitly pass
+their installed `manual_overrides.csv` through `--manual_overrides`, as shown
+in the audit README, to preserve these corrections.
+
 Production v13 extends `BAD_EDGE_SPIKE` to secondary total-energy peaks
 at least half the global W maximum. Radius>=0.97 and own-FWHM<=10 intervals
 are unchanged. Secondary peaks also require max_h |xi_h(r_peak)| to exceed

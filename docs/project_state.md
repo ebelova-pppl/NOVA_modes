@@ -3,7 +3,47 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
-## 2026-09-14 counts across training and processed cases
+## 2026-09-14 completed pilot disagreement review: manual overrides
+
+- Elena completed both 39-shot directional disagreement lists and edited
+  `audits/pilot39_v13_review_20260913/disagreements_elena.csv`: **9 BAD->GOOD
+  and 8 GOOD->BAD**, exactly 17 changes across 13 shots, each with a reason.
+  The other 348 disagreement labels are retained after review.
+- Validated the worksheet against its original 365-row snapshot and verified
+  all 17 current mode-plus-datcon fingerprints. Canonical uppercase overrides
+  with verbatim reasons, reviewer Elena and import timestamp are in
+  [the manual review audit](../audits/pilot39_manual_review_20260914/README.md).
+  The source worksheet remains unchanged. Main training labels and frozen
+  production v13 rules are unchanged.
+- Regenerated, verified and installed all 13 affected rules shots. Previous
+  exports are backed up under `sort_outputs/before_manual_review_20260914/`.
+  The other 26 rules exports and all 39 RF-CNN exports are unchanged.
+  Verification checked all 25,967 input rows and all 6,012 TAE-side raw
+  fingerprints: exactly 17 final-label changes and corresponding selection
+  changes, no additional representative swaps, unchanged automatic evidence,
+  and zero stale, ambiguous, ineligible or unmatched overrides.
+- The 39-shot collection now has **1,647 final GOOD**, **4,365 BAD** and
+  [**1,636 selected TAE representatives**](../audits/pilot39_manual_review_20260914/accepted_tae_modes.csv).
+  All selected representatives are TAE-like. Curated labels disagree with
+  RF-CNN in 348 of 6,004 paired rows (209 BAD/AI-GOOD, 139 GOOD/AI-BAD);
+  these remaining discrepancies were reviewed and kept as labeled.
+  Standalone comparisons are 384 versus RF and 710 versus CNN at p>=0.5.
+  Pure automatic rules still have 365 RF-CNN disagreements. The eight
+  recalculated C50/N1 modes remain excluded from AI comparisons.
+- Across 14 active training shots and 39 disjoint checked cases, the eligible
+  TAE-side total remains **8,312**, including mixed. Combining the 575 manual
+  training GOOD labels with the 1,647 curated pilot GOOD gives **2,222 GOOD
+  before deduplication**. This is not a combined deduplicated or rules-only
+  count. Main/G shot inventory notes record completion without changing
+  membership, statuses or training counts.
+- N7/8319 is now explicitly approved by Elena; its manual GOOD decision
+  supersedes the earlier retained-BAD discussion. The interior-envelope
+  gate itself remains unchanged. The accepted-TAE manifest and current
+  disagreement lists cover all 39 shots. Affected shots include reusable
+  per-shot `manual_overrides.csv`; pass it explicitly on future reruns.
+  The remaining database is deferred; no group distribution is performed.
+
+## 2026-09-14 counts across training and processed cases (before manual overrides)
 
 - Inventory confirms 14 active training shots plus 39 disjoint post-training
   checked cases: 53 cases total. R06 remains an invalid whole-shot case

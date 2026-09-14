@@ -1,5 +1,13 @@
 # Review of the 39 checked shots, production v13
 
+**Review completed, 2026-09-14:** Elena entered 17 corrections (9 BAD->GOOD,
+8 GOOD->BAD) and retained the other 348 labels. Her edited
+`disagreements_elena.csv` is preserved here. See the
+[manual-override application and accepted-mode export](../pilot39_manual_review_20260914/README.md)
+for the subsequent database update. Counts and instructions below describe
+the original review snapshot; blank worksheet entries are now reviewed
+decisions to keep their existing labels, not an unfinished review queue.
+
 Rebuilt from the installed rules and RF-CNN exports on September 13, 2026.
 Both classifier output sets and all labels are unchanged. This review covers
 only the 39 checked shots; processing the remaining database is deferred.

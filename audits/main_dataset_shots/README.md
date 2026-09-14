@@ -4,6 +4,15 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
+Elena completed the 39-shot disagreement review on 2026-09-14. All 17
+approved corrections (9 BAD->GOOD, 8 GOOD->BAD) are installed in the 13
+affected rules shot outputs, with prior versions backed up. The other
+348 disagreement labels are retained after review. See the
+[manual-review audit](../pilot39_manual_review_20260914/README.md) and
+[1,636 accepted TAE representatives](../pilot39_manual_review_20260914/accepted_tae_modes.csv).
+Inventory notes record completion; checked membership, statuses, training
+counts and input exclusions remain unchanged. No additional shots were sorted.
+
 - `shot_status.csv` contains all 200 physical shot directories: 3 NSTX, 2
   legacy NSTX-U, 154 NSTX-U E, and 41 NSTX-U G cases.
 - `g_shot_status.csv` is the 41-row G-shot subset for convenient filtering.
@@ -27,7 +36,7 @@ post-training cases for rules-versus-RF-CNN comparison.
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
   completed with v11 and RF/raw-CNN on 2026-09-10. Checked denotes completed
-  processing/comparison; the latest disagreements still await visual review.
+  processing/comparison; the latest 39-shot disagreement review is complete.
 
 All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
