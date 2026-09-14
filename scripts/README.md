@@ -1,3 +1,41 @@
+# Scripts README
+
+Use this document as the detailed script and scientific-method reference.
+For a first run, start with [Getting started](../docs/getting_started.md) and
+[Flux / Perlmutter environment setup](../docs/platforms.md).
+
+**Current production rules require NumPy 2.x and SciPy.** The Perlmutter-like
+Flux environment and matching RF/CNN packages are needed for AI-model use,
+including historical RF-ranked presets, rather than for current rules sorting.
+Matplotlib is additional for visual review. Existing detailed commands and
+experiment notes are retained below.
+
+Unless stated otherwise, run examples from the repository root. For commands
+using `$NOVA_REPO` or `$NOVA_DATA`, first source your platform's path helper
+as described in the setup guide. On Flux, use the `tcsh` helper unless you
+have explicitly started Bash.
+
+## Find the workflow
+
+| Task | Reference |
+| --- | --- |
+| Sort a new shot with current rules | [`sort_shot_mixed.py`](#sort_shot_mixedpy) |
+| Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |
+| Understand duplicate severity ranking | [Normalized severity](#normalized-gate-severity) and [deduplication](#final-good-production-deduplication) |
+| View modes or apply manual corrections | [Viewer](#view_modes_csvpy), [labeler](#label_modes_fastpy), [adjudication](#manual-adjudication) |
+| Check input validity or recalculated files | [Invalid inputs](#known-invalid-inputs-in-shot-sorting), [provenance audit](#training-shot-provenance-audit-audit_training_provenancepy) |
+| Separate TAE-like and EAE-like modes | [Gap routing](#sorting-taes-vs-eaes-from-mixed-data-split_tae_eaepy) |
+| Train or evaluate AI models | [CNN](#cnn-model-scripts), [RF](#random-forest-classifier), [LOSO](#run_loso_10py), [RF OOF](#rf_oof_checkpy) |
+| Use older sorting interfaces | [RF sorter](#legacy-rf-shot-sorter), [single-model sorter](#sort_shotpy) |
+| Recover earlier main-page instructions and metrics | [Preserved README](../docs/history/readme_before_reorganization_20260914.md) |
+| Transfer the complete project context | [Project state](../docs/project_state.md) |
+
+## Recent adoption and review notes
+
+The following dated adoption counts describe their original runs. The later
+manual-review receipt supersedes the automatic-only pilot selections; gate
+configuration and model training provenance retain their separate identities.
+
 This document consolidates scripts related to various models and methods used in our project. Each section serves as a guide to the corresponding scripts, including their functionality and usage.
 
 Elena completed the 39-shot disagreement review on 2026-09-14. The
@@ -24,8 +62,6 @@ are six label changes; the latest twelve have 141 disagreements, with only
 E203655F01t025 N3/1987 newly added. The adoption audit includes additions and
 removals separately so previously reviewed cases need not be checked again.
 
-# Scripts README
-
 Production v12 adds `BAD_DISTRIBUTED_HARMONIC_NOISE`, a continuum-independent
 branch using HF/full-domain top-two-harmonic energy>0.5%, HF/whole-window
 energy>5%, L_eff>0.03 and simultaneous N_hf>=4 in width-0.05 windows. All
@@ -37,6 +73,8 @@ All 39 checked rules shot exports have been regenerated with verified v11
 backups. The [v12 latest-12 disagreement list](../audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
 has 143 entries; N10/3470 is the only removed disagreement. The historical
 lists and user review annotations remain intact.
+
+## Shared input and command conventions
 
 CSV input note: the shared mode-list readers accept either plain data rows or
 an optional header row. Recognized path headers are `path`, `filepath`, and
@@ -97,6 +135,11 @@ python scripts/sort_shot_mixed.py --method rules --shot_dir /path/to/SHOT --out_
 
 ### Training
 
+These are AI-development instructions. Use the [platform setup guide](../docs/platforms.md)
+for the appropriate Flux CPU or Perlmutter GPU environment. Routine rules
+sorting does not require running a trainer. Unless a command gives an absolute
+script path, run it from the repository root.
+
 All CNN training scripts default to the labeled list from `$NOVA_TRAIN_CSV`.
 For portability, paths in training CSVs should be stored relative to
 `$NOVA_DATA`, for example `nstx_120113/N5/egn05w.1234E+02`.
@@ -117,19 +160,19 @@ four-shot TAE-only and mixed TAE/EAE lists are archived under
 ```bash
 module load pytorch
 
-python cnn_raw.py \
+python scripts/cnn_raw.py \
   --train_csv training_labels/tae_like_train.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_raw.pt
 
-python cnn_straightened.py \
+python scripts/cnn_straightened.py \
   --train_csv training_labels/tae_like_train.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
   --model_out models/nova_cnn_straightened.pt
 
-python cnn_hybrid.py \
+python scripts/cnn_hybrid.py \
   --train_csv training_labels/tae_like_train.csv \
   --data_dir /path/to/nova/data \
   --refit_full_before_save \
@@ -229,7 +272,7 @@ runs the raw CNN through the same Slurm launch path. The helpers default to
 `NOVA_CPUS_PER_TASK=1`; if you set a larger value, request matching CPUs in the
 `salloc` command.
 
-On PPPL Flux with the default `tcsh` shell, source
+For **AI training and inference** on PPPL Flux with the default `tcsh` shell, source
 `configs/paths/nova_paths.flux.csh`. It resolves `NOVA_REPO` from the current
 Git checkout; sets `NOVA_MODELS`, the rebuilt training root `$NOVA_DATA`, the
 live shot root `$NOVA_DITW_ROOT`, `NOVA_TRAIN_CSV`, and
@@ -249,8 +292,10 @@ nova_cpu_smoke
 nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
-The shared Flux environment uses scikit-learn `1.9.0` to match the current
-Perlmutter-trained RF checkpoint. That release requires `narwhals>=2.0.1`.
+The shared Flux **AI** environment uses scikit-learn `1.9.0` to match the
+Perlmutter-trained RF checkpoint. This matching environment is optional for
+current rules sorting, as explained in the [platform guide](../docs/platforms.md).
+That scikit-learn release requires `narwhals>=2.0.1`.
 Install scikit-learn without `--no-deps`, or repair an earlier no-dependency
 upgrade in the activated environment with:
 
@@ -260,14 +305,17 @@ python -m pip check
 python -c "import sys, sklearn, narwhals; print(sys.executable); print('sklearn', sklearn.__version__); print('narwhals', narwhals.__version__)"
 ```
 
-Experimental continuum-branch LOSO can be run through the same LOSO driver:
+On Perlmutter, after a GPU allocation, experimental continuum-branch LOSO
+can use the same driver. These examples use the current 14-shot list. For a
+Flux CPU experiment, use a writable `--work_root` and add
+`--cnn_launch plain --cnn_device cpu --sort_device cpu`.
 
 ```bash
 python "$NOVA_REPO/scripts/run_loso_10.py" \
   --train_csv "$NOVA_TRAIN_CSV" \
   --data_dir "$NOVA_DATA" \
-  --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_branch_M100_bs8" \
-  --work_root "$SCRATCH/nova_s/loso_15_raw_continuum_branch_M100_bs8" \
+  --out_root "$NOVA_REPO/outputs/loso_14_raw_continuum_branch_M100_bs8" \
+  --work_root "$SCRATCH/nova_s/loso_14_raw_continuum_branch_M100_bs8" \
   --cnn_batch_size 8 \
   --cnn_m_target 100 \
   --cnn_continuum_branch
@@ -280,8 +328,8 @@ features, use a separate output directory and add the zero-input control:
 python "$NOVA_REPO/scripts/run_loso_10.py" \
   --train_csv "$NOVA_TRAIN_CSV" \
   --data_dir "$NOVA_DATA" \
-  --out_root "$NOVA_REPO/outputs/loso_15_raw_continuum_branch_zero_M100_bs8" \
-  --work_root "$SCRATCH/nova_sc/loso_15_raw_continuum_branch_zero_M100_bs8" \
+  --out_root "$NOVA_REPO/outputs/loso_14_raw_continuum_branch_zero_M100_bs8" \
+  --work_root "$SCRATCH/nova_s/loso_14_raw_continuum_branch_zero_M100_bs8" \
   --cnn_batch_size 8 \
   --cnn_m_target 100 \
   --cnn_continuum_branch \
@@ -321,8 +369,8 @@ If raw CNN training is slow because the shared filesystem is lagging, use
 nova_run_cnn_raw --batch_size 32 --cache_data
 ```
 
-Current 14-shot raw-CNN refresh from
-`training_labels/tae_like_train.csv` (2,390 rows; batch size 8,
+August 28, 2026 raw-CNN refresh from the then-current 14-shot
+`training_labels/tae_like_train.csv` snapshot (2,390 rows; batch size 8,
 `M_target=100`, seed 42, unweighted loss):
 
 - best 20% stratified-split checkpoint at epoch 40: accuracy=`0.9539`,
@@ -377,7 +425,7 @@ Completed symmetric-recipe 10-shot LOSO result:
 
 Compared with the previous raw-CNN LOSO run, false negatives decreased from
 140 to 67 while false positives increased only from 71 to 74. All 10
-full-data refits completed 80 epochs without collapse. CNN is now the strongest
+full-data refits completed 80 epochs without collapse. CNN was the strongest
 aggregate LOSO model by accuracy, GOOD recall, and GOOD F1. The NSTX-U G-case
 folds remain the weak group: aggregate CNN GOOD recall is `0.425` there,
 compared with `0.933` for the original NSTX shots and `0.942` for NSTX-U
@@ -392,11 +440,16 @@ evaluation. Those checkpoints are archived under `models/old_4shots_models/`:
 
 ### Classification
 
+The active CNN checkpoint is `models/nova_cnn_raw.pt`. The straightened and
+hybrid commands below require a separately trained or explicitly chosen
+historical checkpoint; those filenames are not active top-level model files.
+Historical four-shot checkpoints are under `models/old_4shots_models/`.
+
 ```bash
-python cnn_classify.py --model models/nova_cnn_raw.pt --path /mode_file_path/
-python cnn_classify.py --model models/nova_cnn_straightened.pt --path /mode_file_path/
-python cnn_classify.py --model models/nova_cnn_hybrid.pt --path /mode_file_path/
-python cnn_classify.py --model models/nova_cnn_hybrid.pt --csv training_labels/tae_like_train.csv --out preds.csv
+python scripts/cnn_classify.py --model models/nova_cnn_raw.pt --path /mode_file_path/
+python scripts/cnn_classify.py --model /path/to/nova_cnn_straightened.pt --path /mode_file_path/
+python scripts/cnn_classify.py --model /path/to/nova_cnn_hybrid.pt --path /mode_file_path/
+python scripts/cnn_classify.py --model models/nova_cnn_raw.pt --csv training_labels/tae_like_train.csv --out preds.csv
 ```
 or using env and running from $SCRATCH or other dir
 ```bash
@@ -423,11 +476,14 @@ Modified to **HybridCNN** = 2D mode `(m, r)` + 8 scalars.
 ### Training
 
 To train the mode classifier, use the relevant labeled list. For example, to
-train on the TAE-like side of the mixed data:
+train on the TAE-like side of the mixed data, first set `$NOVA_DATA` to the
+training-data root using the platform helper or an explicit environment
+setting. This RF script resolves relative CSV paths through `$NOVA_DATA`;
+it has no `--data_dir` option.
 
 ```bash
-python rf_train_classify.py --train_csv training_labels/tae_like_train.csv \
-       --model_out nova_mode_classifier.joblib
+python scripts/rf_train_classify.py --train_csv training_labels/tae_like_train.csv \
+       --model_out models/nova_mode_classifier.joblib
 ```
 Or, using env variables and running from $SCRATCH:
 ```bash
@@ -449,7 +505,8 @@ The current script runs five-fold cross-validation on the complete input and
 reports a 90/10 stratified evaluation. It then explicitly refits the pipeline
 on all input rows before saving the deployment checkpoint.
 
-Current 14-shot RF refresh from `training_labels/tae_like_train.csv`:
+August 28, 2026 RF refresh from the then-current 14-shot
+`training_labels/tae_like_train.csv` snapshot:
 
 - input: 2,390 rows (576 GOOD and 1,814 BAD); mean five-fold row-wise CV
   accuracy=`0.9448`
@@ -467,8 +524,9 @@ Most recent RF OOF check, run on the 13-shot list before merging B12:
 - output: `outputs/rf_oof_13shots/`
 
 The active RF checkpoint is `models/nova_mode_classifier.joblib`, refreshed
-from the current Q62-free `training_labels/tae_like_train.csv` as described
-above. Previous four-shot RF checkpoints are archived under
+from the August 28 Q62-free snapshot as described above. The current list has
+2,327 rows; the checkpoint has not been retrained on it. Previous four-shot
+RF checkpoints are archived under
 `models/old_4shots_models/`.
 
 The component six-shot list is `training_labels/additions/tae_like_6new.csv`, with
@@ -484,15 +542,19 @@ python "$NOVA_REPO/scripts/label_modes_fast.py" \
 
 ### Classification
 
-To classify a mode, replace `/path_to_mode` with the file path:
+To classify a mode, replace `/path/to/mode` with the file path:
 
 ```bash
-python rf_train_classify.py --model_in nova_mode_classifier.joblib --classify /path_to_mode
+python scripts/rf_train_classify.py --model_in models/nova_mode_classifier.joblib --classify /path/to/mode
 ```
 
-### Continuum-aware features (optional)
+<a id="continuum-aware-features-optional"></a>
 
-The classifier can optionally compute continuum-related features using NOVA continuum data (`datcon` file). These features are used in addition to structural / roughness features.
+### Continuum-aware features and optional experiments
+
+The current 22-feature RF schema includes continuum-related features from the
+NOVA `datcon` file in addition to structural / roughness features. The
+crossing and extremum extensions described below are optional experiments.
 
 #### Expected `datcon` location and naming
 
@@ -508,12 +570,18 @@ the code looks for a continuum file in the **same** directory, with the name:
 
 #### What happens if `datcon` is missing?
 
-If the continuum file is not found (or cannot be parsed), the code will:
+For standalone RF feature extraction, if the continuum file is not found
+or cannot be parsed, the code will:
 
-1. Print a warning **once per directory** indicating continuum features are disabled, and
-2. Fall back to structural-only features for modes in that directory.
+1. Print a warning **once per directory** about unavailable continuum data.
+2. Preserve the feature schema and fill the continuum columns with fallback
+   values: `r_star=0`, `delta2_eff=1e30`, `S=1e30`, `W_star=0`, and
+   `W_star_max=0`.
 
-This means the script will still work, but results may differ from continuum-aware runs.
+This retains the same 22 columns; it does not select a separately trained
+structural-only model. Predictions can differ from runs with valid continuum
+data. Both methods of the canonical shot sorter instead abort when a required
+`datcon<N>` file is missing, as described in [input validity](#known-invalid-inputs-in-shot-sorting).
 
 Legacy `datcon<N>` files sometimes use a tail sentinel value near `1000.000`
 instead of `NaN`. The shared datcon loader now treats values `> 999` as missing
@@ -553,7 +621,8 @@ than the separately versioned shared preprocessing.
 
 #### Continuum-derived features used
 
-When available, the following scalars are appended to the feature vector:
+The feature vector includes these continuum scalars, with the fallbacks above
+when continuum data are unavailable:
 
 - `delta2_eff`: mode-weighted squared distance outside the local interval
   between the stored lower and upper TAE-gap boundaries; it is zero inside
@@ -705,6 +774,11 @@ PYTHONPATH="$NOVA_REPO/src" python -m unittest discover \
 Split a shot directory or CSV list of modes into TAE-like vs EAE-like groups
 using the upper TAE gap boundary from the local `datcon<N>` file.
 
+This standalone splitter is a family-routing utility. It does not apply the
+known-invalid-input registry or the full production input checks. Use
+`make_tae_like_list.py` for validated preprocessing, or `sort_shot_mixed.py`
+for final production selections.
+
 It reuses the standard NOVA mode loader plus the existing continuum-file lookup
 logic. For each mode it computes:
 
@@ -734,7 +808,7 @@ are still computed from the existing shared continuum data.
 For a new shot directory, the simplest workflow is:
 
 ```bash
-python split_tae_eae.py \
+python scripts/split_tae_eae.py \
   --shot_dir /path/to/nstx_135388 \
   --out_dir split_outputs/nstx_135388
 ```
@@ -756,7 +830,7 @@ script writes to `./<shot>_tae_eae_split`.
 For an existing CSV list:
 
 ```bash
-python split_tae_eae.py \
+python scripts/split_tae_eae.py \
   --input_csv training_labels/old_4shots_mixed_labels/all_modes.csv \
   --out_below_csv split_outputs/tae_like.csv \
   --out_above_csv split_outputs/eae_like.csv
@@ -785,7 +859,7 @@ It saves labeled modes in `mode_labels.csv` and `mode_labels_clean.csv`.
 ### Usage
 
 ```bash
-python label_modes_fast.py dir_name
+python scripts/label_modes_fast.py dir_name
 ```
 
 where `dir_name` is something like `nstx_20113/N1`. Relative directories are
@@ -807,13 +881,13 @@ stored-harmonic-index axis. The black dashed closest-approach marker and
 purple dotted maximum-crossing marker are drawn through both radial panels.
 
 ```bash
-python label_modes_fast.py nstx_135388/N5 \
+python scripts/label_modes_fast.py nstx_135388/N5 \
   --data_dir "$NOVA_DATA" \
   --max-harmonics 80
 ```
 
 ```bash
-python label_modes_fast.py nstx_135388/N5 \
+python scripts/label_modes_fast.py nstx_135388/N5 \
   --data_dir "$NOVA_DATA" \
   --abs
 ```
@@ -822,7 +896,7 @@ For another device or a local data copy where the NSTX-U RF model is not
 applicable, disable RF guidance:
 
 ```bash
-python label_modes_fast.py shot_or_run/N1 \
+python scripts/label_modes_fast.py shot_or_run/N1 \
   --data_dir /path/to/nova/data \
   --csv_out labels_new_device.csv \
   --no-rf
@@ -831,9 +905,9 @@ python label_modes_fast.py shot_or_run/N1 \
 To keep RF guidance, provide a compatible RF model:
 
 ```bash
-python label_modes_fast.py nstx_120113/N5 \
+python scripts/label_modes_fast.py nstx_120113/N5 \
   --data_dir "$NOVA_DATA" \
-  --rf-model nova_mode_classifier.joblib
+  --rf-model models/nova_mode_classifier.joblib
 ```
 
 To label only one mode family from a mixed directory, pass a split mode list.
@@ -841,7 +915,7 @@ The script still scans `mode_dir`, but only presents files whose resolved path
 or shot/N/file suffix appears in the CSV:
 
 ```bash
-python label_modes_fast.py nstx_120113/N5 \
+python scripts/label_modes_fast.py nstx_120113/N5 \
   --data_dir "$NOVA_DATA" \
   --mode-list training_labels/tae_like_train.csv \
   --csv_out labels_tae_like.csv
@@ -881,6 +955,10 @@ frequency.
 
 Script to plot mode structures from a `name.csv` list.
 
+This `viz/` script requires `src/` on `PYTHONPATH`, unlike the bootstrapped
+`scripts/` entry points. Source the matching platform path helper first or use
+the [self-contained viewer command](../docs/getting_started.md#view-modes-and-preserve-manual-corrections).
+
 Makes the same plots as `label_modes_fast.py` plus contour plots of `mode(r, m)`.
 Relative paths in the CSV are resolved under `--base_dir`, which defaults to
 `$NOVA_DATA`. Path headers may be `path`, `filepath`, `mode_path`, or the
@@ -912,7 +990,7 @@ python "$NOVA_REPO/viz/view_modes_csv.py" \
 To see all options, run:
 
 ```bash
-python view_modes_csv.py -h
+python "$NOVA_REPO/viz/view_modes_csv.py" -h
 ```
 
 ---
@@ -920,7 +998,11 @@ python view_modes_csv.py -h
 ## Legacy RF shot sorter
 
 - `legacy/rf_sort_shot.py` — old version; does not check close-frequency modes  
-  Use `sort_shot.py` instead.
+  For current production sorting, use `scripts/sort_shot_mixed.py --method rules`.
+  The single-model successor is `scripts/sort_shot.py`.
+
+The legacy entry point needs this checkout's `src/` on `PYTHONPATH`;
+the examples below set this for the command only.
 
 This script walks a shot directory like:
 
@@ -941,8 +1023,8 @@ It:
 ### Preview run
 
 ```bash
-python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
-  --model nova_mode_classifier.joblib \
+env PYTHONPATH="$NOVA_REPO/src" python legacy/rf_sort_shot.py /path/to/shot \
+  --model models/nova_mode_classifier.joblib \
   --threshold 0.5 \
   --move_bad --dry_run
 ```
@@ -950,8 +1032,8 @@ python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
 ### Actual move
 
 ```bash
-python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
-  --model nova_mode_classifier.joblib \
+env PYTHONPATH="$NOVA_REPO/src" python legacy/rf_sort_shot.py /path/to/shot \
+  --model models/nova_mode_classifier.joblib \
   --threshold 0.5 \
   --move_bad
 ```
@@ -959,14 +1041,16 @@ python rf_sort_shot.py /global/cfs/cdirs/m314/nova/nstx_123456 \
 For help, run:
 
 ```bash
-python rf_sort_shot.py -h
+env PYTHONPATH="$NOVA_REPO/src" python legacy/rf_sort_shot.py -h
 ```
 
 ---
 
 ## `sort_shot.py`
 
-New version, which checks close-frequency clusters and writes `cluster_report` suggesting `KEEP` / `DROP`.
+Legacy single-model interface that checks close-frequency clusters and writes
+`cluster_report` suggestions of `KEEP` / `DROP`. The current production entry
+point is `scripts/sort_shot_mixed.py --method rules`.
 
 This script does the same as `rf_sort_shot.py` for sorting `GOOD` / `BAD`
 modes, and in addition checks `GOOD` modes for frequency spacing. It can use
@@ -979,17 +1063,17 @@ By default, it writes `cluster_report.txt` and `cluster.csv` files in the shot d
 Without moving bad modes out:
 
 ```bash
-python sort_shot.py --model nova_mode_classifier.joblib \
+python scripts/sort_shot.py --model models/nova_mode_classifier.joblib \
   --rel_freq_tol 0.02 shot_dir
 
-python sort_shot.py --model models/nova_cnn_straightened.pt \
+python scripts/sort_shot.py --model models/nova_cnn_raw.pt \
   --rel_freq_tol 0.02 shot_dir
 ```
 
 Or, to move bad modes into `/OUT/`:
 
 ```bash
-python sort_shot.py --model nova_mode_classifier.joblib \
+python scripts/sort_shot.py --model models/nova_mode_classifier.joblib \
   --move_bad --rel_freq_tol 0.02 shot_dir
 ```
 
@@ -1003,7 +1087,7 @@ It will not actually move closely spaced modes, but it will list them in `cluste
 For help, run:
 
 ```bash
-python sort_shot.py -h
+python scripts/sort_shot.py -h
 ```
 
 ---
@@ -1045,9 +1129,10 @@ arguments are validated against the selected method; incompatible options fail
 clearly rather than silently affecting a different backend.
 
 Current operational note: deterministic rules are the production default.
-The top-level RF and raw-CNN checkpoints were retrained from the current
-14-shot `training_labels/tae_like_train.csv` and remain available for explicit
-legacy comparisons. **NSTX-U G-case shots are a distinct AI-model regime**
+The top-level RF and raw-CNN checkpoints were refit on the August 28, 2026
+2,390-row, 14-shot snapshot of `training_labels/tae_like_train.csv`. They have
+not been retrained on the current 2,327-row list and remain available for
+explicit legacy comparisons. **NSTX-U G-case shots are a distinct AI-model regime**
 because their narrow, strongly varying TAE gap gives sparse GOOD-mode labels
 and weaker LOSO performance; this caveat applies to interpretation of the
 legacy RF+CNN backend, not to method selection by omission.
@@ -1167,25 +1252,25 @@ close-frequency duplicate removal, not the RF/CNN fusion labels.
 
 ### Usage
 
-For a production rules run, `--method rules` may be omitted because it is the
-default. Keeping it explicit in saved commands makes provenance clearer:
+Activate the [rules or AI environment for your platform](../docs/platforms.md)
+first. Current rules sorting and its duplicate ranking need no AI packages.
 
-```bash
+For a production rules run, `--method rules` may be omitted because it is the
+default. On Flux, first source the path helper and set the shot/output
+variables in `tcsh`:
+
+```tcsh
+source configs/paths/nova_paths.flux.csh
+setenv SHOT_NAME nstxuE205040A01t016
+setenv NOVA_SORT_OUT /path/to/rules_output
+
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rules \
   --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
   --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
 ```
 
-On Flux, the corresponding environment variables use `tcsh` syntax:
-
-```tcsh
-setenv SHOT_NAME nstxuE205040A01t016
-setenv NOVA_DITW_ROOT /p/nstxdigtwin/energetic_particles/nova/DiTw
-setenv NOVA_SORT_OUT /path/to/output_dir
-```
-
-Production v11 needs no RF checkpoint, including for duplicate ranking.
+Production v11 and later need no RF checkpoint, including for duplicate ranking.
 
 To run the explicit legacy RF+CNN method on Flux:
 
@@ -1196,7 +1281,7 @@ python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
   --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
   --cnn_model_kind cnn_raw \
-  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME" \
+  --out_dir /path/to/ai_output/$SHOT_NAME \
   --device cpu \
   --make_plots
 ```
@@ -1217,21 +1302,22 @@ python scripts/sort_shot_mixed.py \
   --method rf-cnn \
   --shot_dir /path/to/nstx_135388 \
   --rf_model /path/to/nova_mode_classifier.joblib \
-  --cnn_model /path/to/nova_cnn_straightened.pt \
-  --out_dir /path/to/sort_outputs/nstx_135388 \
+  --cnn_model models/nova_cnn_raw.pt \
+  --out_dir /path/to/ai_outputs/nstx_135388 \
   --label_csv training_labels/tae_like_train.csv \
   --make_plots
 ```
-When running from `$NOVA_RUN_ROOT/runs/` to check an old labeled shot:
+When running outside the repository to check an old labeled shot, use
+absolute script, checkpoint, label, and output paths:
 
 ```bash
-python $NOVA_REPO/scripts/sort_shot_mixed.py \
+python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
   --method rf-cnn \
-  --shot_dir $NOVA_DATA/nstx_135388 \
-  --rf_model $NOVA_REPO/models/nova_mode_classifier.joblib \
-  --cnn_model $NOVA_REPO/models/nova_cnn_raw.pt \
-  --out_dir $NOVA_RUN_ROOT/sort_out_nstx_135388 \
-  --label_csv $NOVA_TRAIN_CSV \
+  --shot_dir "$NOVA_DATA/nstx_135388" \
+  --rf_model "$NOVA_REPO/models/nova_mode_classifier.joblib" \
+  --cnn_model "$NOVA_REPO/models/nova_cnn_raw.pt" \
+  --out_dir /path/to/ai_outputs/nstx_135388 \
+  --label_csv "$NOVA_TRAIN_CSV" \
   --make_plots
 ```
 
@@ -1346,8 +1432,9 @@ minimum and OR by maximum, then maximize over candidates. Components in an
 AND expression always belong to the same peak, crossing, window, or region,
 except the existing near-axis gate's explicitly independent mode amplitude.
 
-CSV outputs include one `gate_severity_BAD_*` column for each of the twelve
-gates, plus `overall_rule_severity=max(enabled gate severities)`,
+CSV outputs include one `gate_severity_BAD_*` column for each of the thirteen
+implemented gates (twelve enabled in production v13), plus
+`overall_rule_severity=max(enabled gate severities)`,
 `rule_margin=1-overall_rule_severity`, `nearest_gate`, `severity_complete`,
 `severity_schema_version`, and `severity_config_sha256`. Named runs also
 record `rule_configuration_name` and `rule_configuration_sha256` per row.
@@ -1368,9 +1455,10 @@ Geometry, true crossings, minimum flip counts, and approved physical
 exceptions remain prerequisites. The crossing-window severity uses the
 **window maxima**, not the interpolated point amplitude used by its smooth
 exception. Each excused crossing is excluded before the regional maximum.
-The interior-envelope exception is honored whenever its geometric conditions
-qualify. The extended-noise gate uses top-two energy ratio, local fraction,
-and radial length; harmonic participation remains audit-only. The packet
+The interior-envelope gate honors both its continuum-extremum exception and
+the v13 smoothness/footprint exception. The extended-noise gate uses top-two
+energy ratio, local fraction, and radial length; harmonic participation remains
+audit-only. The packet
 margin uses the kth strongest opposite-sign turn's smaller adjacent step:
 this measures weak packets continuously while preserving the required number
 of turns. Axis/signed-spike margins include subthreshold local peaks, using
@@ -1449,13 +1537,16 @@ decision.
 
 `scripts/tae_rule_engine.py` is a pure per-mode interface. Its current
 `tae-rules-axis-all-peaks-grid-highr-packet-turns-rle05-near-axis-grid-oscillation-cont-window-edge-interior-envelope-harmonic-incoherence-continuum-crossing-tail-smooth-crossing-window-extremum-clearance-axis-energy-concentration-extended-continuum-noise-distributed-harmonic-noise-secondary-edge-energy-peaks-footprint-exception-v25`
-ruleset implements twelve ordered BAD decisions, treating the short-window packet
+ruleset implements thirteen ordered BAD decisions, twelve enabled in v13,
+treating the short-window packet
 and near-axis oscillation screens as gates 2b and 2c so the established
 gate-3/4/5 names remain stable. It still has no positive GOOD
 template. Modes that do not fire any
-gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. Multiple rule
-reasons and structured features are stored as deterministic JSON; missing
-feature values use JSON `null`.
+gate return `REVIEW` with primary reason `NO_GOOD_TEMPLATE`. The first fired
+gate supplies the BAD primary reason and the single entry in
+`rule_triggered_rules`. Every gate's measurements and fired flag remain in
+`severity_features`, including gates after that primary reason. Structured
+features use deterministic JSON, with JSON `null` for missing values.
 
 Before making a decision, the engine records the canonical 31
 measurements and their crossing audit records in a grouped `rule_features`
@@ -1569,8 +1660,9 @@ The CLI names are `--axis_r_ax`, `--axis_amplitude_min`, and
 `--disable_axis_artifact` to calculate fallback axis-window features without
 applying the BAD gate. If any local maximum meets the amplitude minimum and
 maximum full-grid width, the strongest qualifying candidate returns `BAD` with
-`BAD_AXIS_SPIKE` and stops later decision gates. Any sufficiently narrow local
-maximum centered at `r <= 0.03` is treated as a boundary artifact without a
+`BAD_AXIS_SPIKE` as the primary reason, taking precedence over later BAD
+reasons. Any sufficiently narrow local maximum centered at `r <= 0.03` is
+treated as a boundary artifact without a
 morphology-family exception. The shot and
 per-`n` summaries record the enable flag and exact configuration.
 
@@ -1597,7 +1689,7 @@ comparisons are inclusive. The CLI names are `--grid_scale_amplitude_min`,
 `--grid_scale_width_max_grid`, `--grid_scale_high_r_cutoff_r`, and
 `--grid_scale_high_r_width_max_grid`. When the strongest width-limited candidate meets
 the amplitude threshold, the second ordered gate returns `BAD` with
-`BAD_GRID_SCALE_SPIKE` and stops later decision gates. Use
+`BAD_GRID_SCALE_SPIKE` as the primary reason when the axis gate has not fired. Use
 `--disable_grid_scale_spike` to retain the configured-width measurements while
 disabling this decision.
 
@@ -1670,9 +1762,10 @@ continuum_crossing:
   w_cross_threshold: 0.03
 ```
 
-After the axis, single-lobe, and packet gates, a mode with `n_cross > 0` and
-`W_star_max > w_cross_threshold` returns `BAD` with `BAD_CONT_CROSS` and stops
-later gates. The comparison is strictly greater than the threshold. Override
+When this gate is enabled and no earlier gate has fired, a mode with
+`n_cross > 0` and `W_star_max > w_cross_threshold` receives primary reason
+`BAD_CONT_CROSS`. It is disabled in production v13. The comparison is strictly
+greater than the threshold. In the configurable calibration interface, override
 it with `--w_cross_threshold`, or use `--disable_cont_cross` to retain the
 crossing measurements without applying the decision. The shot and per-`n`
 summaries record the crossing-gate enable flag and calibrated threshold.
@@ -1733,7 +1826,7 @@ python scripts/sort_shot_rules.py --shot_dir /path/to/shot --out_dir /path/to/au
 ```
 
 Frozen v5/v6 configurations remain supported and explicitly disable the
-exception. They preserve their prior decisions while emitting current v23
+exception. They preserve their prior decisions while emitting current v26
 audit metadata; exact historical exports require the earlier checkout.
 On nr!=201 the original window gate remains fully active. This exception
 does not add a skipped rejection gate to resolution warnings.
@@ -2027,8 +2120,9 @@ Deterministic/manual semantics use these new names:
 In the production `sort_shot_mixed.py --method rules` output,
 `review_tae_like.csv` normally has no automatic survivors because
 `accept-as-good-v1` promotes them to final GOOD. It remains a valid output for
-manual REVIEW overrides. In `sort_shot_rules.py`, pass-all-gates modes remain
-in this file unless adjudicated.
+manual REVIEW decisions and survivors held back by stale or ambiguous supplied
+overrides. In `sort_shot_rules.py`, pass-all-gates modes remain in this file
+unless adjudicated.
 
 Every CSV is written with headers even when empty. Rows are ordered by shot,
 `ntor`, frequency, and mode filename. Summary reason counts use exactly one
@@ -2071,8 +2165,10 @@ rebuilding a conservative audit instead.
 
 The sorter rejects empty reasons and applies only unique overrides whose stored
 fingerprint matches current inputs. Stale, ambiguous, ineligible, and unmatched
-override counts are reported. The summary stores the SHA-256 of the exact
-override file used.
+override counts are reported. A stale or ambiguous supplied override on an
+otherwise accepted survivor changes its final decision to REVIEW and sets
+`decision_source=override_review_required`, excluding it from the GOOD lists.
+The summary stores the SHA-256 of the exact override file used.
 
 ### Final-GOOD production deduplication
 
@@ -2108,11 +2204,12 @@ Changed same-name modes are also parsed to record `omega`, damping, array
 shape, classifier-used mode-structure equality, and maximum absolute mode
 difference.
 
-After setting `NOVA_DATA`, sourcing the Flux path config supplies
-`NOVA_DITW_ROOT` and `NOVA_TRAIN_CSV`:
+On Flux, source the `tcsh` path config to set `NOVA_DATA`, `NOVA_DITW_ROOT`,
+and `NOVA_TRAIN_CSV`. To compare another training snapshot, override
+`NOVA_DATA` after sourcing:
 
-```bash
-source configs/paths/nova_paths.flux.sh
+```tcsh
+source configs/paths/nova_paths.flux.csh
 python scripts/audit_training_provenance.py \
   --training-root "$NOVA_DATA" \
   --reference-root "$NOVA_DITW_ROOT" \
@@ -2163,7 +2260,11 @@ default. Model checkpoints and training logs are written under
 `$NOVA_RUN/<output-name>`, or `$SCRATCH/nova_s/<output-name>` when `$NOVA_RUN`
 is not set. For parameter comparisons, use separate output/work roots.
 
-Pre-B12 13-shot raw-CNN `M_target` / batch-size comparison:
+Raw-CNN `M_target` / batch-size comparison on the selected training list:
+
+These examples use the current 14-shot list. Historical 13-shot results used
+the pre-B12 snapshot; reproducing them also requires that exact training CSV
+and matching inputs/code, not only the old hyperparameters.
 
 ```bash
 # From inside an interactive GPU allocation.
@@ -2172,8 +2273,8 @@ source configs/paths/nova_paths.nersc.sh
 
 python -u scripts/run_loso_10.py \
   --steps all \
-  --out_root outputs/loso_13_M54 \
-  --work_root "$SCRATCH/nova_s/loso_13_M54" \
+  --out_root outputs/loso_14_M54 \
+  --work_root "$SCRATCH/nova_s/loso_14_M54" \
   --cnn_launch srun \
   --cnn_device cuda \
   --sort_device cpu \
@@ -2183,8 +2284,8 @@ python -u scripts/run_loso_10.py \
 
 python -u scripts/run_loso_10.py \
   --steps all \
-  --out_root outputs/loso_13_M100 \
-  --work_root "$SCRATCH/nova_s/loso_13_M100" \
+  --out_root outputs/loso_14_M100 \
+  --work_root "$SCRATCH/nova_s/loso_14_M100" \
   --cnn_launch srun \
   --cnn_device cuda \
   --sort_device cpu \
@@ -2197,6 +2298,7 @@ NERSC batch run with the current defaults:
 
 ```bash
 cd "$NOVA_REPO"
+export LOSO_TAG=loso_14_M100_bs32
 sbatch scripts/run_loso_10.sbatch
 ```
 
@@ -2204,8 +2306,10 @@ The raw-CNN default `M_target` is now 100, and the LOSO driver defaults to
 `--cnn_batch_size 32`. The historical `outputs/loso_13_M100` comparison used
 `--cnn_batch_size 8`; `outputs/loso_13_M100_bs32` repeats the M100 LOSO check
 with batch size 32. The Slurm wrapper's default `LOSO_TAG` is
-`loso_13_M100_bs32`. To reproduce the older M54 or M100 batch-8 runs, pass
-`--cnn_batch_size 8` and the desired `--cnn_m_target` explicitly.
+`loso_13_M100_bs32`; it is a historical directory name, not a fold-count
+setting. The example overrides it for the current list. To reproduce older
+M54 or M100 batch-8 runs, pass `--cnn_batch_size 8` and the desired
+`--cnn_m_target` explicitly, along with the original training snapshot.
 
 Generic interactive run after a GPU allocation:
 
@@ -2225,13 +2329,13 @@ Useful partial/resume commands:
 
 ```bash
 # Only create the fold split lists.
-python scripts/run_loso_10.py --steps split --out_root outputs/loso_13_M100_bs32
+python scripts/run_loso_10.py --steps split --out_root outputs/loso_14_M100_bs32
 
 # Resume a failed run without repeating completed RF/CNN/sort folds.
 python scripts/run_loso_10.py \
   --steps all \
-  --out_root outputs/loso_13_M100_bs32 \
-  --work_root "$SCRATCH/nova_s/loso_13_M100_bs32" \
+  --out_root outputs/loso_14_M100_bs32 \
+  --work_root "$SCRATCH/nova_s/loso_14_M100_bs32" \
   --skip_existing \
   --cnn_launch srun \
   --cnn_device cuda
@@ -2240,7 +2344,7 @@ python scripts/run_loso_10.py \
 # used by the original run if it did not use the current defaults.
 python scripts/run_loso_10.py \
   --steps aggregate \
-  --out_root outputs/loso_13_M100_bs32 \
+  --out_root outputs/loso_14_M100_bs32 \
   --cnn_m_target 100 \
   --cnn_batch_size 32
 ```
@@ -2267,11 +2371,11 @@ Merges multiple training CSV file lists into a single master list, fixes relativ
 To create a common list from separate shots:
 
 ```bash
-python merge_lists.py train_master.csv \
+python utils/merge_lists.py train_master.csv \
   old_train_list.csv \
-  nstx_120113_labels.csv@/global/cfs/cdirs/m314/nova/nstx_120113 \
-  nstx_135388_labels.csv@/global/cfs/cdirs/m314/nova/nstx_135388 \
-  nstx_141711_labels.csv@/global/cfs/cdirs/m314/nova/nstx_141711
+  nstx_120113_labels.csv@/path/to/data/nstx_120113 \
+  nstx_135388_labels.csv@/path/to/data/nstx_135388 \
+  nstx_141711_labels.csv@/path/to/data/nstx_141711
 ```
 
 Here `old_train_list.csv` is from one NSTX-U shot.
@@ -2304,8 +2408,8 @@ It also prints a confusion matrix based on OOF predictions at threshold `0.5`.
 ### Usage
 
 ```bash
-python rf_oof_check.py training_labels/tae_like_train.csv \
-  --model_in nova_mode_classifier.joblib \
+python scripts/rf_oof_check.py training_labels/tae_like_train.csv \
+  --model_in models/nova_mode_classifier.joblib \
   --out_oof oof_table.csv \
   --out_suspects oof_suspects.csv \
   --thr_low 0.2 --thr_high 0.8
@@ -2314,21 +2418,26 @@ python rf_oof_check.py training_labels/tae_like_train.csv \
 For help, run:
 
 ```bash
-python rf_oof_check.py -h
+python scripts/rf_oof_check.py -h
 ```
 
-**Note:** re-run `rf_train_classify.py` after this.
+This diagnostic does not modify the saved model. Retrain with
+`rf_train_classify.py` only if adopting a revised training list or recipe.
 
 ---
 
 ## `utils/find_rf_disagreements.py`
 
+This utility needs `src/` on `PYTHONPATH` and `$NOVA_DATA` for relative mode
+paths. Use the standard 22-feature RF checkpoint with this utility; it does
+not expose the experimental feature-schema switches.
+
 ### Usage
 
 ```bash
-python find_rf_disagreements.py \
+env PYTHONPATH="$NOVA_REPO/src" python utils/find_rf_disagreements.py \
   training_labels/tae_like_train.csv \
-  nova_mode_classifier.joblib \
+  models/nova_mode_classifier.joblib \
   rf_vs_manual_disagreements.csv
 ```
 

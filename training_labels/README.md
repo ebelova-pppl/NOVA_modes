@@ -134,11 +134,22 @@ and must not be restored to the active training set.
 
 ### `tae_like_train.csv`
 
-Canonical/default TAE-like good/bad training list for RF and CNN training. It
-is derived from `tae_like_v3.csv` by excluding all 249
-`nstxuG121123Q62` rows, with the subsequent correction below. It has 2,390
-rows across 14 shots: 575 `good` and 1,815 `bad`. NERSC and Flux path configs set both `NOVA_TRAIN_CSV` and
-`NOVA_TRAIN_CSV_TAE` to this file. Its SHA-256 is
+Canonical/default TAE-like good/bad training list for RF and CNN training.
+The current list has **2,327 rows across 14 shots: 575 `good` and 1,752 `bad`**.
+It derives from `tae_like_v3.csv` with Q62 suspended, the September 7 label
+correction below, and the September 10 removal of 63 confirmed-invalid N1
+BAD rows from 135388/W29/Y93/B12. Those rows remain in
+[`suspended_training_n1.csv`](../audits/n1_training_alignment_20260910/suspended_training_n1.csv);
+see the [input-alignment audit](../audits/n1_training_alignment_20260910/README.md).
+Its current SHA-256 is
+`f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76`.
+NERSC and Flux path configs set `NOVA_TRAIN_CSV` and `NOVA_TRAIN_CSV_TAE`
+to this file. Existing AI checkpoints retain their August 28 training
+snapshot; they have not been retrained on this current list.
+
+The September 7 snapshot, after excluding all 249 `nstxuG121123Q62` rows
+and applying the correction below but before the N1 exclusions, contained
+2,390 rows: 575 `good` and 1,815 `bad`. Its preserved historical SHA-256 is
 `0eaa367eb850d3643f002da888283cc5439842a295488425a8341c88da90478a`.
 
 On 2026-09-07 the user corrected `nstxu_204202/N9/egn09w.3737E+02` from

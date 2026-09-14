@@ -3,6 +3,53 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-09-14 documentation accuracy and environment review
+
+- Checked the rewritten documentation against current source, frozen v13
+  configuration, input registry, training list, checkpoint files, and Flux
+  environment. Corrections are in `docs/platforms.md`,
+  `docs/getting_started.md`, and `scripts/README.md`.
+- The current Flux Anaconda module supplies NumPy 1.26.4 / SciPy 1.13.1,
+  insufficient for rules. The installed shared environment has Python
+  3.11.15, NumPy 2.1.2, SciPy 1.17.1, scikit-learn 1.9.0, Narwhals 2.25.0,
+  PyTorch 2.8.0+cu128, Matplotlib 3.10.6 and joblib 1.5.3; `pip check` passes.
+  Separate Conda initialization/activation lines work in fresh `tcsh` and
+  run sorter help successfully. The existing combined `set_nova_env` alias
+  fails before Conda's shell hook is initialized; the guide documents the
+  working explicit sequence. No environment or helper implementation changed.
+- Fixed examples that assumed scripts/checkpoints in the repository root,
+  references to absent active straightened/hybrid CNN files, unset output
+  variables, and shared rules/AI output destinations. Historical model
+  refreshes and LOSO examples now distinguish their original snapshots from
+  today's 14-shot training list. Flux CPU LOSO requires explicit CPU options.
+- Clarified thirteen implemented gates / twelve enabled in v13, complete
+  per-gate severity evidence despite a single primary BAD reason, RF's fixed
+  continuum fallback columns, preprocessing validation versus family-only
+  splitting, and REVIEW holds for stale or ambiguous supplied overrides.
+- Verified active training counts (2,327 rows, 575 GOOD / 1,752 BAD, 14 shots),
+  v13/training/three active checkpoint SHA-256 values, RF/CNN metadata, and
+  the 1,636-row accepted representative manifest. The archived README matches
+  its stated source commit exactly after reversing link rebasing.
+- Validation: 14 direct script CLIs pass `--help` from outside the checkout
+  with `PYTHONPATH` unset; 82 documented Python command paths/options,
+  117 local file links and 38 heading links pass static checks. Perlmutter
+  instructions were compared with checked-in configuration; its live modules
+  and GPU execution were not tested from Flux. Changes remain local.
+
+## 2026-09-14 documentation reorganization patch applied locally
+
+- Applied the user-supplied `../NOVA_modes_documentation.patch`: a shorter
+  main README, separate getting-started and platform guides, refreshed usage
+  references, and the preserved previous README under `docs/history/`.
+- The patch also defers RF/CNN imports in `scripts/sort_shot.py` so shared
+  sorting helpers work without AI packages, with two new regression tests.
+- Validation: the complete patch passes reverse-application checking; both
+  new tests pass in the existing Flux AI environment with optional AI/plotting
+  imports blocked in isolated subprocesses. All 117 local Markdown file links
+  and 36 heading links in the affected documentation resolve.
+- Changes are applied locally; GitHub publication remains pending. Scientific
+  rules, training labels, model checkpoints, and shot outputs are unchanged.
+
 ## 2026-09-14 completed pilot disagreement review: manual overrides
 
 - Elena completed both 39-shot directional disagreement lists and edited

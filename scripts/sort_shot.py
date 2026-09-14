@@ -38,7 +38,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
-import joblib
 import numpy as np
 
 from _repo_bootstrap import ensure_repo_src_on_path
@@ -46,7 +45,6 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
-from cnn_infer_common import load_cnn_classifier
 from nova_mode_loader import load_mode_from_nova  # noqa: E402
 from mode_features import compute_features_for_mode  # noqa: E402
 
@@ -782,9 +780,14 @@ def main() -> None:
 
     backend = infer_backend(args.model, args.model_kind)
     if backend == "rf":
+        # Rules reuse the structure/deduplication helpers without AI packages.
+        import joblib
+
         clf = joblib.load(args.model)
         effective_threshold = 0.5 if args.threshold is None else args.threshold
     else:
+        from cnn_infer_common import load_cnn_classifier
+
         cnn_kind = args.model_kind if args.model_kind != "rf" else "auto"
         try:
             clf = load_cnn_classifier(args.model, device=args.device, model_kind=cnn_kind)

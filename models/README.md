@@ -9,14 +9,26 @@ The top-level files are the active checkpoints refreshed from the canonical
   2,390-row feature matrix, labels, feature names, and schema metadata;
 - `nova_cnn_raw.pt` — the active raw signed-mode CNN checkpoint.
 
+Current production rules use severity-based duplicate ranking and do not need
+these checkpoints. For AI use, see [Flux / Perlmutter setup](../docs/platforms.md)
+and the [RF+CNN comparison command](../docs/getting_started.md#optional-rfcnn-comparison).
+
 ## Training data and saved-model scope
 
-The canonical training list contains 2,390 unique rows across 14 shots:
+The August 28, 2026 training snapshot used for these saved checkpoints
+contained 2,390 unique rows across 14 shots:
 
 - 576 `good`;
 - 1,814 `bad`;
 - SHA-256
   `ce89a7d6ab6e5c17877e98fe50552a016b4b517c4f5942dbec00e5926bb14a3d`.
+
+The current active training list has since changed to 2,327 rows (575 GOOD,
+1,752 BAD), following a manual label correction and the removal of 63
+confirmed-invalid N1 rows. These checkpoints have not been retrained on that
+list; the counts and hash above identify the original training snapshot. See
+[project state](../docs/project_state.md) and the
+[N1 audit](../audits/n1_training_alignment_20260910/README.md).
 
 The 249 Q62 rows remain preserved in `training_labels/tae_like_v3.csv`, but
 are suspended from the active training list and are not part of this
@@ -96,24 +108,35 @@ b0a3868163abf4c36b69065c2a0f222192bc39010e0c719ca4d1222b618dfa8c  nova_mode_clas
 
 ## Sorter usage
 
-The canonical production path is deterministic rules with RF used only after
-classification to select representatives among close-frequency,
-structurally matched final-GOOD modes:
+The current canonical production path uses deterministic rules and selects
+close-frequency, structurally matched final-GOOD representatives by lowest
+overall rule severity. It does not load an RF or CNN checkpoint:
 
 ```tcsh
-setenv SHOT_NAME nstx_120113
-setenv NOVA_SORT_OUT /path/to/sort_outputs
-mkdir -p "$NOVA_SORT_OUT"
-python "$NOVA_REPO/scripts/sort_shot_mixed.py" \
+python scripts/sort_shot_mixed.py \
   --method rules \
-  --shot_dir "$NOVA_DITW_ROOT/$SHOT_NAME" \
-  --rf_model "$NOVA_MODELS/nova_mode_classifier.joblib" \
-  --out_dir "$NOVA_SORT_OUT/$SHOT_NAME"
+  --shot_dir /path/to/shot \
+  --out_dir /path/to/rules_output/shot
 ```
 
-The RF cannot change a rule decision in this workflow. The explicit
-`--method rf-cnn` path remains available only for legacy RF+CNN classification
-and comparison runs.
+For the explicit legacy RF+CNN classifier, first activate the compatible AI
+environment and provide both checkpoints. From the repository root:
+
+```tcsh
+python scripts/sort_shot_mixed.py \
+  --method rf-cnn \
+  --shot_dir /path/to/shot \
+  --rf_model models/nova_mode_classifier.joblib \
+  --cnn_model models/nova_cnn_raw.pt \
+  --out_dir /path/to/ai_output/shot \
+  --device cpu
+```
+
+Older frozen rules presets v5-v10 used RF only after classification to rank
+representatives. That historical workflow remains supported with its matching
+preset and checkpoint; the RF cannot change its rule decisions. See the
+[configuration history](../configs/rules/README.md) for the applicable versions
+and [user instructions](../docs/getting_started.md) for current sorting.
 
 ## Historical checkpoints
 

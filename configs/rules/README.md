@@ -1,8 +1,24 @@
 # Deterministic TAE rule configurations
 
-The current frozen production preset is `tae_rules_production_v12.yaml`
-(configuration schema v12, rejection ruleset v23, grouped features v24,
+The current frozen production preset is `tae_rules_production_v13.yaml`
+(configuration schema v13, rejection ruleset v25, grouped features v26,
 severity schema v2). Its SHA-256 is
+`5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919`.
+
+V13 adds significant secondary energy peaks to `BAD_EDGE_SPIKE` and the
+accepted smoothness/footprint exception to the interior-envelope gate. The
+secondary edge branch requires W_peak>=0.5*max(W), r>=0.97, own-FWHM<=10
+grid intervals, and peak harmonic amplitude strictly above the maximum at
+r<0.9. The original global-edge branch is retained. The footprint exception
+requires strict F_spikes<0.50 and Q_local<0.05 in every tested width-0.05 peak
+window; unavailable evidence cannot grant the exception. Other gates can
+still reject a mode. See the [v13 adoption audit](../../audits/morphology_v13_20260913/README.md)
+and [detailed rule reference](../../scripts/README.md#deterministic-rule-sorting-production-and-calibration-interfaces).
+
+## Retained distributed-noise gate from v12
+
+The frozen v12 preset has configuration schema v12, ruleset v23, features v24,
+severity schema v2, and SHA-256
 `6cec796ae20bac12f2f66bd18ac20a14d9e502aa64453c6f2b5ad10f7b54f925`.
 
 V12 appends `BAD_DISTRIBUTED_HARMONIC_NOISE` after every existing gate. Scan
@@ -31,7 +47,10 @@ these ratios are evaluated. Disabled gates are excluded from overall severity.
 The new gate's severity joins `overall_rule_severity`, `rule_margin` and the
 existing representative ranking, with version/configuration hashes.
 
-The canonical sorter loads v12 automatically:
+## Production and calibration commands
+
+The canonical sorter loads v13 automatically. Current rules require NumPy 2.x
+and SciPy, without an AI environment; see [platform setup](../../docs/platforms.md).
 
 ```tcsh
 python scripts/sort_shot_mixed.py --method rules \
@@ -41,22 +60,24 @@ python scripts/sort_shot_mixed.py --method rules \
 A gate survivor remains `rule_decision=REVIEW` / `NO_GOOD_TEMPLATE`. The
 production `accept-as-good-v1` policy separately promotes it to final GOOD,
 then applies fingerprinted manual overrides and duplicate handling. V11 and
-v12 choose final-GOOD representatives by lowest overall rule severity, with
+later presets choose final-GOOD representatives by lowest overall rule severity, with
 mode-key tie breaking. No RF checkpoint is needed.
 
 For conservative calibration without survivor promotion:
 
 ```tcsh
 python scripts/sort_shot_rules.py --shot_dir /path/to/SHOT \
-  --out_dir /path/to/audit-output --rule_config tae_rules_production_v12
+  --out_dir /path/to/audit-output --rule_config tae_rules_production_v13
 ```
 
-Omit `--rule_config` to experiment with individual gate flags. The five new
+Omit `--rule_config` to experiment with individual gate flags. The five v12
 options are `--distributed_noise_nhf_min`, `--distributed_noise_top2_min`,
 `--distributed_noise_local_min`, `--distributed_noise_radial_length_min`, and
 `--distributed_noise_window_dr`. Use `--disable_distributed_harmonic_noise`
 to retain measurements without rejection. A named configuration rejects
 config-owned threshold/gate overrides.
+
+## Frozen version history
 
 All earlier configuration files remain byte-for-byte frozen. Supported legacy
 adapters explicitly disable gates absent from their schema:
@@ -71,8 +92,10 @@ adapters explicitly disable gates absent from their schema:
 | v10 | Extended continuum-side noise | RF p_good |
 | v11 | Normalized severities; unchanged v10 morphology | Rule severity |
 | v12 | Distributed harmonic noise anywhere in radius | Rule severity |
+| v13 | Secondary edge peaks and interior-envelope footprint exception | Rule severity |
 
-Frozen v5-v11 disable the new distributed branch. V11 retains its ruleset-v22
+Frozen v5-v11 disable the distributed branch; v5-v12 retain the global-only
+edge gate and disable the footprint exception. V11 retains its ruleset-v22
 identity and original hash
 `da5019505f7e7a8025215e78dd41b0ed93dbbb3e41a470a0a0cb22b771bac9da`.
 Their morphology decisions remain supported, while new exports use the current
