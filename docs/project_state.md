@@ -1,7 +1,29 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-13)
+### Project state (current snapshot, updated 2026-09-14)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-14 counts across training and processed cases
+
+- Inventory confirms 14 active training shots plus 39 disjoint post-training
+  checked cases: 53 cases total. R06 remains an invalid whole-shot case
+  within the checked cohort and contributes no usable TAE-side modes.
+- The active training list has 2,327 rows and 575 manual GOOD labels. The
+  verified v13 training audit routes 26 BAD-labeled rows to EAE and marks
+  one BAD-labeled row INVALID, leaving 2,300 currently eligible TAE-side
+  entries. The 39 installed rules summaries contain 6,012 TAE-side modes
+  and 1,646 final GOOD before deduplication (1,635 representatives).
+- Combined current TAE-side count is **8,312**, including mixed. Using the
+  existing manual training labels and final rules labels for the other
+  shots gives **2,221 GOOD** before deduplication (575 + 1,646). The raw
+  labeled-list inventory totals 8,339 entries if the 27 no-longer-eligible
+  training rows are included. No labels or classifications were changed.
+- Applying current rules consistently to the labeled training subset would
+  retain 564 there (541 manual GOOD plus 23 manual BAD), giving **2,210**
+  rule survivors across both cohorts. This is a separate count from the
+  existing manual-label basis and is not a combined deduplication count.
+  Training CSV and regression hashes match the v13 receipt; all 39 installed
+  summaries still use the verified v13 configuration.
 
 ## 2026-09-13 refreshed 39-shot disagreements for manual review
 
