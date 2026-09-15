@@ -4,6 +4,15 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
+On 2026-09-15 Elena accepted the recalculated E202806A02t045 rules results,
+bringing the processed collection to **40 post-training shots plus 14 active
+training shots (54 disjoint cases)**. The new shot has `checked_methods=rules`;
+the rules/RF-CNN comparison cohort remains 39. The
+[current 40-shot export](../processed40_20260915/README.md) contains 1,737 GOOD
+modes before deduplication and **1,726 accepted representatives**. The existing
+whole-shot R06 invalidation remains in the processed inventory and contributes
+no accepted modes.
+
 Elena completed the 39-shot disagreement review on 2026-09-14. All 17
 approved corrections (9 BAD->GOOD, 8 GOOD->BAD) are installed in the 13
 affected rules shot outputs, with prior versions backed up. The other
@@ -30,13 +39,14 @@ counts and input exclusions remain unchanged. No additional shots were sorted.
 - `active_training_shot=yes` means the shot occurs in the canonical
   `training_labels/tae_like_train.csv` list. The three label-count columns
   are derived from that file.
-- `post_training_checked=yes` is intentionally narrower: it marks only new
-  cases already run and compared with both `rules` and `rf-cnn`. The complete
-  inventory currently marks 39 post-training cases: the original E case and
+- `post_training_checked=yes` records completed post-training processing and
+  review/comparison. Use `checked_methods` to identify the methods actually
+  run: the original 39 cases have `rules|rf-cnn`; the user-approved
+  E202806A02t045 addition has `rules`. The original cohort includes the E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
-  completed with v11 and RF/raw-CNN on 2026-09-10. Checked denotes completed
-  processing/comparison; the latest 39-shot disagreement review is complete.
+  completed with v11 and RF/raw-CNN on 2026-09-10. Its disagreement review
+  is complete. The current processed membership is 40, with 39 AI comparisons.
 
 All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and

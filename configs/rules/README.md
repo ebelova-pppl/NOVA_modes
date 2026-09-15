@@ -49,8 +49,8 @@ existing representative ranking, with version/configuration hashes.
 
 ## Production and calibration commands
 
-The canonical sorter loads v13 automatically. Current rules require NumPy 2.x
-and SciPy, without an AI environment; see [platform setup](../../docs/platforms.md).
+The canonical sorter loads v13 automatically. Current rules require Python
+3.10+, NumPy 2.x and SciPy; see [platform setup](../../docs/platforms.md).
 
 ```tcsh
 python scripts/sort_shot_mixed.py --method rules \

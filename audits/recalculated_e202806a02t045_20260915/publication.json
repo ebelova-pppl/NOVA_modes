@@ -1,0 +1,7 @@
+{
+  "status": "installed",
+  "installed_utc": "2026-09-15T17:20:40.691452+00:00",
+  "output": "/p/hym/ebelova/NOVA/sort_outputs/nstxuE202806A02t045",
+  "backup": "/p/hym/ebelova/NOVA/sort_outputs/before_numpy_runtime_fix_20260915/nstxuE202806A02t045",
+  "installed_and_backup_hashes_verified": true
+}

@@ -28,6 +28,8 @@ from _repo_bootstrap import ensure_repo_src_on_path
 
 ensure_repo_src_on_path()
 
+import numpy as np  # noqa: E402
+
 from cont_features import CONTINUUM_PREPROCESSING_VERSION  # noqa: E402
 from make_tae_like_list import (  # noqa: E402
     DEFAULT_FRACTION_EAE_THRESHOLD,
@@ -1636,6 +1638,15 @@ def run_shot(
     rule_configuration_sha256: str = "",
 ) -> ShotRunResult:
     """Run the complete noninteractive deterministic workflow for one shot."""
+    # Check before preprocessing: a missing runtime API must not turn every
+    # otherwise valid TAE-side mode into RULE_FEATURE_EXTRACTION_FAILED.
+    if not callable(getattr(np, "trapezoid", None)):
+        raise SystemExit(
+            "ERROR: Rules sorting requires NumPy 2.x (numpy.trapezoid); "
+            f"running NumPy {np.__version__} from {np.__file__} with "
+            f"{sys.executable}. Activate a compatible environment and retry; "
+            "see docs/platforms.md. No sorting outputs were written."
+        )
     if rel_freq_tol <= 0.0 or not math.isfinite(rel_freq_tol):
         raise ValueError("rel_freq_tol must be a finite positive number")
     if rule_survivor_policy not in RULE_SURVIVOR_POLICIES:

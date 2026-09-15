@@ -7,16 +7,31 @@ Perlmutter-trained AI models, not for current deterministic sorting.
 
 | Workflow | Python packages | Model environment / hardware |
 |---|---|---|
-| Current production rules and severity-based duplicate ranking | NumPy 2.x and SciPy | No scikit-learn, PyTorch, checkpoint, or GPU required. |
+| Current production rules and severity-based duplicate ranking | Python 3.10+, NumPy 2.x and SciPy | No scikit-learn, PyTorch, checkpoint, or GPU required. |
 | Plotting and visual review without RF guidance | Rules dependencies plus Matplotlib | Use `label_modes_fast.py --no-rf` to disable optional RF guidance. |
 | RF inference or RF-based duplicate ranking in older presets | NumPy, SciPy, joblib, and the checkpoint-compatible scikit-learn environment | Current RF checkpoint was saved with scikit-learn 1.9.0; the recorded environment also includes Narwhals. CPU is sufficient. |
 | `--method rf-cnn`, CNN inference, or CNN training | AI environment including PyTorch; Matplotlib for plotting | Both RF and CNN checkpoints are required by `--method rf-cnn`. Flux uses CPU for this workflow; Perlmutter can use allocated GPUs. |
+
+Python 3.10 or newer is required by the current source. The shared Flux
+environment uses Python 3.11.15. A traceback ending in
+`TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'` at an
+annotation such as `int | None` means an older interpreter is running.
+Check `python --version` and `which python`, then activate the compatible
+environment below. The canonical sorter now reports this Python requirement
+before importing numerical libraries or project modules.
 
 NumPy 2.x matters even for rules: the current rule engine uses
 `numpy.trapezoid`. An older system Python with NumPy 1.x may import some
 scripts but is not sufficient for full rule evaluation. The previously used
 NumPy 2.1.2 environment is suitable; the AI-specific version matching is not
 a reason to install PyTorch or scikit-learn for rules.
+
+Both rules sorting interfaces now check for `numpy.trapezoid` before processing
+inputs or writing outputs, and report the active NumPy version and interpreter
+when it is missing. In older runs, this incompatibility could produce zero
+GOOD/BAD modes while every TAE-side row was marked INVALID with
+`RULE_FEATURE_EXTRACTION_FAILED`; `rejected_modes.csv` records the underlying
+`AttributeError`. Rerun in a compatible environment to obtain classifications.
 
 Frozen production v5-v10 presets retain RF-based duplicate ranking. The
 v11-and-later presets, including the current v13 default, use rule severity.
@@ -35,7 +50,7 @@ Flux commands below use the user's usual interactive shell, `tcsh`.
 
 ### Rules only
 
-Use an existing Python environment with NumPy 2.x and SciPy. On the checked
+Use Python 3.10+ with NumPy 2.x and SciPy. On the checked
 Flux node (2026-09-14), `module load anaconda3` alone supplies NumPy 1.26.4
 and SciPy 1.13.1, so it does **not** satisfy the rules requirement. The existing
 shared `nova-perlmutter` environment does. Activate it with the separate
@@ -46,6 +61,7 @@ below, then check the selected interpreter:
 ```tcsh
 cd /path/to/your/NOVA_modes
 setenv NOVA_REPO "$cwd"
+python --version
 python -c "import sys, numpy, scipy; print(sys.executable); print('numpy', numpy.__version__); print('scipy', scipy.__version__); assert hasattr(numpy, 'trapezoid'), 'Rules require NumPy 2.x'"
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" --help
 ```
@@ -239,12 +255,13 @@ yourself. Data/cache paths are site-specific in this helper too.
 
 ### Rules only
 
-Use CPU Python with NumPy 2.x and SciPy; no PyTorch module or GPU is required:
+Use CPU Python 3.10+ with NumPy 2.x and SciPy; no PyTorch module or GPU is required:
 
 ```bash
 module load python
 cd /path/to/your/NOVA_modes
 export NOVA_REPO="$PWD"
+python --version
 python -c "import sys, numpy, scipy; print(sys.executable); print('numpy', numpy.__version__); print('scipy', scipy.__version__); assert hasattr(numpy, 'trapezoid'), 'Rules require NumPy 2.x'"
 python "$NOVA_REPO/scripts/sort_shot_mixed.py" --help
 ```

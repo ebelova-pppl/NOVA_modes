@@ -34,12 +34,12 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
-import numpy as np
-
 from _repo_bootstrap import ensure_repo_src_on_path
 
 
 ensure_repo_src_on_path()
+
+import numpy as np  # noqa: E402
 
 from cont_features import CONTINUUM_PREPROCESSING_VERSION, load_datcon_for_mode  # noqa: E402
 from mode_features import radial_centroid, radial_width  # noqa: E402
@@ -1467,6 +1467,7 @@ def run_rules_method(args: argparse.Namespace):
     print(f"Shot: {summary['shot']}")
     print(f"Total files: {summary['n_total_files']}")
     print(f"Known invalid input exclusions: {summary['n_known_invalid_inputs']}")
+    print(f"Invalid modes: {summary['n_invalid']} (details: rejected_modes.csv)")
     print(
         "Gap split: "
         f"tae_like={summary['n_tae_like']} "

@@ -1,5 +1,10 @@
 # Completed 39-shot manual disagreement review
 
+This is the preserved September 14 review snapshot. The
+[current 40-shot collection](../processed40_20260915/README.md) adds the
+user-approved recalculated E202806A02t045 rules results on September 15.
+The 39-shot comparisons and counts below retain their original scope.
+
 Elena completed both directional disagreement lists and approved **17 label
 changes** in `audits/pilot39_v13_review_20260913/disagreements_elena.csv`:
 **9 BAD -> GOOD and 8 GOOD -> BAD**, spanning **13 shots**. The remaining

@@ -1,0 +1,68 @@
+{
+  "status": "complete",
+  "recorded_utc": "2026-09-15T17:45:10.159119+00:00",
+  "reviewer": "Elena",
+  "review_decision": "Results checked and approved; add E202806A02t045 to processed collection.",
+  "added_shot": "nstxuE202806A02t045",
+  "processed_shots": 40,
+  "active_training_shots": 14,
+  "combined_disjoint_shots": 54,
+  "rules_rf_cnn_comparison_shots": 39,
+  "added_shot_methods": [
+    "rules"
+  ],
+  "new_manual_overrides": 0,
+  "totals": {
+    "rule_evaluated": 6256,
+    "routed_eae": 19468,
+    "invalid": 707,
+    "final_good_before_dedup": 1737,
+    "selected_good": 1726,
+    "final_bad": 4519,
+    "manual_overrides": 17
+  },
+  "previous_accepted_rows": 1636,
+  "added_accepted_rows": 90,
+  "previous_accepted_rows_preserved": true,
+  "source_sha256": {
+    "audits/pilot39_manual_review_20260914/accepted_tae_modes.csv": "80ea689d62d13f25bcb4502545a2594f8d1c6b6c5453c475cce6dc4dc0143e01",
+    "audits/pilot39_manual_review_20260914/shot_summary.csv": "f5d00e43668a31831127c4bf056979a34c5008e727fbb3bdd03117b19dfea009",
+    "/p/hym/ebelova/NOVA/sort_outputs/nstxuE202806A02t045/good_tae_final.csv": "927f8cc135b9e3b3e8f7c6e44669b5e027338f7274dd6f84523466a15d1c2b7e"
+  },
+  "inventory": {
+    "path": "audits/main_dataset_shots/shot_status.csv",
+    "before_sha256": "ed15afe0399092bd4cf0fe618db8bffd3d094f62a576fc4d3c57d641bd3d8f03",
+    "after_sha256": "a026e0338f70b03bf35e26f40a03e28eeb478a18a329d490a6d2e46990190042",
+    "only_changed_shot": "nstxuE202806A02t045",
+    "before_row": {
+      "shot": "nstxuE202806A02t045",
+      "shot_family": "NSTX-U E",
+      "shot_dir": "$NOVA_DITW_ROOT/nstxuE202806A02t045",
+      "active_training_shot": "no",
+      "training_label_rows": "0",
+      "training_good_labels": "0",
+      "training_bad_labels": "0",
+      "post_training_checked": "no",
+      "checked_methods": "",
+      "status": "unchecked",
+      "notes": ""
+    },
+    "after_row": {
+      "shot": "nstxuE202806A02t045",
+      "shot_family": "NSTX-U E",
+      "shot_dir": "$NOVA_DITW_ROOT/nstxuE202806A02t045",
+      "active_training_shot": "no",
+      "training_label_rows": "0",
+      "training_good_labels": "0",
+      "training_bad_labels": "0",
+      "post_training_checked": "yes",
+      "checked_methods": "rules",
+      "status": "checked_post_training",
+      "notes": "2026-09-15: Recalculated inputs sorted with production v13 in a compatible NumPy environment; Elena checked the results and approved adding this shot to the processed collection. 464 inputs, all nr=201; 240 TAE-like, 4 mixed, 220 EAE-like; 90 GOOD representatives, 154 BAD, zero INVALID. Rules only; no RF-CNN comparison. See audits/recalculated_e202806a02t045_20260915 and audits/processed40_20260915."
+    }
+  },
+  "output_sha256": {
+    "accepted_tae_modes.csv": "dafeef01823899ae45607a34e61c7efaed2700fd0de770ae91fe6aa9ab707e08",
+    "shot_summary.csv": "abc078f2a19cce593ac286d9513e16ba401e810172e194b672b036a58942be72"
+  }
+}

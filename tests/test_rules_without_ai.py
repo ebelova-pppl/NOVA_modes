@@ -45,6 +45,38 @@ assert not (blocked & {name.split('.')[0] for name in sys.modules})
 
 
 class RulesWithoutAITests(unittest.TestCase):
+    def test_missing_numpy_trapezoid_aborts_before_processing_or_writing(self):
+        runner = """
+import numpy as np
+del np.trapezoid
+# Keep star imports consistent with a NumPy release without this API.
+np.__all__ = [name for name in np.__all__ if name != 'trapezoid']
+""" + GUARDED_RUNNER
+        for script, options in (
+            ("sort_shot_mixed.py", ["--method", "rules"]),
+            ("sort_shot_rules.py", []),
+        ):
+            with self.subTest(script=script), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                output = root / "results"
+                output.mkdir()
+                previous = output / "shot_summary.csv"
+                previous.write_text("previous results\n")
+                completed = subprocess.run(
+                    [sys.executable, "-I", "-B", "-c", runner,
+                     str(REPO_ROOT / "scripts" / script), *options,
+                     "--shot_dir", str(root / "unread_input"),
+                     "--out_dir", str(output)],
+                    cwd=root, capture_output=True, text=True, timeout=60,
+                    check=False,
+                )
+                self.assertNotEqual(completed.returncode, 0)
+                self.assertIn("Rules sorting requires NumPy 2.x", completed.stderr)
+                self.assertIn(sys.executable, completed.stderr)
+                self.assertNotIn("Traceback", completed.stderr)
+                self.assertEqual(previous.read_text(), "previous results\n")
+                self.assertEqual(list(output.iterdir()), [previous])
+
     def run_without_ai(self, script, *args, cwd):
         completed = subprocess.run(
             [

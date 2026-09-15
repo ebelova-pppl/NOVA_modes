@@ -41,7 +41,7 @@ a different toroidal-mode range.
 
 | Task | Requirements |
 | --- | --- |
-| Current rules sorting and severity-based duplicate ranking | Python with NumPy 2.x and SciPy; CPU; no RF/CNN checkpoint. |
+| Current rules sorting and severity-based duplicate ranking | Python 3.10+ with NumPy 2.x and SciPy; CPU; no RF/CNN checkpoint. |
 | Viewing or manually labeling modes | Add Matplotlib; use `--no-rf` with the labeler for a rules-only workflow. |
 | RF/CNN inference, comparison, or training | Relevant AI packages and checkpoints; see the platform guide for compatible versions and CPU/GPU setup. |
 
@@ -121,7 +121,11 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
 | Find earlier results, version notes, and README instructions | [Preserved README reference](docs/history/readme_before_reorganization_20260914.md) |
 
-As of September 14, 2026, the
+As of September 15, 2026, the processed collection contains **40 post-training
+shots plus 14 active training shots (54 total)**. Elena accepted the recalculated
+E202806A02t045 rules results, adding 90 modes to the
+[1,726 accepted representatives from the 40 processed shots](audits/processed40_20260915/accepted_tae_modes.csv).
+The new shot was reviewed using rules; the
 [39-shot disagreement review](audits/pilot39_manual_review_20260914/README.md)
 is complete, including 17 reasoned manual corrections. Future reruns must
 explicitly supply the affected shots' `manual_overrides.csv` to reproduce

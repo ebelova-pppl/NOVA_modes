@@ -14,7 +14,17 @@ from pathlib import Path
 
 
 def ensure_repo_src_on_path() -> Path:
-    """Prepend this checkout's ``src`` directory and return the repo root."""
+    """Check Python support, prepend ``src``, and return the repo root."""
+
+    # Shared modules evaluate PEP 604 annotations such as ``int | None``.
+    if sys.version_info < (3, 10):
+        version = ".".join(str(part) for part in sys.version_info[:3])
+        raise SystemExit(
+            f"ERROR: NOVA scripts require Python 3.10 or newer; running "
+            f"Python {version} ({sys.executable}). Activate a compatible "
+            "environment and retry. Current rules sorting also requires "
+            "NumPy 2.x and SciPy. See docs/platforms.md for setup."
+        )
 
     repo_root = Path(__file__).resolve().parents[1]
     src_dir = repo_root / "src"

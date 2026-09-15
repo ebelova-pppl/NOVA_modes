@@ -1,7 +1,74 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-14)
+### Project state (current snapshot, updated 2026-09-15)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-15 E202806A02t045 accepted: 40 processed shots plus training
+
+- Elena checked the recalculated shot's results, found them satisfactory and
+  approved adding it to the processed list. Updated its sole inventory row to
+  `post_training_checked=yes`, `status=checked_post_training` and
+  `checked_methods=rules`, with the review and counts recorded in notes.
+  The inventory now contains **40 post-training processed cases plus 14
+  disjoint active training shots: 54 total**. The RF-CNN comparison cohort
+  remains 39; no AI comparison is implied for the new shot.
+- Added its 90 accepted TAE-like modes to the preserved 1,636-row manual-review
+  export. The [current 40-shot package](../audits/processed40_20260915/README.md)
+  contains **6,256 TAE-side modes**, **1,737 final GOOD before deduplication**,
+  **4,519 BAD**, and **1,726 accepted representatives**, all TAE-like.
+  It preserves every previous accepted row and the original 17 overrides.
+  R06 remains an invalid processed case and contributes no accepted modes.
+- Checked the added shot's installed output hashes against its verified rerun
+  and the previous manifest against its receipt; verified all 1,726 keys are
+  unique, all selected rows are GOOD, and only the intended inventory row
+  changed. The new package records per-shot counts and provenance. Training
+  labels, rules, shot outputs, prior comparison lists and G-shot inventory
+  are unchanged. The remaining full-database rollout stays deferred.
+
+## 2026-09-15 recalculated E202806A02t045: incompatible NumPy run corrected
+
+- The user's saved run successfully split 464 inputs into 240 TAE-like,
+  4 mixed and 220 EAE-like, then marked all 244 TAE-side modes INVALID with
+  `RULE_FEATURE_EXTRACTION_FAILED`: `numpy.trapezoid` was unavailable.
+  This explains the zero GOOD/BAD totals. The original NumPy version was not
+  recorded; this API is missing from NumPy 1.x. No input-format or radial-grid
+  failure was found in the corrected run.
+- Reran with the existing shared Python 3.11.15 / NumPy 2.1.2 environment
+  and unchanged production v13: **90 GOOD (also 90 after deduplication),
+  154 BAD, 220 EAE-like, zero INVALID**. All 464 inputs have nr=201; all
+  raw fingerprints and routing match the user's run, and EAE rows are
+  unchanged. All 244 TAE-side rows have complete severity evidence.
+- Installed the verified result in `sort_outputs/nstxuE202806A02t045`,
+  preserving the failed run under
+  `sort_outputs/before_numpy_runtime_fix_20260915/nstxuE202806A02t045`.
+  [Audit and receipts](../audits/recalculated_e202806a02t045_20260915/README.md)
+  retain the diagnosis, runtime, counts, per-n summary and output hashes.
+- Added one NumPy capability check in the shared `run_shot` workflow so both
+  rules CLIs stop before processing or writing when `numpy.trapezoid` is
+  unavailable. The canonical terminal summary now also prints INVALID
+  counts and points to `rejected_modes.csv`. Three no-AI tests pass,
+  including missing-API failure for both CLIs without altering prior output,
+  and successful synthetic production sorting with severity deduplication.
+- No gate/configuration, input, training label or installed environment was
+  changed. This is a separate rules-only diagnostic rerun; the 39-shot
+  reviewed cohort and accepted manifest are unchanged. No new RF-CNN
+  comparison or continuum/resonance alignment adjudication was performed.
+
+## 2026-09-15 sorter startup on an older Python interpreter
+
+- Reproduced the reported `int | None` TypeError with system Python 3.9.25.
+  Current source requires Python 3.10+; the existing shared Flux environment
+  provides Python 3.11.15, NumPy 2.1.2 and SciPy 1.17.1.
+- Added the Python version check to the shared CLI bootstrap. The canonical
+  sorter calls it before importing NumPy or project modules, so unsupported
+  Python now exits with an actionable message and the interpreter path.
+  Documented the Python minimum alongside the numerical-library requirements.
+- Verified the clean failure on real Python 3.9 and successful `--help` and
+  `--h` startup in the shared environment. Both no-AI regression tests pass,
+  including synthetic production sorting and severity-based deduplication.
+  Explicit Conda initialization/activation in fresh `tcsh` selects Python 3.11.
+- No scientific rules, inputs, outputs, or installed environments changed.
+  Use the documented compatible environment for the user's sorting run.
 
 ## 2026-09-14 documentation accuracy and environment review
 

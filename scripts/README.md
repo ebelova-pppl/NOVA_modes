@@ -4,11 +4,18 @@ Use this document as the detailed script and scientific-method reference.
 For a first run, start with [Getting started](../docs/getting_started.md) and
 [Flux / Perlmutter environment setup](../docs/platforms.md).
 
-**Current production rules require NumPy 2.x and SciPy.** The Perlmutter-like
+**Current production rules require Python 3.10+, NumPy 2.x and SciPy.** The Perlmutter-like
 Flux environment and matching RF/CNN packages are needed for AI-model use,
 including historical RF-ranked presets, rather than for current rules sorting.
 Matplotlib is additional for visual review. Existing detailed commands and
 experiment notes are retained below.
+
+Both rules sorting interfaces check for `numpy.trapezoid` before processing
+inputs or writing outputs. A missing API reports the active NumPy version
+and interpreter, with environment setup guidance. The canonical summary
+also prints INVALID counts; `rejected_modes.csv` gives their diagnostics.
+See the [E202806A02t045 runtime audit](../audits/recalculated_e202806a02t045_20260915/README.md)
+for a corrected run that previously reported zero GOOD/BAD after splitting.
 
 Unless stated otherwise, run examples from the repository root. For commands
 using `$NOVA_REPO` or `$NOVA_DATA`, first source your platform's path helper
@@ -31,6 +38,12 @@ have explicitly started Bash.
 | Transfer the complete project context | [Project state](../docs/project_state.md) |
 
 ## Recent adoption and review notes
+
+On 2026-09-15 Elena accepted the recalculated E202806A02t045 rules results.
+The [current processed collection](../audits/processed40_20260915/README.md)
+now has 40 post-training shots (plus 14 active training shots), with 1,737
+GOOD modes and 1,726 selected representatives. The new shot's
+`checked_methods=rules` distinguishes it from the 39 rules/RF-CNN comparisons.
 
 The following dated adoption counts describe their original runs. The later
 manual-review receipt supersedes the automatic-only pilot selections; gate
@@ -1345,7 +1358,8 @@ training N1 scopes have been added to the input registry.
 and correction. The user-authorized [new twelve-shot comparison](../audits/pilot12_v11_20260910/README.md)
 on E shots selected using N1/N2 audit evidence is complete: 6,697 inputs,
 all nr=201, and 144 disagreements among 1,817 TAE-side modes. Both output sets
-are installed and checked membership is now 39. Unresolved input scopes
+were installed, bringing checked membership to 39 at that time. The accepted
+E202806A02t045 rules-only addition raised it to 40 on 2026-09-15. Unresolved input scopes
 remain on hold. The [remaining-database audit](../audits/n1_database_alignment_20260910/README.md)
 scans the other 159 inventory shots with N1/N2 controls, using
 `audits/n1_database_alignment_20260910/check_database.py`. It preserves missing,

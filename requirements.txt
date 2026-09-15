@@ -1,6 +1,6 @@
 # AI environment notes (preserved setup reference; not pip requirements syntax).
 # Do not run pip install -r requirements.txt. Use docs/platforms.md for setup.
-# Current rules sorting needs NumPy 2.x and SciPy; Matplotlib is for viewers.
+# Current rules sorting needs Python 3.10+, NumPy 2.x and SciPy; Matplotlib is for viewers.
 # Perlmutter-compatible sklearn/Torch versions below apply to AI models only.
 
 # Perlmutter
