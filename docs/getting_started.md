@@ -125,6 +125,18 @@ with beam-ion profiles before NOVA-C calculations. `rad_width` is not the
 [complete sorter output reference](../scripts/README.md#sort_shot_mixedpy)
 for additional fields and tables.
 
+For a compact list to share, keep the requested 14 identifying, physical and
+decision columns with:
+
+```tcsh
+python scripts/compact_mode_csv.py /path/to/results/shot/good_tae_final.csv
+```
+
+This writes `good_tae_final_minimal.csv` beside the original, preserving every
+row and value. If an older export lacks `overall_rule_severity`, that output
+column is left blank. It requires only Python's standard library. See the
+[column list and output options](../scripts/README.md#compact_mode_csvpy).
+
 Calibration has primarily used `nr=201`. At other resolutions the
 interior-harmonic-incoherence and continuum-crossing-tail rejection thresholds
 are not applied; other measurements have their own applicability conditions.

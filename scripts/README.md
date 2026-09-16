@@ -27,6 +27,7 @@ have explicitly started Bash.
 | Task | Reference |
 | --- | --- |
 | Sort a new shot with current rules | [`sort_shot_mixed.py`](#sort_shot_mixedpy) |
+| Make a compact CSV for sharing | [`compact_mode_csv.py`](#compact_mode_csvpy) |
 | Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |
 | Understand duplicate severity ranking | [Normalized severity](#normalized-gate-severity) and [deduplication](#final-good-production-deduplication) |
 | View modes or apply manual corrections | [Viewer](#view_modes_csvpy), [labeler](#label_modes_fastpy), [adjudication](#manual-adjudication) |
@@ -1340,6 +1341,33 @@ modes stay on the TAE side for the selected decision method so marginal TAEs
 are not lost.
 
 ---
+
+## `compact_mode_csv.py`
+
+Copy a wide `good_tae_final.csv` to a compact CSV using only Python's standard
+library. From the repository root:
+
+```tcsh
+python scripts/compact_mode_csv.py /path/to/good_tae_final.csv
+```
+
+This creates `good_tae_final_minimal.csv` beside the input. To choose another
+destination, add `--output /path/to/compact.csv`. An existing output is never
+overwritten. Older exports may lack `overall_rule_severity`; the converter
+reports this and leaves that output column blank (unavailable). All other
+requested columns are required. Duplicate requested columns or malformed rows
+produce a clear error.
+
+The output contains exactly these columns, in this order:
+
+```text
+path,shot,n,ntor,nr,nhar,omega,gamma_d,rad_loc,rad_width,gap_region,rule_decision,overall_rule_severity,manual_decision
+```
+
+All rows, their order, numeric text, paths and blank values are preserved.
+`rule_decision` remains the preliminary automatic verdict; `manual_decision`
+is blank when no override was applied. The complete sorter CSV retains the
+full audit evidence.
 
 ## Extended continuum noise gate and calibration
 

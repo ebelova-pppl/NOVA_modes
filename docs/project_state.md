@@ -1,7 +1,36 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-15)
+### Project state (current snapshot, updated 2026-09-16)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-16 compact mode CSV for sharing
+
+- Added `scripts/compact_mode_csv.py`, using only Python's standard library,
+  to retain the user's 14 columns in order: `path`, `shot`, `n`, `ntor`,
+  `nr`, `nhar`, `omega`, `gamma_d`, `rad_loc`, `rad_width`, `gap_region`,
+  `rule_decision`, `overall_rule_severity`, `manual_decision`.
+- Defaults to a sibling `*_minimal.csv`; `--output` selects another new
+  destination. Preserves every row, cell text and blank value; refuses to
+  overwrite files and reports missing required columns, duplicated requested
+  columns or malformed rows. Handles large rule-feature JSON fields in the
+  wide source CSV.
+- Older exports without `overall_rule_severity` now produce a blank severity
+  column with a notice; the other 13 columns remain required. Existing
+  severity values are preserved, and unavailable severity is not recomputed
+  or replaced with zero.
+- Verified the compatibility fix on all 125 rows of the existing NSTX 135388
+  training export and all 90 rows of the current E202806A02t045 export. Cell
+  text, row order and source hashes are unchanged; missing required columns,
+  duplicate severity headers, malformed rows and overwrite protection still
+  fail clearly. Header-only legacy input also converts successfully.
+- Checked the CLI outside the checkout on the current E202806A02t045 export:
+  all 90 projected rows match exactly, 57 columns become 14, and file size
+  drops from 1,988,304 to 20,523 bytes. Source hash is unchanged. Also checked
+  CSV quoting/BOM, a large field, a manual decision, header-only input,
+  missing-column diagnostics, default naming, and overwrite protection.
+- Added usage to the getting-started guide and script reference. No sorting,
+  scientific decisions, or production outputs changed; only temporary
+  converted files were written during verification.
 
 ## 2026-09-15 E202806A02t045 accepted: 40 processed shots plus training
 
