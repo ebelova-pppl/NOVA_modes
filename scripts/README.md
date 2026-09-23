@@ -40,6 +40,14 @@ have explicitly started Bash.
 
 ## Recent adoption and review notes
 
+The [2026-09-21 remaining-shot batch](../audits/remaining122_rules_20260921/README.md)
+ran rules for all 122 requested cases. It installed 118 verified outputs,
+with 6,281 selected GOOD modes awaiting visual review, and held four newly
+discovered NaN-metadata shots. Inventory membership is now 158 processed
+post-training cases plus 14 training shots; the original 39 AI comparisons
+and 17 manual corrections are preserved. `sorted_rules_pending_review`
+is an inventory status; it does not change production GOOD/BAD decisions.
+
 On 2026-09-15 Elena accepted the recalculated E202806A02t045 rules results.
 The [current processed collection](../audits/processed40_20260915/README.md)
 now has 40 post-training shots (plus 14 active training shots), with 1,737
@@ -1387,7 +1395,9 @@ and correction. The user-authorized [new twelve-shot comparison](../audits/pilot
 on E shots selected using N1/N2 audit evidence is complete: 6,697 inputs,
 all nr=201, and 144 disagreements among 1,817 TAE-side modes. Both output sets
 were installed, bringing checked membership to 39 at that time. The accepted
-E202806A02t045 rules-only addition raised it to 40 on 2026-09-15. Unresolved input scopes
+E202806A02t045 rules-only addition raised it to 40 on 2026-09-15; the
+September 21 rules batch raised processed membership to 158, with its 118
+new cases awaiting visual review. Unresolved input scopes
 remain on hold. The [remaining-database audit](../audits/n1_database_alignment_20260910/README.md)
 scans the other 159 inventory shots with N1/N2 controls, using
 `audits/n1_database_alignment_20260910/check_database.py`. It preserves missing,

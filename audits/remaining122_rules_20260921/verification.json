@@ -1,0 +1,32 @@
+{
+  "status": "verified",
+  "shots": 118,
+  "attempted_shots": 122,
+  "held_input_shots": [
+    "nstxuE203655F01t030",
+    "nstxuE203653A02t017",
+    "nstxuE203655F01t020",
+    "nstxuE205042A01t025"
+  ],
+  "counts": {
+    "input_modes": 70468,
+    "tae_like": 18898,
+    "mixed": 845,
+    "eae_like": 50725,
+    "invalid": 0,
+    "good_before_dedup": 6324,
+    "selected_good": 6281,
+    "bad": 13419
+  },
+  "all_nr": 201,
+  "all_raw_fingerprints_verified": true,
+  "configuration_sha256": "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919",
+  "output_sha256": {
+    "selection.csv": "5eb62f5d9cdf70f69d5f98101d6c992194ba096228006db6bfb36393bc9e33c4",
+    "shot_summary.csv": "118dd6d5fc55cc37dc41ea25b9713191e5315993e10d5c1c794e0a140f0b3b44",
+    "good_tae_final_batch.csv": "d0d6553df8d9ad3eb761d14269ff52e8cefd0accce3f61729775490f1b1a0f61",
+    "stage_results.json": "dedb3df27ceaf73f5e8b34a0dc617656f51dec27809fcbd9fdebe60c075438a3",
+    "input_holds.json": "a38b0d077d51bfbd907d6210519fee4bb0e3b44f5c1800ccf6887515bac6b698",
+    "invalid_input_files.csv": "7b332791987286eb1357edbeb3797f269cc63a84322edf9e7af021096a2b6757"
+  }
+}

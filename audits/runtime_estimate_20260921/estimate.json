@@ -1,0 +1,68 @@
+{
+  "estimated_utc": "2026-09-21T05:08:22.598162+00:00",
+  "method": "rules",
+  "existing_processed_shots": 40,
+  "active_training_shots": 14,
+  "unprocessed_nontraining": 146,
+  "excluded_unique_shots": 22,
+  "candidate_shots": 124,
+  "candidate_raw_modes": 73729,
+  "with_secondary_n1_holds": {
+    "shots": 122,
+    "raw_modes": 71656,
+    "additional_holds": [
+      "nstxuG133964R48",
+      "nstxuG133964U27"
+    ]
+  },
+  "benchmarks": [
+    {
+      "shot": "nstxuE202806A02t045",
+      "wall_seconds": 44.311,
+      "total_modes": 464,
+      "tae_side_modes": 244,
+      "good": 90,
+      "configuration_sha256": "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919"
+    },
+    {
+      "shot": "nstxuE205055A01t022",
+      "wall_seconds": 64.218,
+      "total_modes": 1017,
+      "tae_side_modes": 155,
+      "good": 66,
+      "configuration_sha256": "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919"
+    }
+  ],
+  "benchmark_conditions": {
+    "sequential_shot_processes": true,
+    "numerical_threads_per_process": 1,
+    "python": "/p/hym/conda_envs/nova-perlmutter/bin/python",
+    "production_outputs_untouched": true
+  },
+  "pooled_serial_extrapolation_minutes": 90.0,
+  "individual_rate_serial_extrapolation_minutes": [
+    117.3,
+    77.6
+  ],
+  "planning_budget_including_automated_checks": {
+    "four_parallel_shots_hours": [
+      1,
+      2
+    ],
+    "sequential_hours": [
+      2,
+      3
+    ]
+  },
+  "caveats": [
+    "Four-process scaling is projected, not benchmarked. Shared filesystem load and TAE-side fraction affect runtime.",
+    "Uses recorded input flags; recalculated flagged shots require review before release. Candidate does not mean N1 independently cleared.",
+    "All candidate N1-N10 populated directories have matching datcon files; no full NaN scan was performed.",
+    "Human visual review, RF-CNN, NOVA recalculation and queue delays are excluded."
+  ],
+  "source_sha256": {
+    "audits/main_dataset_shots/shot_status.csv": "a026e0338f70b03bf35e26f40a03e28eeb478a18a329d490a6d2e46990190042",
+    "audits/n1_database_alignment_20260910/priority_review.csv": "514f2f8f898a6532ad48882b0245571670944293c400d2f4ed35823d58a8c8e2",
+    "audits/n1_database_alignment_20260910/all_200_n1_status.csv": "cc587289fa72e8167040483206a476333141f78692238ff2787fb5941aef9eff"
+  }
+}

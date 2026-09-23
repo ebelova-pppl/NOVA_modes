@@ -4,6 +4,19 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
+On 2026-09-21 the authorized remaining-122 rules batch completed. **118
+verified shots were installed**, and four previously unflagged shots were
+held for NaN `gamma_d` metadata: E203653A02t017, E203655F01t020,
+E203655F01t030 and E205042A01t025. The inventory now has **158 processed
+post-training cases plus 14 active training shots (172 disjoint cases)**;
+28 entries remain held for input issues/review or empty. New installed cases
+have `status=sorted_rules_pending_review`, `checked_methods=rules`; the four
+holds have `status=input_issue` and remain unchecked. See the
+[batch results and bad-file list](../remaining122_rules_20260921/README.md).
+There are 8,007 selected GOOD modes across the processed cases, including
+6,281 new automatic selections awaiting visual review. The prior reviewed
+40-shot export and original 39 rules/RF-CNN comparisons are preserved.
+
 On 2026-09-15 Elena accepted the recalculated E202806A02t045 rules results,
 bringing the processed collection to **40 post-training shots plus 14 active
 training shots (54 disjoint cases)**. The new shot has `checked_methods=rules`;
@@ -40,13 +53,15 @@ counts and input exclusions remain unchanged. No additional shots were sorted.
   `training_labels/tae_like_train.csv` list. The three label-count columns
   are derived from that file.
 - `post_training_checked=yes` records completed post-training processing and
-  review/comparison. Use `checked_methods` to identify the methods actually
-  run: the original 39 cases have `rules|rf-cnn`; the user-approved
-  E202806A02t045 addition has `rules`. The original cohort includes the E case and
+  automated checks. It does not imply visual review or an AI comparison:
+  use `status` and `checked_methods` to distinguish them. The original 39
+  cases have `rules|rf-cnn`; the user-approved E202806A02t045 addition and
+  118 newly installed cases have `rules`. The new 118 retain explicit
+  pending-visual-review status. The original cohort includes the E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
   completed with v11 and RF/raw-CNN on 2026-09-10. Its disagreement review
-  is complete. The current processed membership is 40, with 39 AI comparisons.
+  is complete. Current processed membership is 158, with 39 AI comparisons.
 
 All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and

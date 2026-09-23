@@ -1,0 +1,17 @@
+{
+  "reason": "Accept valid NO_CLOSE_FREQUENCY_CLUSTERS; no scientific rule change.",
+  "driver_before_sha256": "b74eb200dee83097507eb5c4d254ec44dfb439700b097b3cc3333669cdf35055",
+  "driver_after_sha256": "85dc1196ca0155eee29bcd04365caa6a8e4497f13b190bf0a8af5f6697298236",
+  "rechecked_shots": [
+    "nstxuE202926A03t037",
+    "nstxuE204118F01t035",
+    "nstxuE204707X02t035",
+    "nstxuE205034A01t017",
+    "nstxuE205035A01t017",
+    "nstxuE205040A01t018",
+    "nstxuE205040A01t020",
+    "nstxuE205057A01t030",
+    "nstxuE205072A02t034"
+  ],
+  "note": "Elapsed time is blank for recovered rows; sorting was not repeated."
+}

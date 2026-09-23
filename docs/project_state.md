@@ -1,7 +1,71 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-16)
+### Project state (current snapshot, updated 2026-09-21)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-09-21 remaining 122-shot rules batch completed: 118 installed, four held
+
+- User authorized current rules sorting for the 122-shot estimate subset,
+  excluding priority N1 cases, NaN-input holds, the empty entry and secondary
+  N1 cases R48/U27. This supersedes the rollout deferral for these 122 shots.
+- Ran four single-threaded shot workers through `sort_shot_mixed.py
+  --method rules --rule_config tae_rules_production_v13`, using the compatible
+  shared environment. Input/output snapshots, exact selection and progress
+  are under `audits/remaining122_rules_20260921/`; full staged exports and
+  logs are under ignored `outputs/review_remaining122_rules_20260921/`.
+- Each publishable shot was checked for full coverage, stable raw fingerprints, nr=201,
+  zero invalid/runtime failures, complete severities and consistent final
+  output lists. All 118 verified exports are installed in the requested rules
+  root. All destinations were new. Existing reviewed
+  outputs, manual overrides, training labels and RF-CNN exports are preserved.
+- Automated sorting does not constitute visual review: new batch results
+  are marked as awaiting visual review. No additional input scopes
+  have been declared scientifically cleared by this run.
+- All 122 sorter runs completed. Four previously unflagged NaN-metadata
+  shots are held: E203653A02t017 (17 N6 files), E203655F01t020 (5 N6),
+  E203655F01t030 (1 N8), and E205042A01t025 (5 N10). All 28 files have NaN
+  `gamma_d`; their other raw values are finite. Full held-shot diagnostics
+  remain staged, and exact filenames are in
+  [the batch audit](../audits/remaining122_rules_20260921/README.md).
+- The other 118 shots passed verification: 70,468 inputs, all nr=201;
+  18,898 TAE-like, 845 mixed, 50,725 EAE-like; 6,324 GOOD before
+  deduplication, 6,281 selected GOOD and 13,419 BAD, zero INVALID.
+  Selected modes comprise 6,280 TAE-like and one mixed. The batch verifier's
+  omitted valid no-close-cluster status
+  was corrected and nine completed outputs rechecked; no scientific rules
+  or sorter outputs changed. The prior 17 manual corrections and 40-shot
+  accepted manifest were checked and remain intact.
+- Updated the main inventory for all 122 attempted shots: 118 installed cases
+  now have `post_training_checked=yes`, `checked_methods=rules` and
+  `status=sorted_rules_pending_review`; the four NaN holds remain unchecked
+  with `status=input_issue`. Updated the two corresponding G-shot entries.
+  All other rows and training membership are unchanged. The inventory now
+  contains **158 processed post-training cases plus 14 active training shots
+  (172 disjoint cases)**; 28 entries remain held for issues/review or empty.
+- Across the 158 processed cases: **25,999 TAE-side candidates**, **8,061 GOOD
+  before deduplication**, **8,007 selected representatives**, **17,938 BAD**,
+  70,193 EAE-like and 707 previously INVALID inputs. These counts exclude
+  training rows and the four new held shots. The prior reviewed cohort
+  remains 40; RF-CNN comparison coverage remains 39. New selected modes
+  are exported separately for visual review, with installation and inventory
+  receipts linked from the audit README. No scientific rules were changed.
+
+## 2026-09-21 remaining-database runtime estimate
+
+- After 40 processed and 14 training shots, 146 remain. Recorded priority N1,
+  NaN and empty-input holds leave 124 candidates / 73,729 current N1–N10 files;
+  also holding secondary N1 cases R48/U27 leaves 122 / 71,656. These counts
+  use existing flags and do not certify the remaining inputs.
+- Timed current rules on two already processed shots: 464 files in 44.3 s
+  and 1,017 files in 64.2 s, sequentially with one numerical thread per process.
+  Pooled serial extrapolation is about 90 minutes. Budget **1–2 hours with
+  four shot processes**, or **2–3 hours sequentially**, including automated
+  checks/output handling; parallel scaling is an estimate. Human review,
+  RF-CNN, recalculation and queue delays are excluded.
+- [Estimate and workload](../audits/runtime_estimate_20260921/README.md)
+  record assumptions, timings and source hashes. Only isolated benchmark
+  exports were generated; production outputs, flags and processed membership
+  are unchanged. The remaining production rollout has not started.
 
 ## 2026-09-16 compact mode CSV for sharing
 

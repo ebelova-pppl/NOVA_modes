@@ -121,16 +121,18 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
 | Find earlier results, version notes, and README instructions | [Preserved README reference](docs/history/readme_before_reorganization_20260914.md) |
 
-As of September 15, 2026, the processed collection contains **40 post-training
-shots plus 14 active training shots (54 total)**. Elena accepted the recalculated
-E202806A02t045 rules results, adding 90 modes to the
-[1,726 accepted representatives from the 40 processed shots](audits/processed40_20260915/accepted_tae_modes.csv).
-The new shot was reviewed using rules; the
+As of September 21, 2026, the inventory contains **158 processed post-training
+shots plus 14 active training shots (172 total)**. The
+[latest rules batch](audits/remaining122_rules_20260921/README.md) ran all 122
+requested cases and installed 118, holding four newly discovered NaN-input
+shots. Its **6,281 selected GOOD modes await visual review**. The
+[1,726 accepted representatives from the earlier 40-shot cohort](audits/processed40_20260915/accepted_tae_modes.csv)
+remain unchanged. The
 [39-shot disagreement review](audits/pilot39_manual_review_20260914/README.md)
 is complete, including 17 reasoned manual corrections. Future reruns must
 explicitly supply the affected shots' `manual_overrides.csv` to reproduce
-those curated selections. The remaining database is deferred while input
-consistency and rollout are reviewed. See the full
+those curated selections. The remaining 28 inventory entries are held for
+input issues/review or are empty. See the full
 [project state](docs/project_state.md) for context and next steps.
 
 The active training list has 2,327 rows from 14 shots; Q62 and confirmed invalid

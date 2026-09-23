@@ -1,0 +1,22 @@
+{
+  "status": "verified",
+  "manual_corrections_preserved": 17,
+  "bad_to_good_present_in_final_lists": 9,
+  "good_to_bad_absent_from_final_lists": 8,
+  "shots_checked": [
+    "nstxuE202947A03t015",
+    "nstxuE203653A02t025",
+    "nstxuE203655F01t025",
+    "nstxuE203656A02t030",
+    "nstxuE204621A03t030",
+    "nstxuE204636A01t020",
+    "nstxuE204645A16t015",
+    "nstxuE204707A04t030",
+    "nstxuE204955F02t017",
+    "nstxuE205040A01t016",
+    "nstxuE205057A01t020",
+    "nstxuG121123N80",
+    "nstxuG142301H56"
+  ],
+  "previous_40_shot_manifest_unchanged": true
+}
