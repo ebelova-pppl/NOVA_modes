@@ -1,0 +1,198 @@
+{
+  "created_utc": "2026-10-05T15:49:54.801502+00:00",
+  "processed": 163,
+  "production_processed": 163,
+  "calibration_processed": 0,
+  "active_training": 14,
+  "remaining": 23,
+  "changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "8485414f17c4a194a39c3103e6800b1ae2689e6281024757e4fc4da1bdbdba85",
+      "after_sha256": "94fd7d03e010a5eb98cfe3f10313c27faf27f1c546ae9fc84d4c344e339a765f",
+      "changes": [
+        {
+          "shot": "nstxuE203653A02t017",
+          "before": {
+            "shot": "nstxuE203653A02t017",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE203653A02t017",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_issue",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203653A02t017/N6/egn06w.1060E+02, nstxuE203653A02t017/N6/egn06w.1072E+02, nstxuE203653A02t017/N6/egn06w.1184E+01, nstxuE203653A02t017/N6/egn06w.1247E+01, nstxuE203653A02t017/N6/egn06w.1403E+02, nstxuE203653A02t017/N6/egn06w.1555E+02, nstxuE203653A02t017/N6/egn06w.1609E+02, nstxuE203653A02t017/N6/egn06w.1613E+02, nstxuE203653A02t017/N6/egn06w.1616E+02, nstxuE203653A02t017/N6/egn06w.1670E+02, nstxuE203653A02t017/N6/egn06w.1755E+02, nstxuE203653A02t017/N6/egn06w.1862E+02, nstxuE203653A02t017/N6/egn06w.5462E+01, nstxuE203653A02t017/N6/egn06w.8229E+01, nstxuE203653A02t017/N6/egn06w.8593E+01, nstxuE203653A02t017/N6/egn06w.8900E+01, nstxuE203653A02t017/N6/egn06w.9679E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json."
+          },
+          "after": {
+            "shot": "nstxuE203653A02t017",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE203653A02t017",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203653A02t017/N6/egn06w.1060E+02, nstxuE203653A02t017/N6/egn06w.1072E+02, nstxuE203653A02t017/N6/egn06w.1184E+01, nstxuE203653A02t017/N6/egn06w.1247E+01, nstxuE203653A02t017/N6/egn06w.1403E+02, nstxuE203653A02t017/N6/egn06w.1555E+02, nstxuE203653A02t017/N6/egn06w.1609E+02, nstxuE203653A02t017/N6/egn06w.1613E+02, nstxuE203653A02t017/N6/egn06w.1616E+02, nstxuE203653A02t017/N6/egn06w.1670E+02, nstxuE203653A02t017/N6/egn06w.1755E+02, nstxuE203653A02t017/N6/egn06w.1862E+02, nstxuE203653A02t017/N6/egn06w.5462E+01, nstxuE203653A02t017/N6/egn06w.8229E+01, nstxuE203653A02t017/N6/egn06w.8593E+01, nstxuE203653A02t017/N6/egn06w.8900E+01, nstxuE203653A02t017/N6/egn06w.9679E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json. 2026-10-05: NaN hold resolved; user-requested production v13 sorting completed and verified. 324 inputs, nr=201, 181 BAD, 0 REVIEW, 41 selected GOOD, 101 EAE-like, zero INVALID. Output: sort_outputs/nstxuE203653A02t017. Visual review pending; this run does not declare N1/N2 alignment cleared. See audits/cleared_nan_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuE203655F01t020",
+          "before": {
+            "shot": "nstxuE203655F01t020",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE203655F01t020",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_issue",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203655F01t020/N6/egn06w.2483E+01, nstxuE203655F01t020/N6/egn06w.2571E+01, nstxuE203655F01t020/N6/egn06w.2802E+01, nstxuE203655F01t020/N6/egn06w.2990E+01, nstxuE203655F01t020/N6/egn06w.3073E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json."
+          },
+          "after": {
+            "shot": "nstxuE203655F01t020",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE203655F01t020",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203655F01t020/N6/egn06w.2483E+01, nstxuE203655F01t020/N6/egn06w.2571E+01, nstxuE203655F01t020/N6/egn06w.2802E+01, nstxuE203655F01t020/N6/egn06w.2990E+01, nstxuE203655F01t020/N6/egn06w.3073E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json. 2026-10-05: NaN hold resolved; user-requested production v13 sorting completed and verified. 303 inputs, nr=201, 89 BAD, 0 REVIEW, 49 selected GOOD, 165 EAE-like, zero INVALID. Output: sort_outputs/nstxuE203655F01t020. Visual review pending; this run does not declare N1/N2 alignment cleared. See audits/cleared_nan_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuE203655F01t030",
+          "before": {
+            "shot": "nstxuE203655F01t030",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE203655F01t030",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_issue",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203655F01t030/N8/egn08w.2428E+02. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json."
+          },
+          "after": {
+            "shot": "nstxuE203655F01t030",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE203655F01t030",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203655F01t030/N8/egn08w.2428E+02. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json. 2026-10-05: NaN hold resolved; user-requested production v13 sorting completed and verified. 466 inputs, nr=201, 109 BAD, 0 REVIEW, 65 selected GOOD, 292 EAE-like, zero INVALID. Output: sort_outputs/nstxuE203655F01t030. Visual review pending; this run does not declare N1/N2 alignment cleared. See audits/cleared_nan_rules_20261005. Existing isolated N2/6049 crossing-correspondence question remains recorded."
+          }
+        },
+        {
+          "shot": "nstxuE205042A01t025",
+          "before": {
+            "shot": "nstxuE205042A01t025",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE205042A01t025",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_issue",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE205042A01t025/N10/egn10w.3277E+01, nstxuE205042A01t025/N10/egn10w.3332E+01, nstxuE205042A01t025/N10/egn10w.3467E+01, nstxuE205042A01t025/N10/egn10w.3488E+01, nstxuE205042A01t025/N10/egn10w.3560E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json."
+          },
+          "after": {
+            "shot": "nstxuE205042A01t025",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE205042A01t025",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE205042A01t025/N10/egn10w.3277E+01, nstxuE205042A01t025/N10/egn10w.3332E+01, nstxuE205042A01t025/N10/egn10w.3467E+01, nstxuE205042A01t025/N10/egn10w.3488E+01, nstxuE205042A01t025/N10/egn10w.3560E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json. 2026-10-05: NaN hold resolved; user-requested production v13 sorting completed and verified. 499 inputs, nr=201, 89 BAD, 0 REVIEW, 74 selected GOOD, 335 EAE-like, zero INVALID. Output: sort_outputs/nstxuE205042A01t025. Visual review pending; this run does not declare N1/N2 alignment cleared. See audits/cleared_nan_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301M21",
+          "before": {
+            "shot": "nstxuG142301M21",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M21",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_issue",
+            "notes": "DITW-005: 197 N4 gamma_d=NaN files; excluded before inference in 2026-09-08 pilot and replaced by nstxuG142301U84"
+          },
+          "after": {
+            "shot": "nstxuG142301M21",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M21",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "DITW-005: 197 N4 gamma_d=NaN files; excluded before inference in 2026-09-08 pilot and replaced by nstxuG142301U84 2026-10-05: NaN hold resolved; user-requested production v13 sorting completed and verified. 1015 inputs, nr=201, 300 BAD, 0 REVIEW, 12 selected GOOD, 703 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301M21. Visual review pending; this run does not declare N1/N2 alignment cleared. See audits/cleared_nan_rules_20261005. Existing N1/N2 log-coverage limitations remain recorded."
+          }
+        }
+      ]
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "5f80cd64b0dd072e053bfe370a700ef5227800c762f322266a1cdba27b130952",
+      "after_sha256": "09f6036fba17744e0c9f27fbcfe8e403d427b9c97e516dc3f035e603efafb4df",
+      "changes": [
+        {
+          "shot": "nstxuG142301M21",
+          "before": {
+            "shot": "nstxuG142301M21",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M21",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_issue",
+            "notes": "DITW-005: 197 N4 gamma_d=NaN files; excluded before inference in 2026-09-08 pilot and replaced by nstxuG142301U84"
+          },
+          "after": {
+            "shot": "nstxuG142301M21",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M21",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "DITW-005: 197 N4 gamma_d=NaN files; excluded before inference in 2026-09-08 pilot and replaced by nstxuG142301U84 2026-10-05: NaN hold resolved; user-requested production v13 sorting completed and verified. 1015 inputs, nr=201, 300 BAD, 0 REVIEW, 12 selected GOOD, 703 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301M21. Visual review pending; this run does not declare N1/N2 alignment cleared. See audits/cleared_nan_rules_20261005. Existing N1/N2 log-coverage limitations remain recorded."
+          }
+        }
+      ]
+    }
+  ]
+}

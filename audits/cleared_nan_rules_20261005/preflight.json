@@ -1,0 +1,37 @@
+[
+  {
+    "shot": "nstxuE203653A02t017",
+    "current_mode_files": 324,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "changed_sources_since_nan_check": []
+  },
+  {
+    "shot": "nstxuE203655F01t020",
+    "current_mode_files": 303,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "changed_sources_since_nan_check": []
+  },
+  {
+    "shot": "nstxuE203655F01t030",
+    "current_mode_files": 466,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "changed_sources_since_nan_check": []
+  },
+  {
+    "shot": "nstxuE205042A01t025",
+    "current_mode_files": 499,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "changed_sources_since_nan_check": []
+  },
+  {
+    "shot": "nstxuG142301M21",
+    "current_mode_files": 1015,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "changed_sources_since_nan_check": []
+  }
+]

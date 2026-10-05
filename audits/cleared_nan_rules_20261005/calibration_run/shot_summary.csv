@@ -1,0 +1,6 @@
+shot,input_modes,workflow,tae_like,mixed,eae_like,bad,review,invalid,good_before_dedup,selected_good,elapsed_seconds
+nstxuE203653A02t017,324,rules-cli,219,4,101,181,42,0,0,0,15.31
+nstxuE203655F01t020,303,rules-cli,133,5,165,89,49,0,0,0,8.87
+nstxuE203655F01t030,466,rules-cli,166,8,292,109,65,0,0,0,12.56
+nstxuE205042A01t025,499,rules-cli,159,5,335,89,75,0,0,0,10.76
+nstxuG142301M21,1015,rules-cli,268,44,703,300,12,0,0,0,30.35

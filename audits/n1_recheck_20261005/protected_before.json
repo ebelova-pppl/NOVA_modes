@@ -1,0 +1,6 @@
+{
+  "configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+  "training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+  "audits/main_dataset_shots/shot_status.csv": "8485414f17c4a194a39c3103e6800b1ae2689e6281024757e4fc4da1bdbdba85",
+  "audits/main_dataset_shots/g_shot_status.csv": "5f80cd64b0dd072e053bfe370a700ef5227800c762f322266a1cdba27b130952"
+}

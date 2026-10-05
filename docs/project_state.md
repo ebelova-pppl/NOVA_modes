@@ -1,7 +1,86 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-09-21)
+### Project state (current snapshot, updated 2026-10-05)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-10-05 five NaN-cleared shots sorted: 241 selected GOOD, 23 entries remain
+
+- User clarified production `sort_shot_mixed.py --method rules`. Ran frozen
+  v13 for E203653A02t017, E203655F01t020, E203655F01t030, E205042A01t025 and
+  G142301M21; all five outputs are verified and installed under the existing
+  rules output root, with no previous directory replaced.
+- Fresh full-shot preflight: 2,607 finite raw inputs, all nr=201, unchanged
+  from the September 30 input snapshot. Results: 945 TAE-like, 66 mixed,
+  1,596 EAE-like, 768 BAD, 243 GOOD before deduplication and **241 selected
+  GOOD**, all TAE-like; zero INVALID/final REVIEW, complete severities,
+  no grid warnings or duplicate-ranking fallbacks. Visual review is pending.
+- The [batch audit](../audits/cleared_nan_rules_20261005/README.md) includes
+  the combined GOOD list, output/input provenance, installation receipts and
+  [remaining unprocessed list](../audits/cleared_nan_rules_20261005/remaining_unprocessed.csv).
+  Inventory membership is **163 processed + 14 training = 177 disjoint cases**;
+  **23 remain: 22 continuum-review shots and one empty entry**. D46's old
+  NaN status was superseded by its remaining continuum-review hold.
+- None of the 22 N1-review scopes was additionally cleared: the seven passing
+  the N1 TAE-side screen still have N2/all-frequency evidence, including L89's
+  marginal offsets. The NaN-cleared group does not imply full continuum
+  certification; M21's log limitations and E203655F01t030's isolated N2/6049
+  correspondence question remain recorded. Known-invalid exclusions are unchanged.
+- There are now 8,248 selected GOOD representatives in recorded processed
+  outputs; 6,522 automatic selections from 123 later shots await visual review.
+  The earlier reviewed 40-shot accepted list (1,726 modes), original 17 manual
+  corrections, training labels and AI comparison cohort of 39 are preserved.
+  Initial calibration runs are archived separately; their gate results match
+  production exactly and do not add extra processed membership.
+
+## 2026-10-05 N1 recheck: 19 updated continua, substantial improvement
+
+- Rechecked the same 22 pending N1 cases against September 30, with N2
+  controls: 2,900 modes, all nr=201, zero group/input-loading errors. The
+  [dated audit](../audits/n1_recheck_20261005/README.md) preserves per-shot
+  before/after counts, raw source hashes and a 146-mode residual review list.
+- Nineteen N1 `datcon1` files now have changed contents dated October 2.
+  All N1 mode payloads/inventories and logs are unchanged. E205059A01t025,
+  R48 and U27 have no N1 source changes. Every N2 source set is unchanged.
+- Across the 19 updated scopes, TAE-side interior comparisons beyond two
+  grid intervals fall from 281/322 (87.3%) to 26/176 (14.8%); all-frequency
+  comparisons fall from 701/781 to 98/546. Crossing populations and routing
+  changed, so these are not one-to-one crossing comparisons.
+- N75, U37, B85, F62, F66, L89 and M32 have no remaining out-of-tolerance
+  TAE-side comparisons. N75 has only one informative N1 mode; L89 retains
+  one EAE-side outlier and some groups have incomplete raw log coverage.
+- Residual N1 evidence remains: N22/R42 each have 3/5 TAE-side comparisons
+  beyond tolerance, U85 has 8/28, E34 has two modest offsets at 2.23/2.38
+  intervals and S94 one at 3.30. Other updated shots have one or two TAE-side
+  outliers. E205059 remains at 26/26; R48/U27 remain secondary-review cases.
+- N2 concerns persist, including N75 41/41, R42 48/55 and F62 37/50
+  comparisons beyond tolerance. Improved N1 alignment does not establish
+  whole-shot input validity. No exclusions, training labels, processing
+  membership or production outputs were changed, and no sorting was run.
+
+## 2026-09-30 recalculated-input check: NaNs resolved, N1 concerns remain
+
+- Checked the 22 pending N1 cases and six NaN-held shots: 27 distinct shots
+  because D46 is in both groups. Exact selection, hash comparisons and
+  measurements are in the [recalculation audit](../audits/recalculated_input_check_20260930/README.md).
+- All 3,205 current N1--N10 inputs in the six NaN-held shots have finite raw
+  values, nr=201 and readable paired continua. No gamma_d NaNs or input errors
+  remain. Original offending paths: 225 absent from active directories, one
+  M21 path now finite. Formerly affected N groups now have 93 D46/N7,
+  39 M21/N4, 27 E203653A02t017/N6, 87 E203655F01t020/N6,
+  76 E203655F01t030/N8 and 118 E205042A01t025/N10 modes.
+- For 21/22 pending N1 cases, all active mode, datcon1 and frequency-log hashes
+  are unchanged from September 10, despite newer timestamps on some continuum
+  files. Recomputed alignment evidence is unchanged. R48/U27 remain secondary
+  review cases rather than confirmed invalid scopes.
+- E205059A01t025 has changed N1 inputs (120 -> 266 modes and changed continuum),
+  but all 26/26 informative TAE-side interior log/continuum comparisons exceed
+  two grid intervals, with median absolute nearest-log distance 14.59 intervals.
+  Recalculation cannot yet be treated as resolving its alignment concern.
+- D46's NaN issue is resolved but its separate N1 concern remains. Finite data
+  do not establish morphology quality; M21 also retains limited N1 log coverage.
+  No input flags, training labels, processing membership or production outputs
+  were changed. The 158 processed + 14 training inventory remains current;
+  formerly NaN-held shots still require sorting/review before joining it.
 
 ## 2026-09-21 remaining 122-shot rules batch completed: 118 installed, four held
 

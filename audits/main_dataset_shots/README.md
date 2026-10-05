@@ -4,16 +4,28 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
+On 2026-10-05 five NaN-cleared shots completed production rules sorting,
+adding **241 selected GOOD representatives awaiting visual review**. The
+inventory now contains **163 processed post-training cases plus 14 active
+training shots (177 disjoint cases)**. **23 entries remain unprocessed: 22
+continuum-review shots and one empty entry**. D46's resolved NaN status has
+been superseded by `continuum_review_pending`; the other five formerly
+NaN-held rows now have `sorted_rules_pending_review`, `checked_methods=rules`
+and `post_training_checked=yes`. See the [batch and remaining-shot lists](../cleared_nan_rules_20261005/README.md).
+Recorded processed outputs contain 8,248 selected GOOD modes, including
+6,522 automatic selections from 123 later shots awaiting visual review.
+The reviewed 40-shot accepted manifest and 39 AI comparisons remain unchanged.
+
 On 2026-09-21 the authorized remaining-122 rules batch completed. **118
 verified shots were installed**, and four previously unflagged shots were
 held for NaN `gamma_d` metadata: E203653A02t017, E203655F01t020,
-E203655F01t030 and E205042A01t025. The inventory now has **158 processed
+E203655F01t030 and E205042A01t025. The inventory then reached **158 processed
 post-training cases plus 14 active training shots (172 disjoint cases)**;
-28 entries remain held for input issues/review or empty. New installed cases
+28 entries then remained held for input issues/review or empty. Those installed cases
 have `status=sorted_rules_pending_review`, `checked_methods=rules`; the four
-holds have `status=input_issue` and remain unchecked. See the
+holds then had `status=input_issue` and remained unchecked until October 5. See the
 [batch results and bad-file list](../remaining122_rules_20260921/README.md).
-There are 8,007 selected GOOD modes across the processed cases, including
+There were 8,007 selected GOOD modes across those processed cases, including
 6,281 new automatic selections awaiting visual review. The prior reviewed
 40-shot export and original 39 rules/RF-CNN comparisons are preserved.
 
@@ -56,12 +68,12 @@ counts and input exclusions remain unchanged. No additional shots were sorted.
   automated checks. It does not imply visual review or an AI comparison:
   use `status` and `checked_methods` to distinguish them. The original 39
   cases have `rules|rf-cnn`; the user-approved E202806A02t045 addition and
-  118 newly installed cases have `rules`. The new 118 retain explicit
+  118 September 21 cases and five October 5 additions have `rules`. These 123 retain explicit
   pending-visual-review status. The original cohort includes the E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
   completed with v11 and RF/raw-CNN on 2026-09-10. Its disagreement review
-  is complete. Current processed membership is 158, with 39 AI comparisons.
+  is complete. Current processed membership is 163, with 39 AI comparisons.
 
 All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
@@ -110,12 +122,14 @@ twice. Derived split directories, temporary/work directories, `badQ*`
 quarantines, and chatgpt continuum clones are also excluded. The canonical
 directory `nstxu_202806` is retained but marked `empty_no_egn` because it
 currently has no populated `N#` directory containing `egn*` files.
-`nstxuG142301D46` is marked `input_issue`: it was the pilot's initial
-medium-size G draw, but its sole N7 mode has `gamma_d=NaN`, so it was replaced
+`nstxuG142301D46` was initially marked `input_issue`: it was the pilot's initial
+medium-size G draw, but its sole N7 mode had `gamma_d=NaN`, so it was replaced
 before sorting by the next seeded candidate, `nstxuG142301E72`.
-`nstxuG142301M21` is also marked `input_issue`: its 197 N4 modes with
+`nstxuG142301M21` was also initially marked `input_issue`: its 197 N4 modes with
 `gamma_d=NaN` were found during the second pilot preflight, before inference;
-the next large-G candidate, `nstxuG142301U84`, replaced it. Active training
+the next large-G candidate, `nstxuG142301U84`, replaced it. Both NaN issues
+were resolved in the September 30 input check. M21 has now been sorted;
+D46 remains in continuum review, as recorded above. Active training
 counts include the previously requested N9/3737 label correction.
 
 On 2026-09-09 the user invalidated all 73 C50 N1 modes for a confirmed

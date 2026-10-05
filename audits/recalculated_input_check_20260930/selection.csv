@@ -1,0 +1,28 @@
+shot,shot_family,shot_dir,active_training_shot,training_label_rows,training_good_labels,training_bad_labels,post_training_checked,checked_methods,status,notes,check_n1,check_nan
+nstxuE203653A02t017,NSTX-U E,$NOVA_DITW_ROOT/nstxuE203653A02t017,no,0,0,0,no,,input_issue,"2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203653A02t017/N6/egn06w.1060E+02, nstxuE203653A02t017/N6/egn06w.1072E+02, nstxuE203653A02t017/N6/egn06w.1184E+01, nstxuE203653A02t017/N6/egn06w.1247E+01, nstxuE203653A02t017/N6/egn06w.1403E+02, nstxuE203653A02t017/N6/egn06w.1555E+02, nstxuE203653A02t017/N6/egn06w.1609E+02, nstxuE203653A02t017/N6/egn06w.1613E+02, nstxuE203653A02t017/N6/egn06w.1616E+02, nstxuE203653A02t017/N6/egn06w.1670E+02, nstxuE203653A02t017/N6/egn06w.1755E+02, nstxuE203653A02t017/N6/egn06w.1862E+02, nstxuE203653A02t017/N6/egn06w.5462E+01, nstxuE203653A02t017/N6/egn06w.8229E+01, nstxuE203653A02t017/N6/egn06w.8593E+01, nstxuE203653A02t017/N6/egn06w.8900E+01, nstxuE203653A02t017/N6/egn06w.9679E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json.",False,True
+nstxuE203655F01t020,NSTX-U E,$NOVA_DITW_ROOT/nstxuE203655F01t020,no,0,0,0,no,,input_issue,"2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203655F01t020/N6/egn06w.2483E+01, nstxuE203655F01t020/N6/egn06w.2571E+01, nstxuE203655F01t020/N6/egn06w.2802E+01, nstxuE203655F01t020/N6/egn06w.2990E+01, nstxuE203655F01t020/N6/egn06w.3073E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json.",False,True
+nstxuE203655F01t030,NSTX-U E,$NOVA_DITW_ROOT/nstxuE203655F01t030,no,0,0,0,no,,input_issue,2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE203655F01t030/N8/egn08w.2428E+02. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json.,False,True
+nstxuE205042A01t025,NSTX-U E,$NOVA_DITW_ROOT/nstxuE205042A01t025,no,0,0,0,no,,input_issue,"2026-09-21: Rules batch found previously unflagged NaN metadata; whole shot held from publication: nstxuE205042A01t025/N10/egn10w.3277E+01, nstxuE205042A01t025/N10/egn10w.3332E+01, nstxuE205042A01t025/N10/egn10w.3467E+01, nstxuE205042A01t025/N10/egn10w.3488E+01, nstxuE205042A01t025/N10/egn10w.3560E+01. Recalculation/input repair required; local diagnostic outputs retained. See audits/remaining122_rules_20260921/input_holds.json.",False,True
+nstxuE205059A01t025,NSTX-U E,$NOVA_DITW_ROOT/nstxuE205059A01t025,no,0,0,0,no,,unchecked,,True,False
+nstxuG121123N22,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123N22,no,0,0,0,no,,unchecked,,True,False
+nstxuG121123N75,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123N75,no,0,0,0,no,,unchecked,,True,False
+nstxuG121123Q62,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123Q62,no,0,0,0,no,,suspended_training_q62,249 reviewed v3 rows; excluded from active training because the upper continuum is suspect,True,False
+nstxuG121123R42,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123R42,no,0,0,0,no,,unchecked,,True,False
+nstxuG133964R48,NSTX-U G,$NOVA_DITW_ROOT/nstxuG133964R48,no,0,0,0,no,,unchecked,,True,False
+nstxuG133964U27,NSTX-U G,$NOVA_DITW_ROOT/nstxuG133964U27,no,0,0,0,no,,unchecked,,True,False
+nstxuG133964U37,NSTX-U G,$NOVA_DITW_ROOT/nstxuG133964U37,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301B37,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301B37,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301B85,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301B85,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301D46,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301D46,no,0,0,0,no,,input_issue,Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004),True,True
+nstxuG142301E34,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301E34,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301E55,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301E55,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301E77,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301E77,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301F62,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301F62,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301F66,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301F66,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301F83,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301F83,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301K79,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301K79,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301L89,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301L89,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301M21,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301M21,no,0,0,0,no,,input_issue,DITW-005: 197 N4 gamma_d=NaN files; excluded before inference in 2026-09-08 pilot and replaced by nstxuG142301U84,False,True
+nstxuG142301M32,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301M32,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301S94,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301S94,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301U85,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301U85,no,0,0,0,no,,unchecked,,True,False

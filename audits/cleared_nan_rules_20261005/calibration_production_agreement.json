@@ -1,0 +1,14 @@
+{
+  "shots": 5,
+  "compared_columns": [
+    "mode_key",
+    "input_fingerprint",
+    "processing_status",
+    "gap_region",
+    "rule_decision",
+    "rule_primary_reason",
+    "overall_rule_severity",
+    "rule_features"
+  ],
+  "all_equal": true
+}

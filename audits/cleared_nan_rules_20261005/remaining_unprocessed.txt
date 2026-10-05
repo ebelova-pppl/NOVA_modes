@@ -1,0 +1,29 @@
+Remaining unprocessed shots (2026-10-05): 23
+
+Continuum correspondence review: 22
+nstxuE205059A01t025: N1/N2 continuum correspondence still requires review
+nstxuG121123N22: N1/N2 continuum correspondence still requires review
+nstxuG121123N75: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review
+nstxuG121123Q62: N1/N2 continuum correspondence still requires review (Training remains suspended separately.)
+nstxuG121123R42: N1/N2 continuum correspondence still requires review
+nstxuG133964R48: N1/N2 continuum correspondence still requires review (Unchanged secondary-review case; not confirmed invalid.)
+nstxuG133964U27: N1/N2 continuum correspondence still requires review (Unchanged secondary-review case; not confirmed invalid.)
+nstxuG133964U37: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review
+nstxuG142301B37: N1/N2 continuum correspondence still requires review
+nstxuG142301B85: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review
+nstxuG142301D46: N1/N2 continuum correspondence still requires review (NaN gamma_d issue resolved; separate continuum-review hold remains.)
+nstxuG142301E34: N1/N2 continuum correspondence still requires review
+nstxuG142301E55: N1/N2 continuum correspondence still requires review
+nstxuG142301E77: N1/N2 continuum correspondence still requires review
+nstxuG142301F62: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review
+nstxuG142301F66: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review
+nstxuG142301F83: N1/N2 continuum correspondence still requires review
+nstxuG142301K79: N1/N2 continuum correspondence still requires review
+nstxuG142301L89: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review (Marginal: one N1 EAE-side offset 2.16 and one N2 TAE-side offset 2.35 grid intervals; not a confirmed whole-shot failure.)
+nstxuG142301M32: N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review
+nstxuG142301S94: N1/N2 continuum correspondence still requires review
+nstxuG142301U85: N1/N2 continuum correspondence still requires review
+
+Empty entry: nstxu_202806
+
+Five newly processed shots have production GOOD lists; visual review is pending.

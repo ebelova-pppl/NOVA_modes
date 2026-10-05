@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-10-05T15:45:08.703544+00:00",
+  "status": "installed",
+  "destination_root": "/p/hym/ebelova/NOVA/sort_outputs/calibration_20261005",
+  "workflow": "rules-cli",
+  "installed": [
+    "nstxuE203653A02t017",
+    "nstxuE203655F01t020",
+    "nstxuE203655F01t030",
+    "nstxuE205042A01t025",
+    "nstxuG142301M21"
+  ],
+  "existing_outputs_replaced": 0,
+  "finished_utc": "2026-10-05T15:45:09.645763+00:00"
+}

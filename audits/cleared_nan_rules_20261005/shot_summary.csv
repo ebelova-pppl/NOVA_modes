@@ -1,0 +1,6 @@
+shot,input_modes,workflow,tae_like,mixed,eae_like,bad,review,invalid,good_before_dedup,selected_good,elapsed_seconds
+nstxuE203653A02t017,324,production,219,4,101,181,0,0,42,41,15.19
+nstxuE203655F01t020,303,production,133,5,165,89,0,0,49,49,8.95
+nstxuE203655F01t030,466,production,166,8,292,109,0,0,65,65,12.62
+nstxuE205042A01t025,499,production,159,5,335,89,0,0,75,74,11.02
+nstxuG142301M21,1015,production,268,44,703,300,0,0,12,12,30.35

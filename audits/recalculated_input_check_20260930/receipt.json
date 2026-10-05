@@ -1,0 +1,46 @@
+{
+  "created_utc": "2026-09-30T18:17:08.599454+00:00",
+  "data_root": "/p/nstxdigtwin/energetic_particles/nova/DiTw",
+  "selected_distinct_shots": 27,
+  "n1_scopes": 22,
+  "nan_shots": 6,
+  "unchanged_n1_scopes": 21,
+  "changed_n1_scopes": [
+    "nstxuE205059A01t025"
+  ],
+  "nan_scan_modes": 3205,
+  "nan_remaining": 0,
+  "input_errors": 0,
+  "alignment_modes": 3366,
+  "alignment_group_errors": {},
+  "protected_files_sha256": {
+    "configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+    "training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "audits/main_dataset_shots/shot_status.csv": "8485414f17c4a194a39c3103e6800b1ae2689e6281024757e4fc4da1bdbdba85",
+    "audits/main_dataset_shots/g_shot_status.csv": "5f80cd64b0dd072e053bfe370a700ef5227800c762f322266a1cdba27b130952",
+    "configs/rules/tae_rules_production_v13.yaml": "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919"
+  },
+  "artifact_sha256": {
+    "audits/recalculated_input_check_20260930/README.md": "99c56c4cbe2e9f68ddc707525d11902e76fad7fddd8ac13ac708ae553383466e",
+    "audits/recalculated_input_check_20260930/nan_summary.csv": "cc03f11654947f4f3a9853c8bcc8853cfd62b2a6e2aa310d2fe71c927ba39b80",
+    "audits/recalculated_input_check_20260930/previous_nan_files.csv": "453bb74fbd7f75833f2f47b9d30d95c4808ef9e7585c1d579fa6ee7d32e8ca2b",
+    "audits/recalculated_input_check_20260930/n1_before_after.csv": "65671954e2be40fb37d5576d44cfa8da606215db565b2a4c0a43818f7bcdb941",
+    "audits/recalculated_input_check_20260930/n1_auxiliary_files.csv": "439b147c1433367fdc780e273a95ddb305911bef252e2e8e3ef29e05e84e7c45",
+    "audits/recalculated_input_check_20260930/summarize_n1.py": "7bcc8a35a9d8bd8686ddc8a7ec765305f1cb47413a0a7556bf884c0a53de547f",
+    "audits/recalculated_input_check_20260930/check_nan.py": "efaef79bd598874aa268f31adf85aa5d35863b519980968100e6f10f1bb628f7",
+    "audits/recalculated_input_check_20260930/remaining_invalid_modes.csv": "9e2a1b346d6f0fb6e58cedffa8f59bdc6599a920c8782c648085a3035b1b5b0b",
+    "audits/recalculated_input_check_20260930/selection.csv": "35eed53ae45274cf166059314c35981d0f16e9b4f7f8e022170efa8ff7b637b7",
+    "audits/recalculated_input_check_20260930/n2_control_before_after.csv": "c919369b073a5b29dc4c013d7ca86769bfff63b3ce5325df4e279c802fc81f88",
+    "audits/recalculated_input_check_20260930/n1_comparison_receipt.json": "1101c762a3a4a9664735d9d1048d683ae21dc752d4deef99a8c4496949aee62c",
+    "outputs/review_recalculated_input_check_20260930/metadata.json": "c9af84256e47474b0133b508c675e0d2f1aa4d2121f7acd7f47d5398b521a4ee",
+    "outputs/review_recalculated_input_check_20260930/nan_metadata.json": "c2b817fcf019438b71b25b01b61eca8b52368491a5ec7ebd1552ca1ff28b6a50",
+    "outputs/review_recalculated_input_check_20260930/mode_coverage.csv": "36a9d26179a6e5bf21736295c68330612235310e8eedb9d9fc75b9412a553187",
+    "outputs/review_recalculated_input_check_20260930/shot_summary.csv": "f9b7f033084b0d1190706ecad8fc16686530b6fa8582d74b2f7c1047d6413e9f",
+    "outputs/review_recalculated_input_check_20260930/nan_mode_inventory.csv": "e2b70bc8dfdea040df89fed9bc6f9aa13b77a1ab7ef113519c88df7302a015c0",
+    "outputs/review_recalculated_input_check_20260930/file_changes.csv": "80e925a5e88a65b4a33919ff214585dcbbed2a0c5ce8227ff5c7577be71caf63"
+  },
+  "production_outputs_changed": false,
+  "registry_changed": false,
+  "training_labels_changed": false,
+  "processing_inventory_changed": false
+}

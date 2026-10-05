@@ -1,0 +1,24 @@
+shot,reason,n1_tae_beyond_2,n1_tae_comparisons,n1_all_beyond_2,n1_all_comparisons,n2_tae_beyond_2,n2_tae_comparisons,n2_all_beyond_2,n2_all_comparisons,notes
+nstxuE205059A01t025,N1/N2 continuum correspondence still requires review,26,26,40,40,6,12,6,20,
+nstxuG121123N22,N1/N2 continuum correspondence still requires review,3,5,18,30,0,20,28,61,
+nstxuG121123N75,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,1,0,1,41,41,72,73,
+nstxuG121123Q62,N1/N2 continuum correspondence still requires review,1,14,19,97,5,23,26,60,Training remains suspended separately.
+nstxuG121123R42,N1/N2 continuum correspondence still requires review,3,5,16,51,48,55,72,81,
+nstxuG133964R48,N1/N2 continuum correspondence still requires review,2,6,27,32,1,9,13,49,Unchanged secondary-review case; not confirmed invalid.
+nstxuG133964U27,N1/N2 continuum correspondence still requires review,1,4,3,6,2,8,4,10,Unchanged secondary-review case; not confirmed invalid.
+nstxuG133964U37,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,4,0,4,0,0,11,26,
+nstxuG142301B37,N1/N2 continuum correspondence still requires review,1,26,1,27,7,22,19,41,
+nstxuG142301B85,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,6,0,77,22,52,27,60,
+nstxuG142301D46,N1/N2 continuum correspondence still requires review,1,13,1,13,19,33,30,45,NaN gamma_d issue resolved; separate continuum-review hold remains.
+nstxuG142301E34,N1/N2 continuum correspondence still requires review,2,2,2,2,3,5,4,6,
+nstxuG142301E55,N1/N2 continuum correspondence still requires review,1,6,1,6,0,4,0,6,
+nstxuG142301E77,N1/N2 continuum correspondence still requires review,2,12,11,68,2,8,10,26,
+nstxuG142301F62,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,9,0,11,37,50,40,54,
+nstxuG142301F66,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,3,0,17,9,25,15,32,
+nstxuG142301F83,N1/N2 continuum correspondence still requires review,2,21,5,33,14,24,46,56,
+nstxuG142301K79,N1/N2 continuum correspondence still requires review,1,8,1,11,13,41,15,46,
+nstxuG142301L89,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,7,1,39,1,17,1,18,Marginal: one N1 EAE-side offset 2.16 and one N2 TAE-side offset 2.35 grid intervals; not a confirmed whole-shot failure.
+nstxuG142301M32,N1 TAE-side screen passes; residual N2/all-frequency correspondence requires review,0,5,0,6,5,19,17,33,
+nstxuG142301S94,N1/N2 continuum correspondence still requires review,1,1,1,1,0,28,0,28,
+nstxuG142301U85,N1/N2 continuum correspondence still requires review,8,28,21,52,2,19,17,48,
+nstxu_202806,Empty database entry; no active egn mode inputs,,,,,,,,,

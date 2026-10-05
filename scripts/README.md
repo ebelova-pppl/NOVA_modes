@@ -40,10 +40,19 @@ have explicitly started Bash.
 
 ## Recent adoption and review notes
 
+The [2026-10-05 NaN-cleared batch](../audits/cleared_nan_rules_20261005/README.md)
+used production `sort_shot_mixed.py --method rules` for five more shots:
+2,607 valid inputs, 243 GOOD before deduplication and 241 selected GOOD,
+zero INVALID. Installed outputs await visual review. Current membership is
+163 processed plus 14 training shots, with 23 entries still unprocessed.
+The dated audit links the combined GOOD list and remaining-shot reasons.
+Initial conservative `sort_shot_rules.py` results are archived separately;
+their REVIEW labels are superseded by the installed production workflow.
+
 The [2026-09-21 remaining-shot batch](../audits/remaining122_rules_20260921/README.md)
 ran rules for all 122 requested cases. It installed 118 verified outputs,
 with 6,281 selected GOOD modes awaiting visual review, and held four newly
-discovered NaN-metadata shots. Inventory membership is now 158 processed
+discovered NaN-metadata shots. Inventory membership then reached 158 processed
 post-training cases plus 14 training shots; the original 39 AI comparisons
 and 17 manual corrections are preserved. `sorted_rules_pending_review`
 is an inventory status; it does not change production GOOD/BAD decisions.

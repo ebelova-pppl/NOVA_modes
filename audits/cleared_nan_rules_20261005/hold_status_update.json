@@ -1,0 +1,67 @@
+{
+  "created_utc": "2026-10-05T15:51:03.784486+00:00",
+  "changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "94fd7d03e010a5eb98cfe3f10313c27faf27f1c546ae9fc84d4c344e339a765f",
+      "after_sha256": "95c0db3d7e26d76df28fc000f10eca355ff016349b80c180d48456c9f74ccab3",
+      "before": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "input_issue",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004)"
+      },
+      "after": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "continuum_review_pending",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv."
+      }
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "09f6036fba17744e0c9f27fbcfe8e403d427b9c97e516dc3f035e603efafb4df",
+      "after_sha256": "da9d384e04d17cb66a1a44a3553e5c1020a6c4c2a20c57b7d6e22a1c6e515444",
+      "before": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "input_issue",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004)"
+      },
+      "after": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "continuum_review_pending",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv."
+      }
+    }
+  ]
+}

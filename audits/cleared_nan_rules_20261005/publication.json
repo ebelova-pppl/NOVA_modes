@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-10-05T15:48:57.039343+00:00",
+  "status": "installed",
+  "destination_root": "/p/hym/ebelova/NOVA/sort_outputs",
+  "workflow": "production",
+  "installed": [
+    "nstxuE203653A02t017",
+    "nstxuE203655F01t020",
+    "nstxuE203655F01t030",
+    "nstxuE205042A01t025",
+    "nstxuG142301M21"
+  ],
+  "existing_outputs_replaced": 0,
+  "finished_utc": "2026-10-05T15:48:58.003262+00:00"
+}

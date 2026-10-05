@@ -1,0 +1,23 @@
+shot,shot_family,shot_dir,active_training_shot,training_label_rows,training_good_labels,training_bad_labels,post_training_checked,checked_methods,status,notes,check_n1,check_nan
+nstxuE205059A01t025,NSTX-U E,$NOVA_DITW_ROOT/nstxuE205059A01t025,no,0,0,0,no,,unchecked,,True,False
+nstxuG121123N22,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123N22,no,0,0,0,no,,unchecked,,True,False
+nstxuG121123N75,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123N75,no,0,0,0,no,,unchecked,,True,False
+nstxuG121123Q62,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123Q62,no,0,0,0,no,,suspended_training_q62,249 reviewed v3 rows; excluded from active training because the upper continuum is suspect,True,False
+nstxuG121123R42,NSTX-U G,$NOVA_DITW_ROOT/nstxuG121123R42,no,0,0,0,no,,unchecked,,True,False
+nstxuG133964R48,NSTX-U G,$NOVA_DITW_ROOT/nstxuG133964R48,no,0,0,0,no,,unchecked,,True,False
+nstxuG133964U27,NSTX-U G,$NOVA_DITW_ROOT/nstxuG133964U27,no,0,0,0,no,,unchecked,,True,False
+nstxuG133964U37,NSTX-U G,$NOVA_DITW_ROOT/nstxuG133964U37,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301B37,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301B37,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301B85,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301B85,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301D46,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301D46,no,0,0,0,no,,input_issue,Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004),True,True
+nstxuG142301E34,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301E34,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301E55,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301E55,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301E77,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301E77,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301F62,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301F62,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301F66,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301F66,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301F83,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301F83,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301K79,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301K79,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301L89,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301L89,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301M32,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301M32,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301S94,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301S94,no,0,0,0,no,,unchecked,,True,False
+nstxuG142301U85,NSTX-U G,$NOVA_DITW_ROOT/nstxuG142301U85,no,0,0,0,no,,unchecked,,True,False
