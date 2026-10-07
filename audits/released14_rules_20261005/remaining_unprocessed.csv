@@ -1,0 +1,10 @@
+shot,reason,n1_flagged_tae_comparisons,n2_flagged_tae_comparisons,total_flagged_tae_comparisons,potential_eae_issue
+nstxuE205059A01t025,TAE crossing correspondence review pending,13,6,19,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG121123N75,TAE crossing correspondence review pending,0,16,16,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG121123R42,TAE crossing correspondence review pending,2,44,46,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG142301B85,TAE crossing correspondence review pending,0,16,16,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG142301D46,TAE crossing correspondence review pending,1,11,12,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG142301F62,TAE crossing correspondence review pending,0,37,37,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG142301F83,TAE crossing correspondence review pending,1,12,13,POTENTIAL_EAE_CROSSING_ISSUE
+nstxuG142301K79,TAE crossing correspondence review pending,0,13,13,POTENTIAL_EAE_CROSSING_ISSUE
+nstxu_202806,Empty entry; no active egn inputs,,,,

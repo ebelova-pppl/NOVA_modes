@@ -1,0 +1,47 @@
+{
+  "completed_utc": "2026-10-05T18:16:42.675266+00:00",
+  "status": "installed_and_recorded",
+  "shots": 14,
+  "counts": {
+    "input_modes": 12250,
+    "tae_like": 1827,
+    "mixed": 167,
+    "eae_like": 10256,
+    "invalid": 0,
+    "good_before_dedup": 77,
+    "selected_good": 76,
+    "bad": 1917
+  },
+  "processed_shots": 177,
+  "active_training_shots": 14,
+  "remaining_continuum_holds": 8,
+  "empty_entries": 1,
+  "selected_good_across_processed_shots": 8324,
+  "reviewed_mode_outcomes": {
+    "BAD": 39
+  },
+  "all_selected_gap_regions": [
+    "tae_like"
+  ],
+  "viewer_paths_verified": 76,
+  "training_and_exclusions_preserved": true,
+  "eae_and_mixed_flags_preserved": true,
+  "manual_overrides_applied": 0,
+  "artifact_sha256": {
+    "README.md": "7eca0c1c6d68467f59b05dda51d28e42f2a499e7c0104c8f7dd71e7f5a380d09",
+    "e34_n2_2204_review.json": "19ed8161ac5503a25b96f0e412fc74e1aa10f8c98160539d23165008837e4ebb",
+    "good_tae_final_batch.csv": "cbc8b4b930d80b2d8e371fa4037576fb16a9501b5f233645b5edb1c7511d6137",
+    "inventory_update.json": "5baed6f5ee01394307dc993ac6a65bda7a34fb026ccb99a15668a608314e46fe",
+    "preflight.json": "722e59ac1cecfa5f1183f4233e12d563d321957fda1b4868f0b7e95caff49da1",
+    "publication.json": "af707ff3f3c8600c1d3853356be40e4a1ec4de4fc74207e5f9797e0d683908e2",
+    "record_results.py": "38378e659b54b381f56cbc87419393cb4d45afb9382b87ff22623657a8ee02d6",
+    "remaining_unprocessed.csv": "e36983173df0d4cce11599e1f56177891ecaa3cde82881dab17c5040bebf7466",
+    "reviewed_tae_mode_results.csv": "1bc99dfbc1957276be933bfbaf56e2a411e660eba4365eb65d3ac3d44f6a36b1",
+    "run_batch.py": "5b8f93b72d3254459b0f68894e8a36ab32a16ed2b7f001b6fb3135941a08797a",
+    "run_inputs.json": "22385ce526c53e74bc4899b56f713f099686f112408b8fff0402398dee464314",
+    "selection.csv": "892c0a31dc4bd1d4daf21b626380add93ce64bd12776cdcba712b846ded99814",
+    "shot_summary.csv": "971a3b2fbdb746ccd785f27c66510588d45b82d3c2ed5f0a66987321ef229444",
+    "stage_results.json": "d5d52e75569ce872d6a606061eefcfefab766ea25ea4900807603a6718c16db1",
+    "verification.json": "94f815430db102f58be1bed68e5ebe425369bcceb0a02eaf87e2b5b678cfc8df"
+  }
+}

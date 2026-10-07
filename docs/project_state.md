@@ -3,6 +3,99 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-10-05 released 14 shots sorted: 76 selected GOOD, nine entries remain
+
+- Completed user-authorized `sort_shot_mixed.py --method rules` for all 14
+  released shots with frozen v13 and four CPU workers. The
+  [batch audit](../audits/released14_rules_20261005/README.md) records verified
+  installation under the existing rules output root; all destinations were
+  new and no existing output directory was replaced.
+- All 12,250 raw inputs are finite and nr=201. Results: 1,827 TAE-like,
+  167 mixed, 10,256 EAE-like; 1,917 BAD, 77 GOOD before deduplication and
+  **76 selected GOOD**, all TAE-like; zero INVALID/final REVIEW. All 1,994
+  TAE-side candidates have complete severity, with no resolution warnings
+  or ranking fallbacks. Source fingerprints and all output lists verified.
+- The 39 modes in the crossing-review list are all automatically BAD,
+  including **E34/N2/2204**, which triggers `BAD_CONT_CROSS_WINDOW` at lower
+  crossings r=0.08820 and 0.11164. Its crossing K values are 0.6414/0.6177,
+  so the low-amplitude/smoothness exception fails. The audit preserves
+  Elena's favorable assessment separately; no manual override was inferred.
+- Both inventories mark the 14 shots `sorted_rules_pending_review` with
+  `post_training_checked=yes` and `checked_methods=rules`. Membership is
+  **177 processed + 14 training = 191 cases**; **eight continuum holds and
+  one empty entry remain**. The processed outputs contain 8,324 selected
+  GOOD modes; 6,598 automatic selections from 137 later shots await review.
+- Potential EAE issues, separate mixed findings, Q62's training suspension,
+  known-invalid exclusions and the original reviewed 40-shot manifest are
+  preserved. The input release did not constitute review of every selected
+  mode in the new batch. Combined GOOD and remaining-shot lists are linked
+  from the batch audit.
+
+## 2026-10-05 user released 14 reviewed shots; eight continuum holds remain
+
+- Elena reviewed the 39-mode strict TAE shortlist and released all 14 shots
+  (including zero-flag U37) for production `sort_shot_mixed.py --method rules`.
+  Almost all reviewed modes look numerical/grid-scale or have axis/spike
+  defects, so their continuum recalculation is not warranted. E34/N2/2204
+  looks presentable and she sees no continuum-crossing issue in that mode.
+- The [release audit](../audits/continuum_release_20261005/README.md) records
+  the decision and updates both live inventories to `ready_for_rules` for
+  these 14 shots. All 281 exported raw sources for these shots still match
+  the reviewed snapshot. EAE potential-issue flags, mixed findings and log
+  coverage limits remain separate; Q62's training suspension remains active.
+- **Eight continuum-review shots remain:** E205059A01t025, G121123N75,
+  G121123R42, G142301B85, G142301D46, G142301F62, G142301F83 and G142301K79.
+  There is also one empty entry, `nstxu_202806`. Current unprocessed inventory
+  is **14 ready + eight on hold + one empty = 23**; completed membership
+  remains 163 post-training plus 14 training shots. No sorting or individual
+  GOOD/BAD overrides were performed in this release step.
+
+## 2026-10-05 crossing review restricted to TAE-like modes; EAE flags retained
+
+- User restricted the current correspondence review to TAE-like modes because
+  the diagnostic/viewer lacks the upper EAE continuum boundary. EAE-side
+  nearest-log discrepancies are **potential EAE crossing issues**, not evidence
+  sufficient to infer a TAE continuum offset. Mixed modes remain separate.
+- The revised [review package](../audits/continuum_small_review_20261005/README.md)
+  has **14 shots with fewer than 10 TAE-like flagged comparisons**, including
+  U37 with zero. The primary viewer list contains **39 modes in 13 shots,
+  representing 49 comparisons**. U85 now qualifies with eight TAE-like
+  comparisons; its two mixed comparisons are excluded from this count.
+- Across all 22 pending shots, TAE-like findings affect 167 modes/221
+  comparisons in 21 shots. Separate exports preserve mixed findings
+  (47 modes/71 comparisons) and potential EAE findings (234 modes/349
+  comparisons across 20 shots). Seventy EAE log-coverage gaps plus one EAE
+  empty-log case with interior crossings are retained separately, not counted
+  as measured offsets. Live exported inputs match the October 5 hashes.
+- **U37's remaining findings are EAE-only:** no flagged TAE-like or mixed
+  comparisons. Its scope flags now reflect that distinction; this is not full
+  shot certification. Production runs, labels, exclusions and inventory
+  membership are unchanged: 163 processed + 14 training, 23 unprocessed
+  (21 with TAE findings, U37 with potential EAE issues, one empty entry).
+- Earlier all-frequency and TAE-like+mixed shortlists remain as historical
+  exports. They are superseded for this manual review by the strict TAE-only
+  list. Preserve the potential EAE flags if TAE processing is later released.
+
+## 2026-10-05 initial small-crossing-count shortlist (scope superseded above)
+
+- Among the 22 continuum-review holds, five shots have strictly fewer than
+  ten recorded problem crossings across N1+N2 and all frequency ranges:
+  E55 (1 crossing/1 mode), S94 (1/1), L89 (2/2), E34 (6/4), U27 (7/5).
+  Total: **17 crossings in 13 distinct modes**. The existing screen is
+  absolute nearest-log distance >2 grid intervals within `0.03 <= r < 0.75`.
+- The [manual-review package](../audits/continuum_small_review_20261005/README.md)
+  includes a viewer-ready 13-mode list with blank decision/reason fields,
+  full crossing details, fingerprints and all-22 counts. Exported mode,
+  continuum and log hashes match the October 5 snapshot; viewer paths resolve.
+- A TAE-like/mixed-only shortlist has 13 shots, 49 problem crossings and
+  36 distinct modes. It is separate because continuum-dependent routing must
+  not hide EAE-side evidence. E55/L89 also have nine incomplete EAE-side log
+  entries with no interior datcon crossing, recorded separately as coverage
+  gaps rather than measured offsets.
+- User plans to assess whether affected modes are numerical before deciding
+  which holds to release. No labels, holds, sorter outputs or processing
+  membership were changed by preparing these lists.
+
 ## 2026-10-05 five NaN-cleared shots sorted: 241 selected GOOD, 23 entries remain
 
 - User clarified production `sort_shot_mixed.py --method rules`. Ran frozen

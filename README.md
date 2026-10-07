@@ -121,9 +121,12 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
 | Find earlier results, version notes, and README instructions | [Preserved README reference](docs/history/readme_before_reorganization_20260914.md) |
 
-As of October 5, 2026, the inventory contains **163 processed post-training
-shots plus 14 active training shots (177 total)**. The
-[latest five-shot batch](audits/cleared_nan_rules_20261005/README.md) processed
+As of October 5, 2026, the inventory contains **177 processed post-training
+shots plus 14 active training shots (191 total)**. The
+[latest 14-shot batch](audits/released14_rules_20261005/README.md) processed
+the cases released after TAE crossing review and installed **76 selected
+GOOD modes awaiting full visual review**. The earlier
+[five-shot batch](audits/cleared_nan_rules_20261005/README.md) processed
 NaN-cleared inputs and installed **241 selected GOOD modes awaiting visual
 review**. The earlier
 [remaining-shot rules batch](audits/remaining122_rules_20260921/README.md) ran all 122
@@ -134,8 +137,11 @@ remain unchanged. The
 [39-shot disagreement review](audits/pilot39_manual_review_20260914/README.md)
 is complete, including 17 reasoned manual corrections. Future reruns must
 explicitly supply the affected shots' `manual_overrides.csv` to reproduce
-those curated selections. The [remaining 23 inventory entries](audits/cleared_nan_rules_20261005/remaining_unprocessed.txt)
-comprise 22 continuum-review shots and one empty entry. See the full
+those curated selections. The
+[remaining nine inventory entries](audits/released14_rules_20261005/remaining_unprocessed.csv)
+comprise **eight continuum-review holds and one empty entry**.
+Potential EAE issues remain separately flagged; see
+the [release record](audits/continuum_release_20261005/README.md). See the full
 [project state](docs/project_state.md) for context and next steps.
 
 The active training list has 2,327 rows from 14 shots; Q62 and confirmed invalid

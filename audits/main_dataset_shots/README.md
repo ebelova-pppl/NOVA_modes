@@ -4,16 +4,25 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
-On 2026-10-05 five NaN-cleared shots completed production rules sorting,
-adding **241 selected GOOD representatives awaiting visual review**. The
-inventory now contains **163 processed post-training cases plus 14 active
-training shots (177 disjoint cases)**. **23 entries remain unprocessed: 22
-continuum-review shots and one empty entry**. D46's resolved NaN status has
+On 2026-10-05 the 14 shots released after Elena's TAE crossing review
+completed production rules sorting, adding **76 selected GOOD modes**.
+The [installed batch](../released14_rules_20261005/README.md) records counts,
+input/output verification, the combined GOOD list and the remaining holds.
+Both inventories now contain **177 processed post-training cases plus 14
+active training shots (191 disjoint cases)**; **nine entries remain
+unprocessed: eight continuum-review holds and one empty entry**. The 14
+released rows now have `status=sorted_rules_pending_review`,
+`checked_methods=rules` and `post_training_checked=yes`. Potential EAE issues,
+separate mixed findings and Q62's training suspension remain recorded.
+
+Earlier on October 5, five NaN-cleared shots completed production rules
+sorting, adding **241 selected GOOD representatives awaiting visual review**.
+D46's resolved NaN status has
 been superseded by `continuum_review_pending`; the other five formerly
 NaN-held rows now have `sorted_rules_pending_review`, `checked_methods=rules`
 and `post_training_checked=yes`. See the [batch and remaining-shot lists](../cleared_nan_rules_20261005/README.md).
-Recorded processed outputs contain 8,248 selected GOOD modes, including
-6,522 automatic selections from 123 later shots awaiting visual review.
+Recorded processed outputs now contain 8,324 selected GOOD modes, including
+6,598 automatic selections from 137 later shots awaiting visual review.
 The reviewed 40-shot accepted manifest and 39 AI comparisons remain unchanged.
 
 On 2026-09-21 the authorized remaining-122 rules batch completed. **118
@@ -68,12 +77,12 @@ counts and input exclusions remain unchanged. No additional shots were sorted.
   automated checks. It does not imply visual review or an AI comparison:
   use `status` and `checked_methods` to distinguish them. The original 39
   cases have `rules|rf-cnn`; the user-approved E202806A02t045 addition and
-  118 September 21 cases and five October 5 additions have `rules`. These 123 retain explicit
+  118 September 21 cases and 19 October 5 additions have `rules`. These 137 retain explicit
   pending-visual-review status. The original cohort includes the E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
   completed with v11 and RF/raw-CNN on 2026-09-10. Its disagreement review
-  is complete. Current processed membership is 163, with 39 AI comparisons.
+  is complete. Current processed membership is 177, with 39 AI comparisons.
 
 All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
@@ -110,10 +119,11 @@ N1/N2 in the other 159 shots; its
 combines that scan with the earlier training/pilot snapshots. New candidate
 flags are diagnostic, not confirmed registry exclusions. This audit does not
 change `post_training_checked` or the sorting statuses in this inventory.
-Q62 is marked
-`suspended_training_q62`, not as an active training shot: its 249 reviewed
-rows remain in the v3 snapshot, but it is excluded from the active list while
-its upper continuum is considered suspect.
+Q62 was marked `suspended_training_q62`: its 249 reviewed rows remain in the
+v3 snapshot and it is excluded from active training. The October 5 user
+review released it for production processing; its completed run is now
+`sorted_rules_pending_review`, preserving that training suspension and its
+potential EAE issue flags.
 
 Three directory symlink aliases—`nstxuE120113P01t027`,
 `nstxuE135388A02t026`, and `nstxuE141711P07t042`—resolve to the three

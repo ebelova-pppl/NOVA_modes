@@ -1,0 +1,14 @@
+shot,n1_problem_crossings,n2_problem_crossings,problem_crossings,affected_modes,tae_side_problem_crossings,tae_side_affected_modes,coverage_gap_modes,empty_log_modes_with_core_crossings
+nstxuG133964U37,0,11,11,9,0,0,0,0
+nstxuG142301E55,1,0,1,1,1,1,5,0
+nstxuG142301L89,1,1,2,2,1,1,4,0
+nstxuG142301S94,1,0,1,1,1,1,0,0
+nstxuG121123N22,18,28,46,38,3,2,0,0
+nstxuG133964R48,27,13,40,20,3,2,0,0
+nstxuG133964U27,3,4,7,5,3,3,0,0
+nstxuG142301E77,11,10,21,15,4,3,0,0
+nstxuG142301E34,2,4,6,4,5,3,0,0
+nstxuG142301M32,0,17,17,11,5,4,0,0
+nstxuG121123Q62,19,26,45,36,6,5,0,0
+nstxuG142301B37,1,19,20,17,8,8,22,0
+nstxuG142301F66,0,15,15,6,9,3,2,0

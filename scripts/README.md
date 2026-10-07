@@ -40,11 +40,21 @@ have explicitly started Bash.
 
 ## Recent adoption and review notes
 
+The [October 5 released-shot batch](../audits/released14_rules_20261005/README.md)
+completed production rules sorting for all 14 newly released shots: 12,250
+valid inputs, 77 GOOD before deduplication and 76 selected GOOD. Verified
+outputs are installed and marked `sorted_rules_pending_review`. Membership
+is now 177 processed plus 14 training shots; eight continuum-review holds
+and one empty entry remain. Potential EAE issues, mixed findings and Q62's
+training suspension remain recorded. All 39 crossing-review modes are
+automatically BAD, including E34/N2/2204 (`BAD_CONT_CROSS_WINDOW`); its user
+assessment is preserved separately, with no inferred manual override.
+
 The [2026-10-05 NaN-cleared batch](../audits/cleared_nan_rules_20261005/README.md)
 used production `sort_shot_mixed.py --method rules` for five more shots:
 2,607 valid inputs, 243 GOOD before deduplication and 241 selected GOOD,
-zero INVALID. Installed outputs await visual review. Current membership is
-163 processed plus 14 training shots, with 23 entries still unprocessed.
+zero INVALID. Installed outputs await visual review. Membership after that
+batch was 163 processed plus 14 training shots, with 23 entries unprocessed.
 The dated audit links the combined GOOD list and remaining-shot reasons.
 Initial conservative `sort_shot_rules.py` results are archived separately;
 their REVIEW labels are superseded by the installed production workflow.

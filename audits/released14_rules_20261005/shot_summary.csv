@@ -1,0 +1,15 @@
+shot,status,input_modes,estimated_input_modes,tae_like,mixed,eae_like,invalid,good_before_dedup,selected_good,bad,elapsed_seconds
+nstxuG121123N22,verified,960,960,116,21,823,0,2,2,135,13.69
+nstxuG121123Q62,verified,1186,1186,218,21,947,0,7,7,232,22.65
+nstxuG133964R48,verified,1049,1049,110,42,897,0,2,2,150,13.78
+nstxuG133964U27,verified,1024,1024,86,0,938,0,17,16,69,10.7
+nstxuG133964U37,verified,868,868,75,9,784,0,0,0,84,9.63
+nstxuG142301B37,verified,699,699,225,12,462,0,3,3,234,20.51
+nstxuG142301E34,verified,741,741,100,5,636,0,11,11,94,11.55
+nstxuG142301E55,verified,573,573,201,18,354,0,12,12,207,20.93
+nstxuG142301E77,verified,834,834,83,9,742,0,2,2,90,9.57
+nstxuG142301F66,verified,628,628,111,4,513,0,7,7,108,11.81
+nstxuG142301L89,verified,1037,1037,109,1,927,0,2,2,108,11.27
+nstxuG142301M32,verified,815,815,62,5,748,0,4,4,63,7.76
+nstxuG142301S94,verified,860,860,204,11,645,0,7,7,208,16.39
+nstxuG142301U85,verified,976,976,127,9,840,0,1,1,135,13.66

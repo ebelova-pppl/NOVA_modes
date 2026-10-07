@@ -1,0 +1,840 @@
+{
+  "created_utc": "2026-10-05T18:12:53.647912+00:00",
+  "processed": 177,
+  "active_training": 14,
+  "remaining": 9,
+  "continuum_holds": 8,
+  "empty_entries": 1,
+  "changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "3536c8a2876025d3067f0e43d755a0ec2d5ee9ba0b8c1f06103433adb1ab6ae8",
+      "changes": [
+        {
+          "shot": "nstxuG121123N22",
+          "before": {
+            "shot": "nstxuG121123N22",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N22",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG121123N22",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N22",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 960 inputs, nr=201, 135 BAD, 2 selected GOOD, 823 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123N22. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG121123Q62",
+          "before": {
+            "shot": "nstxuG121123Q62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123Q62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "249 reviewed v3 rows; excluded from active training because the upper continuum is suspect; 2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; training suspension remains in effect"
+          },
+          "after": {
+            "shot": "nstxuG121123Q62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123Q62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "249 reviewed v3 rows; excluded from active training because the upper continuum is suspect; 2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; training suspension remains in effect 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1186 inputs, nr=201, 232 BAD, 7 selected GOOD, 947 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123Q62. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG133964R48",
+          "before": {
+            "shot": "nstxuG133964R48",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964R48",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG133964R48",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964R48",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1049 inputs, nr=201, 150 BAD, 2 selected GOOD, 897 EAE-like, zero INVALID. Output: sort_outputs/nstxuG133964R48. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG133964U27",
+          "before": {
+            "shot": "nstxuG133964U27",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U27",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG133964U27",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U27",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1024 inputs, nr=201, 69 BAD, 16 selected GOOD, 938 EAE-like, zero INVALID. Output: sort_outputs/nstxuG133964U27. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG133964U37",
+          "before": {
+            "shot": "nstxuG133964U37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG133964U37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 868 inputs, nr=201, 84 BAD, 0 selected GOOD, 784 EAE-like, zero INVALID. Output: sort_outputs/nstxuG133964U37. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301B37",
+          "before": {
+            "shot": "nstxuG142301B37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301B37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 699 inputs, nr=201, 234 BAD, 3 selected GOOD, 462 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301B37. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301E34",
+          "before": {
+            "shot": "nstxuG142301E34",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E34",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; N2/2204 looks presentable and user sees no crossing issue"
+          },
+          "after": {
+            "shot": "nstxuG142301E34",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E34",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; N2/2204 looks presentable and user sees no crossing issue 2026-10-05: Released-shot production rules v13 sorting completed and verified: 741 inputs, nr=201, 94 BAD, 11 selected GOOD, 636 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301E34. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301E55",
+          "before": {
+            "shot": "nstxuG142301E55",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E55",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301E55",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E55",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 573 inputs, nr=201, 207 BAD, 12 selected GOOD, 354 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301E55. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301E77",
+          "before": {
+            "shot": "nstxuG142301E77",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E77",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG142301E77",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E77",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 834 inputs, nr=201, 90 BAD, 2 selected GOOD, 742 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301E77. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301F66",
+          "before": {
+            "shot": "nstxuG142301F66",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F66",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301F66",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F66",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 628 inputs, nr=201, 108 BAD, 7 selected GOOD, 513 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301F66. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301L89",
+          "before": {
+            "shot": "nstxuG142301L89",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301L89",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301L89",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301L89",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1037 inputs, nr=201, 108 BAD, 2 selected GOOD, 927 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301L89. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301M32",
+          "before": {
+            "shot": "nstxuG142301M32",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M32",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG142301M32",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M32",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 815 inputs, nr=201, 63 BAD, 4 selected GOOD, 748 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301M32. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301S94",
+          "before": {
+            "shot": "nstxuG142301S94",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301S94",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md"
+          },
+          "after": {
+            "shot": "nstxuG142301S94",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301S94",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md 2026-10-05: Released-shot production rules v13 sorting completed and verified: 860 inputs, nr=201, 208 BAD, 7 selected GOOD, 645 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301S94. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301U85",
+          "before": {
+            "shot": "nstxuG142301U85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301U85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301U85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301U85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 976 inputs, nr=201, 135 BAD, 1 selected GOOD, 840 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301U85. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        }
+      ],
+      "after_sha256": "d865960581c3a7f69db62e20f6f666d0be66a4e7996bf4c8f39f0b9a1b8f5176"
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "13dbb8939930e37fc9a156b980c5dcbab82b7c41256ebc8678d1a963f0a41af1",
+      "changes": [
+        {
+          "shot": "nstxuG121123N22",
+          "before": {
+            "shot": "nstxuG121123N22",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N22",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG121123N22",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N22",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 960 inputs, nr=201, 135 BAD, 2 selected GOOD, 823 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123N22. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG121123Q62",
+          "before": {
+            "shot": "nstxuG121123Q62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123Q62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "249 reviewed v3 rows; excluded from active training because the upper continuum is suspect; 2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; training suspension remains in effect"
+          },
+          "after": {
+            "shot": "nstxuG121123Q62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123Q62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "249 reviewed v3 rows; excluded from active training because the upper continuum is suspect; 2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; training suspension remains in effect 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1186 inputs, nr=201, 232 BAD, 7 selected GOOD, 947 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123Q62. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG133964R48",
+          "before": {
+            "shot": "nstxuG133964R48",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964R48",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG133964R48",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964R48",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1049 inputs, nr=201, 150 BAD, 2 selected GOOD, 897 EAE-like, zero INVALID. Output: sort_outputs/nstxuG133964R48. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG133964U27",
+          "before": {
+            "shot": "nstxuG133964U27",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U27",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG133964U27",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U27",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1024 inputs, nr=201, 69 BAD, 16 selected GOOD, 938 EAE-like, zero INVALID. Output: sort_outputs/nstxuG133964U27. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG133964U37",
+          "before": {
+            "shot": "nstxuG133964U37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG133964U37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG133964U37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 868 inputs, nr=201, 84 BAD, 0 selected GOOD, 784 EAE-like, zero INVALID. Output: sort_outputs/nstxuG133964U37. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301B37",
+          "before": {
+            "shot": "nstxuG142301B37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301B37",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B37",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 699 inputs, nr=201, 234 BAD, 3 selected GOOD, 462 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301B37. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301E34",
+          "before": {
+            "shot": "nstxuG142301E34",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E34",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; N2/2204 looks presentable and user sees no crossing issue"
+          },
+          "after": {
+            "shot": "nstxuG142301E34",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E34",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; N2/2204 looks presentable and user sees no crossing issue 2026-10-05: Released-shot production rules v13 sorting completed and verified: 741 inputs, nr=201, 94 BAD, 11 selected GOOD, 636 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301E34. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301E55",
+          "before": {
+            "shot": "nstxuG142301E55",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E55",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301E55",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E55",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 573 inputs, nr=201, 207 BAD, 12 selected GOOD, 354 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301E55. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301E77",
+          "before": {
+            "shot": "nstxuG142301E77",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E77",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG142301E77",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301E77",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 834 inputs, nr=201, 90 BAD, 2 selected GOOD, 742 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301E77. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301F66",
+          "before": {
+            "shot": "nstxuG142301F66",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F66",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301F66",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F66",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 628 inputs, nr=201, 108 BAD, 7 selected GOOD, 513 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301F66. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301L89",
+          "before": {
+            "shot": "nstxuG142301L89",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301L89",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301L89",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301L89",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 1037 inputs, nr=201, 108 BAD, 2 selected GOOD, 927 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301L89. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301M32",
+          "before": {
+            "shot": "nstxuG142301M32",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M32",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained"
+          },
+          "after": {
+            "shot": "nstxuG142301M32",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301M32",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; potential EAE crossing issues retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 815 inputs, nr=201, 63 BAD, 4 selected GOOD, 748 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301M32. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301S94",
+          "before": {
+            "shot": "nstxuG142301S94",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301S94",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md"
+          },
+          "after": {
+            "shot": "nstxuG142301S94",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301S94",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md 2026-10-05: Released-shot production rules v13 sorting completed and verified: 860 inputs, nr=201, 208 BAD, 7 selected GOOD, 645 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301S94. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        },
+        {
+          "shot": "nstxuG142301U85",
+          "before": {
+            "shot": "nstxuG142301U85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301U85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained"
+          },
+          "after": {
+            "shot": "nstxuG142301U85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301U85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-05: Elena released for production rules after TAE-only crossing review; see audits/continuum_release_20261005/README.md; mixed correspondence findings retained separately; potential EAE crossing issues retained; EAE log-coverage gaps retained 2026-10-05: Released-shot production rules v13 sorting completed and verified: 976 inputs, nr=201, 135 BAD, 1 selected GOOD, 840 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301U85. Full selected-mode review pending; separate EAE/mixed evidence retained. See audits/released14_rules_20261005."
+          }
+        }
+      ],
+      "after_sha256": "abe6e50a982ce4f6a155e453bd6f7e6359dfa68cdf5f89c5d52f9d799af72ba5"
+    }
+  ],
+  "files_sha256": {
+    "reviewed_tae_mode_results.csv": "1bc99dfbc1957276be933bfbaf56e2a411e660eba4365eb65d3ac3d44f6a36b1",
+    "remaining_unprocessed.csv": "e36983173df0d4cce11599e1f56177891ecaa3cde82881dab17c5040bebf7466"
+  }
+}

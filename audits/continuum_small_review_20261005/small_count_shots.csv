@@ -1,0 +1,6 @@
+shot,n1_problem_crossings,n2_problem_crossings,problem_crossings,affected_modes,tae_side_problem_crossings,tae_side_affected_modes,coverage_gap_modes,empty_log_modes_with_core_crossings
+nstxuG142301E55,1,0,1,1,1,1,5,0
+nstxuG142301S94,1,0,1,1,1,1,0,0
+nstxuG142301L89,1,1,2,2,1,1,4,0
+nstxuG142301E34,2,4,6,4,5,3,0,0
+nstxuG133964U27,3,4,7,5,3,3,0,0

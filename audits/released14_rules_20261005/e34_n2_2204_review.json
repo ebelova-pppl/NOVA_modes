@@ -1,0 +1,69 @@
+{
+  "mode_key": "nstxuG142301E34/N2/egn02w.2204E+02",
+  "input_fingerprint": "e40bc57b9e27b9f523178f6efd29eb75f30910357bb0cd32b5c1f59982145893",
+  "final_decision": "BAD",
+  "rule_primary_reason": "BAD_CONT_CROSS_WINDOW",
+  "overall_rule_severity": "20.0",
+  "user_assessment": "Presentable; user sees no continuum-crossing issue",
+  "manual_override_applied": false,
+  "crossing_window": {
+    "all_violations_exempted": false,
+    "amplitude_max": 0.2,
+    "calibrated_n_radial": 201,
+    "enabled": true,
+    "half_width_grid": 4,
+    "k_max": 0.1,
+    "n_exempted_crossings": 0,
+    "n_radial": 201,
+    "n_unexcused_crossings": 2,
+    "n_violating_crossings": 2,
+    "records": [
+      {
+        "A_cross": 0.3030200838422473,
+        "A_cross_harmonic_index": 2,
+        "K_cross": 0.641439443631645,
+        "boundary": "low",
+        "exception_conditions_pass": false,
+        "exempted": false,
+        "local_amplitude_energy": 3.395825906767006,
+        "n_centers": 8,
+        "r_cross": 0.08820140941206929,
+        "second_difference_energy": 1.3971940955250048,
+        "window_A_max": 1.0,
+        "window_W_max": 1.0,
+        "window_violation": true
+      },
+      {
+        "A_cross": 0.13588971788443682,
+        "A_cross_harmonic_index": 2,
+        "K_cross": 0.6177210008091766,
+        "boundary": "low",
+        "exception_conditions_pass": false,
+        "exempted": false,
+        "local_amplitude_energy": 3.2885158139373503,
+        "n_centers": 8,
+        "r_cross": 0.11163773272718816,
+        "second_difference_energy": 1.2548293480437254,
+        "window_A_max": 0.3801685349126588,
+        "window_W_max": 0.11148372519802403,
+        "window_violation": true
+      },
+      {
+        "A_cross": 0.012903014747121608,
+        "A_cross_harmonic_index": 5,
+        "K_cross": 2.0376852375544,
+        "boundary": "high",
+        "exception_conditions_pass": false,
+        "exempted": false,
+        "local_amplitude_energy": 0.004309050688192484,
+        "n_centers": 8,
+        "r_cross": 0.6169622594131409,
+        "second_difference_energy": 0.017891872763281233,
+        "window_A_max": 0.014017277864433162,
+        "window_W_max": 0.00045773922208606143,
+        "window_violation": false
+      }
+    ],
+    "resolution_eligible": true
+  }
+}

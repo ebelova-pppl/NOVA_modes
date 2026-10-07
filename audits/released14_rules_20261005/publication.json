@@ -1,0 +1,23 @@
+{
+  "status": "installed",
+  "rules_root": "/p/hym/ebelova/NOVA/sort_outputs",
+  "installed": [
+    "nstxuG121123N22",
+    "nstxuG121123Q62",
+    "nstxuG133964R48",
+    "nstxuG133964U27",
+    "nstxuG133964U37",
+    "nstxuG142301B37",
+    "nstxuG142301E34",
+    "nstxuG142301E55",
+    "nstxuG142301E77",
+    "nstxuG142301F66",
+    "nstxuG142301L89",
+    "nstxuG142301M32",
+    "nstxuG142301S94",
+    "nstxuG142301U85"
+  ],
+  "existing_outputs_replaced": 0,
+  "started_utc": "2026-10-05T18:12:27.795364+00:00",
+  "finished_utc": "2026-10-05T18:12:30.028313+00:00"
+}
