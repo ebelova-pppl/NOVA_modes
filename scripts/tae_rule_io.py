@@ -74,6 +74,8 @@ MANUAL_OVERRIDE_FIELDS = [
 ]
 
 ALLOWED_FINAL_DECISIONS = {"GOOD", "BAD", "REVIEW"}
+# BAE is an explicit manual family assignment, never an automatic rule verdict.
+ALLOWED_MANUAL_DECISIONS = ALLOWED_FINAL_DECISIONS | {"BAE"}
 
 
 def empty_rule_row() -> dict[str, Any]:

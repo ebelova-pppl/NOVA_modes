@@ -111,6 +111,7 @@ REQUIRED_OUTPUTS = {
     "all_modes_rules.csv",
     "tae_like_all.csv",
     "eae_like.csv",
+    "bae_like.csv",
     "rejected_modes.csv",
     "rule_results.csv",
     "final_classifications.csv",
@@ -2675,6 +2676,37 @@ class RuleAndOverrideTests(unittest.TestCase):
         self.assertEqual([row["final_decision"] for row in final], ["BAD", "REVIEW", "GOOD"])
         self.assertEqual(audit.applied, 3)
 
+    def test_manual_bae_changes_family_without_changing_rule_evidence(self):
+        row = self.evaluate().as_output_row(self.base)
+        override = override_row(row, decision="BAE")
+        final, audit = apply_manual_overrides([row], [override])
+        self.assertEqual(final[0]["final_decision"], "BAE")
+        self.assertEqual(final[0]["gap_region"], "bae_like")
+        for key in ("rule_decision", "rule_primary_reason", "rule_features"):
+            self.assertEqual(final[0][key], row[key])
+        self.assertNotEqual(row["gap_region"], "bae_like")
+        self.assertEqual(audit.applied, 1)
+
+    def test_manual_bae_does_not_bypass_fingerprint_or_eligibility(self):
+        original = self.evaluate().as_output_row(self.base)
+        for case in ("stale", "ambiguous", "invalid", "eae"):
+            with self.subTest(case=case):
+                row = dict(original)
+                override = override_row(row, decision="BAE")
+                overrides = [override]
+                if case == "stale":
+                    override["input_fingerprint"] = "b" * 64
+                elif case == "ambiguous":
+                    overrides.append(dict(override))
+                elif case == "invalid":
+                    row.update(rule_decision="INVALID", final_decision="INVALID")
+                else:
+                    row.update(rule_decision="", final_decision="", gap_region="eae_like")
+                final, audit = apply_manual_overrides([row], overrides)
+                self.assertEqual(audit.applied, 0)
+                self.assertEqual(final[0]["gap_region"], row["gap_region"])
+                self.assertNotEqual(final[0]["final_decision"], "BAE")
+
     def test_stale_and_ambiguous_overrides_are_not_applied(self):
         row = self.evaluate().as_output_row(self.base)
         stale = override_row({key: str(value) for key, value in row.items()})
@@ -3136,6 +3168,46 @@ class MixedSorterMethodIntegrationTests(unittest.TestCase):
                 {"REVIEW->BAD": 1},
             )
             self.assertEqual(result.summary["n_final_good"], 0)
+
+    def test_manual_bae_is_exported_separately_and_excluded_from_tae_lists(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            shot = make_tae_shot(root)
+            initial_args = parse_mixed_args([
+                "--shot_dir", str(shot), "--out_dir", str(root / "initial"),
+            ])
+            with contextlib.redirect_stdout(io.StringIO()):
+                initial = run_rules_method(initial_args)
+            accepted = next(r for r in initial.final_rows if r.get("rule_version"))
+            self.assertEqual(accepted["final_decision"], "GOOD")
+            override_path = root / "manual.csv"
+            write_dict_csv(override_path, MANUAL_OVERRIDE_FIELDS,
+                           [override_row(accepted, decision="BAE")])
+            output = root / "final"
+            args = parse_mixed_args([
+                "--shot_dir", str(shot), "--out_dir", str(output),
+                "--manual_overrides", str(override_path),
+            ])
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = run_rules_method(args)
+            self.assertEqual(result.summary["n_bae_like"], 1)
+            self.assertEqual(result.summary["n_tae_like"], 0)
+            self.assertEqual(result.summary["n_final_good"], 0)
+            self.assertEqual(result.summary["n_final_bad"], 0)
+            self.assertEqual(result.summary["n_overrides_applied"], 1)
+            _, bae = read_dict_csv(output / "bae_like.csv")
+            self.assertEqual(len(bae), 1)
+            self.assertEqual(bae[0]["final_decision"], "BAE")
+            self.assertEqual(bae[0]["gap_region"], "bae_like")
+            for name in ("tae_like_all.csv", "good_tae_final.csv", "good_tae_unchecked.csv",
+                         "bad_tae_like.csv", "review_tae_like.csv", "eae_like.csv"):
+                self.assertEqual(read_dict_csv(output / name)[1], [], name)
+            _, preliminary = read_dict_csv(output / "rule_results.csv")
+            self.assertEqual(preliminary[0]["gap_region"], "tae_like")
+            self.assertEqual(preliminary[0]["rule_decision"], accepted["rule_decision"])
+            self.assertEqual(read_dict_csv(output / "final_classifications.csv")[1], bae)
+            _, by_n = read_dict_csv(output / "shot_summary_by_n.csv")
+            self.assertEqual(by_n[0]["n_bae_like"], "1")
 
     def test_stale_override_blocks_automatic_survivor_acceptance(self):
         with tempfile.TemporaryDirectory() as temporary:

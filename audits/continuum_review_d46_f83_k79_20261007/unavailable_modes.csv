@@ -1,0 +1,2 @@
+path,manual_label,manual_reason,shot,n,omega,nr,gap_region,problem_crossings,max_abs_offset_grid,crossing_details,audit_status,n_interior_crossings,input_fingerprint,review_reason
+nstxuG142301D46/N1/egn01w.2532E+02,,,nstxuG142301D46,1,5.032077918968048,201,tae_like,1,2.410185205235127,"[{""boundary"": ""low"", ""crossing_r"": ""0.28794907397382435"", ""singularity_r"": ""0.3"", ""offset_grid"": ""-2.410185205235127""}]",MATCHED,2,,Unavailable: active mode file absent on October 7; diagnostic measurements are from October 5

@@ -1,0 +1,30 @@
+[
+  {
+    "shot": "nstxuG121123N75",
+    "mode_files": 768,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 10
+  },
+  {
+    "shot": "nstxuG142301B85",
+    "mode_files": 813,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 10
+  },
+  {
+    "shot": "nstxuG142301F83",
+    "mode_files": 827,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 10
+  },
+  {
+    "shot": "nstxuG142301K79",
+    "mode_files": 599,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 10
+  }
+]

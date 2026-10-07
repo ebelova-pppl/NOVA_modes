@@ -40,12 +40,48 @@ have explicitly started Bash.
 
 ## Recent adoption and review notes
 
+The [October 7 four-shot batch](../audits/released4_rules_20261007/README.md)
+completed and installed N75, B85, F83 and K79 with production rules v13.
+All 3,007 inputs are finite and nr=201; 697 BAD, 20 selected GOOD (ten each
+in N75/F83), 2,290 EAE-like, zero INVALID. All 44 crossing-review modes are
+automatically BAD. The selected GOOD list awaits visual review. Membership
+is now 181 processed plus 14 training, leaving four holds and one empty entry.
+
+The [October 7 R42/F62 follow-up](../audits/r42_f62_followup_20261007/README.md)
+records R42/N2 continuum recalculation as required and F62 as held while
+considering modes-plus-continuum recalculation. Elena accepted the R42
+higher-n cases after the eleven-mode follow-up review; only its N2 continuum
+requires recalculation. Q62 is already processed
+with seven reviewed accepted TAEs; its training suspension remains. At that
+step four shots were held, four were ready, and one inventory entry was empty.
+
+The [October 7 N75/B85 review](../audits/continuum_release_n75_b85_20261007/README.md)
+released both shots despite confirmed N2 offsets because all 25 flagged
+TAE-like modes look junky. E205059A01t025 remains held for N1/N2
+recalculation: some modes with confirmed offsets otherwise look acceptable.
+At that step nine entries remained unprocessed: four ready (N75/B85/F83/K79), four held
+(E205059A01t025/R42/F62/D46), and one empty. No sorting was run in this step.
+
+The [October 7 GOOD-list review](../audits/released14_manual_review_20261007/README.md)
+corrected B37/N5/9275 to BAD and manually classified five E55/N10 modes as
+BAE. Both shot outputs are installed with backups; the 14-shot cohort now
+has 70 accepted TAEs, with BAEs in a separate list. Original automatic rule
+evidence remains intact. This introduces an explicit `BAE` manual decision,
+not an automatic gap-routing threshold.
+
+The [October 7 review](../audits/continuum_release_f83_k79_20261007/README.md)
+released F83 and K79 for production rules processing (`ready_for_rules`).
+D46 remains held with `input_update_pending` while its N1/N2 mode files are
+changing or missing. At that step nine entries were unprocessed: two ready,
+six held and one empty; the subsequent N75/B85 release is recorded above.
+Completed membership at that step was 177 post-training plus 14 training.
+
 The [October 5 released-shot batch](../audits/released14_rules_20261005/README.md)
 completed production rules sorting for all 14 newly released shots: 12,250
 valid inputs, 77 GOOD before deduplication and 76 selected GOOD. Verified
 outputs are installed and marked `sorted_rules_pending_review`. Membership
-is now 177 processed plus 14 training shots; eight continuum-review holds
-and one empty entry remain. Potential EAE issues, mixed findings and Q62's
+reached 177 processed plus 14 training shots; eight continuum-review holds
+and one empty entry remained at that time. Potential EAE issues, mixed findings and Q62's
 training suspension remain recorded. All 39 crossing-review modes are
 automatically BAD, including E34/N2/2204 (`BAD_CONT_CROSS_WINDOW`); its user
 assessment is preserved separately, with no inferred manual override.
@@ -2173,7 +2209,7 @@ frozen gate or survivor decision.
 Main outputs retain compatible `sort_shot_mixed.py` names where their meaning
 still applies:
 
-- `tae_like_all.csv`, `eae_like.csv`, and `rejected_modes.csv`;
+- `tae_like_all.csv`, `eae_like.csv`, `bae_like.csv`, and `rejected_modes.csv`;
 - `bad_tae_like.csv`, `good_tae_unchecked.csv`, and `good_tae_final.csv`;
 - `shot_summary.csv`, `shot_summary_wide.csv`, and `shot_summary_by_n.csv`;
 - `frequency_cluster_report.txt` and `frequency_clusters.csv`.
@@ -2240,6 +2276,19 @@ override counts are reported. A stale or ambiguous supplied override on an
 otherwise accepted survivor changes its final decision to REVIEW and sets
 `decision_source=override_review_required`, excluding it from the GOOD lists.
 The summary stores the SHA-256 of the exact override file used.
+
+An explicit `manual_decision=BAE` is also supported in the same override CSV
+schema for a user-adjudicated beta-induced AE. A valid override sets
+`final_decision=BAE` and `gap_region=bae_like`, writes the mode to
+`bae_like.csv`, and excludes it from every TAE/GOOD/BAD selection list.
+The complete/final audit retains it, and `rule_results.csv` preserves its
+automatic routing and rule evidence. Shot/per-n summaries report
+`n_bae_like`. Fingerprint, uniqueness and eligibility checks are the same as
+for quality overrides; neither INVALID nor EAE-routed inputs can be revived.
+The automatic split still uses the upper TAE boundary. BAE is a manual
+classification, with no new automatic gate or change to frozen thresholds.
+The interactive g/b/r keys remain quality decisions; prepare BAE entries
+explicitly in the override CSV and pass it through `--manual_overrides`.
 
 ### Final-GOOD production deduplication
 

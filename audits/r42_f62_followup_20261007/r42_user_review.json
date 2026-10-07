@@ -1,0 +1,139 @@
+{
+  "created_utc": "2026-10-07T19:57:11.760054+00:00",
+  "reviewer": "Elena",
+  "review_date": "2026-10-07",
+  "shot": "nstxuG121123R42",
+  "user_assessment": "R42 n>2 look fine. Only n=2 continuum needs recalculation.",
+  "higher_n_review_status": "ACCEPTED_FOR_CONTINUUM_REVIEW",
+  "accepted_ntor": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "recalculation_required_ntor": [
+    2
+  ],
+  "recalculation_target": "continuum",
+  "shot_status": "continuum_recalculation_pending",
+  "review_source_sha256": "feeb1a465e439bc6ff0bd25ae6376c35a0a5b79e9bc06e509adc6508994d4ed3",
+  "reviewed_flagged_modes": [
+    {
+      "path": "nstxuG121123R42/N3/egn03w.2857E+02",
+      "input_fingerprint": "3c8d03df1ac4cfe5d1ab7efbd5990f8d92f004eb3a875f4f6210b7d09d163248"
+    },
+    {
+      "path": "nstxuG121123R42/N3/egn03w.3881E+02",
+      "input_fingerprint": "448a6e02a2fea3dde3d8ab1b9a00da216a464f00a1475c89f640d80acc37ee22"
+    },
+    {
+      "path": "nstxuG121123R42/N3/egn03w.3895E+02",
+      "input_fingerprint": "560c331112580cb980aaac253c3bc71da08872fd586748bea3f832de45403997"
+    },
+    {
+      "path": "nstxuG121123R42/N4/egn04w.2744E+02",
+      "input_fingerprint": "76aa16a95412f853005a6cb553f349645e5dd75df8ab8e88a9b7f7efeb38d884"
+    },
+    {
+      "path": "nstxuG121123R42/N4/egn04w.3363E+02",
+      "input_fingerprint": "229a541b8b0c3708b7304b152daf47ca63b62a3abc6332dbc81fa2c3ec7e7854"
+    },
+    {
+      "path": "nstxuG121123R42/N4/egn04w.4363E+02",
+      "input_fingerprint": "a8b41c72cc6bb04361144ec14c1bd04a153681673b59469b65ac951e635d2fe7"
+    },
+    {
+      "path": "nstxuG121123R42/N5/egn05w.3121E+02",
+      "input_fingerprint": "d2c7099ea2b497adf2812aa43c43bff45777aac0e48638a8880b78b308504e07"
+    },
+    {
+      "path": "nstxuG121123R42/N6/egn06w.5253E+02",
+      "input_fingerprint": "98b7045edf939c911b67105f89afbb52c5977f09d6123b9e720740025007a6f4"
+    },
+    {
+      "path": "nstxuG121123R42/N6/egn06w.5262E+02",
+      "input_fingerprint": "36ebd0ccda312fabf9340a878f8a30d8fb9fee3abad881804bf900bd5c6c6571"
+    },
+    {
+      "path": "nstxuG121123R42/N8/egn08w.4364E+02",
+      "input_fingerprint": "061072229d61c4aa6ddecc264dd72f89bcf508a122ce85cf39b9a55d1aea6aba"
+    },
+    {
+      "path": "nstxuG121123R42/N10/egn10w.4216E+02",
+      "input_fingerprint": "84ba413e81f915a33bd58b118e63bc537d2b4f726f13f58006ce04d7c7b2ed34"
+    }
+  ],
+  "diagnostic_measurements_preserved": true,
+  "log_coverage_limit_preserved": "N10/2376 lacks an exact-frequency log record; no measured offset is inferred.",
+  "inventory_changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "7e0cc5c6c90e9987abc40f2476e1bf14d62ecd8fb96da416619983226cb8cfb4",
+      "after_sha256": "dbebf015d61d1ca35397b8ad3c3b04160515b7e0d6069adbc8691080db1a2939",
+      "before": {
+        "shot": "nstxuG121123R42",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "continuum_recalculation_pending",
+        "notes": "2026-10-07: Elena requires N2 continuum recalculation. New N3-N10 log audit also finds 11 TAE-like review modes (17/311 comparisons), concentrated in N3/N4; N5/N6 have additional flags and N8/N10 marginal ones. N1 review flags remain unresolved. See audits/r42_f62_followup_20261007."
+      },
+      "after": {
+        "shot": "nstxuG121123R42",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "continuum_recalculation_pending",
+        "notes": "2026-10-07: Elena accepts the reviewed n>2 cases after visual inspection and confirms that only the N2 continuum needs recalculation. Keep the shot held for N2 continuum replacement and correspondence recheck. Earlier log flags and N10 log-coverage limitations are retained as audit evidence, not additional recalculation requirements. See audits/r42_f62_followup_20261007/r42_user_review.json."
+      }
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "961ebe107f8a6427bd929642bf3589c018880ea7a39ecb368e3184c79af0f784",
+      "after_sha256": "56bba21c56c44689efcfdd43b4bd0798a4f6b9b8c1eb5ac2137605ce0941f00d",
+      "before": {
+        "shot": "nstxuG121123R42",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "continuum_recalculation_pending",
+        "notes": "2026-10-07: Elena requires N2 continuum recalculation. New N3-N10 log audit also finds 11 TAE-like review modes (17/311 comparisons), concentrated in N3/N4; N5/N6 have additional flags and N8/N10 marginal ones. N1 review flags remain unresolved. See audits/r42_f62_followup_20261007."
+      },
+      "after": {
+        "shot": "nstxuG121123R42",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "continuum_recalculation_pending",
+        "notes": "2026-10-07: Elena accepts the reviewed n>2 cases after visual inspection and confirms that only the N2 continuum needs recalculation. Keep the shot held for N2 continuum replacement and correspondence recheck. Earlier log flags and N10 log-coverage limitations are retained as audit evidence, not additional recalculation requirements. See audits/r42_f62_followup_20261007/r42_user_review.json."
+      }
+    }
+  ],
+  "mode_labels_changed": false,
+  "manual_overrides_changed": false,
+  "production_sorting_run": false
+}

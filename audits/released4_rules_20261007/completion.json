@@ -1,0 +1,52 @@
+{
+  "completed_utc": "2026-10-07T20:21:05.760427+00:00",
+  "status": "installed_verified_and_recorded",
+  "shots": [
+    "nstxuG121123N75",
+    "nstxuG142301B85",
+    "nstxuG142301F83",
+    "nstxuG142301K79"
+  ],
+  "counts": {
+    "input_modes": 3007,
+    "tae_like": 654,
+    "mixed": 63,
+    "eae_like": 2290,
+    "invalid": 0,
+    "good_before_dedup": 20,
+    "selected_good": 20,
+    "bad": 697
+  },
+  "reviewed_crossing_modes_bad": 44,
+  "processed": 181,
+  "active_training": 14,
+  "selected_good_total": 8338,
+  "remaining_held": 4,
+  "remaining_empty": 1,
+  "installed_trees_verified": true,
+  "combined_viewer_list_verified": true,
+  "source_and_protected_files_verified": true,
+  "existing_outputs_replaced": 0,
+  "audit_sha256": {
+    "good_tae_final_batch.csv": "74fc564b5f53af654f9ead7cd76d7e8de19a139020c692347f6b068251b065fe",
+    "preflight.json": "568f464c541123197d7b82d0a546773a24e32b1e233d879372fa46b58aed5d09",
+    "reviewed_tae_mode_results.csv": "d10df4593808b8bd110763903be93d7f0e824f9406c2c59b1f1e8b05b9d53ccf",
+    "run_inputs.json": "0b8852be88a9bbadf3bf2dfa9a33e567e74ed762835a4de7196d6cc2e7044c4a",
+    "verification.json": "f68e699fd5787ff1d462561a26d9d796f91de0c56ac0cec8c49b33d0a6e22566",
+    "shot_summary.csv": "389f715c70e51f26c1ad80cd2622b482abda3ea3767462a97510126566d1cc35",
+    "record_results.py": "00b2ada4926d3ffaa7676d23215ed4bd23b6bc1855738636b75c046c29e7edb9",
+    "remaining_unprocessed.csv": "f6cc5750f369365cbd1259c5dcad3c33995584c4e560f4ddfeaaa4ab7ccfd9e3",
+    "README.md": "e33439b8f59fda8feefd19d14f19e4b64716baea142177e90a0da86db0f4d1b2",
+    "publication.json": "ae13527e3b8cc4a7cb07412f86b98fa4dd1bf48874b0daaf49c5d42e6113e2b9",
+    "stage_results.json": "5cdbf684a150934828e9da5c326401ab2936ae123a0cc7a85386a8044b8237b3",
+    "run_batch.py": "99f545f5c4f00ef804fe36e6983e4e9a3dd083bcf5b4b941549918c1e438c850",
+    "inventory_update.json": "07d39389f6e2ad0dad0eb9e2f42492d1d1d1433290a2cf789e3ebedf12c45804",
+    "selection.csv": "9c21611bdc334b48bb43466b1233c4a13fda3515aab560c8d5454c9952123802"
+  },
+  "docs_sha256": {
+    "README.md": "d92d090854e157a5abb0e6649d0cb2f062f2875f1c63b17a7667dd85670c72ff",
+    "scripts/README.md": "9cd6b5a0118ff1d1814735d5b01b37deb266b46014ab6bff7f670597a344cd8c",
+    "docs/project_state.md": "1c8fe76b30d36b4d5ae3ff6cfe416806f5a549b9e07e86bb61290270ddf568a7",
+    "audits/main_dataset_shots/README.md": "4de652bd4144a5a01d820a23301ee26e3cd62e5a1cb1639f77ea3180d7d04478"
+  }
+}

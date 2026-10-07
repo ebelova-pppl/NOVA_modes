@@ -1,0 +1,92 @@
+{
+  "status": "verified",
+  "counts": {
+    "n_total_files": 12250,
+    "n_tae_like": 1822,
+    "n_mixed": 167,
+    "n_eae_like": 10256,
+    "n_bae_like": 5,
+    "n_final_bad": 1918,
+    "n_final_good_before_clustering": 71,
+    "n_final_good": 70,
+    "n_invalid": 0,
+    "n_overrides_applied": 6
+  },
+  "new_trees": {
+    "nstxuG133964U37": {
+      "files": 18,
+      "tree_sha256": "f174295385182bfef674e029eef34a376af0674cfa868bbabca507d3b71b2fed"
+    },
+    "nstxuG121123N22": {
+      "files": 18,
+      "tree_sha256": "89789c9909664e1b82881c7e56ca4159321c2f44a901dfb562a8aedddebd898f"
+    },
+    "nstxuG142301E55": {
+      "files": 19,
+      "tree_sha256": "9b24d6374d254f6f77e339f7a45b79be90d40c1b4f58ab63221c10831b47a2ab"
+    },
+    "nstxuG142301E77": {
+      "files": 18,
+      "tree_sha256": "883ff10bf0b09d2fd81d413aa652f8b6a8095cf27186bbe7663454fe63ebf78a"
+    },
+    "nstxuG142301L89": {
+      "files": 18,
+      "tree_sha256": "035f05af0aada198769e5c8d846dc1b4d62d00837e6ae0499c7f0d32a75775e9"
+    },
+    "nstxuG142301S94": {
+      "files": 18,
+      "tree_sha256": "115b49823826042ad294c939b2847c8d2f54aec26080c26b549a3caa4e7f85ee"
+    },
+    "nstxuG133964R48": {
+      "files": 18,
+      "tree_sha256": "87d53ca7f38ab1266680dcca2410fe9ad7567ad5dfde54a73b2b9ab4968a9ef9"
+    },
+    "nstxuG133964U27": {
+      "files": 18,
+      "tree_sha256": "0e303065eab79cbb9e9f59b7084a47b2f4eb7c8dbc90352e5e94f117d932ce58"
+    },
+    "nstxuG121123Q62": {
+      "files": 18,
+      "tree_sha256": "20ee8a9a1489258048d46accf764c6d9fef11e25898625da08848563df7d03cc"
+    },
+    "nstxuG142301E34": {
+      "files": 18,
+      "tree_sha256": "ed80702366764942fc10266a4d71a00fa12b43e9d88f1fc5878d2f44c9eec834"
+    },
+    "nstxuG142301M32": {
+      "files": 18,
+      "tree_sha256": "e85d98c43b8d6fde258b2781f186faca896c7225bcffd16c963e626480c49fb0"
+    },
+    "nstxuG142301F66": {
+      "files": 18,
+      "tree_sha256": "5ce87d57f791410286e1927642e46a68fdf8d4b5bd9daa8a056bba9cd0bd488d"
+    },
+    "nstxuG142301B37": {
+      "files": 19,
+      "tree_sha256": "d1cd2e8048bdae38444b530fada34f3957f574b47717ac56194217b4af3a65e2"
+    },
+    "nstxuG142301U85": {
+      "files": 18,
+      "tree_sha256": "20fa51903d99fc8ae68e5d25a95dca147a86cbac60ed5ad06b2956278393225d"
+    }
+  },
+  "changed_modes": 6,
+  "selected_removed": 6,
+  "automatic_evidence_unchanged": true,
+  "raw_inputs_verified": 1272,
+  "other_shot_outputs_unchanged": 12,
+  "tests": {
+    "core_rule_tests_passed": 104,
+    "rules_without_ai_tests_passed": 3,
+    "skill_structure_check": "Full suite skill-validator test blocked by missing PyYAML in existing environment; no skill files changed."
+  },
+  "files_sha256": {
+    "bae_evidence.csv": "4b040a46ac2077c9fe9fb45da645e7b8c6968eeafb04f533383a8245123bf501",
+    "shot_summary.csv": "8ec049f1996b83f3459a1eb057a141a15aabf42d5688c5ab463a803d31a7bab4",
+    "bae_like.csv": "7c78693a9a261d1c933919d2e0ab2fa5bec5ada8d350cc443912cfa6f6783092",
+    "accepted_tae_modes.csv": "c1eb1df36085649f6d8db02f264f76767d47bb0d5965ffbba4f360eac96235e2",
+    "manual_overrides.csv": "799978cc8333e2faa3f7c830d144b8563a68ca34996a1e8a23a65da43e3a8e55",
+    "review_dispositions.csv": "4f0dcb017cca68e6a2a51cbc2ee835a048cb66bf37e89d62255524972531a41a",
+    "label_changes.csv": "028e2772869cf9c6a3f10b0fce24c8fe5647564944f47d14b6f85c944822ef61"
+  }
+}

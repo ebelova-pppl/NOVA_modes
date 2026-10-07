@@ -1,5 +1,10 @@
 # Production sorting of 14 released shots, October 5, 2026
 
+**Current selections:** Elena's [October 7 review](../released14_manual_review_20261007/README.md)
+supersedes this automatic snapshot: 70 accepted TAEs, one newly BAD mode and
+five manually classified BAEs. B37/E55 installed outputs include the
+corrections. The original counts and files below are retained for provenance.
+
 Completed and installed all 14 shots authorized by Elena from the
 [release list](../continuum_release_20261005/released_shots.csv), using
 `sort_shot_mixed.py --method rules --rule_config tae_rules_production_v13`.

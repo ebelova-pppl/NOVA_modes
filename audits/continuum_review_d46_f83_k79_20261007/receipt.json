@@ -1,0 +1,55 @@
+{
+  "created_utc": "2026-10-07T17:39:33.304147+00:00",
+  "measurement_snapshot": "outputs/review_n1_recheck_20261005",
+  "scope": "tae_like only; N1 and N2",
+  "radius_min": 0.03,
+  "radius_max_exclusive": 0.75,
+  "offset_grid_strictly_greater_than": 2,
+  "shots": [
+    {
+      "shot": "nstxuG142301D46",
+      "available_modes": 7,
+      "available_crossings": 11,
+      "unavailable_modes": 1
+    },
+    {
+      "shot": "nstxuG142301F83",
+      "available_modes": 8,
+      "available_crossings": 13,
+      "unavailable_modes": 0
+    },
+    {
+      "shot": "nstxuG142301K79",
+      "available_modes": 11,
+      "available_crossings": 13,
+      "unavailable_modes": 0
+    }
+  ],
+  "available_modes": 26,
+  "available_crossings": 37,
+  "unavailable_modes": 1,
+  "source_changes": [
+    {
+      "shot": "nstxuG142301D46",
+      "n": 1,
+      "previous_mode_files": 57,
+      "current_mode_files": 0,
+      "status": "ACTIVE_MODE_FILES_ABSENT",
+      "note": "October 5 N1 mode files are unavailable; no assumption about the cause."
+    }
+  ],
+  "live_sources_verified": 258,
+  "live_source_hash_manifest_sha256": "3f7302a5de87b88b8620a8da52b4b6557e41299bdbcab39ec5036dac894f0d0d",
+  "source_sha256": {
+    "outputs/review_n1_recheck_20261005/metadata.json": "6a3ab794ee94485bb754edb1962b14a576cc18c805264509b64d67f8b2403bea",
+    "outputs/review_n1_recheck_20261005/crossing_offsets.csv": "1688bebbca9d909acfaa6a15abbcd8f8bab155226e6412a543357c1ea24d345c",
+    "outputs/review_n1_recheck_20261005/mode_coverage.csv": "6c2770579fcee23e6095fdf3a71e900c51bbcf3cafba3dfb4009b1b9112d57af"
+  },
+  "files_sha256": {
+    "tae_review_modes.csv": "e7698133836123f17ce13960e5a3ad2d56ab65234832917bb381d38da9d0a5e3",
+    "unavailable_modes.csv": "5fd2efef36103827291b56d869e4f8608bcd1af0d4df13f77dd7a93b709b0b6f"
+  },
+  "viewer_paths_verified": true,
+  "manual_labels_assigned": false,
+  "holds_changed": false
+}

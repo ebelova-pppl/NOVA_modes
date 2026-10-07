@@ -1,0 +1,238 @@
+{
+  "created_utc": "2026-10-07T18:02:01.804597+00:00",
+  "reviewer": "Elena",
+  "decision": "Release F83 and K79 for production rules processing; keep D46 on hold.",
+  "reviewed_modes": 19,
+  "released_shots": 2,
+  "remaining_held_shots": 6,
+  "empty_entries": 1,
+  "processed_shots": 177,
+  "training_shots": 14,
+  "production_sorting_run": false,
+  "manual_overrides_created": false,
+  "eae_mixed_flags_preserved": true,
+  "source_sha256": {
+    "audits/continuum_review_d46_f83_k79_20261007/tae_review_modes.csv": "e7698133836123f17ce13960e5a3ad2d56ab65234832917bb381d38da9d0a5e3",
+    "outputs/review_n1_recheck_20261005/metadata.json": "6a3ab794ee94485bb754edb1962b14a576cc18c805264509b64d67f8b2403bea",
+    "audits/continuum_release_20261005/remaining_continuum_holds.csv": "a4d53746df787fd52da7657b3fea021d399a6e6186039d6430d5fdf0b4145847"
+  },
+  "verified_live_sources": 211,
+  "verified_source_manifest_sha256": "f617f5bbb760675454b3a56931f39f898fa119d82d272c0ca5503cb1a9f7d779",
+  "d46_input_availability": {
+    "observed_utc": "2026-10-07T18:02:01.797813+00:00",
+    "shot": "nstxuG142301D46",
+    "groups": [
+      {
+        "n": 1,
+        "mode_files": 1,
+        "paths": [
+          "nstxuG142301D46/N1/egn01w.3009E+02"
+        ]
+      },
+      {
+        "n": 2,
+        "mode_files": 0,
+        "paths": []
+      }
+    ]
+  },
+  "protected_sha256": {
+    "configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+    "training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76"
+  },
+  "inventory_changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "d865960581c3a7f69db62e20f6f666d0be66a4e7996bf4c8f39f0b9a1b8f5176",
+      "after_sha256": "ebb43984bffe52c58bd94c8c7dbe1daefb1d8d4f419a772750d08b93a9153d13",
+      "changes": [
+        {
+          "shot": "nstxuG142301D46",
+          "before": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "continuum_review_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv."
+          },
+          "after": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_update_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301F83",
+          "before": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301K79",
+          "before": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          }
+        }
+      ]
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "abe6e50a982ce4f6a155e453bd6f7e6359dfa68cdf5f89c5d52f9d799af72ba5",
+      "after_sha256": "036bd24ae8c48f05a40920ced4bd0710d6438a12d48a929cf202b28c051f1745",
+      "changes": [
+        {
+          "shot": "nstxuG142301D46",
+          "before": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "continuum_review_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv."
+          },
+          "after": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_update_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301F83",
+          "before": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301K79",
+          "before": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          }
+        }
+      ]
+    }
+  ],
+  "files_sha256": {
+    "released_shots.csv": "35b8f9e4c68c8448afd1e434422c84a489d6692231170a32cbbde17d7ce0ece8",
+    "reviewed_modes.csv": "6d1eb8cf787d86ac94706897fd763709047402c8da1a5d91bcc4aa0d74b67d7f",
+    "remaining_unprocessed.csv": "a5d0d0fd15ef346b044a3df5c372177666fd2c824ff89665c680ba3af587708a"
+  }
+}

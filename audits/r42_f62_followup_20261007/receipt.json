@@ -1,0 +1,246 @@
+{
+  "created_utc": "2026-10-07T19:45:36.124197+00:00",
+  "measurement_snapshot": "outputs/review_r42_higher_n_20261007",
+  "radius_min": 0.03,
+  "radius_max_exclusive": 0.75,
+  "offset_grid_strictly_greater_than": 2,
+  "r42_modes": 912,
+  "r42_tae_modes": 163,
+  "r42_tae_matched_modes": 162,
+  "r42_tae_comparisons": 311,
+  "r42_tae_flagged_comparisons": 17,
+  "r42_tae_flagged_modes": 11,
+  "f62_inner_boundary": {
+    "path": "nstxuG142301F62/N2/datcon2",
+    "sha256": "9f831612815092133c676baf9007c18ca4dee3c54eb2139147111e48b9506bfb",
+    "r_min": 0.01,
+    "r_max": 0.295,
+    "finite_samples": 58,
+    "lower_frequency_min": 7.349179079945517,
+    "lower_frequency_max": 7.494825506593183,
+    "lower_frequency_mean": 7.451056373773121,
+    "shared_repair_changed_inner_samples": false,
+    "interpretation": "Flat inner lower boundary is present in raw datcon; this check does not establish the cause or physical validity."
+  },
+  "d46_availability": {
+    "checked_utc": "2026-10-07T19:45:36.099953+00:00",
+    "n1_mode_files": 34,
+    "n2_mode_files": 18,
+    "status": "INPUT_UPDATE_PENDING"
+  },
+  "q62_selected_good": 7,
+  "q62_selected_good_sha256": "022ef32843d422f0d56410e8be8eaacfda684ce985812ba4d57428b2562c86f9",
+  "q62_training_suspension_retained": true,
+  "inventory_changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "702f5a467bac4dc2b13bbc82ed71fe62a74130d08796c3dd1bb212a01d7b73aa",
+      "changes": [
+        {
+          "shot": "nstxuG121123R42",
+          "before": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "continuum_recalculation_pending",
+            "notes": "2026-10-07: Elena requires N2 continuum recalculation. New N3-N10 log audit also finds 11 TAE-like review modes (17/311 comparisons), concentrated in N3/N4; N5/N6 have additional flags and N8/N10 marginal ones. N1 review flags remain unresolved. See audits/r42_f62_followup_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301D46",
+          "before": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_update_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_update_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301F62",
+          "before": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "recalculation_review_pending",
+            "notes": "2026-10-07: Elena notes very flat N2 lower continuum at r<0.3 and some otherwise acceptable modes; retain hold while considering recalculation of both modes and continuum. Inner flatness is present in raw datcon, not introduced by shared repair. Recalculation scope remains to be decided; do not infer a confirmed cause. See audits/r42_f62_followup_20261007."
+          }
+        }
+      ],
+      "after_sha256": "7e0cc5c6c90e9987abc40f2476e1bf14d62ecd8fb96da416619983226cb8cfb4"
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "445d131d918fa39fb9669979a70fdedf7ecda0eef09f7f897a7ae13fe75845e6",
+      "changes": [
+        {
+          "shot": "nstxuG121123R42",
+          "before": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "continuum_recalculation_pending",
+            "notes": "2026-10-07: Elena requires N2 continuum recalculation. New N3-N10 log audit also finds 11 TAE-like review modes (17/311 comparisons), concentrated in N3/N4; N5/N6 have additional flags and N8/N10 marginal ones. N1 review flags remain unresolved. See audits/r42_f62_followup_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301D46",
+          "before": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_update_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "input_update_pending",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301F62",
+          "before": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "recalculation_review_pending",
+            "notes": "2026-10-07: Elena notes very flat N2 lower continuum at r<0.3 and some otherwise acceptable modes; retain hold while considering recalculation of both modes and continuum. Inner flatness is present in raw datcon, not introduced by shared repair. Recalculation scope remains to be decided; do not infer a confirmed cause. See audits/r42_f62_followup_20261007."
+          }
+        }
+      ],
+      "after_sha256": "961ebe107f8a6427bd929642bf3589c018880ea7a39ecb368e3184c79af0f784"
+    }
+  ],
+  "source_sha256": {
+    "outputs/review_r42_higher_n_20261007/mode_coverage.csv": "2339001636608963d282b54595a25c605eb1332564d54e370371d08171906dab",
+    "outputs/review_r42_higher_n_20261007/crossing_offsets.csv": "e5247613c7966366a73588bc4a77f0dfd79d4804cca93d43783491b952b2619e",
+    "outputs/review_r42_higher_n_20261007/metadata.json": "970074ec5c5ca4588de06f8c6a99047410118ed63b4112d1d20a543695abcde6"
+  },
+  "protected_sha256": {
+    "training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+    "audits/continuum_review_f62_r42_20261007/tae_review_modes.csv": "6cd665b24d26ceaf3e39e564433e0ab7c55a46b5a596139d4545afdf67ff76ff"
+  },
+  "files_sha256": {
+    "r42_tae_coverage_gaps.csv": "015575046edabddbe06e1e4a00826d359720b726fa5ef65607ad565867aa6fff",
+    "remaining_unprocessed.csv": "c0a25c57084b54d9f99627d5c777e50fd0074d7e6cfa68c1fb3666fd9d3f1427",
+    "r42_n3_n10_summary.csv": "215d60863f89aeaa0fb804b5e27d5ea1d101e84bc30139eda3c03f76775a0fc9",
+    "r42_tae_review_modes.csv": "feeb1a465e439bc6ff0bd25ae6376c35a0a5b79e9bc06e509adc6508994d4ed3"
+  },
+  "remaining_unprocessed": 9,
+  "ready_for_rules": 4,
+  "held": 4,
+  "empty": 1,
+  "production_sorting_run": false,
+  "manual_labels_assigned": false
+}

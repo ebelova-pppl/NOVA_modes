@@ -4,25 +4,55 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
+On October 7 the [four-shot production batch](../released4_rules_20261007/README.md)
+completed N75, B85, F83 and K79: **20 selected GOOD TAEs** (ten each in
+N75/F83), 697 BAD, zero INVALID, all 3,007 inputs nr=201. All 44 reviewed
+crossing modes are automatically BAD. Both inventories mark the four
+`sorted_rules_pending_review`, with `post_training_checked=yes` and
+`checked_methods=rules`. Membership is now **181 processed + 14 training
+= 195 cases**. Selected-GOOD visual review remains pending.
+
+Elena had released N75 and B85 after confirming N2 crossing offsets but
+judging all 25 listed TAE-like modes junky, following the F83/K79 release.
+E205059A01t025
+requires N1/N2 recalculation and has `continuum_recalculation_pending`;
+some affected modes otherwise look acceptable. D46 is `input_update_pending`
+because its N1/N2 mode files are changing or absent and review is incomplete.
+R42 requires only N2 continuum recalculation; Elena accepted its higher-n
+cases after reviewing the eleven additional flagged TAE-like modes. F62 remains held while
+considering recalculation of both modes and continuum. D46's latest file
+counts are 34 N1 and 18 N2, with completion still unverified. Q62 is already
+processed with seven reviewed selected TAEs; its training suspension remains.
+See the [follow-up audit](../r42_f62_followup_20261007/README.md).
+The [current five unprocessed entries](../released4_rules_20261007/remaining_unprocessed.csv)
+are **four held + one empty**. Potential EAE issues and separate
+mixed findings remain recorded; no released shots remain unprocessed.
+
 On 2026-10-05 the 14 shots released after Elena's TAE crossing review
-completed production rules sorting, adding **76 selected GOOD modes**.
+completed production rules sorting, initially adding **76 selected GOOD modes**.
 The [installed batch](../released14_rules_20261005/README.md) records counts,
 input/output verification, the combined GOOD list and the remaining holds.
-Both inventories now contain **177 processed post-training cases plus 14
-active training shots (191 disjoint cases)**; **nine entries remain
-unprocessed: eight continuum-review holds and one empty entry**. The 14
-released rows now have `status=sorted_rules_pending_review`,
-`checked_methods=rules` and `post_training_checked=yes`. Potential EAE issues,
+Elena's [October 7 GOOD-list review](../released14_manual_review_20261007/README.md)
+leaves **70 accepted TAEs**: B37/N5_9275 is manually BAD, and five E55/N10
+modes are manually BAE. The two corrected shot outputs are installed;
+the original automatic 76-mode list is retained as historical evidence.
+After that batch both inventories contained **177 processed post-training
+cases plus 14 active training shots (191 disjoint cases)**; nine entries
+remained unprocessed, with the later release/status changes recorded above. The 14
+released rows now have `status=sorted_rules_good_reviewed`,
+`checked_methods=rules` and `post_training_checked=yes`. This records review
+of the selected GOOD list, not every rejected mode. Potential EAE issues,
 separate mixed findings and Q62's training suspension remain recorded.
 
 Earlier on October 5, five NaN-cleared shots completed production rules
 sorting, adding **241 selected GOOD representatives awaiting visual review**.
 D46's resolved NaN status has
-been superseded by `continuum_review_pending`; the other five formerly
+been superseded first by `continuum_review_pending` and now by
+`input_update_pending` for the October 7 missing/changing files; the other five formerly
 NaN-held rows now have `sorted_rules_pending_review`, `checked_methods=rules`
 and `post_training_checked=yes`. See the [batch and remaining-shot lists](../cleared_nan_rules_20261005/README.md).
-Recorded processed outputs now contain 8,324 selected GOOD modes, including
-6,598 automatic selections from 137 later shots awaiting visual review.
+Recorded processed outputs now contain 8,338 selected GOOD modes, including
+6,542 automatic selections from 127 later shots awaiting visual review.
 The reviewed 40-shot accepted manifest and 39 AI comparisons remain unchanged.
 
 On 2026-09-21 the authorized remaining-122 rules batch completed. **118
@@ -77,12 +107,14 @@ counts and input exclusions remain unchanged. No additional shots were sorted.
   automated checks. It does not imply visual review or an AI comparison:
   use `status` and `checked_methods` to distinguish them. The original 39
   cases have `rules|rf-cnn`; the user-approved E202806A02t045 addition and
-  118 September 21 cases and 19 October 5 additions have `rules`. These 137 retain explicit
-  pending-visual-review status. The original cohort includes the E case and
+  118 September 21 cases, 19 October 5 additions and four October 7 additions
+  have `rules`. Of these later additions, 127 retain explicit pending-visual-review status; the
+  released 14 now have `sorted_rules_good_reviewed` after GOOD-list review.
+  The original cohort includes the E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases
   completed with v11 and RF/raw-CNN on 2026-09-10. Its disagreement review
-  is complete. Current processed membership is 177, with 39 AI comparisons.
+  is complete. Current processed membership is 181, with 39 AI comparisons.
 
 All 27 earlier checked cases were subsequently regenerated with v6 routing and the
 adopted `datcon-monotonic-tail-v1` shared continuum cleanup. Both rules and
@@ -121,8 +153,8 @@ flags are diagnostic, not confirmed registry exclusions. This audit does not
 change `post_training_checked` or the sorting statuses in this inventory.
 Q62 was marked `suspended_training_q62`: its 249 reviewed rows remain in the
 v3 snapshot and it is excluded from active training. The October 5 user
-review released it for production processing; its completed run is now
-`sorted_rules_pending_review`, preserving that training suspension and its
+review released it for production processing; after October 7 GOOD-list
+review its status is `sorted_rules_good_reviewed`, preserving that training suspension and its
 potential EAE issue flags.
 
 Three directory symlink aliases—`nstxuE120113P01t027`,

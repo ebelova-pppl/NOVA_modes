@@ -1,0 +1,51 @@
+{
+  "created_utc": "2026-10-07T18:47:01.755857+00:00",
+  "measurement_snapshot": "outputs/review_n1_recheck_20261005",
+  "scope": "tae_like only; N1 and N2",
+  "radius_min": 0.03,
+  "radius_max_exclusive": 0.75,
+  "offset_grid_strictly_greater_than": 2,
+  "shots": [
+    {
+      "shot": "nstxuG121123N75",
+      "n1_modes": 0,
+      "n2_modes": 16,
+      "modes": 16,
+      "flagged_comparisons": 16
+    },
+    {
+      "shot": "nstxuG142301B85",
+      "n1_modes": 0,
+      "n2_modes": 9,
+      "modes": 9,
+      "flagged_comparisons": 16
+    },
+    {
+      "shot": "nstxuE205059A01t025",
+      "n1_modes": 13,
+      "n2_modes": 4,
+      "modes": 17,
+      "flagged_comparisons": 19
+    }
+  ],
+  "available_modes": 42,
+  "available_crossings": 51,
+  "unavailable_modes": 0,
+  "live_sources_verified": 591,
+  "source_changes": [],
+  "mode_inventories_unchanged": true,
+  "live_source_hash_manifest_sha256": "09a845ff0c59959de7a808a00a54a453078df337e8c14148ca90c95f254655a4",
+  "source_sha256": {
+    "outputs/review_n1_recheck_20261005/metadata.json": "6a3ab794ee94485bb754edb1962b14a576cc18c805264509b64d67f8b2403bea",
+    "outputs/review_n1_recheck_20261005/crossing_offsets.csv": "1688bebbca9d909acfaa6a15abbcd8f8bab155226e6412a543357c1ea24d345c",
+    "outputs/review_n1_recheck_20261005/mode_coverage.csv": "6c2770579fcee23e6095fdf3a71e900c51bbcf3cafba3dfb4009b1b9112d57af"
+  },
+  "files_sha256": {
+    "tae_review_modes.csv": "88cc81f0367ae3006a219cba63916c7a9e149ffb82c06c842a524962be4c142e",
+    "shot_summary.csv": "cd78f63a034d246e893e1ddb85a6ef8220fecdd64abc33c1e22d9a817c57b101"
+  },
+  "viewer_paths_verified": true,
+  "manual_labels_assigned": false,
+  "holds_changed": false,
+  "production_sorting_run": false
+}

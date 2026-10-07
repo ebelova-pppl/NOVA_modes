@@ -122,6 +122,7 @@ from tae_rule_config import (  # noqa: E402
 )
 from tae_rule_io import (  # noqa: E402
     ALLOWED_FINAL_DECISIONS,
+    ALLOWED_MANUAL_DECISIONS,
     MANUAL_OVERRIDE_FIELDS,
     RULE_OUTPUT_FIELDS,
     read_dict_csv,
@@ -172,6 +173,7 @@ SHOT_SUMMARY_FIELDS = [
     "n_tae_like",
     "n_mixed",
     "n_eae_like",
+    "n_bae_like",
     "n_rule_evaluated",
     "n_interior_harmonic_resolution_eligible",
     "n_interior_harmonic_resolution_ineligible",
@@ -449,13 +451,13 @@ def apply_rule_survivor_policy(
 
 
 def normalize_manual_decision(value: str) -> str:
-    """Normalize a nonempty manual decision to GOOD, BAD, or REVIEW."""
+    """Normalize a quality decision or explicit manual BAE assignment."""
     normalized = value.strip().upper()
     aliases = {"G": "GOOD", "B": "BAD", "R": "REVIEW"}
     normalized = aliases.get(normalized, normalized)
-    if normalized not in ALLOWED_FINAL_DECISIONS:
+    if normalized not in ALLOWED_MANUAL_DECISIONS:
         raise ValueError(
-            f"manual_decision must be GOOD, BAD, or REVIEW, got {value!r}"
+            f"manual_decision must be GOOD, BAD, REVIEW, or BAE, got {value!r}"
         )
     return normalized
 
@@ -600,6 +602,10 @@ def apply_manual_overrides(
                 "rule_survivor_accepted": False,
             }
         )
+        if decision == "BAE":
+            # Preserve automatic routing and rule evidence in rule_results.csv;
+            # the curated family must not remain in any TAE selection list.
+            row["gap_region"] = "bae_like"
         applied += 1
         decisions_changed += int(decision != rule_decision)
         output.append(row)
@@ -1106,6 +1112,7 @@ def build_summary(
         "n_tae_like": sum(row.get("gap_region") == "tae_like" for row in rows),
         "n_mixed": sum(row.get("gap_region") == "mixed" for row in rows),
         "n_eae_like": sum(row.get("gap_region") == "eae_like" for row in rows),
+        "n_bae_like": sum(row.get("gap_region") == "bae_like" for row in rows),
         "n_rule_evaluated": len(rule_rows),
         "n_interior_harmonic_resolution_eligible": (
             resolution_counts["interior_harmonic_eligible"]
@@ -1476,6 +1483,7 @@ def write_outputs(
         row for row in final_sorted if row.get("gap_region") in {"tae_like", "mixed"}
     ]
     eae_rows = [row for row in final_sorted if row.get("processing_status") == "ROUTED_EAE"]
+    bae_rows = [row for row in final_sorted if row.get("final_decision") == "BAE"]
     rejected_rows = [row for row in final_sorted if row.get("final_decision") == "INVALID"]
     bad_rows = [row for row in final_sorted if row.get("final_decision") == "BAD"]
     review_rows = [row for row in final_sorted if row.get("final_decision") == "REVIEW"]
@@ -1486,6 +1494,7 @@ def write_outputs(
     write_dict_csv(out_dir / "all_modes_rules.csv", RULE_OUTPUT_FIELDS, final_sorted)
     write_dict_csv(out_dir / "tae_like_all.csv", RULE_OUTPUT_FIELDS, tae_rows)
     write_dict_csv(out_dir / "eae_like.csv", RULE_OUTPUT_FIELDS, eae_rows)
+    write_dict_csv(out_dir / "bae_like.csv", RULE_OUTPUT_FIELDS, bae_rows)
     write_dict_csv(out_dir / "rejected_modes.csv", RULE_OUTPUT_FIELDS, rejected_rows)
     write_dict_csv(out_dir / "rule_results.csv", RULE_OUTPUT_FIELDS, rule_results)
     write_dict_csv(
@@ -2703,7 +2712,8 @@ def main() -> None:
     print(
         "Frequency routing: "
         f"tae_like={summary['n_tae_like']} mixed={summary['n_mixed']} "
-        f"eae_like={summary['n_eae_like']} invalid={summary['n_invalid']}"
+        f"eae_like={summary['n_eae_like']} bae_like={summary['n_bae_like']} "
+        f"invalid={summary['n_invalid']}"
     )
     print(
         "Final TAE decisions: "

@@ -1,0 +1,268 @@
+{
+  "created_utc": "2026-10-07T20:16:22.504512+00:00",
+  "processed": 181,
+  "active_training": 14,
+  "remaining": 5,
+  "held": 4,
+  "empty": 1,
+  "selected_good_total": 8338,
+  "pending_good_review_shots": 127,
+  "pending_good_review_modes": 6542,
+  "new_selected_good": 20,
+  "changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "dbebf015d61d1ca35397b8ad3c3b04160515b7e0d6069adbc8691080db1a2939",
+      "changes": [
+        {
+          "shot": "nstxuG121123N75",
+          "before": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          },
+          "after": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 768 inputs, nr=201, 197 BAD, 10 selected GOOD, 561 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123N75. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301B85",
+          "before": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 813 inputs, nr=201, 137 BAD, 0 selected GOOD, 676 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301B85. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301F83",
+          "before": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 827 inputs, nr=201, 141 BAD, 10 selected GOOD, 676 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301F83. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301K79",
+          "before": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 599 inputs, nr=201, 222 BAD, 0 selected GOOD, 377 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301K79. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        }
+      ],
+      "after_sha256": "3e8c97aebec91edbab2fe107abd7078753650c59c257915b4ee90db87ead4433"
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "56bba21c56c44689efcfdd43b4bd0798a4f6b9b8c1eb5ac2137605ce0941f00d",
+      "changes": [
+        {
+          "shot": "nstxuG121123N75",
+          "before": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          },
+          "after": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 768 inputs, nr=201, 197 BAD, 10 selected GOOD, 561 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123N75. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301B85",
+          "before": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 813 inputs, nr=201, 137 BAD, 0 selected GOOD, 676 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301B85. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301F83",
+          "before": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301F83",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F83",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 827 inputs, nr=201, 141 BAD, 10 selected GOOD, 676 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301F83. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301K79",
+          "before": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007."
+          },
+          "after": {
+            "shot": "nstxuG142301K79",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301K79",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena released for production rules after reviewing all flagged TAE-like modes as numerical/grid-scale or other defects, mostly near axis. Potential EAE issues, mixed findings and EAE log-coverage gaps remain recorded. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Released-shot production rules v13 sorting completed and verified: 599 inputs, nr=201, 222 BAD, 0 selected GOOD, 377 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301K79. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released4_rules_20261007."
+          }
+        }
+      ],
+      "after_sha256": "fce7cae743168cd6c79f723b4dd09c37b75045633b49e609a459feadea166d59"
+    }
+  ],
+  "reviewed_mode_final_counts": {
+    "GOOD": 0,
+    "BAD": 44
+  },
+  "files_sha256": {
+    "reviewed_tae_mode_results.csv": "d10df4593808b8bd110763903be93d7f0e824f9406c2c59b1f1e8b05b9d53ccf",
+    "remaining_unprocessed.csv": "f6cc5750f369365cbd1259c5dcad3c33995584c4e560f4ddfeaaa4ab7ccfd9e3"
+  }
+}

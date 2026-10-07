@@ -1,0 +1,5 @@
+shot,status,input_modes,estimated_input_modes,tae_like,mixed,eae_like,invalid,good_before_dedup,selected_good,bad,elapsed_seconds
+nstxuG121123N75,verified,768,768,186,21,561,0,10,10,197,17.79
+nstxuG142301B85,verified,813,813,131,6,676,0,0,0,137,12.6
+nstxuG142301F83,verified,827,827,134,17,676,0,10,10,141,16.36
+nstxuG142301K79,verified,599,599,203,19,377,0,0,0,222,18.17

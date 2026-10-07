@@ -1,0 +1,204 @@
+{
+  "created_utc": "2026-10-07T19:02:58.162747+00:00",
+  "reviewer": "Elena",
+  "review_date": "2026-10-07",
+  "released_shots": 2,
+  "reviewed_released_modes": 25,
+  "recalculation_required_shots": 1,
+  "recalculation_required_ntor": [
+    1,
+    2
+  ],
+  "available_review_modes": 42,
+  "live_sources_verified": 591,
+  "source_changes": [],
+  "mode_inventories_unchanged": true,
+  "live_source_hash_manifest_sha256": "09a845ff0c59959de7a808a00a54a453078df337e8c14148ca90c95f254655a4",
+  "source_sha256": {
+    "audits/continuum_review_n75_b85_e205059_20261007/tae_review_modes.csv": "88cc81f0367ae3006a219cba63916c7a9e149ffb82c06c842a524962be4c142e",
+    "audits/continuum_review_n75_b85_e205059_20261007/receipt.json": "d9c3c72c70ed44fcd59f6378b061ccf00e245addf0881ea40be0038aba099961",
+    "outputs/review_n1_recheck_20261005/metadata.json": "6a3ab794ee94485bb754edb1962b14a576cc18c805264509b64d67f8b2403bea",
+    "audits/continuum_small_review_20261005/tae_only_all_22_summary.csv": "6fd925ec236fdcfa3f7b0cbe522038c253e238f2d84825b976b6d848554bc0d4"
+  },
+  "protected_sha256": {
+    "training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71"
+  },
+  "inventory_changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "949d10c33839b401e0a5747f4996d91209e67cc098cf54b1419746ec67580627",
+      "changes": [
+        {
+          "shot": "nstxuE205059A01t025",
+          "before": {
+            "shot": "nstxuE205059A01t025",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE205059A01t025",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuE205059A01t025",
+            "shot_family": "NSTX-U E",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuE205059A01t025",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "continuum_recalculation_pending",
+            "notes": "2026-10-07: Elena confirms continuum crossing offsets in both N1 and N2, with some affected modes otherwise acceptable. Hold whole shot for N1/N2 recalculation and renewed correspondence review. Potential EAE issues, mixed findings and log-coverage limits retained. See audits/continuum_release_n75_b85_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG121123N75",
+          "before": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301B85",
+          "before": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          }
+        }
+      ],
+      "after_sha256": "702f5a467bac4dc2b13bbc82ed71fe62a74130d08796c3dd1bb212a01d7b73aa"
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "99e3d32a1c36793689c2445cb35a3ff2dcc82373ba28d10a03a014bcb7739f00",
+      "changes": [
+        {
+          "shot": "nstxuG121123N75",
+          "before": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG121123N75",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123N75",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          }
+        },
+        {
+          "shot": "nstxuG142301B85",
+          "before": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "unchecked",
+            "notes": ""
+          },
+          "after": {
+            "shot": "nstxuG142301B85",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301B85",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena confirms N2 continuum crossing offsets but judges all listed TAE-like modes junky; releases shot for production rules without continuum recalculation. Potential EAE issues and mixed findings retained. See audits/continuum_release_n75_b85_20261007."
+          }
+        }
+      ],
+      "after_sha256": "445d131d918fa39fb9669979a70fdedf7ecda0eef09f7f897a7ae13fe75845e6"
+    }
+  ],
+  "remaining_unprocessed": 9,
+  "ready_for_rules": 4,
+  "held": 4,
+  "empty": 1,
+  "processed": 177,
+  "active_training": 14,
+  "files_sha256": {
+    "reviewed_modes.csv": "4574ece2726838f88cebc2912cddc24033123d84eab5c6a5e7e3ddca915a64a0",
+    "held_shots.csv": "4a5feb38ecdb75d7e127988b4545de7e88ff7077bc0f6120e207f62aaf0a7a41",
+    "remaining_unprocessed.csv": "ba2459099ee73ca963a9f5614c19ed81ecd4622bb55a929522e094e9bb10d460",
+    "released_shots.csv": "41bd70ead242edeae7b011a1ee014e07bfad62a035fcb3e4102b26b24df886ff"
+  },
+  "production_sorting_run": false,
+  "mode_overrides_changed": false,
+  "training_labels_changed": false,
+  "known_invalid_registry_changed": false
+}

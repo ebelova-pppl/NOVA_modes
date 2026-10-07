@@ -121,11 +121,17 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
 | Find earlier results, version notes, and README instructions | [Preserved README reference](docs/history/readme_before_reorganization_20260914.md) |
 
-As of October 5, 2026, the inventory contains **177 processed post-training
-shots plus 14 active training shots (191 total)**. The
-[latest 14-shot batch](audits/released14_rules_20261005/README.md) processed
-the cases released after TAE crossing review and installed **76 selected
-GOOD modes awaiting full visual review**. The earlier
+As of October 7, 2026, the inventory contains **181 processed post-training
+shots plus 14 active training shots (195 total)**. The
+[latest four-shot batch](audits/released4_rules_20261007/README.md) processed
+N75, B85, F83 and K79 and installed **20 selected GOOD TAEs awaiting visual
+review** (ten each in N75/F83). All 44 crossing-review modes were automatically
+rejected. The
+[latest 14-shot GOOD-list review](audits/released14_manual_review_20261007/README.md)
+is complete, leaving **70 accepted TAEs** after one manual BAD correction
+and five E55/N10 modes reclassified as BAE. The installed outputs and
+accepted list include these corrections; rejected modes were not all
+visually reviewed. The earlier
 [five-shot batch](audits/cleared_nan_rules_20261005/README.md) processed
 NaN-cleared inputs and installed **241 selected GOOD modes awaiting visual
 review**. The earlier
@@ -138,10 +144,13 @@ remain unchanged. The
 is complete, including 17 reasoned manual corrections. Future reruns must
 explicitly supply the affected shots' `manual_overrides.csv` to reproduce
 those curated selections. The
-[remaining nine inventory entries](audits/released14_rules_20261005/remaining_unprocessed.csv)
-comprise **eight continuum-review holds and one empty entry**.
+[remaining five inventory entries](audits/released4_rules_20261007/remaining_unprocessed.csv)
+comprise **four held shots and one empty entry**. E205059A01t025 requires
+N1/N2 recalculation, R42 requires only N2 continuum recalculation after
+acceptance of its higher-n cases, and F62 remains held while considering recalculation
+of modes and continuum. D46 awaits completion and review of changing inputs.
 Potential EAE issues remain separately flagged; see
-the [release record](audits/continuum_release_20261005/README.md). See the full
+the [latest follow-up](audits/r42_f62_followup_20261007/README.md). See the full
 [project state](docs/project_state.md) for context and next steps.
 
 The active training list has 2,327 rows from 14 shots; Q62 and confirmed invalid

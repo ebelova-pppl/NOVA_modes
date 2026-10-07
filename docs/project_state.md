@@ -1,7 +1,165 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-10-05)
+### Project state (current snapshot, updated 2026-10-07)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-10-07 N75/B85/F83/K79 processed: 20 selected GOOD
+
+- Completed and installed all four newly authorized shots using production
+  `sort_shot_mixed.py --method rules`, frozen v13. N75 has ten selected
+  GOOD modes, B85 zero, F83 ten, K79 zero; all 20 are TAE-like and await
+  selected-GOOD visual review. All 44 crossing-review modes are automatically
+  BAD, with fingerprints and outcomes preserved; no overrides were needed.
+- Verified 3,007 finite raw inputs, all nr=201, in 40 populated N groups:
+  654 TAE-like, 63 mixed, 2,290 EAE-like; 697 BAD, 20 GOOD before and after
+  deduplication, zero INVALID/final REVIEW. All 717 evaluated candidates
+  have complete severity; no resolution warnings or ranking fallbacks.
+- The [batch audit](../audits/released4_rules_20261007/README.md) includes
+  the combined GOOD list, source/configuration checks, installed-tree hashes,
+  reviewed-mode outcomes and receipts. Four new output directories were
+  installed under the established rules root; previous outputs were preserved.
+- Both inventories now mark the four `sorted_rules_pending_review`:
+  **181 processed + 14 training = 195 cases**. Installed selections total
+  **8,338**, including 6,542 in 127 shots awaiting GOOD-list review.
+  Five entries remain: four holds (E205059A01t025/R42/F62/D46) and the empty
+  `nstxu_202806`; no released shots remain unprocessed. Existing training,
+  known-invalid scopes, earlier manual corrections and EAE/mixed flags are retained.
+
+## 2026-10-07 R42 higher-n review accepted; N2-only continuum recalculation
+
+- Elena finds R42 n>2 cases acceptable and confirms only the N2 continuum
+  needs recalculation. The [review record](../audits/r42_f62_followup_20261007/r42_user_review.json)
+  preserves the eleven flagged-mode fingerprints and updates both inventory
+  notes. R42 remains held for N2 continuum replacement and recheck.
+- Diagnostic offsets and the N10 log-coverage limitation remain recorded;
+  no extra recalculation scope or per-mode GOOD labels are inferred.
+  Processing membership and all other holds remain unchanged.
+
+## 2026-10-07 R42 higher-n check; R42/F62 recalculation holds clarified
+
+- Elena requires R42/N2 continuum recalculation. F62 remains held while
+  considering recalculation of both modes and continuum after her N2
+  review. Its flat lower boundary at r<0.3 is present in raw datcon;
+  shared repair changes no inner samples. Cause and recalculation scope
+  remain unconfirmed. Inventories record these distinct dispositions.
+- Newly checked all 912 R42 N3–N10 modes with the existing log diagnostic:
+  no input/group errors, all nr=201. Strictly TAE-like comparisons flag
+  17/311 crossings in 11 modes: N3 three modes, N4 three, N5 one, N6 two,
+  plus one marginal mode each in N8/N10. N7/N9 have none. N10/2376 lacks
+  an exact-frequency log match and is listed separately. These flags were
+  submitted for visual review; Elena's subsequent acceptance is recorded above.
+- The [follow-up audit](../audits/r42_f62_followup_20261007/README.md) contains
+  the additional viewer list, per-N counts, evidence and current remaining
+  list. D46 now has 34 N1 and 18 N2 files; its changing-input hold remains.
+  Q62 is already processed with seven reviewed accepted TAEs, but remains
+  suspended from training with potential EAE/upper-continuum concerns.
+- Four held (E205059A01t025/R42/F62/D46), four ready (N75/B85/F83/K79),
+  one empty; 177 processed + 14 training unchanged. No sorting, per-mode
+  label changes or known-invalid-registry changes were made.
+
+## 2026-10-07 F62/R42 TAE crossing review list
+
+- Created the [59-mode viewer list](../audits/continuum_review_f62_r42_20261007/README.md)
+  for Elena's next review: F62 has 23 flagged N2 modes; R42 has two N1
+  and 34 N2 modes. They represent 83 flagged comparisons under the existing
+  strictly TAE-like, N1/N2, interior nearest-log distance >2-grid-interval
+  screen. Blank manual label/reason fields are provided.
+- All 577 sources and four mode inventories match the October 5 snapshot;
+  all 59 viewer paths resolve. EAE/mixed findings remain separate. No
+  labels, holds or processing membership changed at list creation; the
+  subsequent user review and higher-n follow-up are recorded above.
+
+## 2026-10-07 N75/B85 released; E205059A01t025 N1/N2 recalculation required
+
+- Elena confirms N2 crossing offsets in N75 and B85, but judges all 25
+  listed modes junky (16 N75, nine B85). She releases both shots for rules
+  processing without continuum recalculation. Both inventories now mark
+  them `ready_for_rules`; confirmed offsets and EAE/mixed flags are retained.
+- E205059A01t025 has user-confirmed offsets in N1 and N2, including modes
+  that otherwise look acceptable. Its status is
+  `continuum_recalculation_pending`; renewed correspondence review is
+  needed after recalculation. No individual GOOD assignments were inferred.
+- The [release/hold record](../audits/continuum_release_n75_b85_20261007/README.md)
+  preserves assessments, scope flags and inventory changes. All 591 sources,
+  six inventories and 42 review fingerprints still match the reviewed data.
+  Nine entries remain: **four ready (N75/B85/F83/K79), four held
+  (E205059A01t025/R42/F62/D46), one empty**. No sorting was run; membership
+  remains 177 processed plus 14 training. Training labels, overrides and
+  known-invalid registry entries are unchanged.
+
+## 2026-10-07 N75/B85/E205059A01t025 TAE crossing review list
+
+- Created a [42-mode viewer list](../audits/continuum_review_n75_b85_e205059_20261007/README.md)
+  for Elena's next review: N75 has 16 N2 modes, B85 nine N2 modes, and
+  E205059A01t025 has 13 N1 plus four N2 modes. These represent 51 flagged
+  comparisons using the existing strictly TAE-like, N1/N2, interior
+  nearest-log distance >2-grid-interval screen.
+- All 591 sources and six mode inventories match the October 5 snapshot;
+  all 42 paths resolve. Blank manual review fields are provided. Potential
+  EAE/mixed findings remain separate; processing holds, labels and outputs
+  were unchanged at list creation. The completed review is recorded above.
+
+## 2026-10-07 released-14 GOOD-list review completed: 70 accepted TAEs, five BAEs
+
+- Elena reviewed the prior 76 selected GOOD modes. B37/N5/9275 is now BAD;
+  she confirmed the five reviewed E55/N10 modes (1292, 1375, 1478, 1751,
+  2149) should be classified as BAE. Their measured fractions below the lower
+  TAE boundary range from 98.26% to 99.99995%. The current automatic split
+  tests the upper boundary and does not distinguish this BAE population.
+- Added explicit `manual_decision=BAE` support to the existing fingerprinted
+  override schema: final `BAE`/`bae_like`, a separate `bae_like.csv`, and
+  `n_bae_like` summaries. Original routing, rule decisions, features and
+  severity remain available in the preliminary audit. No automatic BAE
+  threshold or frozen-gate change was introduced. Existing uniqueness,
+  fingerprint and eligibility safeguards also apply to BAE assignments.
+- Regenerated and installed B37/E55 with all six overrides applied; previous
+  directories are backed up. Verified 1,272 raw input fingerprints, exactly
+  six changed selections, byte-identical preliminary rule tables, all other
+  rows unchanged and all 12 untouched shot trees preserved. 104 core rule
+  tests and three rules-without-AI tests passed. A separate skill-validator
+  test remains unavailable due to missing PyYAML in the environment.
+- The [review audit](../audits/released14_manual_review_20261007/README.md)
+  contains the current **70-mode accepted TAE list**, five BAEs, six reusable
+  overrides, measurements, dispositions and receipts. The original 76-mode
+  batch list is historical. Future B37/E55 reruns must pass the installed
+  `manual_overrides.csv` explicitly.
+- All 14 inventory rows are `sorted_rules_good_reviewed`, recording review
+  of selected GOOD modes rather than all rejected modes. Membership remains
+  177 processed + 14 training; the installed selected-GOOD total is now
+  **8,318**, with 6,522 selections in 123 pending-review shots. Training,
+  known-invalid scopes, earlier 40-shot accepted modes, EAE/mixed flags and
+  the separate F83/K79 release are preserved.
+
+## 2026-10-07 F83/K79 released; D46 held for changing/missing inputs
+
+- Elena reviewed all 19 listed TAE-like modes from F83 (eight) and K79
+  (eleven) as numerical/grid-scale or otherwise problematic, mostly near
+  axis, and released both shots for production rules processing. Both
+  inventories now mark them `ready_for_rules`; no sorting was run yet.
+  The [release audit](../audits/continuum_release_f83_k79_20261007/README.md)
+  preserves assessments, fingerprints and EAE/mixed/coverage flags. All 211
+  N1/N2 source files and mode inventories still match the reviewed snapshot.
+- D46 could not be reviewed: its N2 modes are now absent, and N1 contains
+  one new file (`egn01w.3009E+02`) at the release check, versus 57 N1 and 45
+  N2 files on October 5. Its status is `input_update_pending`, retaining
+  the unresolved correspondence review. The old D46 viewer rows are now
+  historical. File changes are observed; their cause is unconfirmed.
+- Nine entries remain unprocessed: **two ready + six held + one empty**.
+  Held shots: E205059A01t025, G121123N75, G121123R42, G142301B85,
+  G142301F62 and G142301D46. Completed membership remains 177 processed plus
+  14 training; no mode overrides, training labels or exclusions changed.
+
+## 2026-10-07 D46/F83/K79 manual TAE review list; D46/N1 files unavailable
+
+- Created a [viewer-ready list](../audits/continuum_review_d46_f83_k79_20261007/README.md)
+  of 26 available flagged TAE-like modes: D46 seven, F83 eight and K79 eleven,
+  covering 37 comparisons. Same N1+N2 interior >2-grid-interval screen as the
+  prior review, with blank manual label/reason fields.
+- The historical selection had 27 modes/38 comparisons. D46/N1 now has zero
+  active `egn*` files (57 in the October 5 snapshot), so N1/2532 is recorded
+  separately as unavailable. The cause is unconfirmed. All 258 source files
+  in the other five N groups and their mode inventories match the snapshot;
+  all exported viewer paths resolve. Labels and processing holds are unchanged.
 
 ## 2026-10-05 released 14 shots sorted: 76 selected GOOD, nine entries remain
 

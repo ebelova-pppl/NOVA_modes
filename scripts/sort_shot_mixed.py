@@ -1472,7 +1472,8 @@ def run_rules_method(args: argparse.Namespace):
         "Gap split: "
         f"tae_like={summary['n_tae_like']} "
         f"mixed={summary['n_mixed']} "
-        f"eae_like={summary['n_eae_like']}"
+        f"eae_like={summary['n_eae_like']} "
+        f"bae_like={summary['n_bae_like']}"
     )
     print(
         "Rule decisions: "
