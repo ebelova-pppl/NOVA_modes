@@ -1,0 +1,5 @@
+shot,n_total_files,n_tae_like,n_mixed,n_eae_like,n_bae_like,n_final_bad,n_final_good_before_clustering,n_final_good,n_invalid,n_overrides_applied
+nstxuG121123N75,768,186,21,561,0,198,9,9,0,1
+nstxuG142301B85,813,131,6,676,0,137,0,0,0,0
+nstxuG142301F83,827,134,17,676,0,141,10,10,0,0
+nstxuG142301K79,599,203,19,377,0,222,0,0,0,0

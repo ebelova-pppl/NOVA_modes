@@ -123,10 +123,11 @@ select `--method rf-cnn` and supply both model checkpoints. See
 
 As of October 7, 2026, the inventory contains **181 processed post-training
 shots plus 14 active training shots (195 total)**. The
-[latest four-shot batch](audits/released4_rules_20261007/README.md) processed
-N75, B85, F83 and K79 and installed **20 selected GOOD TAEs awaiting visual
-review** (ten each in N75/F83). All 44 crossing-review modes were automatically
-rejected. The
+[latest four-shot review](audits/released4_manual_review_20261007/README.md)
+is complete for N75, B85, F83 and K79: **19 accepted TAEs** (nine N75 and ten
+F83) after manually rejecting N75/N4_1299 for sharp edge spikes. Installed
+outputs include the correction; the original 20-mode list is historical.
+All 44 crossing-review modes were automatically rejected. The
 [latest 14-shot GOOD-list review](audits/released14_manual_review_20261007/README.md)
 is complete, leaving **70 accepted TAEs** after one manual BAD correction
 and five E55/N10 modes reclassified as BAE. The installed outputs and

@@ -1,0 +1,25 @@
+{
+  "completed_utc": "2026-10-07T20:33:31.819762+00:00",
+  "status": "installed_verified_and_recorded",
+  "manual_bad_mode": "nstxuG121123N75/N4/egn04w.1299E+02",
+  "accepted_tae_modes": 19,
+  "other_shot_outputs_unchanged": 3,
+  "selected_good_total": 8337,
+  "processed": 181,
+  "active_training": 14,
+  "pending_good_review_shots": 123,
+  "pending_good_review_modes": 6522,
+  "artifact_sha256": {
+    "README.md": "2d23c7af10827ea838dc538027bbc37a3eb98d17f92f438e3ed1f6d64c2fde7b",
+    "run_inputs.json": "2157ef3b7424e0b47ef2f858586c98592e00381e3646c490251e1a5c1126713e",
+    "inventory_update.json": "a34e7be22266b0d90626ec8e2ac7732fa99758e67179d5d137cea369718d9ac6",
+    "verification.json": "a006bd97735d62d23ab1e76ed31d73c2c8a7df61dc4105ac867531b1ed0c9633",
+    "shot_summary.csv": "eb70c041b699c4326b082d98c9d9a53d584035d9b90da0a3cbaf8ad5020544cb",
+    "review_dispositions.csv": "e0cdf76b01f08fb3103de391645502f19321c1218289de428a43b564bdfea3e9",
+    "label_changes.csv": "9aad586538e3abcab9a78d2c139fa897715eed1f4f6a094943a73c75fd22c21d",
+    "publication.json": "06798ef18123e1120a740d5900663bb7fd32319cc0145179feef3b3e29c4f74c",
+    "manual_overrides.csv": "347e8b05353fef836b4f93bfabebf4506b0f75998fc5456ade784bf49fa2dd24",
+    "accepted_tae_modes.csv": "5e1b7f71a1b1b06813ae82d2e628f434a7f53defdb658c2eba38ed4b70fe6b17",
+    "publish.py": "b72ad0a6a6989cc35d58e5ffae846e680860d10e1227b3d2cf742eee8eb08a32"
+  }
+}

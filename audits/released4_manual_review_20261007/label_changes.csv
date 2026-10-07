@@ -1,0 +1,2 @@
+path,shot,ntor,previous_decision,final_decision,review_status,reason,input_fingerprint
+nstxuG121123N75/N4/egn04w.1299E+02,nstxuG121123N75,4,GOOD,BAD,REJECTED_BAD,"Elena visual review: many sharp, large-amplitude spikes near the edge.",5c2cd41a935fca51a266af2b3a663b90137d48cb94d1d43e571227f3a11f21ac

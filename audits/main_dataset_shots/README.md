@@ -4,13 +4,14 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
-On October 7 the [four-shot production batch](../released4_rules_20261007/README.md)
-completed N75, B85, F83 and K79: **20 selected GOOD TAEs** (ten each in
-N75/F83), 697 BAD, zero INVALID, all 3,007 inputs nr=201. All 44 reviewed
-crossing modes are automatically BAD. Both inventories mark the four
-`sorted_rules_pending_review`, with `post_training_checked=yes` and
+On October 7 the [four-shot GOOD-list review](../released4_manual_review_20261007/README.md)
+completed N75, B85, F83 and K79: **19 accepted TAEs** (nine N75, ten F83)
+after manually rejecting N75/N4_1299 for sharp edge spikes. Current outputs
+have 698 BAD, zero INVALID, all 3,007 inputs nr=201. All 44 reviewed
+crossing modes remain automatically BAD. Both inventories mark the four
+`sorted_rules_good_reviewed`, with `post_training_checked=yes` and
 `checked_methods=rules`. Membership is now **181 processed + 14 training
-= 195 cases**. Selected-GOOD visual review remains pending.
+= 195 cases**. This records selected-GOOD review, not every rejected mode.
 
 Elena had released N75 and B85 after confirming N2 crossing offsets but
 judging all 25 listed TAE-like modes junky, following the F83/K79 release.
@@ -51,8 +52,8 @@ been superseded first by `continuum_review_pending` and now by
 `input_update_pending` for the October 7 missing/changing files; the other five formerly
 NaN-held rows now have `sorted_rules_pending_review`, `checked_methods=rules`
 and `post_training_checked=yes`. See the [batch and remaining-shot lists](../cleared_nan_rules_20261005/README.md).
-Recorded processed outputs now contain 8,338 selected GOOD modes, including
-6,542 automatic selections from 127 later shots awaiting visual review.
+Recorded processed outputs now contain 8,337 selected GOOD modes, including
+6,522 automatic selections from 123 later shots awaiting visual review.
 The reviewed 40-shot accepted manifest and 39 AI comparisons remain unchanged.
 
 On 2026-09-21 the authorized remaining-122 rules batch completed. **118
@@ -108,8 +109,9 @@ counts and input exclusions remain unchanged. No additional shots were sorted.
   use `status` and `checked_methods` to distinguish them. The original 39
   cases have `rules|rf-cnn`; the user-approved E202806A02t045 addition and
   118 September 21 cases, 19 October 5 additions and four October 7 additions
-  have `rules`. Of these later additions, 127 retain explicit pending-visual-review status; the
-  released 14 now have `sorted_rules_good_reviewed` after GOOD-list review.
+  have `rules`. Of these later additions, 123 retain explicit pending-visual-review status;
+  the released 14 and the four October 7 additions now have
+  `sorted_rules_good_reviewed` after GOOD-list review.
   The original cohort includes the E case and
   two original G cases, the first 12-shot pilot in `pilot12_selection.csv`,
   the twelve fresh v5 cases completed on 2026-09-08, and the twelve E cases

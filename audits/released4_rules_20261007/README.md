@@ -1,5 +1,10 @@
 # Production sorting of N75, B85, F83 and K79, October 7, 2026
 
+**Current reviewed selections:** Elena rejected N75/N4_1299 for sharp edge
+spikes and approved the remaining **19 TAEs**. The installed N75 correction
+and current accepted list are in the [manual-review audit](../released4_manual_review_20261007/README.md).
+The original automatic counts, 20-mode list and receipts below are preserved.
+
 Completed and installed the four shots authorized by Elena, using
 `sort_shot_mixed.py --method rules --rule_config tae_rules_production_v13`.
 Outputs are in the four new shot directories under the established

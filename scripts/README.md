@@ -40,12 +40,15 @@ have explicitly started Bash.
 
 ## Recent adoption and review notes
 
-The [October 7 four-shot batch](../audits/released4_rules_20261007/README.md)
-completed and installed N75, B85, F83 and K79 with production rules v13.
-All 3,007 inputs are finite and nr=201; 697 BAD, 20 selected GOOD (ten each
-in N75/F83), 2,290 EAE-like, zero INVALID. All 44 crossing-review modes are
-automatically BAD. The selected GOOD list awaits visual review. Membership
-is now 181 processed plus 14 training, leaving four holds and one empty entry.
+The [October 7 four-shot review](../audits/released4_manual_review_20261007/README.md)
+is complete: N75/N4_1299 was manually rejected for many sharp, large-amplitude
+edge spikes; the remaining **19 TAEs are approved** (nine N75, ten F83).
+N75's installed output includes the reusable override; future reruns must
+explicitly pass `--manual_overrides`. The original production batch had 20
+selections; current totals are 698 BAD, 19 selected GOOD, 2,290 EAE-like,
+zero INVALID, all 3,007 inputs finite and nr=201. All 44 crossing-review
+modes remain automatically BAD. Membership is 181 processed plus 14 training,
+leaving four holds and one empty entry.
 
 The [October 7 R42/F62 follow-up](../audits/r42_f62_followup_20261007/README.md)
 records R42/N2 continuum recalculation as required and F62 as held while

@@ -1,0 +1,21 @@
+path,shot,ntor,previous_decision,final_decision,review_status,reason,input_fingerprint
+nstxuG121123N75/N4/egn04w.1299E+02,nstxuG121123N75,4,GOOD,BAD,REJECTED_BAD,"Elena visual review: many sharp, large-amplitude spikes near the edge.",5c2cd41a935fca51a266af2b3a663b90137d48cb94d1d43e571227f3a11f21ac
+nstxuG121123N75/N7/egn07w.2698E+02,nstxuG121123N75,7,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,76aa3ce6a1157b465db4c03d4fada113e0480e8802589b208a38f839c04f125a
+nstxuG121123N75/N8/egn08w.2317E+02,nstxuG121123N75,8,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,9d5e18d999d13d86d0ea245534a23718f4b43f665edff33f2f7ab988fe758b78
+nstxuG121123N75/N10/egn10w.1419E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,867498a77a8f90933ad1d8a07306b0f0660342e48ce75acae0fe123a21cda3c8
+nstxuG121123N75/N10/egn10w.1572E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,a6c45e5c4cc6a97346a5d5be8448b3f005e3e12bd3a31f583e5ec72ff0ac8004
+nstxuG121123N75/N10/egn10w.1669E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,af44fa236c78d8eabb1654fe08f09cd14ccf5ffbc5d0aabb371e9b310e91d1c2
+nstxuG121123N75/N10/egn10w.2231E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,a709a3157dd40eecd97c78064723877af38f9d73c88368ab511aabbd089a66db
+nstxuG121123N75/N10/egn10w.2394E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,fa77bbac2fb91f826424ae17031ae606de770a734f8a84b03170d2e30111f9f5
+nstxuG121123N75/N10/egn10w.3702E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,b36240e5bfa17f652101e6f7be9234b738847c44e43922a120051dd7cd95d3af
+nstxuG121123N75/N10/egn10w.3734E+02,nstxuG121123N75,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,08998ea67e6a360d3f2da1d653958f0c45ae0ea7263fa50c9e72461963655e78
+nstxuG142301F83/N3/egn03w.4268E+02,nstxuG142301F83,3,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,f968e526cf48d1abcbceec269e67062744cb29564c4c040479ca5a7d0e83809b
+nstxuG142301F83/N4/egn04w.4497E+02,nstxuG142301F83,4,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,4f12aa687a8195890763b48e14237057e39aafbd55f46b4156f461b3e3ec616e
+nstxuG142301F83/N5/egn05w.4462E+02,nstxuG142301F83,5,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,91610c9dfc747f674397511747a67d5c9e1f6aa24f94f6945832ad59c4d483c0
+nstxuG142301F83/N7/egn07w.4163E+02,nstxuG142301F83,7,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,11ec2d680a872862936d93cf3ad521d3d67c131a61a90d1d1292340b9cd8a9e8
+nstxuG142301F83/N7/egn07w.4720E+02,nstxuG142301F83,7,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,fe548e033c95de674186c1d0660c99656e947468723c5954914ab225c3a35376
+nstxuG142301F83/N8/egn08w.2393E+02,nstxuG142301F83,8,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,e9b3aa06943e63d4b2d5293cf53031842e1e021bf1869a859d21615dfa1707e9
+nstxuG142301F83/N8/egn08w.4373E+02,nstxuG142301F83,8,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,1c683a0b8eae2908de3e2a8ba9a6eb88b40392cf75f5ee6832064feb32ed6b65
+nstxuG142301F83/N9/egn09w.3896E+02,nstxuG142301F83,9,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,a03d14a2623388135c049168e1059dd091a2eb0a4772019032e945b032e1fa6f
+nstxuG142301F83/N9/egn09w.4173E+02,nstxuG142301F83,9,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,7e43ac8ec08bbc2dc285578ee2d57dd4eaffc978850b7cdc87cb3528b03430e9
+nstxuG142301F83/N10/egn10w.3787E+02,nstxuG142301F83,10,GOOD,GOOD,APPROVED_GOOD,Elena approved the remaining selected modes.,24df45743a05e99bf05b3c50e681dec3d2968315e19782ed6411c51207df2309

@@ -3,6 +3,24 @@
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
 
+## 2026-10-07 four-shot GOOD-list review completed: 19 accepted TAEs
+
+- Elena rejected N75/N4/1299 for many sharp, large-amplitude spikes near
+  the edge and approved the other 19 selections. Installed N75 now has
+  nine selected GOOD and 198 BAD; F83 retains ten selected GOOD, B85/K79 zero.
+- Regenerated N75 with one fingerprinted manual BAD override, retaining
+  the original automatic rule evidence. Verified 768 input fingerprints,
+  one changed final row, byte-identical preliminary rule results and the
+  other three unchanged output trees. The previous N75 output is backed up.
+  No gate, training-label or known-invalid-registry changes were made.
+- The [review audit](../audits/released4_manual_review_20261007/README.md)
+  provides the 19-mode accepted list, reusable override, review dispositions
+  and receipts. Future N75 reruns must pass its `manual_overrides.csv`.
+  Both inventories mark all four `sorted_rules_good_reviewed` for GOOD-list
+  review; total selected GOOD is **8,337**, with 6,522 in 123 pending-review
+  shots. Membership stays 181 processed + 14 training; four holds and one
+  empty entry remain. The original 20-mode automatic list is historical.
+
 ## 2026-10-07 N75/B85/F83/K79 processed: 20 selected GOOD
 
 - Completed and installed all four newly authorized shots using production
