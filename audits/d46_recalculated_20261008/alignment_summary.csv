@@ -1,0 +1,7 @@
+n,gap_region,modes,matched_modes,coverage_gap_modes,measured_interior_crossings,flagged_comparisons,flagged_modes,interpretation
+1,tae_like,1,1,0,1,0,0,NO_FLAG_ABOVE_2_GRID
+1,mixed,0,0,0,0,0,0,NO_MODES
+1,eae_like,36,36,0,58,49,25,POTENTIAL_EAE_ONLY
+2,tae_like,17,0,17,0,,,OFFSET_UNMEASURED
+2,mixed,6,0,6,0,,,OFFSET_UNMEASURED
+2,eae_like,15,0,15,0,,,POTENTIAL_EAE_ONLY

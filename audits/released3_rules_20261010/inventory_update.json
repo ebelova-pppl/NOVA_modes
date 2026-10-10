@@ -1,0 +1,210 @@
+{
+  "created_utc": "2026-10-10T20:46:33.832113+00:00",
+  "processed": 184,
+  "active_training": 14,
+  "remaining": 2,
+  "held": 1,
+  "empty": 1,
+  "selected_good_total": 8366,
+  "pending_good_review_shots": 126,
+  "pending_good_review_modes": 6551,
+  "new_selected_good": 29,
+  "changes": [
+    {
+      "path": "audits/main_dataset_shots/shot_status.csv",
+      "before_sha256": "e068198d3784ba2060650f4f2d35fc24067e1f39eba8567e1bc918b73073db3a",
+      "changes": [
+        {
+          "shot": "nstxuG121123R42",
+          "before": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena accepts the reviewed n>2 cases after visual inspection and confirms that only the N2 continuum needs recalculation. Keep the shot held for N2 continuum replacement and correspondence recheck. Earlier log flags and N10 log-coverage limitations are retained as audit evidence, not additional recalculation requirements. See audits/r42_f62_followup_20261007/r42_user_review.json. 2026-10-10: Current N1/N2 mode payloads replaced (41/50 modes); N2 continuum updated, N1 continuum unchanged. N2 TAE-like crossings are 0/21 flagged, with two marginal mixed flags (6087/6142, 2.02/2.10 grid intervals). New N1 modes flag 23/24 TAE-like/mixed comparisons in 14 modes. All N1/N2 inputs finite, nr=201. Retain hold for review of new residual evidence; no new N1 recalculation order inferred. Earlier acceptance of n>2 is retained. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release R42 for production rules processing; 16 R42 review modes retain fingerprinted assessments. Offsets and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010."
+          },
+          "after": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena accepts the reviewed n>2 cases after visual inspection and confirms that only the N2 continuum needs recalculation. Keep the shot held for N2 continuum replacement and correspondence recheck. Earlier log flags and N10 log-coverage limitations are retained as audit evidence, not additional recalculation requirements. See audits/r42_f62_followup_20261007/r42_user_review.json. 2026-10-10: Current N1/N2 mode payloads replaced (41/50 modes); N2 continuum updated, N1 continuum unchanged. N2 TAE-like crossings are 0/21 flagged, with two marginal mixed flags (6087/6142, 2.02/2.10 grid intervals). New N1 modes flag 23/24 TAE-like/mixed comparisons in 14 modes. All N1/N2 inputs finite, nr=201. Retain hold for review of new residual evidence; no new N1 recalculation order inferred. Earlier acceptance of n>2 is retained. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release R42 for production rules processing; 16 R42 review modes retain fingerprinted assessments. Offsets and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010. 2026-10-10: Released-shot production rules v13 sorting completed and verified: 1003 inputs, nr=201, 189 BAD, 13 selected GOOD, 801 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123R42. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released3_rules_20261010."
+          }
+        },
+        {
+          "shot": "nstxuG142301D46",
+          "before": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008. 2026-10-08: Elena visually accepted the recalculated N2 continuum correspondence after reviewing the 23 TAE-like/mixed modes and releases D46 for production rules processing. Her message said D26, interpreted as D46 from this review and the matching N2/2817 and N2/2650 examples. Most modes look numerical; those two are possible acceptable candidates, not manual GOOD overrides. Missing current N2 log matches and potential EAE findings remain documented; the TAE processing hold is lifted. See audits/continuum_release_d46_20261008."
+          },
+          "after": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008. 2026-10-08: Elena visually accepted the recalculated N2 continuum correspondence after reviewing the 23 TAE-like/mixed modes and releases D46 for production rules processing. Her message said D26, interpreted as D46 from this review and the matching N2/2817 and N2/2650 examples. Most modes look numerical; those two are possible acceptable candidates, not manual GOOD overrides. Missing current N2 log matches and potential EAE findings remain documented; the TAE processing hold is lifted. See audits/continuum_release_d46_20261008. 2026-10-10: Released-shot production rules v13 sorting completed and verified: 571 inputs, nr=201, 118 BAD, 11 selected GOOD, 442 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301D46. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released3_rules_20261010."
+          }
+        },
+        {
+          "shot": "nstxuG142301F62",
+          "before": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena notes very flat N2 lower continuum at r<0.3 and some otherwise acceptable modes; retain hold while considering recalculation of both modes and continuum. Inner flatness is present in raw datcon, not introduced by shared repair. Recalculation scope remains to be decided; do not infer a confirmed cause. See audits/r42_f62_followup_20261007. 2026-10-10: Current N1/N2 mode payloads replaced (19/42 modes); N2 continuum updated, N1 continuum unchanged. N2 improves to 6/49 flagged TAE-like/mixed comparisons in three TAE-like modes (1004/1139/1141); N1 has two flagged modes (1186/7296). All N1/N2 inputs finite, nr=201. Inner N2 lower boundary remains relatively flat (frequency 7.278-7.493 at r=0.01-0.295). Hold for five-mode review retained, with potential EAE findings separate. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release F62 for production rules processing; five F62 review modes retain fingerprinted assessments. Offsets, inner-boundary observations and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010."
+          },
+          "after": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena notes very flat N2 lower continuum at r<0.3 and some otherwise acceptable modes; retain hold while considering recalculation of both modes and continuum. Inner flatness is present in raw datcon, not introduced by shared repair. Recalculation scope remains to be decided; do not infer a confirmed cause. See audits/r42_f62_followup_20261007. 2026-10-10: Current N1/N2 mode payloads replaced (19/42 modes); N2 continuum updated, N1 continuum unchanged. N2 improves to 6/49 flagged TAE-like/mixed comparisons in three TAE-like modes (1004/1139/1141); N1 has two flagged modes (1186/7296). All N1/N2 inputs finite, nr=201. Inner N2 lower boundary remains relatively flat (frequency 7.278-7.493 at r=0.01-0.295). Hold for five-mode review retained, with potential EAE findings separate. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release F62 for production rules processing; five F62 review modes retain fingerprinted assessments. Offsets, inner-boundary observations and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010. 2026-10-10: Released-shot production rules v13 sorting completed and verified: 695 inputs, nr=201, 199 BAD, 5 selected GOOD, 491 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301F62. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released3_rules_20261010."
+          }
+        }
+      ],
+      "after_sha256": "53573af7dbd56469a2a8a16d2a4fb4cb5bc88ba1ea79e6b6f5174eb97df801b0"
+    },
+    {
+      "path": "audits/main_dataset_shots/g_shot_status.csv",
+      "before_sha256": "7203da3d9a813ba7b951a6d54e6792e096f1b9c799c2d2be43122581c5edc5f8",
+      "changes": [
+        {
+          "shot": "nstxuG121123R42",
+          "before": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena accepts the reviewed n>2 cases after visual inspection and confirms that only the N2 continuum needs recalculation. Keep the shot held for N2 continuum replacement and correspondence recheck. Earlier log flags and N10 log-coverage limitations are retained as audit evidence, not additional recalculation requirements. See audits/r42_f62_followup_20261007/r42_user_review.json. 2026-10-10: Current N1/N2 mode payloads replaced (41/50 modes); N2 continuum updated, N1 continuum unchanged. N2 TAE-like crossings are 0/21 flagged, with two marginal mixed flags (6087/6142, 2.02/2.10 grid intervals). New N1 modes flag 23/24 TAE-like/mixed comparisons in 14 modes. All N1/N2 inputs finite, nr=201. Retain hold for review of new residual evidence; no new N1 recalculation order inferred. Earlier acceptance of n>2 is retained. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release R42 for production rules processing; 16 R42 review modes retain fingerprinted assessments. Offsets and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010."
+          },
+          "after": {
+            "shot": "nstxuG121123R42",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG121123R42",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena accepts the reviewed n>2 cases after visual inspection and confirms that only the N2 continuum needs recalculation. Keep the shot held for N2 continuum replacement and correspondence recheck. Earlier log flags and N10 log-coverage limitations are retained as audit evidence, not additional recalculation requirements. See audits/r42_f62_followup_20261007/r42_user_review.json. 2026-10-10: Current N1/N2 mode payloads replaced (41/50 modes); N2 continuum updated, N1 continuum unchanged. N2 TAE-like crossings are 0/21 flagged, with two marginal mixed flags (6087/6142, 2.02/2.10 grid intervals). New N1 modes flag 23/24 TAE-like/mixed comparisons in 14 modes. All N1/N2 inputs finite, nr=201. Retain hold for review of new residual evidence; no new N1 recalculation order inferred. Earlier acceptance of n>2 is retained. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release R42 for production rules processing; 16 R42 review modes retain fingerprinted assessments. Offsets and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010. 2026-10-10: Released-shot production rules v13 sorting completed and verified: 1003 inputs, nr=201, 189 BAD, 13 selected GOOD, 801 EAE-like, zero INVALID. Output: sort_outputs/nstxuG121123R42. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released3_rules_20261010."
+          }
+        },
+        {
+          "shot": "nstxuG142301D46",
+          "before": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008. 2026-10-08: Elena visually accepted the recalculated N2 continuum correspondence after reviewing the 23 TAE-like/mixed modes and releases D46 for production rules processing. Her message said D26, interpreted as D46 from this review and the matching N2/2817 and N2/2650 examples. Most modes look numerical; those two are possible acceptable candidates, not manual GOOD overrides. Missing current N2 log matches and potential EAE findings remain documented; the TAE processing hold is lifted. See audits/continuum_release_d46_20261008."
+          },
+          "after": {
+            "shot": "nstxuG142301D46",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008. 2026-10-08: Elena visually accepted the recalculated N2 continuum correspondence after reviewing the 23 TAE-like/mixed modes and releases D46 for production rules processing. Her message said D26, interpreted as D46 from this review and the matching N2/2817 and N2/2650 examples. Most modes look numerical; those two are possible acceptable candidates, not manual GOOD overrides. Missing current N2 log matches and potential EAE findings remain documented; the TAE processing hold is lifted. See audits/continuum_release_d46_20261008. 2026-10-10: Released-shot production rules v13 sorting completed and verified: 571 inputs, nr=201, 118 BAD, 11 selected GOOD, 442 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301D46. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released3_rules_20261010."
+          }
+        },
+        {
+          "shot": "nstxuG142301F62",
+          "before": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "no",
+            "checked_methods": "",
+            "status": "ready_for_rules",
+            "notes": "2026-10-07: Elena notes very flat N2 lower continuum at r<0.3 and some otherwise acceptable modes; retain hold while considering recalculation of both modes and continuum. Inner flatness is present in raw datcon, not introduced by shared repair. Recalculation scope remains to be decided; do not infer a confirmed cause. See audits/r42_f62_followup_20261007. 2026-10-10: Current N1/N2 mode payloads replaced (19/42 modes); N2 continuum updated, N1 continuum unchanged. N2 improves to 6/49 flagged TAE-like/mixed comparisons in three TAE-like modes (1004/1139/1141); N1 has two flagged modes (1186/7296). All N1/N2 inputs finite, nr=201. Inner N2 lower boundary remains relatively flat (frequency 7.278-7.493 at r=0.01-0.295). Hold for five-mode review retained, with potential EAE findings separate. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release F62 for production rules processing; five F62 review modes retain fingerprinted assessments. Offsets, inner-boundary observations and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010."
+          },
+          "after": {
+            "shot": "nstxuG142301F62",
+            "shot_family": "NSTX-U G",
+            "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301F62",
+            "active_training_shot": "no",
+            "training_label_rows": "0",
+            "training_good_labels": "0",
+            "training_bad_labels": "0",
+            "post_training_checked": "yes",
+            "checked_methods": "rules",
+            "status": "sorted_rules_pending_review",
+            "notes": "2026-10-07: Elena notes very flat N2 lower continuum at r<0.3 and some otherwise acceptable modes; retain hold while considering recalculation of both modes and continuum. Inner flatness is present in raw datcon, not introduced by shared repair. Recalculation scope remains to be decided; do not infer a confirmed cause. See audits/r42_f62_followup_20261007. 2026-10-10: Current N1/N2 mode payloads replaced (19/42 modes); N2 continuum updated, N1 continuum unchanged. N2 improves to 6/49 flagged TAE-like/mixed comparisons in three TAE-like modes (1004/1139/1141); N1 has two flagged modes (1186/7296). All N1/N2 inputs finite, nr=201. Inner N2 lower boundary remains relatively flat (frequency 7.278-7.493 at r=0.01-0.295). Hold for five-mode review retained, with potential EAE findings separate. See audits/last3_recalculated_20261010. 2026-10-10: Elena completed the 21-mode R42/F62 TAE-like/mixed review and judged all modes unsuitable due to grid-scale numerical structure or large axis spikes. Crossing offsets are visible but she considers further continuum accuracy unnecessary for these modes. Release F62 for production rules processing; five F62 review modes retain fingerprinted assessments. Offsets, inner-boundary observations and potential EAE findings remain recorded, with no inferred sorter overrides. See audits/continuum_release_r42_f62_20261010. 2026-10-10: Released-shot production rules v13 sorting completed and verified: 695 inputs, nr=201, 199 BAD, 5 selected GOOD, 491 EAE-like, zero INVALID. Output: sort_outputs/nstxuG142301F62. Selected GOOD review pending; continuum-release evidence and separate EAE/mixed flags retained. See audits/released3_rules_20261010."
+          }
+        }
+      ],
+      "after_sha256": "a64d8441c7fd17c87dc16cc594adf2513194f277824542b156e04b3511247df8"
+    }
+  ],
+  "reviewed_mode_final_counts": {
+    "GOOD": 0,
+    "BAD": 44
+  },
+  "files_sha256": {
+    "reviewed_tae_mode_results.csv": "21e5a83f3d6d3f4e6135eaadec51dd2d46b083bf39846150e591a54607e028b2",
+    "remaining_unprocessed.csv": "4ac644618a515f2b8ff24893869854f50f18451bcba3d5d5ea3ca56a3fe6a43d"
+  }
+}

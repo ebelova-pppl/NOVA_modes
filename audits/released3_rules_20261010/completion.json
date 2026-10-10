@@ -1,0 +1,39 @@
+{
+  "completed_utc": "2026-10-10T20:48:20.464152+00:00",
+  "status": "complete",
+  "installed_shots": [
+    "nstxuG121123R42",
+    "nstxuG142301D46",
+    "nstxuG142301F62"
+  ],
+  "method": "rules",
+  "configuration": "tae_rules_production_v13",
+  "selected_good": 29,
+  "reviewed_r42_f62_bad": 21,
+  "d46_reviewed_bad": 23,
+  "viewer_paths_verified": 29,
+  "held_e_shot_unchanged": true,
+  "protected_sources_unchanged_except_documented_inventory_updates": true,
+  "existing_outputs_replaced": 0,
+  "processed_post_training": 184,
+  "active_training": 14,
+  "selected_good_total": 8366,
+  "remaining_held": 1,
+  "remaining_empty": 1,
+  "artifacts_sha256": {
+    "record_results.py": "4874249180b5d4fb72a6d15f26e8718f5c6e6b91bc5d5a721b6b6c78b3d1d1a8",
+    "README.md": "e4b20475274baeffac2933e6e1ad9233f0dca441178887e354dcb8fee69f34e0",
+    "good_tae_final_batch.csv": "753988a65dac6d0dde3699b29564339a592f803289891f7b70df5529197bac7a",
+    "remaining_unprocessed.csv": "4ac644618a515f2b8ff24893869854f50f18451bcba3d5d5ea3ca56a3fe6a43d",
+    "publication.json": "70221688cd47914269501c45cc1ea85e85d8cb9c178e901a2e8c769859a109bc",
+    "verification.json": "6c74451b2435e33fb6097f1e990e5d444a8123027afa73b59020e7bd2e06158f",
+    "reviewed_tae_mode_results.csv": "21e5a83f3d6d3f4e6135eaadec51dd2d46b083bf39846150e591a54607e028b2",
+    "inventory_update.json": "770eaa5ca4e67b45c7994022e89685afd84437561b0fe8eb5fcaf373a825cc41",
+    "preflight.json": "23a87be77761dff32696e92c32fb81d5ee31b6c9f1a29ef21272d3178c888fcd",
+    "run_batch.py": "5e45cffd0616ff61517f59a16034c958af7abf9e273f19b2e883452c83d7f484",
+    "run_inputs.json": "8227af33ba7982edd45ca84c1c59cdfa7e4c2f4f0dc00aa59190b64570290ba0",
+    "stage_results.json": "73725a57916fb3153af467ade4a585bdf636705f7f8d8d94ad85402e83695ec2",
+    "selection.csv": "f3294fff9f5d178e622c14e230b314ff6eff80b6fc14855d6c33671bfb42435b",
+    "shot_summary.csv": "a27400b69e8438508c276cdf98e342d6ded1321a201fe0e6ecf1a9ee0db35632"
+  }
+}

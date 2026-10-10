@@ -1,0 +1,23 @@
+[
+  {
+    "shot": "nstxuG121123R42",
+    "mode_files": 1003,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 10
+  },
+  {
+    "shot": "nstxuG142301D46",
+    "mode_files": 571,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 9
+  },
+  {
+    "shot": "nstxuG142301F62",
+    "mode_files": 695,
+    "nr": 201,
+    "nonfinite_files": 0,
+    "n_groups": 10
+  }
+]

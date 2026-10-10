@@ -1,0 +1,6 @@
+shot,processing_disposition,inventory_status,post_training_checked,reason
+nstxuE205059A01t025,CONTINUUM_RECALCULATION_PENDING,continuum_recalculation_pending,no,Elena reconfirms N1/N2 recalculation is required; current mode/continuum contents remain unchanged.
+nstxuG121123R42,READY_FOR_RULES,ready_for_rules,no,Elena judged all flagged review modes numerical or axis-spiked and released the shot despite visible offsets; production sorting pending.
+nstxuG142301D46,READY_FOR_RULES,ready_for_rules,no,"Elena accepted recalculated N2 TAE-like/mixed continuum correspondence; released for production rules sorting, not yet processed."
+nstxuG142301F62,READY_FOR_RULES,ready_for_rules,no,Elena judged all flagged review modes numerical or axis-spiked and released the shot despite visible offsets; production sorting pending.
+nstxu_202806,EMPTY_NO_EGN,empty_no_egn,no,Empty: no egn mode files.

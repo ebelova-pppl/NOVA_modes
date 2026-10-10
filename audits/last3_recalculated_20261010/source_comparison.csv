@@ -1,0 +1,7 @@
+shot,n,previous_modes,current_modes,added_names,removed_names,shared_names_changed,shared_names_unchanged,continuum_changed,continuum_sha256
+nstxuE205059A01t025,1,266,266,0,0,0,266,False,a7ecdd91c76cd5244e9dcefba31e4d3d1be57f09e3b0b5850990fcb0bb916918
+nstxuE205059A01t025,2,52,52,0,0,0,52,False,e82949e72472cb28cbe7c0fde57b0916843bce4078d99516f3beb4c9bd74d8c8
+nstxuG121123R42,1,363,41,39,361,2,0,False,1a48ece3eb0d2bbe5996d9d049ca870be01a2b249354e75b04ae804ab4b2a65a
+nstxuG121123R42,2,85,50,49,84,1,0,True,e90cbd062dd6f788ef442c24aa5cda6f5dfcad41574f88704fe797b9d50a85eb
+nstxuG142301F62,1,68,19,18,67,1,0,False,d7758fd16c66a8cd99618a9beec11fad2ab6818235bfe0f57d4f1230e3f4061b
+nstxuG142301F62,2,51,42,42,51,0,0,True,d9f1a430c87b1969205ef1446d4a6bd5109e0200c525f33a7cc8a40d98f8e898

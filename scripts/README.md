@@ -40,6 +40,42 @@ have explicitly started Bash.
 
 ## Recent adoption and review notes
 
+The [October 10 three-shot production batch](../audits/released3_rules_20261010/README.md)
+completed D46/R42/F62 with frozen v13 rules and installed 29 selected GOOD
+TAEs awaiting visual review (11/13/5 respectively). All 21 visually rejected
+R42/F62 review modes and all 23 D46 N2 review modes are automatically BAD;
+no manual overrides were needed. All 2,269 inputs are finite and nr=201,
+with complete evaluated-mode severity and no resolution warnings. Membership
+is now 184 processed plus 14 training, with 8,366 selected GOOD. The processed
+count includes wholly invalid R06. There are
+[two whole-shot input holds](../audits/main_dataset_shots/active_shot_holds.csv):
+E205059A01t025 (N1/N2 recalculation) and R06 (corrected whole-shot inputs and
+review). Only the E-shot is unprocessed; the empty entry is separate.
+
+The [October 10 N1/N2 recheck](../audits/last3_recalculated_20261010/README.md)
+covers the last three held shots. All 470 mode files are finite and nr=201.
+E205059A01t025's mode/continuum contents are unchanged despite newer timestamps.
+R42/F62 have replacement modes and updated N2 continua; residual flags remain,
+including new R42/N1 cases. The viewer lists separate 21 changed-input TAE-like/
+mixed cases from the full 51-mode list. Elena subsequently judged all 21
+changed-input cases numerical or axis-spiked and
+[released R42/F62 despite the visible offsets](../audits/continuum_release_r42_f62_20261010/README.md).
+At that release step R42/F62/D46 were ready; all three are now processed
+as recorded above. E205059A01t025 remains held for N1/N2 recalculation, and
+one entry is empty. No sorting or sorter overrides were applied in the
+release step itself.
+
+The [October 8 D46 recheck](../audits/d46_recalculated_20261008/README.md)
+verifies replacement N1/N2 modes and finite nr=201 inputs throughout the shot.
+Its TAE-like/mixed viewer list contains 23 N2 modes (17 TAE-like, six mixed).
+N2 lacks an exact-frequency match in its old March log, so these are coverage
+gaps, not measured offsets. N1's only TAE-like mode has an offset below one
+grid interval. Elena subsequently accepted N2's continuum correspondence
+visually and [released D46 for rules processing](../audits/continuum_release_d46_20261008/README.md).
+Potential EAE flags and log-coverage limits remain recorded. At that step D46
+was ready, E205059A01t025/R42/F62 were held, and one entry was empty; the
+subsequent R42/F62 release is recorded above. No sorting was run in that step.
+
 The [October 7 four-shot review](../audits/released4_manual_review_20261007/README.md)
 is complete: N75/N4_1299 was manually rejected for many sharp, large-amplitude
 edge spikes; the remaining **19 TAEs are approved** (nine N75, ten F83).
@@ -74,8 +110,9 @@ not an automatic gap-routing threshold.
 
 The [October 7 review](../audits/continuum_release_f83_k79_20261007/README.md)
 released F83 and K79 for production rules processing (`ready_for_rules`).
-D46 remains held with `input_update_pending` while its N1/N2 mode files are
-changing or missing. At that step nine entries were unprocessed: two ready,
+D46 was held with `input_update_pending` while its N1/N2 mode files were
+changing or missing; the October 8 recheck above supersedes that observation.
+At that step nine entries were unprocessed: two ready,
 six held and one empty; the subsequent N75/B85 release is recorded above.
 Completed membership at that step was 177 post-training plus 14 training.
 

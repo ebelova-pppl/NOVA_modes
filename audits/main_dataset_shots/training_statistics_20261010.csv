@@ -1,0 +1,15 @@
+shot,shot_family,labeled_modes,good_labels,bad_labels,zero_good_labels
+nstx_120113,NSTX,174,45,129,False
+nstx_135388,NSTX,309,131,178,False
+nstx_141711,NSTX,158,78,80,False
+nstxuE202855A01t020,NSTX-U E,79,52,27,False
+nstxuE204669M03t025,NSTX-U E,217,80,137,False
+nstxuE205052A01t022,NSTX-U E,291,57,234,False
+nstxuG121123B12,NSTX-U G,133,20,113,False
+nstxuG121123J38,NSTX-U G,174,7,167,False
+nstxuG121123K51,NSTX-U G,152,24,128,False
+nstxuG133964S31,NSTX-U G,76,0,76,True
+nstxuG142301H47,NSTX-U G,178,12,166,False
+nstxuG142301W29,NSTX-U G,144,7,137,False
+nstxuG142301Y93,NSTX-U G,102,1,101,False
+nstxu_204202,NSTX-U legacy,140,61,79,False

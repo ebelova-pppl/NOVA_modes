@@ -1,0 +1,133 @@
+{
+  "created_utc": "2026-10-08T19:36:59.593140+00:00",
+  "review_date": "2026-10-08",
+  "reviewer": "Elena",
+  "shot": "nstxuG142301D46",
+  "user_statement": "I've checked new D26/N2 modes - continuum crossing looks fine, most mode are numerical , but few might be ok, for example 2817 and 2650. So it seems this shot is ok now",
+  "shot_name_interpretation": "D26 treated as D46: current discussion and both cited N2 filenames match the D46 review list; neither inventory contains a D26 shot.",
+  "review_scope": "Visual acceptance of N2 TAE-like and mixed continuum correspondence; shot released for TAE production sorting.",
+  "processing_disposition": "READY_FOR_RULES",
+  "reviewed_mode_count": 23,
+  "gap_region_counts": {
+    "mixed": 6,
+    "tae_like": 17
+  },
+  "possible_good_examples": [
+    "nstxuG142301D46/N2/egn02w.2650E+02",
+    "nstxuG142301D46/N2/egn02w.2817E+02"
+  ],
+  "manual_labels_assigned": false,
+  "production_sorting_run": false,
+  "retained_limitations": [
+    "N2 offsets remain unmeasured by the log diagnostic because no current exact-frequency log matches are available.",
+    "Potential EAE correspondence findings remain separate; the upper EAE boundary is unavailable."
+  ],
+  "verified_raw_source_count": 581,
+  "verified_raw_modes": 571,
+  "verified_all_n_inventories": true,
+  "source_audit_sha256": {
+    "audits/d46_recalculated_20261008/raw_input_metadata.json": "025334cfc993fc9e14e2be7044d76312fcb3bd85e6f04332283de575c8d1715d",
+    "audits/d46_recalculated_20261008/metadata.json": "ebf74257400f4e8d281e27f0b8fad38b12f8f2ca8408ca4f5dcc5e853406bb44",
+    "audits/d46_recalculated_20261008/tae_mixed_review_modes.csv": "5f29e2d54695bdbcd0012a4de4dea1bc2f371bf1d8582cf3f635ab63aa8a8797",
+    "audits/d46_recalculated_20261008/receipt.json": "8e8e12fe1b055bdb9bebea181999109eb87f07ab02521cb9172490f3ede33c55"
+  },
+  "reviewed_input_fingerprints": {
+    "nstxuG142301D46/N2/egn02w.2053E+02": "2496f0d4e53411a85b86d58adde7b9489b571da221ee1e5f3673f2d41d3a8892",
+    "nstxuG142301D46/N2/egn02w.2459E+02": "9af0a725c3ff01b9bd948f91f314d07511364da1e8cf60a2ddf76cc51baf4dbc",
+    "nstxuG142301D46/N2/egn02w.2470E+02": "be93ebfc9635680d07c14ce80a74fb46296e1569070cb81063ad6da2a2e7d62b",
+    "nstxuG142301D46/N2/egn02w.2484E+02": "656b37d8a26c57a98d31ce5a74888f9eebc67a2790d80793dfcd256900b9b5a7",
+    "nstxuG142301D46/N2/egn02w.2491E+02": "3514b420f748ee57ec08deb3466e9ac29c82e77e44ff20b3056f11293f75518e",
+    "nstxuG142301D46/N2/egn02w.2498E+02": "3af48535b9fb6a9cc7da30aa31bb23d4c35c73b12590ef96942ee51d2c7cec8b",
+    "nstxuG142301D46/N2/egn02w.2512E+02": "58c945f3d443f4564f1d1304f4e905bb6e99f60118bf5c08adcb446c751393f4",
+    "nstxuG142301D46/N2/egn02w.2522E+02": "3ba5de138eba0f79671a1120149fa6c888bf9a12e7665d3a59283b679edb06d1",
+    "nstxuG142301D46/N2/egn02w.2529E+02": "1649ee08da849f3ddc3fe88c9687f432256998931db473cb0f5bd1e7c4463155",
+    "nstxuG142301D46/N2/egn02w.2540E+02": "f89cef0f1ce63830ba7af6d598daf5b4ea213f3b98bc988569e805a00e06d81b",
+    "nstxuG142301D46/N2/egn02w.2561E+02": "c3ea19c65843fe83464d5926f4afbcfe42279663fded5980b1c20108fd0dfe49",
+    "nstxuG142301D46/N2/egn02w.2597E+02": "e5a5b6d11e909ceef454922453b571afd284f6b171f8e207f9e3383ae5218165",
+    "nstxuG142301D46/N2/egn02w.2650E+02": "e56c39a796bf9d63e259d383a2995d793f028a07646843d59c945e8e748d2104",
+    "nstxuG142301D46/N2/egn02w.2719E+02": "64091d911e7deb99c51c02002b5fffc11c9a4b0c5246b2b958a5a6d8286259f1",
+    "nstxuG142301D46/N2/egn02w.2817E+02": "9fd44d69354e62bdd55c3449d7a50b47dce7b4da1d7d688fc758f94348ddc49c",
+    "nstxuG142301D46/N2/egn02w.2961E+02": "578574928d0017de80ebdeabe3bbb72f087a92b5673cc9c57eec0783defb4d12",
+    "nstxuG142301D46/N2/egn02w.3183E+02": "dc09f395201ddcb7825f75ee4135500c239c6a3f4e522a634312c01dc85f977b",
+    "nstxuG142301D46/N2/egn02w.3196E+02": "a54bd52db7d212d1f637efa6de19e7577358a264b9c45141ab6ee1e17a9ad930",
+    "nstxuG142301D46/N2/egn02w.4284E+02": "52b33e2937e2844fc0d142f4e59bf809ca66672c03d4b8febade1d47a4f42688",
+    "nstxuG142301D46/N2/egn02w.4308E+02": "154bb6eb64d0dd471db4fa4ae94a687c2ee19aafb9403831c20f5a1617604b0a",
+    "nstxuG142301D46/N2/egn02w.4528E+02": "16687cfa552656743786021374eb1115b70369476cfb617db251353dfacd17c7",
+    "nstxuG142301D46/N2/egn02w.4572E+02": "5f61014a971017bd358767c553a60181ce226e0f9aa99343209c6bdabdd90277",
+    "nstxuG142301D46/N2/egn02w.4584E+02": "edb44a2ff166beed7264a94b6dd865de7d56e42e01c8367e1cd15a83fe12d000"
+  },
+  "inventory_updates": {
+    "audits/main_dataset_shots/shot_status.csv": {
+      "before_sha256": "ac3e325e73c7d4fbd1e009893d0b22c3e03b75e68e0eb4c0e56bdbbbb6e6ca02",
+      "after_sha256": "1be285f0188d2ceb784cf824a3fae8e12779ac3d3392fb4704567beec8cc498f",
+      "before_row": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "input_update_pending",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008."
+      },
+      "after_row": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "ready_for_rules",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008. 2026-10-08: Elena visually accepted the recalculated N2 continuum correspondence after reviewing the 23 TAE-like/mixed modes and releases D46 for production rules processing. Her message said D26, interpreted as D46 from this review and the matching N2/2817 and N2/2650 examples. Most modes look numerical; those two are possible acceptable candidates, not manual GOOD overrides. Missing current N2 log matches and potential EAE findings remain documented; the TAE processing hold is lifted. See audits/continuum_release_d46_20261008."
+      }
+    },
+    "audits/main_dataset_shots/g_shot_status.csv": {
+      "before_sha256": "06a02f2f80ca9234d413ec386e3baf5155e1bbc97483c6c458fd86fd3dbb8386",
+      "after_sha256": "5e2db6b2e253ac9ec3135c4a2dd2df6801dc146eea77f0b11f0ef392ab8ef9c3",
+      "before_row": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "input_update_pending",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008."
+      },
+      "after_row": {
+        "shot": "nstxuG142301D46",
+        "shot_family": "NSTX-U G",
+        "shot_dir": "$NOVA_DITW_ROOT/nstxuG142301D46",
+        "active_training_shot": "no",
+        "training_label_rows": "0",
+        "training_good_labels": "0",
+        "training_bad_labels": "0",
+        "post_training_checked": "no",
+        "checked_methods": "",
+        "status": "ready_for_rules",
+        "notes": "Initial pilot draw excluded: N7/egn07w.1593E+02 has gamma_d=NaN (DITW-004) 2026-10-05: September 30 raw-input audit confirmed the gamma_d NaN issue resolved. Shot remains unprocessed for separate N1/N2 continuum-correspondence review; this is not a current NaN hold. See audits/n1_recheck_20261005 and audits/cleared_nan_rules_20261005/remaining_unprocessed.csv. 2026-10-07: Active mode inventory changing (N1=1, N2=0 egn files at release check). User could not complete D46 review; hold for input availability and N1/N2 correspondence review. Old NaN issue remains resolved. See audits/continuum_release_f83_k79_20261007. 2026-10-07: Later availability check found 34 N1 and 18 N2 mode files, increased from earlier 1/0. Inputs are being replaced; completion and continuum correspondence have not been verified. Hold retained. See audits/r42_f62_followup_20261007. 2026-10-08: Recalculation recheck found stable replacement N1=37/N2=38 mode sets, with both continua unchanged from October 5; all 571 current modes finite and nr=201. N1 has one TAE-like mode (3009), offset 0.87 grid intervals, and no mixed modes. N2 has no exact-frequency matches in the available March 25 log; offsets remain unmeasured. Viewer list includes 17 TAE-like and six mixed N2 modes. Hold now concerns missing current N2 logs/correspondence review rather than changing mode availability; potential EAE flags retained separately. See audits/d46_recalculated_20261008. 2026-10-08: Elena visually accepted the recalculated N2 continuum correspondence after reviewing the 23 TAE-like/mixed modes and releases D46 for production rules processing. Her message said D26, interpreted as D46 from this review and the matching N2/2817 and N2/2650 examples. Most modes look numerical; those two are possible acceptable candidates, not manual GOOD overrides. Missing current N2 log matches and potential EAE findings remain documented; the TAE processing hold is lifted. See audits/continuum_release_d46_20261008."
+      }
+    }
+  },
+  "remaining_counts": {
+    "ready": 1,
+    "held": 3,
+    "empty": 1
+  },
+  "processed_post_training": 181,
+  "active_training_shots": 14,
+  "selected_good": 8337,
+  "artifact_sha256": {
+    "remaining_unprocessed.csv": "0be957663ba5c240ff471effd7e5bfb7dac4a811f98c89034e25a75bd7b8e61e",
+    "README.md": "331d0783f825671784d50fbab688282707f2b4ce449d66f28f300dca2b7ac5de"
+  }
+}

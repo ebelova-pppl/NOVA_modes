@@ -4,6 +4,28 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
+## Current status, October 10, 2026
+
+The D46/R42/F62 production run brings membership to **184 processed
+post-training entries plus 14 training shots**. Installed outputs contain
+8,366 selected GOOD modes. The processed count includes wholly invalid R06;
+excluding it leaves 183 processed plus 14 training shots.
+
+[active_shot_holds.csv](active_shot_holds.csv) records **two whole-shot holds**:
+E205059A01t025 (N1/N2 recalculation) and G133964R06 (corrected whole-shot
+inputs and review). Processing history is independent of validity: R06 has
+`post_training_checked=yes` and `status=invalid_input`. It is absent from the
+[two-entry unprocessed list](../released3_rules_20261010/remaining_unprocessed.csv),
+which contains only the E-shot and empty `nstxu_202806`.
+
+Do not use `post_training_checked=no` alone to count outstanding input holds.
+Earlier batch receipts count holds within their unprocessed subset. Partial-n
+registry exclusions in otherwise retained shots are a separate category.
+See the [latest batch](../released3_rules_20261010/README.md) and
+[per-shot statistics](production_statistics_20261010.csv).
+
+## Earlier inventory milestones
+
 On October 7 the [four-shot GOOD-list review](../released4_manual_review_20261007/README.md)
 completed N75, B85, F83 and K79: **19 accepted TAEs** (nine N75, ten F83)
 after manually rejecting N75/N4_1299 for sharp edge spikes. Current outputs

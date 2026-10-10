@@ -1,0 +1,51 @@
+{
+  "created_utc": "2026-10-08T19:15:26.119350+00:00",
+  "shot": "nstxuG142301D46",
+  "raw_modes": 571,
+  "input_errors": 0,
+  "nr_values": [
+    201
+  ],
+  "source_verification": "All recorded raw mode/continuum and diagnostic sources and inventories unchanged at export",
+  "tae_mixed_review_modes": 23,
+  "tae_like_review_modes": 17,
+  "mixed_review_modes": 6,
+  "n1_tae_reference": "nstxuG142301D46/N1/egn01w.3009E+02",
+  "n1_tae_offset_grid": 0.8674651237722264,
+  "n2_matched_modes": 0,
+  "n2_total_modes": 38,
+  "n2_log_mtime_local": "2026-03-25 20:24:51 America/New_York",
+  "potential_eae_flagged_modes": 25,
+  "potential_eae_flagged_comparisons": 49,
+  "viewer_paths_verified": true,
+  "production_sorting_run": false,
+  "labels_changed": false,
+  "artifact_sha256": {
+    "raw_input_metadata.json": "025334cfc993fc9e14e2be7044d76312fcb3bd85e6f04332283de575c8d1715d",
+    "alignment_summary.csv": "6a0a0c93c2df90524d1e0ff8a1ab9995a3470d4858c09566ac01a7f1ed9451be",
+    "potential_eae_review_modes.csv": "f48a59ba2ab749b1a86a98268d8baa2c62cac99c7c0844c9d96621b6f14f187c",
+    "tae_mixed_review_modes.csv": "5f29e2d54695bdbcd0012a4de4dea1bc2f371bf1d8582cf3f635ab63aa8a8797",
+    "mode_coverage.csv": "5fec3d81aca6dbb563c51fb3c229eac1ee38636355bf9103c27893809e08dd05",
+    "crossing_offsets.csv": "6081fa1f02eb7641a988012673f07863bedf29b061a765d35f0c63bbef5c7910",
+    "selection.csv": "6410c136a2fa206979887e6e041b89c3415f2ffed67823033f26d933872d9986",
+    "source_comparison.csv": "5efbc8b2bfc5f4172e3135f1a96d267d40783c31bceaebdb8f152bbf995f7125",
+    "invalid_inputs.csv": "de5418525a5dc0d4b6d7c88f36bf039c5d4d998a6ba76837e39bb27a5f7f12f1",
+    "metadata.json": "ebf74257400f4e8d281e27f0b8fad38b12f8f2ca8408ca4f5dcc5e853406bb44",
+    "input_summary.csv": "ddbbee5f6330fe5cc7bfbd19b0e991f736e23bd3e67e0c015a2ea3e02d15a0e0",
+    "README.md": "2f16c9c25fffa6ae5d91e9df79d74a46eba277de48e5c99e90d2811a09d63fcf",
+    "remaining_unprocessed.csv": "94a3d01229d42b734a0975c75dbf6902ec9fe648c5831182db9761cac9bacdba"
+  },
+  "completed_utc": "2026-10-08T19:17:13.799842+00:00",
+  "inventory_updates": {
+    "audits/main_dataset_shots/shot_status.csv": {
+      "before_sha256": "c67766de716ef79c2645ddb5f8ec0d4346dd08d0688c9422768094fcad7566d7",
+      "after_sha256": "ac3e325e73c7d4fbd1e009893d0b22c3e03b75e68e0eb4c0e56bdbbbb6e6ca02",
+      "status": "input_update_pending"
+    },
+    "audits/main_dataset_shots/g_shot_status.csv": {
+      "before_sha256": "e071b1d81bce0f4fcabefce0ae5637071ba8036fc338353a7fed990718504e6b",
+      "after_sha256": "06a02f2f80ca9234d413ec386e3baf5155e1bbc97483c6c458fd86fd3dbb8386",
+      "status": "input_update_pending"
+    }
+  }
+}

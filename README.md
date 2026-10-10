@@ -121,8 +121,15 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
 | Find earlier results, version notes, and README instructions | [Preserved README reference](docs/history/readme_before_reorganization_20260914.md) |
 
-As of October 7, 2026, the inventory contains **181 processed post-training
-shots plus 14 active training shots (195 total)**. The
+As of October 10, 2026, the inventory contains **184 processed post-training
+shots plus 14 active training shots (198 total)**. The processed count includes
+the wholly invalid R06 shot, which still awaits corrected inputs. Excluding
+R06 gives 183 processed shots plus 14 training shots. The
+[latest three-shot rules batch](audits/released3_rules_20261010/README.md)
+processed D46, R42 and F62 and installed **29 selected GOOD TAEs awaiting
+visual review** (11 D46, 13 R42, five F62). All 21 visually unsuitable
+R42/F62 review modes were automatically rejected. Installed selections now
+total **8,366**. The
 [latest four-shot review](audits/released4_manual_review_20261007/README.md)
 is complete for N75, B85, F83 and K79: **19 accepted TAEs** (nine N75 and ten
 F83) after manually rejecting N75/N4_1299 for sharp edge spikes. Installed
@@ -145,11 +152,22 @@ remain unchanged. The
 is complete, including 17 reasoned manual corrections. Future reruns must
 explicitly supply the affected shots' `manual_overrides.csv` to reproduce
 those curated selections. The
-[remaining five inventory entries](audits/released4_rules_20261007/remaining_unprocessed.csv)
-comprise **four held shots and one empty entry**. E205059A01t025 requires
-N1/N2 recalculation, R42 requires only N2 continuum recalculation after
-acceptance of its higher-n cases, and F62 remains held while considering recalculation
-of modes and continuum. D46 awaits completion and review of changing inputs.
+[two unprocessed inventory entries](audits/released3_rules_20261010/remaining_unprocessed.csv)
+are E205059A01t025 and empty `nstxu_202806`; no released shots await processing.
+There are **two active whole-shot input holds** overall:
+[E205059A01t025 and G133964R06](audits/main_dataset_shots/active_shot_holds.csv).
+R06 already has outputs marked INVALID and therefore does not appear in
+the unprocessed list. The
+[October 10 recheck](audits/last3_recalculated_20261010/README.md) finds unchanged
+N1/N2 mode/continuum results for E205059A01t025 and replacement modes with
+updated N2 continua for R42/F62. Residual TAE-like/mixed crossing flags remain;
+Elena judged all 21 changed-input cases numerical or axis-spiked and
+[released R42/F62 for the completed rules run](audits/continuum_release_r42_f62_20261010/README.md).
+E205059A01t025 remains held for N1/N2 recalculation; R06 remains excluded
+pending corrected whole-shot inputs and review.
+[D46 was released](audits/continuum_release_d46_20261008/README.md)
+after Elena accepted recalculated N2 continuum correspondence in the
+23-mode TAE-like/mixed review. Its missing current log matches remain documented.
 Potential EAE issues remain separately flagged; see
 the [latest follow-up](audits/r42_f62_followup_20261007/README.md). See the full
 [project state](docs/project_state.md) for context and next steps.

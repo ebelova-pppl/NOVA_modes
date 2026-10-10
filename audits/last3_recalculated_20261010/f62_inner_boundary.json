@@ -1,0 +1,23 @@
+{
+  "previous": {
+    "path": "nstxuG142301F62/N2/datcon2",
+    "sha256": "9f831612815092133c676baf9007c18ca4dee3c54eb2139147111e48b9506bfb",
+    "r_min": 0.01,
+    "r_max": 0.295,
+    "finite_samples": 58,
+    "lower_frequency_min": 7.349179079945517,
+    "lower_frequency_max": 7.494825506593183,
+    "lower_frequency_mean": 7.451056373773121,
+    "shared_repair_changed_inner_samples": false,
+    "interpretation": "Flat inner lower boundary is present in raw datcon; this check does not establish the cause or physical validity."
+  },
+  "current": {
+    "path": "/p/nstxdigtwin/energetic_particles/nova/DiTw/nstxuG142301F62/N2/datcon2",
+    "sha256": "d9f1a430c87b1969205ef1446d4a6bd5109e0200c525f33a7cc8a40d98f8e898",
+    "finite_samples": 58,
+    "lower_frequency_min": 7.2780283096758165,
+    "lower_frequency_max": 7.49302102031559,
+    "lower_frequency_mean": 7.434770707912732
+  },
+  "interpretation": "The inner lower boundary remains relatively flat; range comparison alone establishes neither validity nor a cause of mode morphology."
+}

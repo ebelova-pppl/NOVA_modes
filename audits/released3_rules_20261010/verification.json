@@ -1,0 +1,23 @@
+{
+  "status": "verified",
+  "shots": 3,
+  "counts": {
+    "input_modes": 2269,
+    "tae_like": 496,
+    "mixed": 39,
+    "eae_like": 1734,
+    "invalid": 0,
+    "good_before_dedup": 29,
+    "selected_good": 29,
+    "bad": 506
+  },
+  "all_nr": 201,
+  "all_raw_fingerprints_verified": true,
+  "configuration_sha256": "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919",
+  "artifacts_sha256": {
+    "good_tae_final_batch.csv": "753988a65dac6d0dde3699b29564339a592f803289891f7b70df5529197bac7a",
+    "reviewed_tae_mode_results.csv": "21e5a83f3d6d3f4e6135eaadec51dd2d46b083bf39846150e591a54607e028b2",
+    "selection.csv": "f3294fff9f5d178e622c14e230b314ff6eff80b6fc14855d6c33671bfb42435b",
+    "shot_summary.csv": "a27400b69e8438508c276cdf98e342d6ded1321a201fe0e6ecf1a9ee0db35632"
+  }
+}

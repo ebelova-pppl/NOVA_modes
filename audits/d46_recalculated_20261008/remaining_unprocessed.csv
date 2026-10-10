@@ -1,0 +1,6 @@
+shot,processing_disposition,inventory_status,post_training_checked,reason
+nstxuE205059A01t025,CONTINUUM_RECALCULATION_PENDING,continuum_recalculation_pending,no,N1/N2 continuum recalculation required after visual review.
+nstxuG121123R42,CONTINUUM_RECALCULATION_PENDING,continuum_recalculation_pending,no,N2 continuum recalculation required; user accepted n>2.
+nstxuG142301D46,INPUT_UPDATE_PENDING,input_update_pending,no,"Replacement N1/N2 modes stable; N2 current log missing, TAE/mixed correspondence review pending."
+nstxuG142301F62,MODE_CONTINUUM_RECALCULATION_REVIEW,recalculation_review_pending,no,Held while considering recalculation of modes and continuum.
+nstxu_202806,EMPTY_NO_EGN,empty_no_egn,no,Empty: no egn mode files.
