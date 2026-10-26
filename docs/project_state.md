@@ -1,7 +1,56 @@
 # Project: AI NOVA mode classifier
-### Project state (current snapshot, updated 2026-10-10)
+### Project state (current snapshot, updated 2026-10-26)
 ## Goal
 Train ML classifiers to identify physically meaningful NOVA eigenmodes (“good”) vs unphysical/numerical modes (“bad”), and provide a clean, deduplicated mode set for downstream analysis (e.g., NOVA-C, surrogate modeling, digital twin workflows).
+
+## 2026-10-26: common 12-column accepted-mode catalog
+
+- Added [catalogs/accepted_modes.csv](../catalogs/accepted_modes.csv) and the
+  reusable `scripts/build_accepted_catalog.py` exporter. All 198 installed
+  final lists were read; their exact 8,943 selected GOOD modes are preserved
+  (8,366 post-training and 577 training-shot selections). There are 8,941 TAE,
+  two mixed and nine applied manual GOOD overrides; 190 lists are nonempty.
+- The agreed 12 columns use full shot names without a separate shot number,
+  portable relative paths, original omega, four-significant-digit radius/
+  severity values, short rule preset, final decision and review status.
+  Historical v1/v2 training outputs have no severity: all 577 cells stay blank.
+  Full versions, input-source hashes and counts are in companion metadata.
+- Training review is credited: 538 selected training modes match human GOOD
+  labels with matching saved audit fingerprints. Another 39 selected modes
+  have human BAD labels and remain in the export as pending adjudication;
+  [the conflict CSV](../catalogs/accepted_modes.review_conflicts.csv) preserves
+  these disagreements. No label, sorter output or rule was changed.
+- Per-mode review totals are 865 reviewed, 6,590 pending (6,551 awaiting review
+  plus the 39 conflicts), and 1,488 unknown. The latter are selections from
+  the original 39-shot cohort outside its explicit disagreement-review records;
+  the cohort's processing/accepted-set status is not treated as proof of an
+  individual visual inspection. Evidence sources and exact semantics are in
+  [the catalog documentation](../catalogs/README.md).
+- Validation checks inventory coverage, exact selected membership/counts,
+  unique mode keys, configuration consistency, manual overrides and current
+  input exclusions. Eight focused exporter tests pass. Next: resolve the 39
+  training-label conflicts when requested and register future review evidence
+  before regenerating the catalog. Existing production holds are unchanged.
+
+## 2026-10-25: check five queried training modes in nstxu_204202
+
+- Non-blind raw signed-mode/continuum inspection and a fresh isolated v13
+  check confirm N4/8263, N6/2987, N6/1273 and N7/9477 are GOOD. All four
+  already appear in `../sort_outputs/nstxu_204202/good_tae_final.csv` and
+  the live shot's GOOD exports. Preliminary REVIEW is distinct from final GOOD.
+- N4 has a resolved 5.21-grid-interval energy peak near a lower-continuum
+  maximum; its only true crossing is in a weak remote tail. An earlier blind
+  rejection for narrowness was not the adopted training decision.
+- N10/1026 remains `BAD_AXIS_SPIKE`: stored harmonic 15 has amplitude
+  0.284065 at r=0.015 and FWHM 1.06871 grid intervals. All five current
+  training labels are GOOD, so the previously documented N10 disagreement
+  remains for explicit adjudication; no label or output changes were made.
+- All five raw modes and four continua match the training copies byte for
+  byte, and fingerprints/decisions match the earlier v13 audit and installed
+  output. The [five-mode audit](../audits/nstxu_204202_five_mode_review_20261025/README.md)
+  preserves measurements, plots and provenance. Next: trace the colleague's
+  exact file if needed, and adjudicate N10 only if requested. Project counts
+  and existing processing/review holds are unchanged.
 
 ## 2026-10-10 hold-count correction: R06 and E205059A01t025
 

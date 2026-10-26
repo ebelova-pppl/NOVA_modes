@@ -1,0 +1,4115 @@
+[
+  {
+    "mode_key": "nstxu_204202/N4/egn04w.8263E+01",
+    "rule_decision": "REVIEW",
+    "final_decision": "GOOD",
+    "rule_features": {
+      "boundary_features": {
+        "axis_artifact": {
+          "axis_amplitude_qualified_peak_count": 0,
+          "axis_candidate_amplitude_min": 0.2,
+          "axis_candidate_found": false,
+          "axis_candidate_width_limit_grid": 10.0,
+          "axis_component_touches_boundary": false,
+          "axis_halfmax_outer_edge_r": 0.01854342473912097,
+          "axis_halfmax_width_grid": 1.820292279729659,
+          "axis_halfmax_width_r": 0.009101461398648295,
+          "axis_local_peak_count": 79,
+          "axis_peak": 0.004822780401639399,
+          "axis_peak_harmonic_index": 8,
+          "axis_peak_is_local_max": true,
+          "axis_peak_r": 0.015,
+          "axis_width_qualified_peak_count": 76,
+          "r_ax": 0.03
+        },
+        "axis_energy_concentration": {
+          "amplitude_min": 0.5,
+          "amplitude_r_max": 0.015,
+          "axis_amplitude": 0.004822780401639399,
+          "axis_harmonic_index": 8,
+          "axis_peak_r": 0.015,
+          "axis_sample_count": 4,
+          "axis_signed_amplitude": -0.004822780401639399,
+          "candidate_found": false,
+          "enabled": true,
+          "energy_fraction_min": 0.5,
+          "energy_r_max": 0.05,
+          "inner_energy_fraction": 2.3796650711288573e-06,
+          "n_radial": 201,
+          "total_energy": 0.09384942801004358
+        },
+        "edge_artifact": {
+          "edge_body_amplitude_max": 1.0,
+          "edge_body_r_max": 0.9,
+          "edge_energy_component_touches_boundary": false,
+          "edge_energy_halfmax_inner_edge_r": 0.4849420122693268,
+          "edge_energy_halfmax_outer_edge_r": 0.5109731102970353,
+          "edge_energy_halfmax_width_grid": 5.206219605541695,
+          "edge_energy_halfmax_width_r": 0.026031098027708477,
+          "edge_energy_local_peaks": [],
+          "edge_energy_peak": 1.0,
+          "edge_energy_peak_in_window": false,
+          "edge_energy_peak_r": 0.505,
+          "edge_harmonic_component_touches_boundary": false,
+          "edge_harmonic_halfmax_inner_edge_r": 0.9601164441133714,
+          "edge_harmonic_halfmax_outer_edge_r": 0.9736987333709857,
+          "edge_harmonic_halfmax_width_grid": 2.7164578515228577,
+          "edge_harmonic_halfmax_width_r": 0.013582289257614288,
+          "edge_harmonic_peak": 0.04756993762858981,
+          "edge_harmonic_peak_harmonic_index": 25,
+          "edge_harmonic_peak_is_local_max": true,
+          "edge_harmonic_peak_r": 0.97,
+          "r_edge_min": 0.97
+        }
+      },
+      "crossing_features": {
+        "W_star_high_shear": 1.3327797752544096e-05,
+        "W_star_high_shear_sum": 1.3327797752544096e-05,
+        "W_star_sum": 0.0023222092616086063,
+        "continuum_crossing_tail": {
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "energy_peak_r": 0.505,
+          "half_width_grid": 4,
+          "k_min": 0.4,
+          "n_qualifying_crossings": 0,
+          "n_radial": 201,
+          "records": [
+            {
+              "K_cross": 0.5722750573440553,
+              "boundary": "low",
+              "candidate_found": false,
+              "energy_fraction_inner": 0.0007769529336753032,
+              "energy_fraction_outer": 0.9992230470663247,
+              "local_amplitude_energy": 0.013941307204965883,
+              "n_centers": 8,
+              "r_cross": 0.27575800342504536,
+              "second_difference_energy": 0.004565760561119388,
+              "tail_energy": 7.291658841615253e-05,
+              "tail_fraction": 0.0007769529336753032,
+              "tail_over_top2": 0.0009247863795623339,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            }
+          ],
+          "resolution_eligible": true,
+          "top2_energy": 0.07884695322898373,
+          "top2_energy_share": 0.8401431409954432,
+          "top2_harmonic_indices": [
+            8,
+            9
+          ],
+          "top2_ratio_min": 0.035,
+          "total_energy": 0.09384942801004358,
+          "witness": null
+        },
+        "continuum_crossing_window_exception": {
+          "all_violations_exempted": false,
+          "amplitude_max": 0.2,
+          "calibrated_n_radial": 201,
+          "enabled": true,
+          "half_width_grid": 4,
+          "k_max": 0.1,
+          "n_exempted_crossings": 0,
+          "n_radial": 201,
+          "n_unexcused_crossings": 0,
+          "n_violating_crossings": 0,
+          "records": [
+            {
+              "A_cross": 0.05354406768576855,
+              "A_cross_harmonic_index": 8,
+              "K_cross": 0.5722750573440553,
+              "boundary": "low",
+              "exception_conditions_pass": false,
+              "exempted": false,
+              "local_amplitude_energy": 0.013941307204965883,
+              "n_centers": 8,
+              "r_cross": 0.27575800342504536,
+              "second_difference_energy": 0.004565760561119388,
+              "window_A_max": 0.05960915495502899,
+              "window_W_max": 0.002618875293594931,
+              "window_violation": false
+            }
+          ],
+          "resolution_eligible": true
+        },
+        "cross_window_A_crossing_boundary": "low",
+        "cross_window_A_crossing_r": 0.27575800342504536,
+        "cross_window_A_distance_grid": 0.15160068500906787,
+        "cross_window_A_harmonic_index": 8,
+        "cross_window_A_max": 0.05960915495502899,
+        "cross_window_A_neighbor_count": 4,
+        "cross_window_A_neighbor_rms": 0.0351319092873632,
+        "cross_window_A_neighbor_stencil_complete": true,
+        "cross_window_A_sample_r": 0.275,
+        "cross_window_W_crossing_boundary": "low",
+        "cross_window_W_crossing_r": 0.27575800342504536,
+        "cross_window_W_distance_grid": 0.15160068500906787,
+        "cross_window_W_max": 0.002618875293594931,
+        "cross_window_W_sample_r": 0.275,
+        "cross_window_candidate_found": true,
+        "cross_window_half_width_grid": 2,
+        "cross_window_half_width_r": 0.01,
+        "n_cross": 1.0,
+        "r_star_high_shear": 0.27575800342504536,
+        "r_star_max": 0.27575800342504536
+      },
+      "crossing_records": [
+        {
+          "W_peak": 0.0023222092616086063,
+          "boundary": "low",
+          "r_cross": 0.27575800342504536,
+          "shear_weighted": 1.3327797752544096e-05
+        }
+      ],
+      "extremum_features": {
+        "ext_df_gap": null,
+        "ext_dr": null,
+        "ext_energy_frac": null,
+        "match_found": false
+      },
+      "feature_schema_version": "tae-rule-features-grouped-v26",
+      "numerical_structure_features": {
+        "distributed_harmonic_noise": {
+          "actual_window_dr": 0.05,
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "energy_reference": "full-domain-top-two-individual-harmonics",
+          "gate_enabled": true,
+          "local_energy_policy": "all-raw-nodes-in-window",
+          "maximum_effective_length": 0.045,
+          "minimum_n_radial": 41,
+          "n_firing_windows": 0,
+          "n_harmonics": 54,
+          "n_population_windows": 22,
+          "n_radial": 201,
+          "n_scanned_windows": 191,
+          "native_grid_spacing": 0.005,
+          "participation_policy": "pointwise-N_hf-inclusive; same-selected-centers-for-HF-and-length",
+          "reason": null,
+          "resolution_eligible": true,
+          "schema_version": "distributed-harmonic-noise-v1",
+          "status": "MEASURED",
+          "stencil_policy": "all-three-samples-in-same-window",
+          "thresholds": {
+            "local_min": 0.05,
+            "nhf_min": 4.0,
+            "radial_length_min": 0.03,
+            "top2_min": 0.005,
+            "window_dr": 0.05
+          },
+          "top2_energy": 0.07884695322898373,
+          "top2_energy_share": 0.8401431409954433,
+          "top2_harmonic_indices": [
+            8,
+            9
+          ],
+          "total_energy": 0.09384942801004356,
+          "witness": {
+            "effective_length": 0.005278328521766764,
+            "end_index": 198,
+            "fires": false,
+            "hf_energy": 2.148169335992379e-06,
+            "hf_top2_ratio": 2.7244798283502007e-05,
+            "hf_total_fraction": 2.2889530405688636e-05,
+            "hf_window_fraction": 0.0011064526291783164,
+            "minimum_cut_ratio": 0.005448959656700401,
+            "n_qualifying": 2,
+            "qualifying_center_indices": [
+              189,
+              197
+            ],
+            "qualifying_hf_energy": [
+              2.089954801051836e-06,
+              5.8214534940543e-08
+            ],
+            "qualifying_nhf": [
+              6.406206769962317,
+              5.185854130728886
+            ],
+            "r_end": 0.99,
+            "r_start": 0.9400000000000001,
+            "raw_window_energy": 0.0019414923688035985,
+            "start_index": 188
+          },
+          "witness_policy": "max-min-cut-ratios; earliest-tie; default-top2-cut-when-disabled"
+        },
+        "extended_continuum_noise": {
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "gate_enabled": true,
+          "n_harmonics": 54,
+          "n_radial": 201,
+          "native_grid_spacing": 0.005,
+          "outside_sample_count": 54,
+          "qualifying_region_ids": [],
+          "reason": null,
+          "records": [
+            {
+              "crossing_stencil_count": 1,
+              "eligible_stencil_count": 52,
+              "end_index": 55,
+              "hf_crossing_stencil_energy": 1.0606593886249537e-06,
+              "hf_out_energy": 1.1284884945400859e-07,
+              "hf_out_harmonic_extent": 1.0614892017715025,
+              "hf_out_local_fraction": 0.0013964716624667716,
+              "hf_out_radial_extent": 2.5647785494962,
+              "hf_out_radial_length": 0.012823892747481,
+              "hf_out_top2_ratio": 1.4312391897538273e-06,
+              "hf_out_total_fraction": 1.2024457883955532e-06,
+              "hf_peak_harmonic_index": 8,
+              "hf_peak_r": 0.015,
+              "hf_positive_harmonic_count": 54,
+              "hf_positive_radial_count": 52,
+              "hf_unknown_neighbor_energy": 4.2713059083769126e-08,
+              "outside_sample_count": 54,
+              "r_end": 0.275,
+              "r_start": 0.01,
+              "raw_out_energy": 8.080998167529503e-05,
+              "raw_out_total_fraction": 0.0008610599274685711,
+              "region_id": 0,
+              "side": "below_lower",
+              "start_index": 2,
+              "unknown_neighbor_stencil_count": 1
+            }
+          ],
+          "resolution_policy": "native-grid-high-pass-with-radial-length",
+          "schema_version": "continuum-side-noise-v2",
+          "stencil_policy": "all-three-samples-in-same-outside-region",
+          "thresholds": {
+            "local_min": 0.2,
+            "radial_length_min": 0.04,
+            "top2_min": 0.01
+          },
+          "top2_energy": 0.07884695322898373,
+          "top2_energy_share": 0.840143140995443,
+          "top2_harmonic_indices": [
+            8,
+            9
+          ],
+          "total_energy": 0.0938494280100436,
+          "unknown_continuum_sample_count": 4,
+          "valid_continuum_sample_count": 197,
+          "witness": null
+        },
+        "grid_scale_packet": {
+          "grid_scale_packet_amplitude_min": 0.3,
+          "grid_scale_packet_amplitude_qualified_window_count": 0,
+          "grid_scale_packet_candidate_found": false,
+          "grid_scale_packet_direction_change_count": null,
+          "grid_scale_packet_large_step_count": null,
+          "grid_scale_packet_large_turn_count": null,
+          "grid_scale_packet_max_step": null,
+          "grid_scale_packet_min_large_turns": 3,
+          "grid_scale_packet_peak": null,
+          "grid_scale_packet_peak_harmonic_index": null,
+          "grid_scale_packet_peak_r": null,
+          "grid_scale_packet_peak_r_max": 0.5,
+          "grid_scale_packet_peak_signed_amplitude": null,
+          "grid_scale_packet_radius_qualified_window_count": 0,
+          "grid_scale_packet_sign_change_count": null,
+          "grid_scale_packet_step_min": 0.2,
+          "grid_scale_packet_step_rms": null,
+          "grid_scale_packet_total_variation": null,
+          "grid_scale_packet_turn_qualified_window_count": 0,
+          "grid_scale_packet_window_end_index": null,
+          "grid_scale_packet_window_end_r": null,
+          "grid_scale_packet_window_span_grid": 4,
+          "grid_scale_packet_window_start_index": null,
+          "grid_scale_packet_window_start_r": null,
+          "grid_scale_packet_window_values": null
+        },
+        "grid_scale_spike": {
+          "grid_scale_candidate_found": true,
+          "grid_scale_candidate_width_limit_grid": 0.75,
+          "grid_scale_component_touches_boundary": false,
+          "grid_scale_halfmax_inner_edge_r": 0.8936396382440482,
+          "grid_scale_halfmax_outer_edge_r": 0.8963927830125127,
+          "grid_scale_halfmax_width_grid": 0.5506289536928888,
+          "grid_scale_halfmax_width_r": 0.002753144768464444,
+          "grid_scale_high_r_cutoff_r": 0.7,
+          "grid_scale_high_r_width_max_grid": 0.75,
+          "grid_scale_peak": 0.039784658547703196,
+          "grid_scale_peak_harmonic_index": 15,
+          "grid_scale_peak_r": 0.895,
+          "grid_scale_peak_sign": 1,
+          "grid_scale_peak_signed_amplitude": 0.039784658547703196,
+          "grid_scale_width_max_grid": 1.0
+        },
+        "interior_harmonic_incoherence": {
+          "active_adjacent_harmonic_pair_count": 2,
+          "active_core_energy_fraction_min": 0.005,
+          "active_core_harmonic_count": 3,
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "core_adjacent_harmonic_coherence": 0.9500358559405052,
+          "core_adjacent_radial_pair_count": 99,
+          "core_effective_harmonic_count_wmean": 1.770293980417254,
+          "core_energy_fraction": 0.477921066699484,
+          "core_energy_fraction_above_effective_harmonic_count_threshold": 9.906762742391369e-05,
+          "core_js_divergence": 0.0005678980468224212,
+          "core_positive_energy_sample_count": 100,
+          "core_r_max": 0.5,
+          "core_radial_sample_count": 101,
+          "effective_harmonic_count_threshold": 3.0,
+          "global_effective_harmonic_count_wmean": 1.7363085052735934,
+          "global_energy_fraction_above_effective_harmonic_count_threshold": 0.00017191396920062743,
+          "incoherence_score": 2.4006585507001857e-05,
+          "max_lag_grid": 5,
+          "resolution_eligible": true,
+          "score_threshold": 0.1,
+          "total_energy_fraction_in_core_above_effective_harmonic_count_threshold": 4.734650617382388e-05
+        },
+        "near_axis_grid_oscillation": {
+          "amplitude_min": 0.1,
+          "candidate_found": false,
+          "min_consecutive_sign_flips": 4,
+          "near_axis_peak": 0.004822780401639399,
+          "near_axis_peak_amplitude_qualified": false,
+          "near_axis_peak_and_run_same_harmonic": false,
+          "near_axis_peak_harmonic_index": 8,
+          "near_axis_peak_r": 0.015,
+          "near_axis_peak_signed_amplitude": -0.004822780401639399,
+          "peak_r_max_exclusive": 0.1,
+          "qualifying_run_count": 56,
+          "selected_run_consecutive_sign_flip_count": 5,
+          "selected_run_end_index": 8,
+          "selected_run_end_r": 0.04,
+          "selected_run_harmonic_index": 9,
+          "selected_run_max_step": 0.0009692645022976675,
+          "selected_run_mean_abs_step": 0.00027972733846944075,
+          "selected_run_peak": 0.0009000308277269709,
+          "selected_run_peak_r": 0.015,
+          "selected_run_peak_signed_amplitude": 0.0009000308277269709,
+          "selected_run_start_index": 3,
+          "selected_run_start_r": 0.015,
+          "selected_run_step_l2": 0.001006889023838179,
+          "selected_run_total_variation": 0.0013986366923472038,
+          "step_l2_min": 0.3,
+          "step_l2_qualified_run_count": 0
+        }
+      },
+      "resolution_features": {
+        "interior_unresolved_envelope": {
+          "candidate_found": false,
+          "energy_component_touches_boundary": false,
+          "energy_halfmax_inner_edge_r": 0.4849420122693268,
+          "energy_halfmax_outer_edge_r": 0.5109731102970353,
+          "energy_halfmax_width_grid": 5.206219605541695,
+          "energy_halfmax_width_r": 0.026031098027708477,
+          "energy_peak": 1.0,
+          "energy_peak_r": 0.505,
+          "ext_df_gap": null,
+          "ext_df_gap_max": 0.04,
+          "ext_df_gap_min": 0.001,
+          "ext_df_gap_min_inclusive": false,
+          "ext_dr": null,
+          "ext_dr_max": 0.02,
+          "ext_energy_frac": null,
+          "extremum_exception_applied": false,
+          "extremum_match_found": false,
+          "extremum_r_max": 0.5,
+          "extremum_r_min": 0.03,
+          "footprint_exception": {
+            "applied": false,
+            "enabled": true,
+            "local_hf_fraction": null,
+            "local_hf_fraction_max": 0.05,
+            "qualified": false,
+            "spikes_fraction": null,
+            "spikes_fraction_max": 0.5,
+            "status": "NOT_APPLICABLE",
+            "window_dr": 0.05
+          },
+          "peak_r_max": 0.5,
+          "width_max_grid": 2.0
+        }
+      },
+      "rf_standard_features": {
+        "S": 2.2493030824432476,
+        "W_star": 0.015032731775854376,
+        "W_star_max": 0.0023222092616086063,
+        "delta2_eff": 0.00031636414527470315,
+        "frac_spikes": 0.010410908420858669,
+        "gamma_d": -6.486767313316407e-06,
+        "max_abs_d1_abs": 0.41714294982033023,
+        "max_abs_d2_abs": 0.37173412038336245,
+        "max_per_m_mean": 0.10116634197829047,
+        "max_to_mean": 167.59799766496704,
+        "max_to_median": 2651066.2817193274,
+        "mean_abs_d1_mode": 0.0012504289189019288,
+        "mean_abs_d2_mode": 0.0008617791092785175,
+        "mean_amp": 0.005966658395474564,
+        "ntor": 4.0,
+        "r_star": 0.28,
+        "rad_loc": 0.5558928093579375,
+        "rad_width": 0.12265701830453488,
+        "spikes_per_m": 2.0925925925925926,
+        "std_amp": 0.041154645292213736,
+        "std_per_m_max": 0.22008427934342975,
+        "std_per_m_mean": 0.02205443361121061
+      },
+      "severity_features": {
+        "complete": true,
+        "configuration_sha256": "e8659b347f6bfdb1bbf343b8701019ddb58b109c8726777f9a152b3a7b893e33",
+        "gates": {
+          "BAD_AXIS_ENERGY_CONCENTRATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">",
+                "ratio": 0.009645560803278799,
+                "threshold": 0.5,
+                "value": 0.004822780401639399
+              },
+              "inner_energy_fraction": {
+                "comparison": ">",
+                "ratio": 4.759330142257715e-06,
+                "threshold": 0.5,
+                "value": 2.3796650711288573e-06
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 4.759330142257715e-06,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_AXIS_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.024113902008196995,
+                "threshold": 0.2,
+                "value": 0.004822780401639399
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 5.493623255648346,
+                "threshold": 10.0,
+                "value": 1.820292279729659
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.024113902008196995,
+            "status": "MEASURED",
+            "witness": {
+              "axis_component_touches_boundary": false,
+              "axis_halfmax_outer_edge_r": 0.01854342473912097,
+              "axis_halfmax_width_grid": 1.820292279729659,
+              "axis_halfmax_width_r": 0.009101461398648295,
+              "axis_peak": 0.004822780401639399,
+              "axis_peak_harmonic_index": 8,
+              "axis_peak_is_local_max": true,
+              "axis_peak_r": 0.015
+            }
+          },
+          "BAD_CONTINUUM_CROSSING_TAIL": {
+            "components": {
+              "roughness": {
+                "comparison": ">",
+                "ratio": 1.430687643360138,
+                "threshold": 0.4,
+                "value": 0.5722750573440553
+              },
+              "tail_top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.02642246798749525,
+                "threshold": 0.035,
+                "value": 0.0009247863795623339
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.02642246798749525,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "low",
+              "r_cross": 0.27575800342504536
+            }
+          },
+          "BAD_CONT_CROSS": {
+            "components": {},
+            "enabled": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": null,
+            "status": "DISABLED",
+            "witness": null
+          },
+          "BAD_CONT_CROSS_WINDOW": {
+            "components": {
+              "window_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.23843661982011596,
+                "threshold": 0.25,
+                "value": 0.05960915495502899
+              },
+              "window_energy": {
+                "comparison": ">=",
+                "ratio": 0.05237750587189862,
+                "threshold": 0.05,
+                "value": 0.002618875293594931
+              }
+            },
+            "enabled": true,
+            "exempted_candidates": 0,
+            "fired": false,
+            "operation": "OR",
+            "severity": 0.23843661982011596,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "low",
+              "r_cross": 0.27575800342504536
+            }
+          },
+          "BAD_DISTRIBUTED_HARMONIC_NOISE": {
+            "components": {
+              "radial_length": {
+                "comparison": ">",
+                "ratio": 0.17594428405889215,
+                "threshold": 0.03,
+                "value": 0.005278328521766764
+              },
+              "top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.005448959656700401,
+                "threshold": 0.005,
+                "value": 2.7244798283502007e-05
+              },
+              "window_fraction": {
+                "comparison": ">",
+                "ratio": 0.022129052583566327,
+                "threshold": 0.05,
+                "value": 0.0011064526291783164
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "population_selection": {
+              "comparison": ">=",
+              "nhf_min": 4.0,
+              "window_dr": 0.05
+            },
+            "severity": 0.005448959656700401,
+            "status": "MEASURED",
+            "witness": {
+              "effective_length": 0.005278328521766764,
+              "end_index": 198,
+              "fires": false,
+              "hf_energy": 2.148169335992379e-06,
+              "hf_top2_ratio": 2.7244798283502007e-05,
+              "hf_total_fraction": 2.2889530405688636e-05,
+              "hf_window_fraction": 0.0011064526291783164,
+              "minimum_cut_ratio": 0.005448959656700401,
+              "n_qualifying": 2,
+              "qualifying_center_indices": [
+                189,
+                197
+              ],
+              "qualifying_hf_energy": [
+                2.089954801051836e-06,
+                5.8214534940543e-08
+              ],
+              "qualifying_nhf": [
+                6.406206769962317,
+                5.185854130728886
+              ],
+              "r_end": 0.99,
+              "r_start": 0.9400000000000001,
+              "raw_window_energy": 0.0019414923688035985,
+              "start_index": 188
+            }
+          },
+          "BAD_EDGE_SPIKE": {
+            "components": {},
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_EXTENDED_CONTINUUM_NOISE": {
+            "components": {
+              "local_fraction": {
+                "comparison": ">=",
+                "ratio": 0.006982358312333858,
+                "threshold": 0.2,
+                "value": 0.0013964716624667716
+              },
+              "radial_length": {
+                "comparison": ">=",
+                "ratio": 0.320597318687025,
+                "threshold": 0.04,
+                "value": 0.012823892747481
+              },
+              "top2_ratio": {
+                "comparison": ">=",
+                "ratio": 0.00014312391897538273,
+                "threshold": 0.01,
+                "value": 1.4312391897538273e-06
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.00014312391897538273,
+            "status": "MEASURED",
+            "witness": {
+              "r_end": 0.275,
+              "r_start": 0.01,
+              "region_id": 0,
+              "side": "below_lower"
+            }
+          },
+          "BAD_GRID_SCALE_PACKET": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.016075934672131333,
+                "threshold": 0.3,
+                "value": 0.004822780401639399
+              },
+              "turn_step": {
+                "comparison": ">=",
+                "ratio": 0.00551192121020408,
+                "threshold": 0.2,
+                "value": 0.001102384242040816
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.00551192121020408,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.004822780401639399,
+              "harmonic_index": 8,
+              "opposing_turns": 3,
+              "required_turns": 3,
+              "turn_step": 0.001102384242040816,
+              "window_start_index": 1
+            }
+          },
+          "BAD_GRID_SCALE_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.6784698606664026,
+                "threshold": 0.3,
+                "value": 0.20354095819992077
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.39950085919983,
+                "threshold": 0.75,
+                "value": 1.8773426457760145
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.39950085919983,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.20354095819992077,
+              "harmonic_index": 23,
+              "peak_r": 0.96,
+              "width_grid": 1.8773426457760145,
+              "width_limit": 0.75
+            }
+          },
+          "BAD_INTERIOR_HARMONIC_INCOHERENCE": {
+            "components": {
+              "incoherence_score": {
+                "comparison": ">",
+                "ratio": 0.00024006585507001856,
+                "threshold": 0.1,
+                "value": 2.4006585507001857e-05
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.00024006585507001856,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_INTERIOR_UNRESOLVED_ENVELOPE": {
+            "components": {},
+            "enabled": true,
+            "exception_qualified": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_NEAR_AXIS_GRID_OSCILLATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.04822780401639399,
+                "threshold": 0.1,
+                "value": 0.004822780401639399
+              },
+              "run_step_l2": {
+                "comparison": ">=",
+                "ratio": 0.0033562967461272636,
+                "threshold": 0.3,
+                "value": 0.001006889023838179
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0033562967461272636,
+            "status": "MEASURED",
+            "witness": {
+              "selected_run_consecutive_sign_flip_count": 5,
+              "selected_run_end_index": 8,
+              "selected_run_harmonic_index": 9,
+              "selected_run_start_index": 3
+            }
+          }
+        },
+        "nearest_gate": "BAD_GRID_SCALE_SPIKE",
+        "overall_rule_severity": 0.39950085919983,
+        "rule_margin": 0.60049914080017,
+        "schema_version": "rule-severity-v2",
+        "unavailable_gates": []
+      },
+      "source_feature_schema_version": "rf_all_crossings_extremum_energy_31_v2"
+    }
+  },
+  {
+    "mode_key": "nstxu_204202/N6/egn06w.1273E+02",
+    "rule_decision": "REVIEW",
+    "final_decision": "GOOD",
+    "rule_features": {
+      "boundary_features": {
+        "axis_artifact": {
+          "axis_amplitude_qualified_peak_count": 0,
+          "axis_candidate_amplitude_min": 0.2,
+          "axis_candidate_found": false,
+          "axis_candidate_width_limit_grid": 10.0,
+          "axis_component_touches_boundary": false,
+          "axis_halfmax_outer_edge_r": 0.017212258154658308,
+          "axis_halfmax_width_grid": 2.838630857351531,
+          "axis_halfmax_width_r": 0.014193154286757654,
+          "axis_local_peak_count": 93,
+          "axis_peak": 0.008028638687624563,
+          "axis_peak_harmonic_index": 10,
+          "axis_peak_is_local_max": true,
+          "axis_peak_r": 0.01,
+          "axis_width_qualified_peak_count": 87,
+          "r_ax": 0.03
+        },
+        "axis_energy_concentration": {
+          "amplitude_min": 0.5,
+          "amplitude_r_max": 0.015,
+          "axis_amplitude": 0.008028638687624563,
+          "axis_harmonic_index": 10,
+          "axis_peak_r": 0.01,
+          "axis_sample_count": 4,
+          "axis_signed_amplitude": -0.008028638687624563,
+          "candidate_found": false,
+          "enabled": true,
+          "energy_fraction_min": 0.5,
+          "energy_r_max": 0.05,
+          "inner_energy_fraction": 3.6273041023264302e-06,
+          "n_radial": 201,
+          "total_energy": 0.27596967108024134
+        },
+        "edge_artifact": {
+          "edge_body_amplitude_max": 1.0,
+          "edge_body_r_max": 0.9,
+          "edge_energy_component_touches_boundary": false,
+          "edge_energy_halfmax_inner_edge_r": 0.5493095625830718,
+          "edge_energy_halfmax_outer_edge_r": 0.7200707109567743,
+          "edge_energy_halfmax_width_grid": 34.1522296747405,
+          "edge_energy_halfmax_width_r": 0.1707611483737025,
+          "edge_energy_local_peaks": [
+            {
+              "component_touches_boundary": false,
+              "halfmax_inner_edge_r": 0.34862691861702744,
+              "halfmax_outer_edge_r": 0.9952700935448199,
+              "halfmax_width_grid": 129.3286349855585,
+              "halfmax_width_r": 0.6466431749277924,
+              "is_global_peak": false,
+              "peak_amplitude": 0.01317130003848089,
+              "peak_energy_fraction": 0.0006245812321604372,
+              "peak_index": 197,
+              "peak_r": 0.985
+            }
+          ],
+          "edge_energy_peak": 1.0,
+          "edge_energy_peak_in_window": false,
+          "edge_energy_peak_r": 0.655,
+          "edge_harmonic_component_touches_boundary": false,
+          "edge_harmonic_halfmax_inner_edge_r": 0.9626312028356386,
+          "edge_harmonic_halfmax_outer_edge_r": 0.9729389962417192,
+          "edge_harmonic_halfmax_width_grid": 2.0615586812161135,
+          "edge_harmonic_halfmax_width_r": 0.010307793406080568,
+          "edge_harmonic_peak": 0.029540642307580776,
+          "edge_harmonic_peak_harmonic_index": 35,
+          "edge_harmonic_peak_is_local_max": true,
+          "edge_harmonic_peak_r": 0.97,
+          "r_edge_min": 0.97
+        }
+      },
+      "crossing_features": {
+        "W_star_high_shear": 0.0,
+        "W_star_high_shear_sum": 0.0,
+        "W_star_sum": 0.0,
+        "continuum_crossing_tail": {
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "energy_peak_r": 0.655,
+          "half_width_grid": 4,
+          "k_min": 0.4,
+          "n_qualifying_crossings": 0,
+          "n_radial": 201,
+          "records": [],
+          "resolution_eligible": true,
+          "top2_energy": 0.18049095838955004,
+          "top2_energy_share": 0.654024616846647,
+          "top2_harmonic_indices": [
+            12,
+            13
+          ],
+          "top2_ratio_min": 0.035,
+          "total_energy": 0.27596967108024134,
+          "witness": null
+        },
+        "continuum_crossing_window_exception": {
+          "all_violations_exempted": false,
+          "amplitude_max": 0.2,
+          "calibrated_n_radial": 201,
+          "enabled": true,
+          "half_width_grid": 4,
+          "k_max": 0.1,
+          "n_exempted_crossings": 0,
+          "n_radial": 201,
+          "n_unexcused_crossings": 0,
+          "n_violating_crossings": 0,
+          "records": [],
+          "resolution_eligible": true
+        },
+        "cross_window_A_crossing_boundary": null,
+        "cross_window_A_crossing_r": null,
+        "cross_window_A_distance_grid": null,
+        "cross_window_A_harmonic_index": null,
+        "cross_window_A_max": null,
+        "cross_window_A_neighbor_count": null,
+        "cross_window_A_neighbor_rms": null,
+        "cross_window_A_neighbor_stencil_complete": null,
+        "cross_window_A_sample_r": null,
+        "cross_window_W_crossing_boundary": null,
+        "cross_window_W_crossing_r": null,
+        "cross_window_W_distance_grid": null,
+        "cross_window_W_max": null,
+        "cross_window_W_sample_r": null,
+        "cross_window_candidate_found": false,
+        "cross_window_half_width_grid": 2,
+        "cross_window_half_width_r": 0.01,
+        "n_cross": 0.0,
+        "r_star_high_shear": null,
+        "r_star_max": null
+      },
+      "crossing_records": [],
+      "extremum_features": {
+        "ext_df_gap": 0.097459050752083,
+        "ext_dr": 0.325,
+        "ext_energy_frac": 5.6021371924180904e-05,
+        "match_found": true
+      },
+      "feature_schema_version": "tae-rule-features-grouped-v26",
+      "numerical_structure_features": {
+        "distributed_harmonic_noise": {
+          "actual_window_dr": 0.05,
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "energy_reference": "full-domain-top-two-individual-harmonics",
+          "gate_enabled": true,
+          "local_energy_policy": "all-raw-nodes-in-window",
+          "maximum_effective_length": 0.045,
+          "minimum_n_radial": 41,
+          "n_firing_windows": 0,
+          "n_harmonics": 54,
+          "n_population_windows": 24,
+          "n_radial": 201,
+          "n_scanned_windows": 191,
+          "native_grid_spacing": 0.005,
+          "participation_policy": "pointwise-N_hf-inclusive; same-selected-centers-for-HF-and-length",
+          "reason": null,
+          "resolution_eligible": true,
+          "schema_version": "distributed-harmonic-noise-v1",
+          "status": "MEASURED",
+          "stencil_policy": "all-three-samples-in-same-window",
+          "thresholds": {
+            "local_min": 0.05,
+            "nhf_min": 4.0,
+            "radial_length_min": 0.03,
+            "top2_min": 0.005,
+            "window_dr": 0.05
+          },
+          "top2_energy": 0.18049095838955004,
+          "top2_energy_share": 0.6540246168466468,
+          "top2_harmonic_indices": [
+            12,
+            13
+          ],
+          "total_energy": 0.2759696710802414,
+          "witness": {
+            "effective_length": 0.005,
+            "end_index": 182,
+            "fires": false,
+            "hf_energy": 8.053459429164406e-06,
+            "hf_top2_ratio": 4.4619738855742485e-05,
+            "hf_total_fraction": 2.918240760892442e-05,
+            "hf_window_fraction": 0.0004468965588479985,
+            "minimum_cut_ratio": 0.008923947771148497,
+            "n_qualifying": 1,
+            "qualifying_center_indices": [
+              180
+            ],
+            "qualifying_hf_energy": [
+              8.053459429164406e-06
+            ],
+            "qualifying_nhf": [
+              4.393482547768135
+            ],
+            "r_end": 0.91,
+            "r_start": 0.86,
+            "raw_window_energy": 0.018020858003302737,
+            "start_index": 172
+          },
+          "witness_policy": "max-min-cut-ratios; earliest-tie; default-top2-cut-when-disabled"
+        },
+        "extended_continuum_noise": {
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "gate_enabled": true,
+          "n_harmonics": 54,
+          "n_radial": 201,
+          "native_grid_spacing": 0.005,
+          "outside_sample_count": 0,
+          "qualifying_region_ids": [],
+          "reason": null,
+          "records": [],
+          "resolution_policy": "native-grid-high-pass-with-radial-length",
+          "schema_version": "continuum-side-noise-v2",
+          "stencil_policy": "all-three-samples-in-same-outside-region",
+          "thresholds": {
+            "local_min": 0.2,
+            "radial_length_min": 0.04,
+            "top2_min": 0.01
+          },
+          "top2_energy": 0.18049095838955004,
+          "top2_energy_share": 0.6540246168466467,
+          "top2_harmonic_indices": [
+            12,
+            13
+          ],
+          "total_energy": 0.27596967108024145,
+          "unknown_continuum_sample_count": 4,
+          "valid_continuum_sample_count": 197,
+          "witness": null
+        },
+        "grid_scale_packet": {
+          "grid_scale_packet_amplitude_min": 0.3,
+          "grid_scale_packet_amplitude_qualified_window_count": 0,
+          "grid_scale_packet_candidate_found": false,
+          "grid_scale_packet_direction_change_count": null,
+          "grid_scale_packet_large_step_count": null,
+          "grid_scale_packet_large_turn_count": null,
+          "grid_scale_packet_max_step": null,
+          "grid_scale_packet_min_large_turns": 3,
+          "grid_scale_packet_peak": null,
+          "grid_scale_packet_peak_harmonic_index": null,
+          "grid_scale_packet_peak_r": null,
+          "grid_scale_packet_peak_r_max": 0.5,
+          "grid_scale_packet_peak_signed_amplitude": null,
+          "grid_scale_packet_radius_qualified_window_count": 0,
+          "grid_scale_packet_sign_change_count": null,
+          "grid_scale_packet_step_min": 0.2,
+          "grid_scale_packet_step_rms": null,
+          "grid_scale_packet_total_variation": null,
+          "grid_scale_packet_turn_qualified_window_count": 0,
+          "grid_scale_packet_window_end_index": null,
+          "grid_scale_packet_window_end_r": null,
+          "grid_scale_packet_window_span_grid": 4,
+          "grid_scale_packet_window_start_index": null,
+          "grid_scale_packet_window_start_r": null,
+          "grid_scale_packet_window_values": null
+        },
+        "grid_scale_spike": {
+          "grid_scale_candidate_found": true,
+          "grid_scale_candidate_width_limit_grid": 0.75,
+          "grid_scale_component_touches_boundary": false,
+          "grid_scale_halfmax_inner_edge_r": 0.9538922365821502,
+          "grid_scale_halfmax_outer_edge_r": 0.9575248438444697,
+          "grid_scale_halfmax_width_grid": 0.7265214524639019,
+          "grid_scale_halfmax_width_r": 0.0036326072623195094,
+          "grid_scale_high_r_cutoff_r": 0.7,
+          "grid_scale_high_r_width_max_grid": 0.75,
+          "grid_scale_peak": 0.0690064544652255,
+          "grid_scale_peak_harmonic_index": 28,
+          "grid_scale_peak_r": 0.9550000000000001,
+          "grid_scale_peak_sign": -1,
+          "grid_scale_peak_signed_amplitude": -0.0690064544652255,
+          "grid_scale_width_max_grid": 1.0
+        },
+        "interior_harmonic_incoherence": {
+          "active_adjacent_harmonic_pair_count": 3,
+          "active_core_energy_fraction_min": 0.005,
+          "active_core_harmonic_count": 4,
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "core_adjacent_harmonic_coherence": 0.9955874624393256,
+          "core_adjacent_radial_pair_count": 99,
+          "core_effective_harmonic_count_wmean": 1.681251496476762,
+          "core_energy_fraction": 0.022721002535511025,
+          "core_energy_fraction_above_effective_harmonic_count_threshold": 0.00012000072887589004,
+          "core_js_divergence": 0.00019504494647805932,
+          "core_positive_energy_sample_count": 100,
+          "core_r_max": 0.5,
+          "core_radial_sample_count": 101,
+          "effective_harmonic_count_threshold": 3.0,
+          "global_effective_harmonic_count_wmean": 1.751015938606609,
+          "global_energy_fraction_above_effective_harmonic_count_threshold": 0.0015469867378707204,
+          "incoherence_score": 3.2876327021814954e-08,
+          "max_lag_grid": 5,
+          "resolution_eligible": true,
+          "score_threshold": 0.1,
+          "total_energy_fraction_in_core_above_effective_harmonic_count_threshold": 2.7265368650522686e-06
+        },
+        "near_axis_grid_oscillation": {
+          "amplitude_min": 0.1,
+          "candidate_found": false,
+          "min_consecutive_sign_flips": 4,
+          "near_axis_peak": 0.008028638687624563,
+          "near_axis_peak_amplitude_qualified": false,
+          "near_axis_peak_and_run_same_harmonic": false,
+          "near_axis_peak_harmonic_index": 10,
+          "near_axis_peak_r": 0.01,
+          "near_axis_peak_signed_amplitude": -0.008028638687624563,
+          "peak_r_max_exclusive": 0.1,
+          "qualifying_run_count": 52,
+          "selected_run_consecutive_sign_flip_count": 6,
+          "selected_run_end_index": 8,
+          "selected_run_end_r": 0.04,
+          "selected_run_harmonic_index": 9,
+          "selected_run_max_step": 0.0021998642611883914,
+          "selected_run_mean_abs_step": 0.000786766116023288,
+          "selected_run_peak": 0.0015674776730920613,
+          "selected_run_peak_r": 0.01,
+          "selected_run_peak_signed_amplitude": 0.0015674776730920613,
+          "selected_run_start_index": 2,
+          "selected_run_start_r": 0.01,
+          "selected_run_step_l2": 0.002688323130010337,
+          "selected_run_total_variation": 0.004720596696139728,
+          "step_l2_min": 0.3,
+          "step_l2_qualified_run_count": 0
+        }
+      },
+      "resolution_features": {
+        "interior_unresolved_envelope": {
+          "candidate_found": false,
+          "energy_component_touches_boundary": false,
+          "energy_halfmax_inner_edge_r": 0.5493095625830718,
+          "energy_halfmax_outer_edge_r": 0.7200707109567743,
+          "energy_halfmax_width_grid": 34.1522296747405,
+          "energy_halfmax_width_r": 0.1707611483737025,
+          "energy_peak": 1.0,
+          "energy_peak_r": 0.655,
+          "ext_df_gap": 0.097459050752083,
+          "ext_df_gap_max": 0.04,
+          "ext_df_gap_min": 0.001,
+          "ext_df_gap_min_inclusive": false,
+          "ext_dr": 0.325,
+          "ext_dr_max": 0.02,
+          "ext_energy_frac": 5.6021371924180904e-05,
+          "extremum_exception_applied": false,
+          "extremum_match_found": true,
+          "extremum_r_max": 0.5,
+          "extremum_r_min": 0.03,
+          "footprint_exception": {
+            "applied": false,
+            "enabled": true,
+            "local_hf_fraction": null,
+            "local_hf_fraction_max": 0.05,
+            "qualified": false,
+            "spikes_fraction": null,
+            "spikes_fraction_max": 0.5,
+            "status": "NOT_APPLICABLE",
+            "window_dr": 0.05
+          },
+          "peak_r_max": 0.5,
+          "width_max_grid": 2.0
+        }
+      },
+      "rf_standard_features": {
+        "S": 5.847015190474275,
+        "W_star": 3.6451049536086475e-06,
+        "W_star_max": 0.0,
+        "delta2_eff": 0.0,
+        "frac_spikes": 0.012898470609913396,
+        "gamma_d": -0.0,
+        "max_abs_d1_abs": 0.5280223672729404,
+        "max_abs_d2_abs": 0.8718703671243249,
+        "max_per_m_mean": 0.1483856374607295,
+        "max_to_mean": 92.34772548780056,
+        "max_to_median": 559339.8161421749,
+        "mean_abs_d1_mode": 0.002661401947486952,
+        "mean_abs_d2_mode": 0.0023104525277667766,
+        "mean_amp": 0.010828637030586698,
+        "ntor": 6.0,
+        "r_star": 0.01,
+        "rad_loc": 0.6746297032785279,
+        "rad_width": 0.11366991218963633,
+        "spikes_per_m": 2.5925925925925926,
+        "std_amp": 0.07048307930561745,
+        "std_per_m_max": 0.28425431588007133,
+        "std_per_m_mean": 0.032891202631634704
+      },
+      "severity_features": {
+        "complete": true,
+        "configuration_sha256": "e8659b347f6bfdb1bbf343b8701019ddb58b109c8726777f9a152b3a7b893e33",
+        "gates": {
+          "BAD_AXIS_ENERGY_CONCENTRATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">",
+                "ratio": 0.016057277375249125,
+                "threshold": 0.5,
+                "value": 0.008028638687624563
+              },
+              "inner_energy_fraction": {
+                "comparison": ">",
+                "ratio": 7.2546082046528605e-06,
+                "threshold": 0.5,
+                "value": 3.6273041023264302e-06
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 7.2546082046528605e-06,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_AXIS_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.04014319343812281,
+                "threshold": 0.2,
+                "value": 0.008028638687624563
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 3.522825088053222,
+                "threshold": 10.0,
+                "value": 2.838630857351531
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.04014319343812281,
+            "status": "MEASURED",
+            "witness": {
+              "axis_component_touches_boundary": false,
+              "axis_halfmax_outer_edge_r": 0.017212258154658308,
+              "axis_halfmax_width_grid": 2.838630857351531,
+              "axis_halfmax_width_r": 0.014193154286757654,
+              "axis_peak": 0.008028638687624563,
+              "axis_peak_harmonic_index": 10,
+              "axis_peak_is_local_max": true,
+              "axis_peak_r": 0.01
+            }
+          },
+          "BAD_CONTINUUM_CROSSING_TAIL": {
+            "components": {},
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_CONT_CROSS": {
+            "components": {},
+            "enabled": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": null,
+            "status": "DISABLED",
+            "witness": null
+          },
+          "BAD_CONT_CROSS_WINDOW": {
+            "components": {},
+            "enabled": true,
+            "exempted_candidates": 0,
+            "fired": false,
+            "operation": "OR",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_DISTRIBUTED_HARMONIC_NOISE": {
+            "components": {
+              "radial_length": {
+                "comparison": ">",
+                "ratio": 0.16666666666666669,
+                "threshold": 0.03,
+                "value": 0.005
+              },
+              "top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.008923947771148497,
+                "threshold": 0.005,
+                "value": 4.4619738855742485e-05
+              },
+              "window_fraction": {
+                "comparison": ">",
+                "ratio": 0.008937931176959969,
+                "threshold": 0.05,
+                "value": 0.0004468965588479985
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "population_selection": {
+              "comparison": ">=",
+              "nhf_min": 4.0,
+              "window_dr": 0.05
+            },
+            "severity": 0.008923947771148497,
+            "status": "MEASURED",
+            "witness": {
+              "effective_length": 0.005,
+              "end_index": 182,
+              "fires": false,
+              "hf_energy": 8.053459429164406e-06,
+              "hf_top2_ratio": 4.4619738855742485e-05,
+              "hf_total_fraction": 2.918240760892442e-05,
+              "hf_window_fraction": 0.0004468965588479985,
+              "minimum_cut_ratio": 0.008923947771148497,
+              "n_qualifying": 1,
+              "qualifying_center_indices": [
+                180
+              ],
+              "qualifying_hf_energy": [
+                8.053459429164406e-06
+              ],
+              "qualifying_nhf": [
+                4.393482547768135
+              ],
+              "r_end": 0.91,
+              "r_start": 0.86,
+              "raw_window_energy": 0.018020858003302737,
+              "start_index": 172
+            }
+          },
+          "BAD_EDGE_SPIKE": {
+            "components": {
+              "amplitude_over_body": {
+                "comparison": ">",
+                "ratio": 0.01317130003848089,
+                "threshold": 1.0,
+                "value": 0.01317130003848089
+              },
+              "peak_energy_fraction": {
+                "comparison": ">=",
+                "ratio": 0.0012491624643208743,
+                "threshold": 0.5,
+                "value": 0.0006245812321604372
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.07732239655291075,
+                "threshold": 10.0,
+                "value": 129.3286349855585
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0012491624643208743,
+            "status": "MEASURED",
+            "witness": {
+              "component_touches_boundary": false,
+              "halfmax_inner_edge_r": 0.34862691861702744,
+              "halfmax_outer_edge_r": 0.9952700935448199,
+              "halfmax_width_grid": 129.3286349855585,
+              "halfmax_width_r": 0.6466431749277924,
+              "is_global_peak": false,
+              "peak_amplitude": 0.01317130003848089,
+              "peak_energy_fraction": 0.0006245812321604372,
+              "peak_index": 197,
+              "peak_r": 0.985
+            }
+          },
+          "BAD_EXTENDED_CONTINUUM_NOISE": {
+            "components": {},
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_GRID_SCALE_PACKET": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.005224925576973538,
+                "threshold": 0.3,
+                "value": 0.0015674776730920613
+              },
+              "turn_step": {
+                "comparison": ">=",
+                "ratio": 0.001377225794934188,
+                "threshold": 0.2,
+                "value": 0.0002754451589868376
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.001377225794934188,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.0015674776730920613,
+              "harmonic_index": 9,
+              "opposing_turns": 3,
+              "required_turns": 3,
+              "turn_step": 0.0002754451589868376,
+              "window_start_index": 2
+            }
+          },
+          "BAD_GRID_SCALE_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 1.1256748711277276,
+                "threshold": 0.3,
+                "value": 0.33770246133831827
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.5322283389192136,
+                "threshold": 0.75,
+                "value": 1.409169608523686
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.5322283389192136,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.33770246133831827,
+              "harmonic_index": 28,
+              "peak_r": 0.9450000000000001,
+              "width_grid": 1.409169608523686,
+              "width_limit": 0.75
+            }
+          },
+          "BAD_INTERIOR_HARMONIC_INCOHERENCE": {
+            "components": {
+              "incoherence_score": {
+                "comparison": ">",
+                "ratio": 3.287632702181495e-07,
+                "threshold": 0.1,
+                "value": 3.2876327021814954e-08
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 3.287632702181495e-07,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_INTERIOR_UNRESOLVED_ENVELOPE": {
+            "components": {},
+            "enabled": true,
+            "exception_qualified": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_NEAR_AXIS_GRID_OSCILLATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.08028638687624562,
+                "threshold": 0.1,
+                "value": 0.008028638687624563
+              },
+              "run_step_l2": {
+                "comparison": ">=",
+                "ratio": 0.008961077100034458,
+                "threshold": 0.3,
+                "value": 0.002688323130010337
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.008961077100034458,
+            "status": "MEASURED",
+            "witness": {
+              "selected_run_consecutive_sign_flip_count": 6,
+              "selected_run_end_index": 8,
+              "selected_run_harmonic_index": 9,
+              "selected_run_start_index": 2
+            }
+          }
+        },
+        "nearest_gate": "BAD_GRID_SCALE_SPIKE",
+        "overall_rule_severity": 0.5322283389192136,
+        "rule_margin": 0.4677716610807864,
+        "schema_version": "rule-severity-v2",
+        "unavailable_gates": []
+      },
+      "source_feature_schema_version": "rf_all_crossings_extremum_energy_31_v2"
+    }
+  },
+  {
+    "mode_key": "nstxu_204202/N6/egn06w.2987E+02",
+    "rule_decision": "REVIEW",
+    "final_decision": "GOOD",
+    "rule_features": {
+      "boundary_features": {
+        "axis_artifact": {
+          "axis_amplitude_qualified_peak_count": 0,
+          "axis_candidate_amplitude_min": 0.2,
+          "axis_candidate_found": false,
+          "axis_candidate_width_limit_grid": 10.0,
+          "axis_component_touches_boundary": false,
+          "axis_halfmax_outer_edge_r": 0.03336085592100359,
+          "axis_halfmax_width_grid": 2.7793671936429765,
+          "axis_halfmax_width_r": 0.013896835968214883,
+          "axis_local_peak_count": 102,
+          "axis_peak": 0.01800753727760557,
+          "axis_peak_harmonic_index": 11,
+          "axis_peak_is_local_max": true,
+          "axis_peak_r": 0.025,
+          "axis_width_qualified_peak_count": 99,
+          "r_ax": 0.03
+        },
+        "axis_energy_concentration": {
+          "amplitude_min": 0.5,
+          "amplitude_r_max": 0.015,
+          "axis_amplitude": 0.007571593576525378,
+          "axis_harmonic_index": 9,
+          "axis_peak_r": 0.015,
+          "axis_sample_count": 4,
+          "axis_signed_amplitude": 0.007571593576525378,
+          "candidate_found": false,
+          "enabled": true,
+          "energy_fraction_min": 0.5,
+          "energy_r_max": 0.05,
+          "inner_energy_fraction": 1.6295718875152093e-05,
+          "n_radial": 201,
+          "total_energy": 0.31159039174445863
+        },
+        "edge_artifact": {
+          "edge_body_amplitude_max": 0.9409939540933302,
+          "edge_body_r_max": 0.9,
+          "edge_energy_component_touches_boundary": false,
+          "edge_energy_halfmax_inner_edge_r": 0.7490856236161972,
+          "edge_energy_halfmax_outer_edge_r": 0.9340637562377482,
+          "edge_energy_halfmax_width_grid": 36.99562652431019,
+          "edge_energy_halfmax_width_r": 0.18497813262155094,
+          "edge_energy_local_peaks": [],
+          "edge_energy_peak": 1.0,
+          "edge_energy_peak_in_window": false,
+          "edge_energy_peak_r": 0.86,
+          "edge_harmonic_component_touches_boundary": false,
+          "edge_harmonic_halfmax_inner_edge_r": 0.9596431624977878,
+          "edge_harmonic_halfmax_outer_edge_r": 0.9729637614383783,
+          "edge_harmonic_halfmax_width_grid": 2.664119788118091,
+          "edge_harmonic_halfmax_width_r": 0.013320598940590456,
+          "edge_harmonic_peak": 0.06252220299826161,
+          "edge_harmonic_peak_harmonic_index": 35,
+          "edge_harmonic_peak_is_local_max": false,
+          "edge_harmonic_peak_r": 0.97,
+          "r_edge_min": 0.97
+        }
+      },
+      "crossing_features": {
+        "W_star_high_shear": 9.650854040580026e-05,
+        "W_star_high_shear_sum": 9.650854040580026e-05,
+        "W_star_sum": 0.004578733488704179,
+        "continuum_crossing_tail": {
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "energy_peak_r": 0.86,
+          "half_width_grid": 4,
+          "k_min": 0.4,
+          "n_qualifying_crossings": 0,
+          "n_radial": 201,
+          "records": [
+            {
+              "K_cross": 0.951011600180407,
+              "boundary": "high",
+              "candidate_found": false,
+              "energy_fraction_inner": 1.640769119679241e-05,
+              "energy_fraction_outer": 0.9999835923088032,
+              "local_amplitude_energy": 5.338754728765562e-06,
+              "n_centers": 8,
+              "r_cross": 0.08354737445436244,
+              "second_difference_energy": 4.828492908013948e-06,
+              "tail_energy": 5.112478927630652e-06,
+              "tail_fraction": 1.640769119679241e-05,
+              "tail_over_top2": 7.965003880094661e-05,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            },
+            {
+              "K_cross": 0.1944160090850246,
+              "boundary": "high",
+              "candidate_found": false,
+              "energy_fraction_inner": 0.0008307794634769517,
+              "energy_fraction_outer": 0.999169220536523,
+              "local_amplitude_energy": 0.04377259813499088,
+              "n_centers": 8,
+              "r_cross": 0.3451905518820271,
+              "second_difference_energy": 0.0016544984806678524,
+              "tail_energy": 0.00025886289847803454,
+              "tail_fraction": 0.0008307794634769517,
+              "tail_over_top2": 0.004032963304057362,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            }
+          ],
+          "resolution_eligible": true,
+          "top2_energy": 0.0641867725941383,
+          "top2_energy_share": 0.20599727814065308,
+          "top2_harmonic_indices": [
+            15,
+            16
+          ],
+          "top2_ratio_min": 0.035,
+          "total_energy": 0.31159039174445863,
+          "witness": null
+        },
+        "continuum_crossing_window_exception": {
+          "all_violations_exempted": false,
+          "amplitude_max": 0.2,
+          "calibrated_n_radial": 201,
+          "enabled": true,
+          "half_width_grid": 4,
+          "k_max": 0.1,
+          "n_exempted_crossings": 0,
+          "n_radial": 201,
+          "n_unexcused_crossings": 0,
+          "n_violating_crossings": 0,
+          "records": [
+            {
+              "A_cross": 0.0006419048812845401,
+              "A_cross_harmonic_index": 11,
+              "K_cross": 0.951011600180407,
+              "boundary": "high",
+              "exception_conditions_pass": false,
+              "exempted": false,
+              "local_amplitude_energy": 5.338754728765562e-06,
+              "n_centers": 8,
+              "r_cross": 0.08354737445436244,
+              "second_difference_energy": 4.828492908013948e-06,
+              "window_A_max": 0.0008654869051604954,
+              "window_W_max": 7.392320048993112e-07,
+              "window_violation": false
+            },
+            {
+              "A_cross": 0.062194524378888685,
+              "A_cross_harmonic_index": 11,
+              "K_cross": 0.1944160090850246,
+              "boundary": "high",
+              "exception_conditions_pass": false,
+              "exempted": false,
+              "local_amplitude_energy": 0.04377259813499088,
+              "n_centers": 8,
+              "r_cross": 0.3451905518820271,
+              "second_difference_energy": 0.0016544984806678524,
+              "window_A_max": 0.06236047341494688,
+              "window_W_max": 0.0045910444078773715,
+              "window_violation": false
+            }
+          ],
+          "resolution_eligible": true
+        },
+        "cross_window_A_crossing_boundary": "high",
+        "cross_window_A_crossing_r": 0.3451905518820271,
+        "cross_window_A_distance_grid": 0.03811037640540915,
+        "cross_window_A_harmonic_index": 11,
+        "cross_window_A_max": 0.06236047341494688,
+        "cross_window_A_neighbor_count": 4,
+        "cross_window_A_neighbor_rms": 0.01634037196927969,
+        "cross_window_A_neighbor_stencil_complete": true,
+        "cross_window_A_sample_r": 0.34500000000000003,
+        "cross_window_W_crossing_boundary": "high",
+        "cross_window_W_crossing_r": 0.3451905518820271,
+        "cross_window_W_distance_grid": 0.03811037640540915,
+        "cross_window_W_max": 0.0045910444078773715,
+        "cross_window_W_sample_r": 0.34500000000000003,
+        "cross_window_candidate_found": true,
+        "cross_window_half_width_grid": 2,
+        "cross_window_half_width_r": 0.01,
+        "n_cross": 2.0,
+        "r_star_high_shear": 0.3451905518820271,
+        "r_star_max": 0.3451905518820271
+      },
+      "crossing_records": [
+        {
+          "W_peak": 5.93846980770283e-07,
+          "boundary": "high",
+          "r_cross": 0.08354737445436244,
+          "shear_weighted": 0.0
+        },
+        {
+          "W_peak": 0.004578139641723409,
+          "boundary": "high",
+          "r_cross": 0.3451905518820271,
+          "shear_weighted": 9.650854040580026e-05
+        }
+      ],
+      "extremum_features": {
+        "ext_df_gap": 0.410790980742868,
+        "ext_dr": 0.53,
+        "ext_energy_frac": 0.0008124039174175112,
+        "match_found": true
+      },
+      "feature_schema_version": "tae-rule-features-grouped-v26",
+      "numerical_structure_features": {
+        "distributed_harmonic_noise": {
+          "actual_window_dr": 0.05,
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "energy_reference": "full-domain-top-two-individual-harmonics",
+          "gate_enabled": true,
+          "local_energy_policy": "all-raw-nodes-in-window",
+          "maximum_effective_length": 0.045,
+          "minimum_n_radial": 41,
+          "n_firing_windows": 0,
+          "n_harmonics": 54,
+          "n_population_windows": 17,
+          "n_radial": 201,
+          "n_scanned_windows": 191,
+          "native_grid_spacing": 0.005,
+          "participation_policy": "pointwise-N_hf-inclusive; same-selected-centers-for-HF-and-length",
+          "reason": null,
+          "resolution_eligible": true,
+          "schema_version": "distributed-harmonic-noise-v1",
+          "status": "MEASURED",
+          "stencil_policy": "all-three-samples-in-same-window",
+          "thresholds": {
+            "local_min": 0.05,
+            "nhf_min": 4.0,
+            "radial_length_min": 0.03,
+            "top2_min": 0.005,
+            "window_dr": 0.05
+          },
+          "top2_energy": 0.06418677259413827,
+          "top2_energy_share": 0.205997278140653,
+          "top2_harmonic_indices": [
+            15,
+            16
+          ],
+          "total_energy": 0.31159039174445863,
+          "witness": {
+            "effective_length": 0.006505586253420388,
+            "end_index": 199,
+            "fires": false,
+            "hf_energy": 9.523507575315991e-05,
+            "hf_top2_ratio": 0.0014837180918153387,
+            "hf_total_fraction": 0.00030564188844200323,
+            "hf_window_fraction": 0.006971991124092355,
+            "minimum_cut_ratio": 0.13943982248184708,
+            "n_qualifying": 5,
+            "qualifying_center_indices": [
+              190,
+              195,
+              196,
+              197,
+              198
+            ],
+            "qualifying_hf_energy": [
+              8.326789695851518e-05,
+              3.96109505912874e-06,
+              2.4031762997185514e-06,
+              2.8793875822721157e-06,
+              2.723519853525324e-06
+            ],
+            "qualifying_nhf": [
+              4.673870293790472,
+              6.392168944938364,
+              10.32672442966886,
+              7.139240636185651,
+              4.309325345229937
+            ],
+            "r_end": 0.995,
+            "r_start": 0.9450000000000001,
+            "raw_window_energy": 0.013659666809394861,
+            "start_index": 189
+          },
+          "witness_policy": "max-min-cut-ratios; earliest-tie; default-top2-cut-when-disabled"
+        },
+        "extended_continuum_noise": {
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "gate_enabled": true,
+          "n_harmonics": 54,
+          "n_radial": 201,
+          "native_grid_spacing": 0.005,
+          "outside_sample_count": 53,
+          "qualifying_region_ids": [],
+          "reason": null,
+          "records": [
+            {
+              "crossing_stencil_count": 2,
+              "eligible_stencil_count": 51,
+              "end_index": 69,
+              "hf_crossing_stencil_energy": 3.4758735036799757e-07,
+              "hf_out_energy": 1.6349477081225942e-07,
+              "hf_out_harmonic_extent": 2.29735447943621,
+              "hf_out_local_fraction": 0.0006071868510701869,
+              "hf_out_radial_extent": 1.268434621949995,
+              "hf_out_radial_length": 0.006342173109749974,
+              "hf_out_top2_ratio": 2.547172325458069e-06,
+              "hf_out_total_fraction": 5.247105659995596e-07,
+              "hf_peak_harmonic_index": 11,
+              "hf_peak_r": 0.34,
+              "hf_positive_harmonic_count": 54,
+              "hf_positive_radial_count": 51,
+              "hf_unknown_neighbor_energy": 0.0,
+              "outside_sample_count": 53,
+              "r_end": 0.34500000000000003,
+              "r_start": 0.085,
+              "raw_out_energy": 0.00026926599369550655,
+              "raw_out_total_fraction": 0.0008641665495139427,
+              "region_id": 0,
+              "side": "above_upper",
+              "start_index": 17,
+              "unknown_neighbor_stencil_count": 0
+            }
+          ],
+          "resolution_policy": "native-grid-high-pass-with-radial-length",
+          "schema_version": "continuum-side-noise-v2",
+          "stencil_policy": "all-three-samples-in-same-outside-region",
+          "thresholds": {
+            "local_min": 0.2,
+            "radial_length_min": 0.04,
+            "top2_min": 0.01
+          },
+          "top2_energy": 0.06418677259413827,
+          "top2_energy_share": 0.20599727814065297,
+          "top2_harmonic_indices": [
+            15,
+            16
+          ],
+          "total_energy": 0.3115903917444587,
+          "unknown_continuum_sample_count": 4,
+          "valid_continuum_sample_count": 197,
+          "witness": null
+        },
+        "grid_scale_packet": {
+          "grid_scale_packet_amplitude_min": 0.3,
+          "grid_scale_packet_amplitude_qualified_window_count": 0,
+          "grid_scale_packet_candidate_found": false,
+          "grid_scale_packet_direction_change_count": null,
+          "grid_scale_packet_large_step_count": null,
+          "grid_scale_packet_large_turn_count": null,
+          "grid_scale_packet_max_step": null,
+          "grid_scale_packet_min_large_turns": 3,
+          "grid_scale_packet_peak": null,
+          "grid_scale_packet_peak_harmonic_index": null,
+          "grid_scale_packet_peak_r": null,
+          "grid_scale_packet_peak_r_max": 0.5,
+          "grid_scale_packet_peak_signed_amplitude": null,
+          "grid_scale_packet_radius_qualified_window_count": 0,
+          "grid_scale_packet_sign_change_count": null,
+          "grid_scale_packet_step_min": 0.2,
+          "grid_scale_packet_step_rms": null,
+          "grid_scale_packet_total_variation": null,
+          "grid_scale_packet_turn_qualified_window_count": 0,
+          "grid_scale_packet_window_end_index": null,
+          "grid_scale_packet_window_end_r": null,
+          "grid_scale_packet_window_span_grid": 4,
+          "grid_scale_packet_window_start_index": null,
+          "grid_scale_packet_window_start_r": null,
+          "grid_scale_packet_window_values": null
+        },
+        "grid_scale_spike": {
+          "grid_scale_candidate_found": true,
+          "grid_scale_candidate_width_limit_grid": 0.75,
+          "grid_scale_component_touches_boundary": false,
+          "grid_scale_halfmax_inner_edge_r": 0.9590013291765956,
+          "grid_scale_halfmax_outer_edge_r": 0.9620403373257786,
+          "grid_scale_halfmax_width_grid": 0.6078016298366018,
+          "grid_scale_halfmax_width_r": 0.003039008149183009,
+          "grid_scale_high_r_cutoff_r": 0.7,
+          "grid_scale_high_r_width_max_grid": 0.75,
+          "grid_scale_peak": 0.032025352329247685,
+          "grid_scale_peak_harmonic_index": 29,
+          "grid_scale_peak_r": 0.96,
+          "grid_scale_peak_sign": -1,
+          "grid_scale_peak_signed_amplitude": -0.032025352329247685,
+          "grid_scale_width_max_grid": 1.0
+        },
+        "interior_harmonic_incoherence": {
+          "active_adjacent_harmonic_pair_count": 4,
+          "active_core_energy_fraction_min": 0.005,
+          "active_core_harmonic_count": 5,
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "core_adjacent_harmonic_coherence": 0.8815157367945068,
+          "core_adjacent_radial_pair_count": 99,
+          "core_effective_harmonic_count_wmean": 2.560509873039021,
+          "core_energy_fraction": 0.00799523280756343,
+          "core_energy_fraction_above_effective_harmonic_count_threshold": 0.2926195006934328,
+          "core_js_divergence": 0.00213615860398068,
+          "core_positive_energy_sample_count": 100,
+          "core_r_max": 0.5,
+          "core_radial_sample_count": 101,
+          "effective_harmonic_count_threshold": 3.0,
+          "global_effective_harmonic_count_wmean": 2.219742012456253,
+          "global_energy_fraction_above_effective_harmonic_count_threshold": 0.030536601052720696,
+          "incoherence_score": 5.1814550617838305e-06,
+          "max_lag_grid": 5,
+          "resolution_eligible": true,
+          "score_threshold": 0.1,
+          "total_energy_fraction_in_core_above_effective_harmonic_count_threshold": 0.002339561032076964
+        },
+        "near_axis_grid_oscillation": {
+          "amplitude_min": 0.1,
+          "candidate_found": false,
+          "min_consecutive_sign_flips": 4,
+          "near_axis_peak": 0.01800753727760557,
+          "near_axis_peak_amplitude_qualified": false,
+          "near_axis_peak_and_run_same_harmonic": true,
+          "near_axis_peak_harmonic_index": 11,
+          "near_axis_peak_r": 0.025,
+          "near_axis_peak_signed_amplitude": -0.01800753727760557,
+          "peak_r_max_exclusive": 0.1,
+          "qualifying_run_count": 47,
+          "selected_run_consecutive_sign_flip_count": 5,
+          "selected_run_end_index": 22,
+          "selected_run_end_r": 0.11,
+          "selected_run_harmonic_index": 11,
+          "selected_run_max_step": 0.0008357503409413036,
+          "selected_run_mean_abs_step": 0.0003355944466632174,
+          "selected_run_peak": 0.00055034957366029,
+          "selected_run_peak_r": 0.085,
+          "selected_run_peak_signed_amplitude": 0.00055034957366029,
+          "selected_run_start_index": 17,
+          "selected_run_start_r": 0.085,
+          "selected_run_step_l2": 0.0009703081580902088,
+          "selected_run_total_variation": 0.001677972233316087,
+          "step_l2_min": 0.3,
+          "step_l2_qualified_run_count": 0
+        }
+      },
+      "resolution_features": {
+        "interior_unresolved_envelope": {
+          "candidate_found": false,
+          "energy_component_touches_boundary": false,
+          "energy_halfmax_inner_edge_r": 0.7490856236161972,
+          "energy_halfmax_outer_edge_r": 0.9340637562377482,
+          "energy_halfmax_width_grid": 36.99562652431019,
+          "energy_halfmax_width_r": 0.18497813262155094,
+          "energy_peak": 1.0,
+          "energy_peak_r": 0.86,
+          "ext_df_gap": 0.410790980742868,
+          "ext_df_gap_max": 0.04,
+          "ext_df_gap_min": 0.001,
+          "ext_df_gap_min_inclusive": false,
+          "ext_dr": 0.53,
+          "ext_dr_max": 0.02,
+          "ext_energy_frac": 0.0008124039174175112,
+          "extremum_exception_applied": false,
+          "extremum_match_found": true,
+          "extremum_r_max": 0.5,
+          "extremum_r_min": 0.03,
+          "footprint_exception": {
+            "applied": false,
+            "enabled": true,
+            "local_hf_fraction": null,
+            "local_hf_fraction_max": 0.05,
+            "qualified": false,
+            "spikes_fraction": null,
+            "spikes_fraction_max": 0.5,
+            "status": "NOT_APPLICABLE",
+            "window_dr": 0.05
+          },
+          "peak_r_max": 0.5,
+          "width_max_grid": 2.0
+        }
+      },
+      "rf_standard_features": {
+        "S": 8.29010725383222,
+        "W_star": 1.6464209805616914e-05,
+        "W_star_max": 0.004578139641723409,
+        "delta2_eff": 0.0009629699147938699,
+        "frac_spikes": 0.014372581536760642,
+        "gamma_d": -8.014693043091529e-08,
+        "max_abs_d1_abs": 0.5501858521283902,
+        "max_abs_d2_abs": 0.9529278255831423,
+        "max_per_m_mean": 0.06982977519382591,
+        "max_to_mean": 79.3749804965019,
+        "max_to_median": 732699.0039057725,
+        "mean_abs_d1_mode": 0.0035533735900128843,
+        "mean_abs_d2_mode": 0.002478237190791064,
+        "mean_amp": 0.012598428291452562,
+        "ntor": 6.0,
+        "r_star": 0.01,
+        "rad_loc": 0.8163038729616305,
+        "rad_width": 0.09726097000501592,
+        "spikes_per_m": 2.888888888888889,
+        "std_amp": 0.07471790026028034,
+        "std_per_m_max": 0.3525496308939859,
+        "std_per_m_mean": 0.02118944908763602
+      },
+      "severity_features": {
+        "complete": true,
+        "configuration_sha256": "e8659b347f6bfdb1bbf343b8701019ddb58b109c8726777f9a152b3a7b893e33",
+        "gates": {
+          "BAD_AXIS_ENERGY_CONCENTRATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">",
+                "ratio": 0.015143187153050757,
+                "threshold": 0.5,
+                "value": 0.007571593576525378
+              },
+              "inner_energy_fraction": {
+                "comparison": ">",
+                "ratio": 3.2591437750304186e-05,
+                "threshold": 0.5,
+                "value": 1.6295718875152093e-05
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 3.2591437750304186e-05,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_AXIS_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.09003768638802785,
+                "threshold": 0.2,
+                "value": 0.01800753727760557
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 3.5979412950085177,
+                "threshold": 10.0,
+                "value": 2.7793671936429765
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.09003768638802785,
+            "status": "MEASURED",
+            "witness": {
+              "axis_component_touches_boundary": false,
+              "axis_halfmax_outer_edge_r": 0.03336085592100359,
+              "axis_halfmax_width_grid": 2.7793671936429765,
+              "axis_halfmax_width_r": 0.013896835968214883,
+              "axis_peak": 0.01800753727760557,
+              "axis_peak_harmonic_index": 11,
+              "axis_peak_is_local_max": true,
+              "axis_peak_r": 0.025
+            }
+          },
+          "BAD_CONTINUUM_CROSSING_TAIL": {
+            "components": {
+              "roughness": {
+                "comparison": ">",
+                "ratio": 0.48604002271256147,
+                "threshold": 0.4,
+                "value": 0.1944160090850246
+              },
+              "tail_top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.11522752297306749,
+                "threshold": 0.035,
+                "value": 0.004032963304057362
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.11522752297306749,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "high",
+              "r_cross": 0.3451905518820271
+            }
+          },
+          "BAD_CONT_CROSS": {
+            "components": {},
+            "enabled": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": null,
+            "status": "DISABLED",
+            "witness": null
+          },
+          "BAD_CONT_CROSS_WINDOW": {
+            "components": {
+              "window_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.24944189365978753,
+                "threshold": 0.25,
+                "value": 0.06236047341494688
+              },
+              "window_energy": {
+                "comparison": ">=",
+                "ratio": 0.09182088815754742,
+                "threshold": 0.05,
+                "value": 0.0045910444078773715
+              }
+            },
+            "enabled": true,
+            "exempted_candidates": 0,
+            "fired": false,
+            "operation": "OR",
+            "severity": 0.24944189365978753,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "high",
+              "r_cross": 0.3451905518820271
+            }
+          },
+          "BAD_DISTRIBUTED_HARMONIC_NOISE": {
+            "components": {
+              "radial_length": {
+                "comparison": ">",
+                "ratio": 0.21685287511401294,
+                "threshold": 0.03,
+                "value": 0.006505586253420388
+              },
+              "top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.29674361836306773,
+                "threshold": 0.005,
+                "value": 0.0014837180918153387
+              },
+              "window_fraction": {
+                "comparison": ">",
+                "ratio": 0.13943982248184708,
+                "threshold": 0.05,
+                "value": 0.006971991124092355
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "population_selection": {
+              "comparison": ">=",
+              "nhf_min": 4.0,
+              "window_dr": 0.05
+            },
+            "severity": 0.13943982248184708,
+            "status": "MEASURED",
+            "witness": {
+              "effective_length": 0.006505586253420388,
+              "end_index": 199,
+              "fires": false,
+              "hf_energy": 9.523507575315991e-05,
+              "hf_top2_ratio": 0.0014837180918153387,
+              "hf_total_fraction": 0.00030564188844200323,
+              "hf_window_fraction": 0.006971991124092355,
+              "minimum_cut_ratio": 0.13943982248184708,
+              "n_qualifying": 5,
+              "qualifying_center_indices": [
+                190,
+                195,
+                196,
+                197,
+                198
+              ],
+              "qualifying_hf_energy": [
+                8.326789695851518e-05,
+                3.96109505912874e-06,
+                2.4031762997185514e-06,
+                2.8793875822721157e-06,
+                2.723519853525324e-06
+              ],
+              "qualifying_nhf": [
+                4.673870293790472,
+                6.392168944938364,
+                10.32672442966886,
+                7.139240636185651,
+                4.309325345229937
+              ],
+              "r_end": 0.995,
+              "r_start": 0.9450000000000001,
+              "raw_window_energy": 0.013659666809394861,
+              "start_index": 189
+            }
+          },
+          "BAD_EDGE_SPIKE": {
+            "components": {},
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_EXTENDED_CONTINUUM_NOISE": {
+            "components": {
+              "local_fraction": {
+                "comparison": ">=",
+                "ratio": 0.003035934255350934,
+                "threshold": 0.2,
+                "value": 0.0006071868510701869
+              },
+              "radial_length": {
+                "comparison": ">=",
+                "ratio": 0.15855432774374936,
+                "threshold": 0.04,
+                "value": 0.006342173109749974
+              },
+              "top2_ratio": {
+                "comparison": ">=",
+                "ratio": 0.0002547172325458069,
+                "threshold": 0.01,
+                "value": 2.547172325458069e-06
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0002547172325458069,
+            "status": "MEASURED",
+            "witness": {
+              "r_end": 0.34500000000000003,
+              "r_start": 0.085,
+              "region_id": 0,
+              "side": "above_upper"
+            }
+          },
+          "BAD_GRID_SCALE_PACKET": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.0018344985788676332,
+                "threshold": 0.3,
+                "value": 0.00055034957366029
+              },
+              "turn_step": {
+                "comparison": ">=",
+                "ratio": 0.000616536411122304,
+                "threshold": 0.2,
+                "value": 0.0001233072822244608
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.000616536411122304,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.00055034957366029,
+              "harmonic_index": 11,
+              "opposing_turns": 3,
+              "required_turns": 3,
+              "turn_step": 0.0001233072822244608,
+              "window_start_index": 17
+            }
+          },
+          "BAD_GRID_SCALE_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 1.4760261430717216,
+                "threshold": 0.3,
+                "value": 0.4428078429215165
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.4520700107395752,
+                "threshold": 0.75,
+                "value": 1.6590350657700537
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.4520700107395752,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.4428078429215165,
+              "harmonic_index": 33,
+              "peak_r": 0.96,
+              "width_grid": 1.6590350657700537,
+              "width_limit": 0.75
+            }
+          },
+          "BAD_INTERIOR_HARMONIC_INCOHERENCE": {
+            "components": {
+              "incoherence_score": {
+                "comparison": ">",
+                "ratio": 5.18145506178383e-05,
+                "threshold": 0.1,
+                "value": 5.1814550617838305e-06
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 5.18145506178383e-05,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_INTERIOR_UNRESOLVED_ENVELOPE": {
+            "components": {},
+            "enabled": true,
+            "exception_qualified": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_NEAR_AXIS_GRID_OSCILLATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.1800753727760557,
+                "threshold": 0.1,
+                "value": 0.01800753727760557
+              },
+              "run_step_l2": {
+                "comparison": ">=",
+                "ratio": 0.003234360526967363,
+                "threshold": 0.3,
+                "value": 0.0009703081580902088
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.003234360526967363,
+            "status": "MEASURED",
+            "witness": {
+              "selected_run_consecutive_sign_flip_count": 5,
+              "selected_run_end_index": 22,
+              "selected_run_harmonic_index": 11,
+              "selected_run_start_index": 17
+            }
+          }
+        },
+        "nearest_gate": "BAD_GRID_SCALE_SPIKE",
+        "overall_rule_severity": 0.4520700107395752,
+        "rule_margin": 0.5479299892604248,
+        "schema_version": "rule-severity-v2",
+        "unavailable_gates": []
+      },
+      "source_feature_schema_version": "rf_all_crossings_extremum_energy_31_v2"
+    }
+  },
+  {
+    "mode_key": "nstxu_204202/N7/egn07w.9477E+01",
+    "rule_decision": "REVIEW",
+    "final_decision": "GOOD",
+    "rule_features": {
+      "boundary_features": {
+        "axis_artifact": {
+          "axis_amplitude_qualified_peak_count": 0,
+          "axis_candidate_amplitude_min": 0.2,
+          "axis_candidate_found": false,
+          "axis_candidate_width_limit_grid": 10.0,
+          "axis_component_touches_boundary": false,
+          "axis_halfmax_outer_edge_r": 0.013760432925910974,
+          "axis_halfmax_width_grid": 1.324443702085872,
+          "axis_halfmax_width_r": 0.006622218510429359,
+          "axis_local_peak_count": 75,
+          "axis_peak": 0.06578232103999414,
+          "axis_peak_harmonic_index": 11,
+          "axis_peak_is_local_max": true,
+          "axis_peak_r": 0.01,
+          "axis_width_qualified_peak_count": 74,
+          "r_ax": 0.03
+        },
+        "axis_energy_concentration": {
+          "amplitude_min": 0.5,
+          "amplitude_r_max": 0.015,
+          "axis_amplitude": 0.06578232103999414,
+          "axis_harmonic_index": 11,
+          "axis_peak_r": 0.01,
+          "axis_sample_count": 4,
+          "axis_signed_amplitude": -0.06578232103999414,
+          "candidate_found": false,
+          "enabled": true,
+          "energy_fraction_min": 0.5,
+          "energy_r_max": 0.05,
+          "inner_energy_fraction": 0.0001272407211874621,
+          "n_radial": 201,
+          "total_energy": 0.2143593551257555
+        },
+        "edge_artifact": {
+          "edge_body_amplitude_max": 1.0,
+          "edge_body_r_max": 0.9,
+          "edge_energy_component_touches_boundary": false,
+          "edge_energy_halfmax_inner_edge_r": 0.4866569318092121,
+          "edge_energy_halfmax_outer_edge_r": 0.6207260804840076,
+          "edge_energy_halfmax_width_grid": 26.813829734959093,
+          "edge_energy_halfmax_width_r": 0.13406914867479547,
+          "edge_energy_local_peaks": [
+            {
+              "component_touches_boundary": false,
+              "halfmax_inner_edge_r": 0.19675926116204795,
+              "halfmax_outer_edge_r": 0.9896631045508272,
+              "halfmax_width_grid": 158.58076867775583,
+              "halfmax_width_r": 0.7929038433887792,
+              "is_global_peak": false,
+              "peak_amplitude": 0.0019573834983923023,
+              "peak_energy_fraction": 8.540281176758339e-06,
+              "peak_index": 196,
+              "peak_r": 0.98
+            },
+            {
+              "component_touches_boundary": true,
+              "halfmax_inner_edge_r": 0.16457788125638345,
+              "halfmax_outer_edge_r": 1.0,
+              "halfmax_width_grid": 167.0844237487233,
+              "halfmax_width_r": 0.8354221187436166,
+              "is_global_peak": false,
+              "peak_amplitude": 0.00020165715452257607,
+              "peak_energy_fraction": 1.646891197894945e-06,
+              "peak_index": 200,
+              "peak_r": 1.0
+            }
+          ],
+          "edge_energy_peak": 1.0,
+          "edge_energy_peak_in_window": false,
+          "edge_energy_peak_r": 0.51,
+          "edge_harmonic_component_touches_boundary": false,
+          "edge_harmonic_halfmax_inner_edge_r": 0.9823472002059399,
+          "edge_harmonic_halfmax_outer_edge_r": 0.9878940927524701,
+          "edge_harmonic_halfmax_width_grid": 1.109378509306036,
+          "edge_harmonic_halfmax_width_r": 0.00554689254653018,
+          "edge_harmonic_peak": 0.0026063623577033753,
+          "edge_harmonic_peak_harmonic_index": 52,
+          "edge_harmonic_peak_is_local_max": true,
+          "edge_harmonic_peak_r": 0.985,
+          "r_edge_min": 0.97
+        }
+      },
+      "crossing_features": {
+        "W_star_high_shear": 6.159702413385872e-05,
+        "W_star_high_shear_sum": 6.159702413385872e-05,
+        "W_star_sum": 0.0038237770687931227,
+        "continuum_crossing_tail": {
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "energy_peak_r": 0.51,
+          "half_width_grid": 4,
+          "k_min": 0.4,
+          "n_qualifying_crossings": 0,
+          "n_radial": 201,
+          "records": [
+            {
+              "K_cross": 0.9924479064355668,
+              "boundary": "low",
+              "candidate_found": false,
+              "energy_fraction_inner": 0.0008904035059189265,
+              "energy_fraction_outer": 0.999109596494081,
+              "local_amplitude_energy": 0.030362663688642478,
+              "n_centers": 8,
+              "r_cross": 0.3269210286799412,
+              "second_difference_energy": 0.02990579204227789,
+              "tail_energy": 0.0001908663213304929,
+              "tail_fraction": 0.0008904035059189265,
+              "tail_over_top2": 0.0013708596812910942,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            }
+          ],
+          "resolution_eligible": true,
+          "top2_energy": 0.1392311145592468,
+          "top2_energy_share": 0.6495219883338698,
+          "top2_harmonic_indices": [
+            13,
+            14
+          ],
+          "top2_ratio_min": 0.035,
+          "total_energy": 0.2143593551257555,
+          "witness": null
+        },
+        "continuum_crossing_window_exception": {
+          "all_violations_exempted": false,
+          "amplitude_max": 0.2,
+          "calibrated_n_radial": 201,
+          "enabled": true,
+          "half_width_grid": 4,
+          "k_max": 0.1,
+          "n_exempted_crossings": 0,
+          "n_radial": 201,
+          "n_unexcused_crossings": 0,
+          "n_violating_crossings": 0,
+          "records": [
+            {
+              "A_cross": 0.038027543578822466,
+              "A_cross_harmonic_index": 12,
+              "K_cross": 0.9924479064355668,
+              "boundary": "low",
+              "exception_conditions_pass": false,
+              "exempted": false,
+              "local_amplitude_energy": 0.030362663688642478,
+              "n_centers": 8,
+              "r_cross": 0.3269210286799412,
+              "second_difference_energy": 0.02990579204227789,
+              "window_A_max": 0.08207445054190689,
+              "window_W_max": 0.005327745419793993,
+              "window_violation": false
+            }
+          ],
+          "resolution_eligible": true
+        },
+        "cross_window_A_crossing_boundary": "low",
+        "cross_window_A_crossing_r": 0.3269210286799412,
+        "cross_window_A_distance_grid": 0.38420573598824115,
+        "cross_window_A_harmonic_index": 12,
+        "cross_window_A_max": 0.08207445054190689,
+        "cross_window_A_neighbor_count": 4,
+        "cross_window_A_neighbor_rms": 0.08411115917265796,
+        "cross_window_A_neighbor_stencil_complete": true,
+        "cross_window_A_sample_r": 0.325,
+        "cross_window_W_crossing_boundary": "low",
+        "cross_window_W_crossing_r": 0.3269210286799412,
+        "cross_window_W_distance_grid": 0.38420573598824115,
+        "cross_window_W_max": 0.005327745419793993,
+        "cross_window_W_sample_r": 0.325,
+        "cross_window_candidate_found": true,
+        "cross_window_half_width_grid": 2,
+        "cross_window_half_width_r": 0.01,
+        "n_cross": 1.0,
+        "r_star_high_shear": 0.3269210286799412,
+        "r_star_max": 0.3269210286799412
+      },
+      "crossing_records": [
+        {
+          "W_peak": 0.0038237770687931227,
+          "boundary": "low",
+          "r_cross": 0.3269210286799412,
+          "shear_weighted": 6.159702413385872e-05
+        }
+      ],
+      "extremum_features": {
+        "ext_df_gap": -0.19447729205887562,
+        "ext_dr": 0.35,
+        "ext_energy_frac": 3.5314121837335653e-07,
+        "match_found": true
+      },
+      "feature_schema_version": "tae-rule-features-grouped-v26",
+      "numerical_structure_features": {
+        "distributed_harmonic_noise": {
+          "actual_window_dr": 0.05,
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "energy_reference": "full-domain-top-two-individual-harmonics",
+          "gate_enabled": true,
+          "local_energy_policy": "all-raw-nodes-in-window",
+          "maximum_effective_length": 0.045,
+          "minimum_n_radial": 41,
+          "n_firing_windows": 0,
+          "n_harmonics": 54,
+          "n_population_windows": 35,
+          "n_radial": 201,
+          "n_scanned_windows": 191,
+          "native_grid_spacing": 0.005,
+          "participation_policy": "pointwise-N_hf-inclusive; same-selected-centers-for-HF-and-length",
+          "reason": null,
+          "resolution_eligible": true,
+          "schema_version": "distributed-harmonic-noise-v1",
+          "status": "MEASURED",
+          "stencil_policy": "all-three-samples-in-same-window",
+          "thresholds": {
+            "local_min": 0.05,
+            "nhf_min": 4.0,
+            "radial_length_min": 0.03,
+            "top2_min": 0.005,
+            "window_dr": 0.05
+          },
+          "top2_energy": 0.13923111455924678,
+          "top2_energy_share": 0.6495219883338694,
+          "top2_harmonic_indices": [
+            13,
+            14
+          ],
+          "total_energy": 0.21435935512575555,
+          "witness": {
+            "effective_length": 0.005924799913299573,
+            "end_index": 194,
+            "fires": false,
+            "hf_energy": 1.5303937506025776e-05,
+            "hf_top2_ratio": 0.00010991751056846936,
+            "hf_total_fraction": 7.139384001714133e-05,
+            "hf_window_fraction": 0.002831883828931191,
+            "minimum_cut_ratio": 0.021983502113693872,
+            "n_qualifying": 3,
+            "qualifying_center_indices": [
+              185,
+              191,
+              193
+            ],
+            "qualifying_hf_energy": [
+              1.400365787720005e-05,
+              1.243802793647223e-06,
+              5.6476835178504544e-08
+            ],
+            "qualifying_nhf": [
+              4.144352354178716,
+              4.0635942024397425,
+              8.381631263357745
+            ],
+            "r_end": 0.97,
+            "r_start": 0.92,
+            "raw_window_energy": 0.005404154418227595,
+            "start_index": 184
+          },
+          "witness_policy": "max-min-cut-ratios; earliest-tie; default-top2-cut-when-disabled"
+        },
+        "extended_continuum_noise": {
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "gate_enabled": true,
+          "n_harmonics": 54,
+          "n_radial": 201,
+          "native_grid_spacing": 0.005,
+          "outside_sample_count": 64,
+          "qualifying_region_ids": [],
+          "reason": null,
+          "records": [
+            {
+              "crossing_stencil_count": 1,
+              "eligible_stencil_count": 62,
+              "end_index": 65,
+              "hf_crossing_stencil_energy": 5.18163970427066e-06,
+              "hf_out_energy": 6.135738684332718e-06,
+              "hf_out_harmonic_extent": 1.0220228400321008,
+              "hf_out_local_fraction": 0.03136416080734715,
+              "hf_out_radial_extent": 1.4338170579429699,
+              "hf_out_radial_length": 0.00716908528971485,
+              "hf_out_top2_ratio": 4.406873207728138e-05,
+              "hf_out_total_fraction": 2.8623610482188375e-05,
+              "hf_peak_harmonic_index": 11,
+              "hf_peak_r": 0.015,
+              "hf_positive_harmonic_count": 54,
+              "hf_positive_radial_count": 62,
+              "hf_unknown_neighbor_energy": 8.2829010598614e-06,
+              "outside_sample_count": 64,
+              "r_end": 0.325,
+              "r_start": 0.01,
+              "raw_out_energy": 0.0001956289767171262,
+              "raw_out_total_fraction": 0.000912621595648853,
+              "region_id": 0,
+              "side": "below_lower",
+              "start_index": 2,
+              "unknown_neighbor_stencil_count": 1
+            }
+          ],
+          "resolution_policy": "native-grid-high-pass-with-radial-length",
+          "schema_version": "continuum-side-noise-v2",
+          "stencil_policy": "all-three-samples-in-same-outside-region",
+          "thresholds": {
+            "local_min": 0.2,
+            "radial_length_min": 0.04,
+            "top2_min": 0.01
+          },
+          "top2_energy": 0.13923111455924678,
+          "top2_energy_share": 0.6495219883338694,
+          "top2_harmonic_indices": [
+            13,
+            14
+          ],
+          "total_energy": 0.21435935512575557,
+          "unknown_continuum_sample_count": 4,
+          "valid_continuum_sample_count": 197,
+          "witness": null
+        },
+        "grid_scale_packet": {
+          "grid_scale_packet_amplitude_min": 0.3,
+          "grid_scale_packet_amplitude_qualified_window_count": 0,
+          "grid_scale_packet_candidate_found": false,
+          "grid_scale_packet_direction_change_count": null,
+          "grid_scale_packet_large_step_count": null,
+          "grid_scale_packet_large_turn_count": null,
+          "grid_scale_packet_max_step": null,
+          "grid_scale_packet_min_large_turns": 3,
+          "grid_scale_packet_peak": null,
+          "grid_scale_packet_peak_harmonic_index": null,
+          "grid_scale_packet_peak_r": null,
+          "grid_scale_packet_peak_r_max": 0.5,
+          "grid_scale_packet_peak_signed_amplitude": null,
+          "grid_scale_packet_radius_qualified_window_count": 0,
+          "grid_scale_packet_sign_change_count": null,
+          "grid_scale_packet_step_min": 0.2,
+          "grid_scale_packet_step_rms": null,
+          "grid_scale_packet_total_variation": null,
+          "grid_scale_packet_turn_qualified_window_count": 0,
+          "grid_scale_packet_window_end_index": null,
+          "grid_scale_packet_window_end_r": null,
+          "grid_scale_packet_window_span_grid": 4,
+          "grid_scale_packet_window_start_index": null,
+          "grid_scale_packet_window_start_r": null,
+          "grid_scale_packet_window_values": null
+        },
+        "grid_scale_spike": {
+          "grid_scale_candidate_found": true,
+          "grid_scale_candidate_width_limit_grid": 1.0,
+          "grid_scale_component_touches_boundary": false,
+          "grid_scale_halfmax_inner_edge_r": 0.00778057825122137,
+          "grid_scale_halfmax_outer_edge_r": 0.011872402607882068,
+          "grid_scale_halfmax_width_grid": 0.8183648713321396,
+          "grid_scale_halfmax_width_r": 0.004091824356660698,
+          "grid_scale_high_r_cutoff_r": 0.7,
+          "grid_scale_high_r_width_max_grid": 0.75,
+          "grid_scale_peak": 0.06578232103999414,
+          "grid_scale_peak_harmonic_index": 11,
+          "grid_scale_peak_r": 0.01,
+          "grid_scale_peak_sign": -1,
+          "grid_scale_peak_signed_amplitude": -0.06578232103999414,
+          "grid_scale_width_max_grid": 1.0
+        },
+        "interior_harmonic_incoherence": {
+          "active_adjacent_harmonic_pair_count": 3,
+          "active_core_energy_fraction_min": 0.005,
+          "active_core_harmonic_count": 4,
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "core_adjacent_harmonic_coherence": 0.9617574416031441,
+          "core_adjacent_radial_pair_count": 99,
+          "core_effective_harmonic_count_wmean": 1.98051633793182,
+          "core_energy_fraction": 0.12442168228351225,
+          "core_energy_fraction_above_effective_harmonic_count_threshold": 0.0016577912510946208,
+          "core_js_divergence": 0.0017465105414867178,
+          "core_positive_energy_sample_count": 100,
+          "core_r_max": 0.5,
+          "core_radial_sample_count": 101,
+          "effective_harmonic_count_threshold": 3.0,
+          "global_effective_harmonic_count_wmean": 1.6851600873349495,
+          "global_energy_fraction_above_effective_harmonic_count_threshold": 0.000688806823802687,
+          "incoherence_score": 1.6458590818773005e-05,
+          "max_lag_grid": 5,
+          "resolution_eligible": true,
+          "score_threshold": 0.1,
+          "total_energy_fraction_in_core_above_effective_harmonic_count_threshold": 0.0002062651763360812
+        },
+        "near_axis_grid_oscillation": {
+          "amplitude_min": 0.1,
+          "candidate_found": false,
+          "min_consecutive_sign_flips": 4,
+          "near_axis_peak": 0.06578232103999414,
+          "near_axis_peak_amplitude_qualified": false,
+          "near_axis_peak_and_run_same_harmonic": true,
+          "near_axis_peak_harmonic_index": 11,
+          "near_axis_peak_r": 0.01,
+          "near_axis_peak_signed_amplitude": -0.06578232103999414,
+          "peak_r_max_exclusive": 0.1,
+          "qualifying_run_count": 56,
+          "selected_run_consecutive_sign_flip_count": 5,
+          "selected_run_end_index": 6,
+          "selected_run_end_r": 0.03,
+          "selected_run_harmonic_index": 11,
+          "selected_run_max_step": 0.08783143214375587,
+          "selected_run_mean_abs_step": 0.0437626596193169,
+          "selected_run_peak": 0.06578232103999414,
+          "selected_run_peak_r": 0.01,
+          "selected_run_peak_signed_amplitude": -0.06578232103999414,
+          "selected_run_start_index": 1,
+          "selected_run_start_r": 0.005,
+          "selected_run_step_l2": 0.12239560221599731,
+          "selected_run_total_variation": 0.21881329809658448,
+          "step_l2_min": 0.3,
+          "step_l2_qualified_run_count": 0
+        }
+      },
+      "resolution_features": {
+        "interior_unresolved_envelope": {
+          "candidate_found": false,
+          "energy_component_touches_boundary": false,
+          "energy_halfmax_inner_edge_r": 0.4866569318092121,
+          "energy_halfmax_outer_edge_r": 0.6207260804840076,
+          "energy_halfmax_width_grid": 26.813829734959093,
+          "energy_halfmax_width_r": 0.13406914867479547,
+          "energy_peak": 1.0,
+          "energy_peak_r": 0.51,
+          "ext_df_gap": 0.058114640125236726,
+          "ext_df_gap_max": 0.04,
+          "ext_df_gap_min": 0.001,
+          "ext_df_gap_min_inclusive": false,
+          "ext_dr": 0.015000000000000013,
+          "ext_dr_max": 0.02,
+          "ext_energy_frac": 0.2462195201732326,
+          "extremum_exception_applied": false,
+          "extremum_match_found": true,
+          "extremum_r_max": 0.5,
+          "extremum_r_min": 0.03,
+          "footprint_exception": {
+            "applied": false,
+            "enabled": true,
+            "local_hf_fraction": null,
+            "local_hf_fraction_max": 0.05,
+            "qualified": false,
+            "spikes_fraction": null,
+            "spikes_fraction_max": 0.5,
+            "status": "NOT_APPLICABLE",
+            "window_dr": 0.05
+          },
+          "peak_r_max": 0.5,
+          "width_max_grid": 2.0
+        }
+      },
+      "rf_standard_features": {
+        "S": 2.3823010302062757,
+        "W_star": 0.005452261028362066,
+        "W_star_max": 0.0038237770687931227,
+        "delta2_eff": 0.0009907213387274003,
+        "frac_spikes": 0.011147963884282292,
+        "gamma_d": -5.034024142171437e-05,
+        "max_abs_d1_abs": 0.27340994757270815,
+        "max_abs_d2_abs": 0.4495096830330663,
+        "max_per_m_mean": 0.14226876521145326,
+        "max_to_mean": 111.39257947583913,
+        "max_to_median": 189140.80299901284,
+        "mean_abs_d1_mode": 0.002117972323614643,
+        "mean_abs_d2_mode": 0.0015180782033244696,
+        "mean_amp": 0.008977258670138847,
+        "ntor": 7.0,
+        "r_star": 0.33,
+        "rad_loc": 0.6049478949307145,
+        "rad_width": 0.11541274232019509,
+        "spikes_per_m": 2.240740740740741,
+        "std_amp": 0.062203514962682865,
+        "std_per_m_max": 0.2447866362765133,
+        "std_per_m_mean": 0.028415367090631832
+      },
+      "severity_features": {
+        "complete": true,
+        "configuration_sha256": "e8659b347f6bfdb1bbf343b8701019ddb58b109c8726777f9a152b3a7b893e33",
+        "gates": {
+          "BAD_AXIS_ENERGY_CONCENTRATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">",
+                "ratio": 0.13156464207998828,
+                "threshold": 0.5,
+                "value": 0.06578232103999414
+              },
+              "inner_energy_fraction": {
+                "comparison": ">",
+                "ratio": 0.0002544814423749242,
+                "threshold": 0.5,
+                "value": 0.0001272407211874621
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0002544814423749242,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_AXIS_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.32891160519997065,
+                "threshold": 0.2,
+                "value": 0.06578232103999414
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 7.550339802477794,
+                "threshold": 10.0,
+                "value": 1.324443702085872
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.32891160519997065,
+            "status": "MEASURED",
+            "witness": {
+              "axis_component_touches_boundary": false,
+              "axis_halfmax_outer_edge_r": 0.013760432925910974,
+              "axis_halfmax_width_grid": 1.324443702085872,
+              "axis_halfmax_width_r": 0.006622218510429359,
+              "axis_peak": 0.06578232103999414,
+              "axis_peak_harmonic_index": 11,
+              "axis_peak_is_local_max": true,
+              "axis_peak_r": 0.01
+            }
+          },
+          "BAD_CONTINUUM_CROSSING_TAIL": {
+            "components": {
+              "roughness": {
+                "comparison": ">",
+                "ratio": 2.481119766088917,
+                "threshold": 0.4,
+                "value": 0.9924479064355668
+              },
+              "tail_top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.03916741946545983,
+                "threshold": 0.035,
+                "value": 0.0013708596812910942
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.03916741946545983,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "low",
+              "r_cross": 0.3269210286799412
+            }
+          },
+          "BAD_CONT_CROSS": {
+            "components": {},
+            "enabled": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": null,
+            "status": "DISABLED",
+            "witness": null
+          },
+          "BAD_CONT_CROSS_WINDOW": {
+            "components": {
+              "window_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.32829780216762755,
+                "threshold": 0.25,
+                "value": 0.08207445054190689
+              },
+              "window_energy": {
+                "comparison": ">=",
+                "ratio": 0.10655490839587986,
+                "threshold": 0.05,
+                "value": 0.005327745419793993
+              }
+            },
+            "enabled": true,
+            "exempted_candidates": 0,
+            "fired": false,
+            "operation": "OR",
+            "severity": 0.32829780216762755,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "low",
+              "r_cross": 0.3269210286799412
+            }
+          },
+          "BAD_DISTRIBUTED_HARMONIC_NOISE": {
+            "components": {
+              "radial_length": {
+                "comparison": ">",
+                "ratio": 0.1974933304433191,
+                "threshold": 0.03,
+                "value": 0.005924799913299573
+              },
+              "top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.021983502113693872,
+                "threshold": 0.005,
+                "value": 0.00010991751056846936
+              },
+              "window_fraction": {
+                "comparison": ">",
+                "ratio": 0.05663767657862381,
+                "threshold": 0.05,
+                "value": 0.002831883828931191
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "population_selection": {
+              "comparison": ">=",
+              "nhf_min": 4.0,
+              "window_dr": 0.05
+            },
+            "severity": 0.021983502113693872,
+            "status": "MEASURED",
+            "witness": {
+              "effective_length": 0.005924799913299573,
+              "end_index": 194,
+              "fires": false,
+              "hf_energy": 1.5303937506025776e-05,
+              "hf_top2_ratio": 0.00010991751056846936,
+              "hf_total_fraction": 7.139384001714133e-05,
+              "hf_window_fraction": 0.002831883828931191,
+              "minimum_cut_ratio": 0.021983502113693872,
+              "n_qualifying": 3,
+              "qualifying_center_indices": [
+                185,
+                191,
+                193
+              ],
+              "qualifying_hf_energy": [
+                1.400365787720005e-05,
+                1.243802793647223e-06,
+                5.6476835178504544e-08
+              ],
+              "qualifying_nhf": [
+                4.144352354178716,
+                4.0635942024397425,
+                8.381631263357745
+              ],
+              "r_end": 0.97,
+              "r_start": 0.92,
+              "raw_window_energy": 0.005404154418227595,
+              "start_index": 184
+            }
+          },
+          "BAD_EDGE_SPIKE": {
+            "components": {
+              "amplitude_over_body": {
+                "comparison": ">",
+                "ratio": 0.0019573834983923023,
+                "threshold": 1.0,
+                "value": 0.0019573834983923023
+              },
+              "peak_energy_fraction": {
+                "comparison": ">=",
+                "ratio": 1.7080562353516678e-05,
+                "threshold": 0.5,
+                "value": 8.540281176758339e-06
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.06305934876832706,
+                "threshold": 10.0,
+                "value": 158.58076867775583
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 1.7080562353516678e-05,
+            "status": "MEASURED",
+            "witness": {
+              "component_touches_boundary": false,
+              "halfmax_inner_edge_r": 0.19675926116204795,
+              "halfmax_outer_edge_r": 0.9896631045508272,
+              "halfmax_width_grid": 158.58076867775583,
+              "halfmax_width_r": 0.7929038433887792,
+              "is_global_peak": false,
+              "peak_amplitude": 0.0019573834983923023,
+              "peak_energy_fraction": 8.540281176758339e-06,
+              "peak_index": 196,
+              "peak_r": 0.98
+            }
+          },
+          "BAD_EXTENDED_CONTINUUM_NOISE": {
+            "components": {
+              "local_fraction": {
+                "comparison": ">=",
+                "ratio": 0.15682080403673573,
+                "threshold": 0.2,
+                "value": 0.03136416080734715
+              },
+              "radial_length": {
+                "comparison": ">=",
+                "ratio": 0.17922713224287123,
+                "threshold": 0.04,
+                "value": 0.00716908528971485
+              },
+              "top2_ratio": {
+                "comparison": ">=",
+                "ratio": 0.004406873207728138,
+                "threshold": 0.01,
+                "value": 4.406873207728138e-05
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.004406873207728138,
+            "status": "MEASURED",
+            "witness": {
+              "r_end": 0.325,
+              "r_start": 0.01,
+              "region_id": 0,
+              "side": "below_lower"
+            }
+          },
+          "BAD_GRID_SCALE_PACKET": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.21927440346664714,
+                "threshold": 0.3,
+                "value": 0.06578232103999414
+              },
+              "turn_step": {
+                "comparison": ">=",
+                "ratio": 0.08327682515800142,
+                "threshold": 0.2,
+                "value": 0.016655365031600283
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.08327682515800142,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.06578232103999414,
+              "harmonic_index": 11,
+              "opposing_turns": 3,
+              "required_turns": 3,
+              "turn_step": 0.016655365031600283,
+              "window_start_index": 1
+            }
+          },
+          "BAD_GRID_SCALE_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 1.0841907995596605,
+                "threshold": 0.3,
+                "value": 0.3252572398678981
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.42705560408102006,
+                "threshold": 0.75,
+                "value": 1.7562115865776384
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.42705560408102006,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.3252572398678981,
+              "harmonic_index": 32,
+              "peak_r": 0.9400000000000001,
+              "width_grid": 1.7562115865776384,
+              "width_limit": 0.75
+            }
+          },
+          "BAD_INTERIOR_HARMONIC_INCOHERENCE": {
+            "components": {
+              "incoherence_score": {
+                "comparison": ">",
+                "ratio": 0.00016458590818773004,
+                "threshold": 0.1,
+                "value": 1.6458590818773005e-05
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.00016458590818773004,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_INTERIOR_UNRESOLVED_ENVELOPE": {
+            "components": {},
+            "enabled": true,
+            "exception_qualified": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_NEAR_AXIS_GRID_OSCILLATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.6578232103999413,
+                "threshold": 0.1,
+                "value": 0.06578232103999414
+              },
+              "run_step_l2": {
+                "comparison": ">=",
+                "ratio": 0.40798534071999104,
+                "threshold": 0.3,
+                "value": 0.12239560221599731
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.40798534071999104,
+            "status": "MEASURED",
+            "witness": {
+              "selected_run_consecutive_sign_flip_count": 5,
+              "selected_run_end_index": 6,
+              "selected_run_harmonic_index": 11,
+              "selected_run_start_index": 1
+            }
+          }
+        },
+        "nearest_gate": "BAD_GRID_SCALE_SPIKE",
+        "overall_rule_severity": 0.42705560408102006,
+        "rule_margin": 0.5729443959189799,
+        "schema_version": "rule-severity-v2",
+        "unavailable_gates": []
+      },
+      "source_feature_schema_version": "rf_all_crossings_extremum_energy_31_v2"
+    }
+  },
+  {
+    "mode_key": "nstxu_204202/N10/egn10w.1026E+02",
+    "rule_decision": "BAD",
+    "final_decision": "BAD",
+    "rule_features": {
+      "boundary_features": {
+        "axis_artifact": {
+          "axis_amplitude_qualified_peak_count": 1,
+          "axis_candidate_amplitude_min": 0.2,
+          "axis_candidate_found": true,
+          "axis_candidate_width_limit_grid": 10.0,
+          "axis_component_touches_boundary": false,
+          "axis_halfmax_outer_edge_r": 0.01765327086967039,
+          "axis_halfmax_width_grid": 1.0687120218219974,
+          "axis_halfmax_width_r": 0.005343560109109987,
+          "axis_local_peak_count": 75,
+          "axis_peak": 0.2840649228523934,
+          "axis_peak_harmonic_index": 15,
+          "axis_peak_is_local_max": true,
+          "axis_peak_r": 0.015,
+          "axis_width_qualified_peak_count": 74,
+          "r_ax": 0.03
+        },
+        "axis_energy_concentration": {
+          "amplitude_min": 0.5,
+          "amplitude_r_max": 0.015,
+          "axis_amplitude": 0.2840649228523934,
+          "axis_harmonic_index": 15,
+          "axis_peak_r": 0.015,
+          "axis_sample_count": 4,
+          "axis_signed_amplitude": -0.2840649228523934,
+          "candidate_found": false,
+          "enabled": true,
+          "energy_fraction_min": 0.5,
+          "energy_r_max": 0.05,
+          "inner_energy_fraction": 0.003012614148026785,
+          "n_radial": 201,
+          "total_energy": 0.1749271270022306
+        },
+        "edge_artifact": {
+          "edge_body_amplitude_max": 1.0,
+          "edge_body_r_max": 0.9,
+          "edge_energy_component_touches_boundary": false,
+          "edge_energy_halfmax_inner_edge_r": 0.5442972334789472,
+          "edge_energy_halfmax_outer_edge_r": 0.6013035794938246,
+          "edge_energy_halfmax_width_grid": 11.401269202975483,
+          "edge_energy_halfmax_width_r": 0.05700634601487742,
+          "edge_energy_local_peaks": [
+            {
+              "component_touches_boundary": true,
+              "halfmax_inner_edge_r": 0.9935324393445193,
+              "halfmax_outer_edge_r": 1.0,
+              "halfmax_width_grid": 1.2935121310961417,
+              "halfmax_width_r": 0.006467560655480709,
+              "is_global_peak": false,
+              "peak_amplitude": 5.894868252515447e-05,
+              "peak_energy_fraction": 1.1136767152736419e-07,
+              "peak_index": 200,
+              "peak_r": 1.0
+            }
+          ],
+          "edge_energy_peak": 1.0,
+          "edge_energy_peak_in_window": false,
+          "edge_energy_peak_r": 0.5750000000000001,
+          "edge_harmonic_component_touches_boundary": false,
+          "edge_harmonic_halfmax_inner_edge_r": 0.9431320924857542,
+          "edge_harmonic_halfmax_outer_edge_r": 0.9773888446343527,
+          "edge_harmonic_halfmax_width_grid": 6.851350429719694,
+          "edge_harmonic_halfmax_width_r": 0.03425675214859847,
+          "edge_harmonic_peak": 0.00016015822898183347,
+          "edge_harmonic_peak_harmonic_index": 53,
+          "edge_harmonic_peak_is_local_max": false,
+          "edge_harmonic_peak_r": 0.97,
+          "r_edge_min": 0.97
+        }
+      },
+      "crossing_features": {
+        "W_star_high_shear": 3.716523077054012e-06,
+        "W_star_high_shear_sum": 7.2121209441901975e-06,
+        "W_star_sum": 0.00034458734430115577,
+        "continuum_crossing_tail": {
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "energy_peak_r": 0.5750000000000001,
+          "half_width_grid": 4,
+          "k_min": 0.4,
+          "n_qualifying_crossings": 0,
+          "n_radial": 201,
+          "records": [
+            {
+              "K_cross": 0.3018069110281978,
+              "boundary": "low",
+              "candidate_found": false,
+              "energy_fraction_inner": 0.0030129998139365208,
+              "energy_fraction_outer": 0.9969870001860635,
+              "local_amplitude_energy": 6.645518153008944e-06,
+              "n_centers": 8,
+              "r_cross": 0.11170441844878526,
+              "second_difference_energy": 6.053230469287903e-07,
+              "tail_energy": 0.0005270554011101709,
+              "tail_fraction": 0.0030129998139365208,
+              "tail_over_top2": 0.004630735728545726,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            },
+            {
+              "K_cross": 0.048032069993430786,
+              "boundary": "low",
+              "candidate_found": false,
+              "energy_fraction_inner": 0.0030442025185264065,
+              "energy_fraction_outer": 0.9969557974814736,
+              "local_amplitude_energy": 0.00235686442403022,
+              "n_centers": 8,
+              "r_cross": 0.34438604762721625,
+              "second_difference_energy": 5.437474181117312e-06,
+              "tail_energy": 0.000532513600578779,
+              "tail_fraction": 0.0030442025185264065,
+              "tail_over_top2": 0.00467869174842442,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            },
+            {
+              "K_cross": 0.04501720607018685,
+              "boundary": "low",
+              "candidate_found": false,
+              "energy_fraction_inner": 0.003045463725862915,
+              "energy_fraction_outer": 0.9969545362741371,
+              "local_amplitude_energy": 0.002866302111644446,
+              "n_centers": 8,
+              "r_cross": 0.34514811008186874,
+              "second_difference_energy": 5.808701226223322e-06,
+              "tail_energy": 0.0005327342199547085,
+              "tail_fraction": 0.003045463725862915,
+              "tail_over_top2": 0.00468063012155251,
+              "tail_side": "inner",
+              "thresholds_pass": false
+            }
+          ],
+          "resolution_eligible": true,
+          "top2_energy": 0.11381677383599942,
+          "top2_energy_share": 0.6506525076270651,
+          "top2_harmonic_indices": [
+            17,
+            18
+          ],
+          "top2_ratio_min": 0.035,
+          "total_energy": 0.1749271270022306,
+          "witness": null
+        },
+        "continuum_crossing_window_exception": {
+          "all_violations_exempted": false,
+          "amplitude_max": 0.2,
+          "calibrated_n_radial": 201,
+          "enabled": true,
+          "half_width_grid": 4,
+          "k_max": 0.1,
+          "n_exempted_crossings": 0,
+          "n_radial": 201,
+          "n_unexcused_crossings": 0,
+          "n_violating_crossings": 0,
+          "records": [
+            {
+              "A_cross": 0.0005951503009043367,
+              "A_cross_harmonic_index": 5,
+              "K_cross": 0.3018069110281978,
+              "boundary": "low",
+              "exception_conditions_pass": false,
+              "exempted": false,
+              "local_amplitude_energy": 6.645518153008944e-06,
+              "n_centers": 8,
+              "r_cross": 0.11170441844878526,
+              "second_difference_energy": 6.053230469287903e-07,
+              "window_A_max": 0.0006065373794373034,
+              "window_W_max": 5.137399834288465e-07,
+              "window_violation": false
+            },
+            {
+              "A_cross": 0.014378402248776352,
+              "A_cross_harmonic_index": 15,
+              "K_cross": 0.048032069993430786,
+              "boundary": "low",
+              "exception_conditions_pass": true,
+              "exempted": false,
+              "local_amplitude_energy": 0.00235686442403022,
+              "n_centers": 8,
+              "r_cross": 0.34438604762721625,
+              "second_difference_energy": 5.437474181117312e-06,
+              "window_A_max": 0.016877126135699812,
+              "window_W_max": 0.00024656958372539715,
+              "window_violation": false
+            },
+            {
+              "A_cross": 0.014722169323222588,
+              "A_cross_harmonic_index": 15,
+              "K_cross": 0.04501720607018685,
+              "boundary": "low",
+              "exception_conditions_pass": true,
+              "exempted": false,
+              "local_amplitude_energy": 0.002866302111644446,
+              "n_centers": 8,
+              "r_cross": 0.34514811008186874,
+              "second_difference_energy": 5.808701226223322e-06,
+              "window_A_max": 0.017848166072349278,
+              "window_W_max": 0.0002960475074931773,
+              "window_violation": false
+            }
+          ],
+          "resolution_eligible": true
+        },
+        "cross_window_A_crossing_boundary": "low",
+        "cross_window_A_crossing_r": 0.34514811008186874,
+        "cross_window_A_distance_grid": 1.970377983626248,
+        "cross_window_A_harmonic_index": 15,
+        "cross_window_A_max": 0.017848166072349278,
+        "cross_window_A_neighbor_count": 4,
+        "cross_window_A_neighbor_rms": 0.0016846811487786042,
+        "cross_window_A_neighbor_stencil_complete": true,
+        "cross_window_A_sample_r": 0.355,
+        "cross_window_W_crossing_boundary": "low",
+        "cross_window_W_crossing_r": 0.34514811008186874,
+        "cross_window_W_distance_grid": 1.970377983626248,
+        "cross_window_W_max": 0.0002960475074931773,
+        "cross_window_W_sample_r": 0.355,
+        "cross_window_candidate_found": true,
+        "cross_window_half_width_grid": 2,
+        "cross_window_half_width_r": 0.01,
+        "n_cross": 3.0,
+        "r_star_high_shear": 0.34514811008186874,
+        "r_star_max": 0.34514811008186874
+      },
+      "crossing_records": [
+        {
+          "W_peak": 5.050155795718888e-07,
+          "boundary": "low",
+          "r_cross": 0.11170441844878526,
+          "shear_weighted": 0.0
+        },
+        {
+          "W_peak": 0.00016767604012016371,
+          "boundary": "low",
+          "r_cross": 0.34438604762721625,
+          "shear_weighted": 3.4955978671361856e-06
+        },
+        {
+          "W_peak": 0.0001764062886014202,
+          "boundary": "low",
+          "r_cross": 0.34514811008186874,
+          "shear_weighted": 3.716523077054012e-06
+        }
+      ],
+      "extremum_features": {
+        "ext_df_gap": -6.734339616030006e-05,
+        "ext_dr": 0.23000000000000004,
+        "ext_energy_frac": 0.00011429085363057586,
+        "match_found": true
+      },
+      "feature_schema_version": "tae-rule-features-grouped-v26",
+      "numerical_structure_features": {
+        "distributed_harmonic_noise": {
+          "actual_window_dr": 0.05,
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "energy_reference": "full-domain-top-two-individual-harmonics",
+          "gate_enabled": true,
+          "local_energy_policy": "all-raw-nodes-in-window",
+          "maximum_effective_length": 0.045,
+          "minimum_n_radial": 41,
+          "n_firing_windows": 0,
+          "n_harmonics": 54,
+          "n_population_windows": 50,
+          "n_radial": 201,
+          "n_scanned_windows": 191,
+          "native_grid_spacing": 0.005,
+          "participation_policy": "pointwise-N_hf-inclusive; same-selected-centers-for-HF-and-length",
+          "reason": null,
+          "resolution_eligible": true,
+          "schema_version": "distributed-harmonic-noise-v1",
+          "status": "MEASURED",
+          "stencil_policy": "all-three-samples-in-same-window",
+          "thresholds": {
+            "local_min": 0.05,
+            "nhf_min": 4.0,
+            "radial_length_min": 0.03,
+            "top2_min": 0.005,
+            "window_dr": 0.05
+          },
+          "top2_energy": 0.11381677383599952,
+          "top2_energy_share": 0.6506525076270652,
+          "top2_harmonic_indices": [
+            17,
+            18
+          ],
+          "total_energy": 0.1749271270022307,
+          "witness": {
+            "effective_length": 0.00908827683774553,
+            "end_index": 181,
+            "fires": false,
+            "hf_energy": 7.973359905594547e-06,
+            "hf_top2_ratio": 7.005434820251973e-05,
+            "hf_total_fraction": 4.558103732814905e-05,
+            "hf_window_fraction": 0.0012217819732976314,
+            "minimum_cut_ratio": 0.014010869640503945,
+            "n_qualifying": 2,
+            "qualifying_center_indices": [
+              176,
+              180
+            ],
+            "qualifying_hf_energy": [
+              5.249385512157423e-06,
+              2.7239743934371243e-06
+            ],
+            "qualifying_nhf": [
+              4.426179798533362,
+              4.486808303299289
+            ],
+            "r_end": 0.905,
+            "r_start": 0.855,
+            "raw_window_energy": 0.006526008796867559,
+            "start_index": 171
+          },
+          "witness_policy": "max-min-cut-ratios; earliest-tie; default-top2-cut-when-disabled"
+        },
+        "extended_continuum_noise": {
+          "candidate_found": false,
+          "energy_quadrature": "native-trapezoidal-node-weights",
+          "gate_enabled": true,
+          "n_harmonics": 54,
+          "n_radial": 201,
+          "native_grid_spacing": 0.005,
+          "outside_sample_count": 22,
+          "qualifying_region_ids": [],
+          "reason": null,
+          "records": [
+            {
+              "crossing_stencil_count": 1,
+              "eligible_stencil_count": 19,
+              "end_index": 22,
+              "hf_crossing_stencil_energy": 8.227859166931375e-11,
+              "hf_out_energy": 0.00013919020906801109,
+              "hf_out_harmonic_extent": 1.1146268092441205,
+              "hf_out_local_fraction": 0.2829942104154838,
+              "hf_out_radial_extent": 1.5754877840703416,
+              "hf_out_radial_length": 0.007877438920351709,
+              "hf_out_top2_ratio": 0.0012229323005462497,
+              "hf_out_total_fraction": 0.0007957039680085532,
+              "hf_peak_harmonic_index": 15,
+              "hf_peak_r": 0.015,
+              "hf_positive_harmonic_count": 54,
+              "hf_positive_radial_count": 19,
+              "hf_unknown_neighbor_energy": 4.8641133106475295e-05,
+              "outside_sample_count": 21,
+              "r_end": 0.11,
+              "r_start": 0.01,
+              "raw_out_energy": 0.0004918482567670063,
+              "raw_out_total_fraction": 0.002811732320743679,
+              "region_id": 0,
+              "side": "below_lower",
+              "start_index": 2,
+              "unknown_neighbor_stencil_count": 1
+            },
+            {
+              "crossing_stencil_count": 1,
+              "eligible_stencil_count": 0,
+              "end_index": 69,
+              "hf_crossing_stencil_energy": 1.4313511781733654e-10,
+              "hf_out_energy": 0.0,
+              "hf_out_harmonic_extent": null,
+              "hf_out_local_fraction": 0.0,
+              "hf_out_radial_extent": null,
+              "hf_out_radial_length": null,
+              "hf_out_top2_ratio": 0.0,
+              "hf_out_total_fraction": 0.0,
+              "hf_peak_harmonic_index": null,
+              "hf_peak_r": null,
+              "hf_positive_harmonic_count": 0,
+              "hf_positive_radial_count": 0,
+              "hf_unknown_neighbor_energy": 0.0,
+              "outside_sample_count": 1,
+              "r_end": 0.34500000000000003,
+              "r_start": 0.34500000000000003,
+              "raw_out_energy": 1.4681203846404194e-06,
+              "raw_out_total_fraction": 8.392754227431505e-06,
+              "region_id": 1,
+              "side": "below_lower",
+              "start_index": 69,
+              "unknown_neighbor_stencil_count": 0
+            }
+          ],
+          "resolution_policy": "native-grid-high-pass-with-radial-length",
+          "schema_version": "continuum-side-noise-v2",
+          "stencil_policy": "all-three-samples-in-same-outside-region",
+          "thresholds": {
+            "local_min": 0.2,
+            "radial_length_min": 0.04,
+            "top2_min": 0.01
+          },
+          "top2_energy": 0.11381677383599952,
+          "top2_energy_share": 0.6506525076270653,
+          "top2_harmonic_indices": [
+            17,
+            18
+          ],
+          "total_energy": 0.17492712700223068,
+          "unknown_continuum_sample_count": 8,
+          "valid_continuum_sample_count": 193,
+          "witness": null
+        },
+        "grid_scale_packet": {
+          "grid_scale_packet_amplitude_min": 0.3,
+          "grid_scale_packet_amplitude_qualified_window_count": 0,
+          "grid_scale_packet_candidate_found": false,
+          "grid_scale_packet_direction_change_count": null,
+          "grid_scale_packet_large_step_count": null,
+          "grid_scale_packet_large_turn_count": null,
+          "grid_scale_packet_max_step": null,
+          "grid_scale_packet_min_large_turns": 3,
+          "grid_scale_packet_peak": null,
+          "grid_scale_packet_peak_harmonic_index": null,
+          "grid_scale_packet_peak_r": null,
+          "grid_scale_packet_peak_r_max": 0.5,
+          "grid_scale_packet_peak_signed_amplitude": null,
+          "grid_scale_packet_radius_qualified_window_count": 0,
+          "grid_scale_packet_sign_change_count": null,
+          "grid_scale_packet_step_min": 0.2,
+          "grid_scale_packet_step_rms": null,
+          "grid_scale_packet_total_variation": null,
+          "grid_scale_packet_turn_qualified_window_count": 0,
+          "grid_scale_packet_window_end_index": null,
+          "grid_scale_packet_window_end_r": null,
+          "grid_scale_packet_window_span_grid": 4,
+          "grid_scale_packet_window_start_index": null,
+          "grid_scale_packet_window_start_r": null,
+          "grid_scale_packet_window_values": null
+        },
+        "grid_scale_spike": {
+          "grid_scale_candidate_found": true,
+          "grid_scale_candidate_width_limit_grid": 1.0,
+          "grid_scale_component_touches_boundary": false,
+          "grid_scale_halfmax_inner_edge_r": 0.008462444826776756,
+          "grid_scale_halfmax_outer_edge_r": 0.012234077531631849,
+          "grid_scale_halfmax_width_grid": 0.7543265409710186,
+          "grid_scale_halfmax_width_r": 0.003771632704855093,
+          "grid_scale_high_r_cutoff_r": 0.7,
+          "grid_scale_high_r_width_max_grid": 0.75,
+          "grid_scale_peak": 0.10130103106932854,
+          "grid_scale_peak_harmonic_index": 14,
+          "grid_scale_peak_r": 0.01,
+          "grid_scale_peak_sign": -1,
+          "grid_scale_peak_signed_amplitude": -0.10130103106932854,
+          "grid_scale_width_max_grid": 1.0
+        },
+        "interior_harmonic_incoherence": {
+          "active_adjacent_harmonic_pair_count": 4,
+          "active_core_energy_fraction_min": 0.005,
+          "active_core_harmonic_count": 5,
+          "calibrated_n_radial": 201,
+          "candidate_found": false,
+          "core_adjacent_harmonic_coherence": 0.906788018726732,
+          "core_adjacent_radial_pair_count": 99,
+          "core_effective_harmonic_count_wmean": 1.9335597661977437,
+          "core_energy_fraction": 0.048588375289039754,
+          "core_energy_fraction_above_effective_harmonic_count_threshold": 0.003067495460107498,
+          "core_js_divergence": 0.026079640518819686,
+          "core_positive_energy_sample_count": 100,
+          "core_r_max": 0.5,
+          "core_radial_sample_count": 101,
+          "effective_harmonic_count_threshold": 3.0,
+          "global_effective_harmonic_count_wmean": 1.6730838762809697,
+          "global_energy_fraction_above_effective_harmonic_count_threshold": 0.0001520609415938317,
+          "incoherence_score": 0.0002283827604386421,
+          "max_lag_grid": 5,
+          "resolution_eligible": true,
+          "score_threshold": 0.1,
+          "total_energy_fraction_in_core_above_effective_harmonic_count_threshold": 0.0001490446206131288
+        },
+        "near_axis_grid_oscillation": {
+          "amplitude_min": 0.1,
+          "candidate_found": false,
+          "min_consecutive_sign_flips": 4,
+          "near_axis_peak": 0.2840649228523934,
+          "near_axis_peak_amplitude_qualified": true,
+          "near_axis_peak_and_run_same_harmonic": false,
+          "near_axis_peak_harmonic_index": 15,
+          "near_axis_peak_r": 0.015,
+          "near_axis_peak_signed_amplitude": -0.2840649228523934,
+          "peak_r_max_exclusive": 0.1,
+          "qualifying_run_count": 60,
+          "selected_run_consecutive_sign_flip_count": 9,
+          "selected_run_end_index": 10,
+          "selected_run_end_r": 0.05,
+          "selected_run_harmonic_index": 14,
+          "selected_run_max_step": 0.1647112130242564,
+          "selected_run_mean_abs_step": 0.0345856624039435,
+          "selected_run_peak": 0.10130103106932854,
+          "selected_run_peak_r": 0.01,
+          "selected_run_peak_signed_amplitude": -0.10130103106932854,
+          "selected_run_start_index": 1,
+          "selected_run_start_r": 0.005,
+          "selected_run_step_l2": 0.20091052710598972,
+          "selected_run_total_variation": 0.3112709616354915,
+          "step_l2_min": 0.3,
+          "step_l2_qualified_run_count": 0
+        }
+      },
+      "resolution_features": {
+        "interior_unresolved_envelope": {
+          "candidate_found": false,
+          "energy_component_touches_boundary": false,
+          "energy_halfmax_inner_edge_r": 0.5442972334789472,
+          "energy_halfmax_outer_edge_r": 0.6013035794938246,
+          "energy_halfmax_width_grid": 11.401269202975483,
+          "energy_halfmax_width_r": 0.05700634601487742,
+          "energy_peak": 1.0,
+          "energy_peak_r": 0.5750000000000001,
+          "ext_df_gap": 0.09006487425743978,
+          "ext_df_gap_max": 0.04,
+          "ext_df_gap_min": 0.001,
+          "ext_df_gap_min_inclusive": false,
+          "ext_dr": 0.08500000000000008,
+          "ext_dr_max": 0.02,
+          "ext_energy_frac": 0.09244033764134468,
+          "extremum_exception_applied": false,
+          "extremum_match_found": true,
+          "extremum_r_max": 0.5,
+          "extremum_r_min": 0.03,
+          "footprint_exception": {
+            "applied": false,
+            "enabled": true,
+            "local_hf_fraction": null,
+            "local_hf_fraction_max": 0.05,
+            "qualified": false,
+            "spikes_fraction": null,
+            "spikes_fraction_max": 0.5,
+            "status": "NOT_APPLICABLE",
+            "window_dr": 0.05
+          },
+          "peak_r_max": 0.5,
+          "width_max_grid": 2.0
+        }
+      },
+      "rf_standard_features": {
+        "S": 4.57700212734446,
+        "W_star": 0.0030135469109626896,
+        "W_star_max": 0.0001764062886014202,
+        "delta2_eff": 0.005478976783365312,
+        "frac_spikes": 0.010871568085498435,
+        "gamma_d": -1.371851267144715e-05,
+        "max_abs_d1_abs": 0.2921092501388605,
+        "max_abs_d2_abs": 0.5316278860644492,
+        "max_per_m_mean": 0.09513334233287941,
+        "max_to_mean": 128.7431479588613,
+        "max_to_median": 126594.47115398044,
+        "mean_abs_d1_mode": 0.0024656320778020167,
+        "mean_abs_d2_mode": 0.0020367622523672258,
+        "mean_amp": 0.007767403669442646,
+        "ntor": 10.0,
+        "r_star": 0.115,
+        "rad_loc": 0.6222466332492107,
+        "rad_width": 0.11082508138114726,
+        "spikes_per_m": 2.185185185185185,
+        "std_amp": 0.05624004192148044,
+        "std_per_m_max": 0.2374133456163509,
+        "std_per_m_mean": 0.020838995375226738
+      },
+      "severity_features": {
+        "complete": true,
+        "configuration_sha256": "e8659b347f6bfdb1bbf343b8701019ddb58b109c8726777f9a152b3a7b893e33",
+        "gates": {
+          "BAD_AXIS_ENERGY_CONCENTRATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">",
+                "ratio": 0.5681298457047868,
+                "threshold": 0.5,
+                "value": 0.2840649228523934
+              },
+              "inner_energy_fraction": {
+                "comparison": ">",
+                "ratio": 0.00602522829605357,
+                "threshold": 0.5,
+                "value": 0.003012614148026785
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.00602522829605357,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_AXIS_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 1.4203246142619668,
+                "threshold": 0.2,
+                "value": 0.2840649228523934
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 9.357057650527281,
+                "threshold": 10.0,
+                "value": 1.0687120218219974
+              }
+            },
+            "enabled": true,
+            "fired": true,
+            "operation": "AND",
+            "severity": 1.4203246142619668,
+            "status": "MEASURED",
+            "witness": {
+              "axis_component_touches_boundary": false,
+              "axis_halfmax_outer_edge_r": 0.01765327086967039,
+              "axis_halfmax_width_grid": 1.0687120218219974,
+              "axis_halfmax_width_r": 0.005343560109109987,
+              "axis_peak": 0.2840649228523934,
+              "axis_peak_harmonic_index": 15,
+              "axis_peak_is_local_max": true,
+              "axis_peak_r": 0.015
+            }
+          },
+          "BAD_CONTINUUM_CROSSING_TAIL": {
+            "components": {
+              "roughness": {
+                "comparison": ">",
+                "ratio": 0.7545172775704945,
+                "threshold": 0.4,
+                "value": 0.3018069110281978
+              },
+              "tail_top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.13230673510130644,
+                "threshold": 0.035,
+                "value": 0.004630735728545726
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.13230673510130644,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "low",
+              "r_cross": 0.11170441844878526
+            }
+          },
+          "BAD_CONT_CROSS": {
+            "components": {},
+            "enabled": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": null,
+            "status": "DISABLED",
+            "witness": null
+          },
+          "BAD_CONT_CROSS_WINDOW": {
+            "components": {
+              "window_amplitude": {
+                "comparison": ">=",
+                "ratio": 0.0024261495177492136,
+                "threshold": 0.25,
+                "value": 0.0006065373794373034
+              },
+              "window_energy": {
+                "comparison": ">=",
+                "ratio": 1.0274799668576928e-05,
+                "threshold": 0.05,
+                "value": 5.137399834288465e-07
+              }
+            },
+            "enabled": true,
+            "exempted_candidates": 2,
+            "fired": false,
+            "operation": "OR",
+            "severity": 0.0024261495177492136,
+            "status": "MEASURED",
+            "witness": {
+              "boundary": "low",
+              "r_cross": 0.11170441844878526
+            }
+          },
+          "BAD_DISTRIBUTED_HARMONIC_NOISE": {
+            "components": {
+              "radial_length": {
+                "comparison": ">",
+                "ratio": 0.30294256125818436,
+                "threshold": 0.03,
+                "value": 0.00908827683774553
+              },
+              "top2_ratio": {
+                "comparison": ">",
+                "ratio": 0.014010869640503945,
+                "threshold": 0.005,
+                "value": 7.005434820251973e-05
+              },
+              "window_fraction": {
+                "comparison": ">",
+                "ratio": 0.024435639465952626,
+                "threshold": 0.05,
+                "value": 0.0012217819732976314
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "population_selection": {
+              "comparison": ">=",
+              "nhf_min": 4.0,
+              "window_dr": 0.05
+            },
+            "severity": 0.014010869640503945,
+            "status": "MEASURED",
+            "witness": {
+              "effective_length": 0.00908827683774553,
+              "end_index": 181,
+              "fires": false,
+              "hf_energy": 7.973359905594547e-06,
+              "hf_top2_ratio": 7.005434820251973e-05,
+              "hf_total_fraction": 4.558103732814905e-05,
+              "hf_window_fraction": 0.0012217819732976314,
+              "minimum_cut_ratio": 0.014010869640503945,
+              "n_qualifying": 2,
+              "qualifying_center_indices": [
+                176,
+                180
+              ],
+              "qualifying_hf_energy": [
+                5.249385512157423e-06,
+                2.7239743934371243e-06
+              ],
+              "qualifying_nhf": [
+                4.426179798533362,
+                4.486808303299289
+              ],
+              "r_end": 0.905,
+              "r_start": 0.855,
+              "raw_window_energy": 0.006526008796867559,
+              "start_index": 171
+            }
+          },
+          "BAD_EDGE_SPIKE": {
+            "components": {
+              "amplitude_over_body": {
+                "comparison": ">",
+                "ratio": 5.894868252515447e-05,
+                "threshold": 1.0,
+                "value": 5.894868252515447e-05
+              },
+              "peak_energy_fraction": {
+                "comparison": ">=",
+                "ratio": 2.2273534305472838e-07,
+                "threshold": 0.5,
+                "value": 1.1136767152736419e-07
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 7.730890000641779,
+                "threshold": 10.0,
+                "value": 1.2935121310961417
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 2.2273534305472838e-07,
+            "status": "MEASURED",
+            "witness": {
+              "component_touches_boundary": true,
+              "halfmax_inner_edge_r": 0.9935324393445193,
+              "halfmax_outer_edge_r": 1.0,
+              "halfmax_width_grid": 1.2935121310961417,
+              "halfmax_width_r": 0.006467560655480709,
+              "is_global_peak": false,
+              "peak_amplitude": 5.894868252515447e-05,
+              "peak_energy_fraction": 1.1136767152736419e-07,
+              "peak_index": 200,
+              "peak_r": 1.0
+            }
+          },
+          "BAD_EXTENDED_CONTINUUM_NOISE": {
+            "components": {
+              "local_fraction": {
+                "comparison": ">=",
+                "ratio": 1.4149710520774188,
+                "threshold": 0.2,
+                "value": 0.2829942104154838
+              },
+              "radial_length": {
+                "comparison": ">=",
+                "ratio": 0.1969359730087927,
+                "threshold": 0.04,
+                "value": 0.007877438920351709
+              },
+              "top2_ratio": {
+                "comparison": ">=",
+                "ratio": 0.12229323005462497,
+                "threshold": 0.01,
+                "value": 0.0012229323005462497
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.12229323005462497,
+            "status": "MEASURED",
+            "witness": {
+              "r_end": 0.11,
+              "r_start": 0.01,
+              "region_id": 0,
+              "side": "below_lower"
+            }
+          },
+          "BAD_GRID_SCALE_PACKET": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.3376701035644285,
+                "threshold": 0.3,
+                "value": 0.10130103106932854
+              },
+              "turn_step": {
+                "comparison": ">=",
+                "ratio": 0.08351960438183016,
+                "threshold": 0.2,
+                "value": 0.016703920876366032
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.08351960438183016,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.10130103106932854,
+              "harmonic_index": 14,
+              "opposing_turns": 3,
+              "required_turns": 3,
+              "turn_step": 0.016703920876366032,
+              "window_start_index": 0
+            }
+          },
+          "BAD_GRID_SCALE_SPIKE": {
+            "components": {
+              "amplitude": {
+                "comparison": ">=",
+                "ratio": 0.9468830761746446,
+                "threshold": 0.3,
+                "value": 0.2840649228523934
+              },
+              "width": {
+                "comparison": "<=",
+                "ratio": 0.9893625267569411,
+                "threshold": 1.0,
+                "value": 1.0107518457141567
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.9468830761746446,
+            "status": "MEASURED",
+            "witness": {
+              "amplitude": 0.2840649228523934,
+              "harmonic_index": 15,
+              "peak_r": 0.015,
+              "width_grid": 1.0107518457141567,
+              "width_limit": 1.0
+            }
+          },
+          "BAD_INTERIOR_HARMONIC_INCOHERENCE": {
+            "components": {
+              "incoherence_score": {
+                "comparison": ">",
+                "ratio": 0.002283827604386421,
+                "threshold": 0.1,
+                "value": 0.0002283827604386421
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.002283827604386421,
+            "status": "MEASURED",
+            "witness": null
+          },
+          "BAD_INTERIOR_UNRESOLVED_ENVELOPE": {
+            "components": {},
+            "enabled": true,
+            "exception_qualified": false,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.0,
+            "status": "NOT_APPLICABLE",
+            "witness": null
+          },
+          "BAD_NEAR_AXIS_GRID_OSCILLATION": {
+            "components": {
+              "axis_amplitude": {
+                "comparison": ">=",
+                "ratio": 2.8406492285239335,
+                "threshold": 0.1,
+                "value": 0.2840649228523934
+              },
+              "run_step_l2": {
+                "comparison": ">=",
+                "ratio": 0.6697017570199658,
+                "threshold": 0.3,
+                "value": 0.20091052710598972
+              }
+            },
+            "enabled": true,
+            "fired": false,
+            "operation": "AND",
+            "severity": 0.6697017570199658,
+            "status": "MEASURED",
+            "witness": {
+              "selected_run_consecutive_sign_flip_count": 9,
+              "selected_run_end_index": 10,
+              "selected_run_harmonic_index": 14,
+              "selected_run_start_index": 1
+            }
+          }
+        },
+        "nearest_gate": "BAD_AXIS_SPIKE",
+        "overall_rule_severity": 1.4203246142619668,
+        "rule_margin": -0.42032461426196677,
+        "schema_version": "rule-severity-v2",
+        "unavailable_gates": []
+      },
+      "source_feature_schema_version": "rf_all_crossings_extremum_energy_31_v2"
+    }
+  }
+]

@@ -116,6 +116,7 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Set up Flux or Perlmutter; use CPU/GPU helpers | [Platform environments](docs/platforms.md) |
 | Find a script, gate definition, or experiment command | [Script reference and task index](scripts/README.md) |
 | Identify a frozen rules configuration | [Rules configurations](configs/rules/README.md) |
+| Share the common accepted-mode list | [12-column catalog](catalogs/README.md) and [CSV](catalogs/accepted_modes.csv) |
 | Use or retrain RF/CNN models | [Model inventory](models/README.md) and [training instructions](scripts/README.md#cnn-model-scripts) |
 | Understand training labels and archived datasets | [Training-label documentation](training_labels/README.md) |
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |

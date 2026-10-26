@@ -1,0 +1,79 @@
+{
+  "review_date": "2026-10-25",
+  "review_type": "non-blind diagnostic; no adjudication applied",
+  "prior_seen": true,
+  "git_commit": "9f8a1f74bb6f2dfba093d33adfc9928a5338845e",
+  "live_root": "/p/nstxdigtwin/energetic_particles/nova/DiTw",
+  "training_root": "/p/hym/ebelova/NOVA/data_mixed",
+  "inputs": {
+    "nstxu_204202/N4/egn04w.8263E+01": {
+      "sha256": "e3ab76967a1466717d926ecafaa872a1d14c6765be67eb4ce397387f1d16dea7",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N4/datcon4": {
+      "sha256": "0c502b499b4d7c0428c80f50b6ed2108bf27b07503209198a5952211f7229e4d",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N6/egn06w.1273E+02": {
+      "sha256": "b405d42fcbfac98313fc2a00b33860d773c7f0846f2cfb50f747cfce59df8882",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N6/datcon6": {
+      "sha256": "1d45a4baf18ebabad75917c8cdcfff0a7009b5d05fe0c7c41f542a540824f0de",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N6/egn06w.2987E+02": {
+      "sha256": "16b8c9db72af187e16ed122a59104655dac3953c2b80713864138d028e0db37a",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N7/egn07w.9477E+01": {
+      "sha256": "f377c6016e655ab0e204eccbe70a9a98fa4df3078a44f8834ed9ab0d3212e7f4",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N7/datcon7": {
+      "sha256": "46ff758eb2de10ac87a3a04362024067b4722df411fbea63d5299c62bbc29562",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N10/egn10w.1026E+02": {
+      "sha256": "e21427dbd33b50aff58a60df273d3d77789630f8db3eac6eee5bb3bbe3d7fc52",
+      "live_training_byte_identical": true
+    },
+    "nstxu_204202/N10/datcon10": {
+      "sha256": "894673af3c9ac8514c6c593772f0a751afe6fdfba39c3096d845c64677417886",
+      "live_training_byte_identical": true
+    }
+  },
+  "source_sha256": {
+    "training_labels/tae_like_train.csv": "f914bec1562485f6b35fc6e6e9aac6c8bf14a6cca989a9b0e2cd4fffc5ef4e76",
+    "configs/rules/tae_rules_production_v13.yaml": "5d1319910b578d9b684a367d358d5a2304a7319218fe1571b462e9ce9d3b3919",
+    "configs/known_invalid_inputs.csv": "5e6db43370cf7e3d0e5b6d7e62c99176f7767835d6062f60153a7f13091ddb71",
+    "scripts/sort_shot_mixed.py": "925fe1354aa393d2b2fe9155213cd7fda1a2643389f8f718dac410395853a98b",
+    "scripts/sort_shot_rules.py": "700aae90871cb0343f80e6a82cf147f7d013cf4855d0ce45aa3e09b8e96e3346",
+    "scripts/tae_rule_engine.py": "aab69cc25513d2903d92acac452d48a522e8db207ad497ddd80eb9da38818aba",
+    "scripts/tae_rule_config.py": "3dfbe6fac0d63baafe1edcda1a09e23498c786e211e3311cb6a1d0843b872b77",
+    "scripts/tae_rule_io.py": "791208cb6cd9d7c68ff19a27877723f26f2dcdc1e92533914ad13c428296b698"
+  },
+  "shot_export_sha256": {
+    "good_tae_final.csv": "d01671eff70e93079f1c86b4be87d2eeb31cda145efd9f971122627394ca8d1e",
+    "good_tae_finalEBOct10.csv": "0cf87e755ebf5ac9c13960a2286358235c4ef19aebc6ef956ead2af2865e7e71",
+    "selected_modes.csv": "e953a8a5b26a7c70dc55909b5252a3f8b9a796c959e81c61327fe4270be72500"
+  },
+  "validation": {
+    "five_mode_only_rules_run": true,
+    "all_raw_and_continuum_hashes_match_training": true,
+    "all_five_fingerprints_match_september_13_v13_audit": true,
+    "all_five_decisions_match_september_13_v13_audit": true,
+    "installed_fingerprints_and_five_decisions_match": true,
+    "training_rules_source_and_existing_shot_exports_unchanged": true
+  },
+  "rule_command": "python scripts/sort_shot_mixed.py --method rules --shot_dir outputs/nstxu_204202_five_mode_review_20261025/inputs/nstxu_204202 --out_dir outputs/nstxu_204202_five_mode_review_20261025/rules --rule_config tae_rules_production_v13",
+  "installed_output_root": "/p/hym/ebelova/NOVA/sort_outputs/nstxu_204202",
+  "installed_output_sha256": {
+    "final_classifications.csv": "a81cfc41e4fa49054171ded0865d2577ccc0378081cd0071cef6374fc9ceffe3",
+    "rule_results.csv": "7e1e4c0558a0253e2f999fe908db876bdd738e481d29c14756313c0c1caa4e39",
+    "good_tae_final.csv": "0cf87e755ebf5ac9c13960a2286358235c4ef19aebc6ef956ead2af2865e7e71",
+    "bad_tae_like.csv": "82ed735908418fbef0e62d4ba77bec37f328e26067209199dd9bda474c355ae7",
+    "shot_summary.csv": "7a948aa7b33c78eb221da426363b337a65620cdb2876681f9a9f83c456bc27e7",
+    "manual_overrides.csv": "85b4fedc4a0b53c8a7a6429ed554661a82292201c8fe9a35b7411ed8570fe6e1"
+  }
+}

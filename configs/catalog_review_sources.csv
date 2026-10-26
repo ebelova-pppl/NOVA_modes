@@ -1,0 +1,7 @@
+path,decision_column,shot,reviewer,fingerprint_source
+audits/pilot39_manual_review_20260914/review_dispositions.csv,after,*,Elena,
+audits/processed40_20260915/accepted_tae_modes.csv,final_decision,nstxuE202806A02t045,Elena,
+audits/released14_manual_review_20261007/accepted_tae_modes.csv,final_decision,*,Elena,
+audits/released4_manual_review_20261007/accepted_tae_modes.csv,final_decision,*,Elena,
+audits/nstxu_204202_five_mode_review_20261025/mode_summary.csv,production_v13_decision,*,Codex,
+training_labels/tae_like_train.csv,validity,*,Elena,outputs/review_morphology_v13_20260913/training_comparison.csv

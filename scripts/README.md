@@ -28,6 +28,7 @@ have explicitly started Bash.
 | --- | --- |
 | Sort a new shot with current rules | [`sort_shot_mixed.py`](#sort_shot_mixedpy) |
 | Make a compact CSV for sharing | [`compact_mode_csv.py`](#compact_mode_csvpy) |
+| Export the common accepted-mode catalog | [`build_accepted_catalog.py`](#build_accepted_catalogpy) |
 | Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |
 | Understand duplicate severity ranking | [Normalized severity](#normalized-gate-severity) and [deduplication](#final-good-production-deduplication) |
 | View modes or apply manual corrections | [Viewer](#view_modes_csvpy), [labeler](#label_modes_fastpy), [adjudication](#manual-adjudication) |
@@ -1444,6 +1445,43 @@ modes stay on the TAE side for the selected decision method so marginal TAEs
 are not lost.
 
 ---
+
+## `build_accepted_catalog.py`
+
+Combine installed per-shot final GOOD lists into the common **12-column**
+[accepted-mode catalog](../catalogs/README.md), with portable paths and explicit
+review status. From the repository root:
+
+```tcsh
+python scripts/build_accepted_catalog.py \
+  --sort-root ../sort_outputs \
+  --output catalogs/accepted_modes.csv
+```
+
+The exporter preserves final-list membership and validates inventory coverage,
+unique mode keys, selected GOOD flags, summary counts, shot/n/configuration
+consistency and current invalid-input exclusions. It scans only direct shot
+directories. No rules, models or raw-mode preprocessing are run; Python 3.10+
+and the standard library suffice. It uses shared repository I/O/validity helpers.
+
+Columns are `path,shot,family,ntor,omega,rad_loc,rad_width,rule_config,overall_rule_severity,manual_override,final_decision,review_status`.
+Radius measurements and severity use four significant digits; omega retains
+source precision and units. Missing historical severity remains blank. The
+short preset appears in the catalog; full engine versions and source hashes
+remain in the companion `.metadata.json`.
+
+Review status uses [explicit evidence sources](../configs/catalog_review_sources.csv)
+matched by input fingerprint, including human training labels and their saved
+training-audit fingerprints. An unresolved human BAD/final GOOD disagreement
+is `pending`, with details in `.review_conflicts.csv`; it does not silently
+change selection. Applied manual GOOD overrides count as reviewed. Otherwise,
+the inventory's pending-review status yields `pending`; missing per-mode
+evidence yields `unknown`. Processing or training membership alone is not
+visual approval. See the catalog README for scope and the current counts.
+
+Successful runs update the CSV and companion files after validation, using
+atomic writes per file. `--inventory` and `--review-sources` select alternate
+metadata inputs. The exporter refuses to replace its source lists.
 
 ## `compact_mode_csv.py`
 
