@@ -1,5 +1,9 @@
 # N1 recheck, October 5, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Rechecked exactly the same **22 pending N1 scopes** from September 30, with
 N2 controls. The audit measures 2,900 current mode files: 1,752 N1 and 1,148
 N2, all nr=201. All 44 groups completed with no input-loading or group errors.
@@ -98,14 +102,14 @@ not rerun in this N1-only request.
 
 ## Files and reproduction
 
-- [Exact selection](selection.csv).
-- [N1 before/after measurements](n1_before_after.csv), including coverage counts.
-- [N2 control measurements](n2_control_before_after.csv).
-- [Continuum hashes and timestamps](continuum_files.csv).
-- [Viewer-ready residual review list](review_modes.csv): 146 N1 modes across
+- Exact selection (archived: `selection.csv`).
+- N1 before/after measurements (archived: `n1_before_after.csv`), including coverage counts.
+- N2 control measurements (archived: `n2_control_before_after.csv`).
+- Continuum hashes and timestamps (archived: `continuum_files.csv`).
+- Viewer-ready residual review list (archived: `review_modes.csv`): 146 N1 modes across
   all frequency ranges with an out-of-tolerance interior comparison or an
   empty matched log despite an interior crossing; no morphology labels.
-- [Receipt](receipt.json): historical/current snapshot hashes and protected files.
+- Receipt (archived: `receipt.json`): historical/current snapshot hashes and protected files.
 
 Full source snapshots, per-crossing offsets and file comparisons remain under
 ignored `outputs/review_n1_recheck_20261005/`. This directory is separate from

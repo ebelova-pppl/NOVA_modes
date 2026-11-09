@@ -1,5 +1,9 @@
 # Independent secondary edge-energy peaks
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Final adoption:** production v13 combines the body-amplitude refinement
 below with the accepted interior smoothness/footprint exception. See the
 [full regression and regeneration receipt](../morphology_v13_20260913/README.md)
@@ -8,7 +12,7 @@ counts below are historical intermediate calibrations.
 
 **Current refinement:** secondary peaks must additionally satisfy
 max_h |xi_h(r_peak)| > max_{h,r<0.9} |xi_h(r)|. All other edge cuts and the
-original global branch stay unchanged. The [body-amplitude comparison](body_amplitude_comparison.csv)
+original global branch stay unchanged. The body-amplitude comparison (archived: `body_amplitude_comparison.csv`)
 checks all 15 prior changes: three pilot modes and one training GOOD-label
 conflict still reject; eleven pilot modes are preserved. The initial 14-pilot
 projection below describes the preceding energy-only version of uncommitted
@@ -20,7 +24,7 @@ and selected just the W>=50% row below with unchanged r>=0.97 and own-FWHM<=10.
 Production v13 implements this as an extension of `BAD_EDGE_SPIKE`. All other
 gate settings remain unchanged; installed shot outputs have not been rerun.
 Earlier experiments and counts below retain their original audit provenance.
-The [adopted-gate label-change list](adopted_label_changes.csv) contains 14
+The adopted-gate label-change list (archived: `adopted_label_changes.csv`) contains 14
 pilot GOOD-to-BAD projections (9 latest twelve) and one training GOOD-label
 conflict. Exact production cuts reproduce the cached 2,214-survivor scan;
 all 15 changing modes were freshly checked with the shared production edge
@@ -151,11 +155,11 @@ of both candidate modes and the two training conflicts were inspected.
 
 ## Files and reproduction
 
-- [Base comparisons](comparison.csv) and [initial scan receipt](summary.json).
-- [Combined two-mode review list](half_energy_and_contrast.csv) and its
-  [cached-data projection receipt](combined_projection.json).
-- [Half-height-only candidates](W_peak_ge_0.50.csv) and
-  [contrast-only candidates](A_ge_0.3_contrast_ge_3.csv), including conflicts.
+- Base comparisons (archived: `comparison.csv`) and initial scan receipt (archived: `summary.json`).
+- Combined two-mode review list (archived: `half_energy_and_contrast.csv`) and its
+  cached-data projection receipt (archived: `combined_projection.json`).
+- Half-height-only candidates (archived: `W_peak_ge_0.50.csv`) and
+  contrast-only candidates (archived: `A_ge_0.3_contrast_ge_3.csv`), including conflicts.
 - All 2,214 measurements, complete per-peak arrays, unrestricted candidate
   lists and the inspected `edge_peak_comparison.png` remain ignored under
   `outputs/review_edge_secondary_peaks_20260913/`.

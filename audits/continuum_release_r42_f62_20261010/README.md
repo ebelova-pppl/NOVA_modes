@@ -1,5 +1,9 @@
 # R42 and F62 released after visual review, October 10, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Elena reviewed all **21 changed-input TAE-like/mixed modes** from the
 [recalculation check](../last3_recalculated_20261010/README.md): 16 in R42 and
 five in F62. All look grid-scale numerical or have large axis spikes. She
@@ -7,7 +11,7 @@ can see continuum-crossing offsets but judges further accuracy unnecessary
 for these unsuitable modes, and explicitly releases both shots for production
 rules processing. Both inventories now mark them `ready_for_rules`.
 
-The [reviewed-mode record](reviewed_modes.csv) retains all 21 fingerprints,
+The reviewed-mode record (archived: `reviewed_modes.csv`) retains all 21 fingerprints,
 types and the shared user assessment. The exact pathology is not assigned
 individually. The release does not assert corrected continuum correspondence
 or establish that the rules have already rejected these modes. Their eventual
@@ -21,10 +25,10 @@ findings remain recorded in the source audit.
 
 All recorded N1/N2 sources and all six inventories still match the October 10
 snapshot; all 21 reviewed fingerprints were checked. The
-[release record](release.json) preserves the user's statement, source-audit
+release record (archived: `release.json`) preserves the user's statement, source-audit
 hashes, verification and before/after inventory rows.
 
-[Five entries remain unprocessed](remaining_unprocessed.csv):
+Five entries remain unprocessed (archived: `remaining_unprocessed.csv`):
 
 - **Ready:** `nstxuG121123R42`, `nstxuG142301F62`, `nstxuG142301D46`.
 - **Held for N1/N2 recalculation:** `nstxuE205059A01t025`.

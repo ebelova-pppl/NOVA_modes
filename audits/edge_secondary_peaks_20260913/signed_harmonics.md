@@ -1,5 +1,9 @@
 # Individual signed edge peaks: 1.5 versus 2 intervals
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 2026-09-13; **audit only, no gate adopted or shot outputs regenerated**.
 The user proposes testing sufficiently large main or secondary peaks on
 individual harmonics, with amplitude>=0.7, P_edge>=3 and a narrow signed
@@ -106,13 +110,13 @@ of physical modes from numerical artifacts. No radius or width is adopted.
 
 ## Evidence and reproduction
 
-- [Comparison](signed_harmonics/comparison.csv) includes 24 radius/width
+- Comparison (archived: `signed_harmonics/comparison.csv`) includes 24 radius/width
   combinations, with widths 1, 1.25, 1.5, 2, 3 and 4 intervals.
-- [Review candidates](signed_harmonics/review_candidates.csv) contains the
+- Review candidates (archived: `signed_harmonics/review_candidates.csv`) contains the
   union of r>0.9/width<=1.5 and r>0.95/width<=2 candidates, plus the separate
   r>0.97 witness where applicable. There are 65 unique modes and 68 witness
   rows. The `scenarios` column identifies the cuts satisfied by that witness.
-- [Verification receipt](signed_harmonics/summary.json) preserves thresholds,
+- Verification receipt (archived: `signed_harmonics/summary.json`) preserves thresholds,
   hashes, native-grid counts and synthetic checks.
 - Full native measurements and both r>0.9 width candidate lists remain
   ignored in `outputs/review_edge_signed_peaks_20260913/`. The inspected

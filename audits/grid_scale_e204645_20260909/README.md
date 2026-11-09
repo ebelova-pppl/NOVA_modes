@@ -1,5 +1,9 @@
 # E204645 seven-mode grid-scale diagnostic, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Non-blind explanation of the seven modes queried by the user, with current
 rules labels already visible. This is diagnostic evidence, not adjudication
 or a change to production rules, saved classifications, or training labels.

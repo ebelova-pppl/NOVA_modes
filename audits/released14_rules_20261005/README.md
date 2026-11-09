@@ -1,12 +1,16 @@
 # Production sorting of 14 released shots, October 5, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Current selections:** Elena's [October 7 review](../released14_manual_review_20261007/README.md)
 supersedes this automatic snapshot: 70 accepted TAEs, one newly BAD mode and
 five manually classified BAEs. B37/E55 installed outputs include the
 corrections. The original counts and files below are retained for provenance.
 
 Completed and installed all 14 shots authorized by Elena from the
-[release list](../continuum_release_20261005/released_shots.csv), using
+release list (archived: `../continuum_release_20261005/released_shots.csv`), using
 `sort_shot_mixed.py --method rules --rule_config tae_rules_production_v13`.
 The survivor policy, continuum preprocessing and severity-based duplicate
 selection retain their frozen production settings.
@@ -23,26 +27,26 @@ selection retain their frozen production settings.
   existing `sort_outputs` root. Both live inventories now record completed
   rules sorting with `sorted_rules_pending_review`.
 - Membership is **177 processed + 14 training = 191 cases**. The
-  [nine remaining entries](remaining_unprocessed.csv) comprise eight
+  nine remaining entries (archived: `remaining_unprocessed.csv`) comprise eight
   continuum-review holds and the empty `nstxu_202806` directory.
 
-Use the [combined 76-mode GOOD list](good_tae_final_batch.csv) or each shot's
-installed `good_tae_final.csv`. [Per-shot counts](shot_summary.csv),
-[input checks](preflight.json), [verification](verification.json),
-[installation receipt](publication.json) and
-[inventory changes](inventory_update.json) preserve the evidence.
+Use the combined 76-mode GOOD list (archived: `good_tae_final_batch.csv`) or each shot's
+installed `good_tae_final.csv`. Per-shot counts (archived: `shot_summary.csv`),
+input checks (archived: `preflight.json`), verification (archived: `verification.json`),
+installation receipt (archived: `publication.json`) and
+inventory changes (archived: `inventory_update.json`) preserve the evidence.
 
 ## Outcome of the 39-mode crossing review
 
 All 39 reviewed modes are automatically BAD. Their gate outcomes and original
-fingerprints are in [reviewed_tae_mode_results.csv](reviewed_tae_mode_results.csv).
+fingerprints are in reviewed_tae_mode_results.csv (archived: `reviewed_tae_mode_results.csv`).
 This includes E34/N2/2204, despite Elena's favorable visual assessment. Its
 `BAD_CONT_CROSS_WINDOW` rejection comes from lower-boundary crossings at
 r=0.08820 and 0.11164. The first window reaches A=1 and W=1 at r=0.095.
 At the crossings, (A_cross, K_c) are (0.3030, 0.6414) and (0.1359, 0.6177),
 so neither satisfies the low-amplitude/smoothness exception. Its weak upper
 crossing at r=0.61696 does not violate the window gate.
-[Saved diagnostic](e34_n2_2204_review.json) records the user's assessment
+Saved diagnostic (archived: `e34_n2_2204_review.json`) records the user's assessment
 alongside the unchanged rule result. No individual manual override was applied.
 
 ## Input checks and retained scope flags

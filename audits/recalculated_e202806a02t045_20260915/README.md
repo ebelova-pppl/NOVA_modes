@@ -1,5 +1,9 @@
 # Recalculated E202806A02t045: sorting runtime diagnosis
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 After this rerun, Elena checked the results and approved adding the shot to
 the processed collection on 2026-09-15. It is now the 40th post-training case,
 with `checked_methods=rules`. Its 90 selected modes are included in the
@@ -35,9 +39,9 @@ The verified results are installed under the rules output root at
 preserved under `before_numpy_runtime_fix_20260915/nstxuE202806A02t045/`.
 Receipts record the actual source/output locations and file hashes:
 
-- [Verification and runtime](verification.json)
-- [Installation and backup](publication.json)
-- [Per-n results](shot_summary_by_n.csv)
+- Verification and runtime (archived: `verification.json`)
+- Installation and backup (archived: `publication.json`)
+- Per-n results (archived: `shot_summary_by_n.csv`)
 
 Both sorting CLIs now check the required NumPy API in the shared `run_shot`
 workflow before preprocessing or writing. The error names the active NumPy

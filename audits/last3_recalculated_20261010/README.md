@@ -1,5 +1,9 @@
 # Last three held shots: N1/N2 recheck, October 10, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **The available results do not yet clear all three shots.** R42 and F62 have
 replacement N1/N2 modes and updated N2 continua. E205059A01t025's mode files,
 continua and main logs are byte-identical to October 5 despite newer mode/log
@@ -10,9 +14,9 @@ verified stable. This check covers N1/N2 only and does not run production sortin
 
 ## Review lists
 
-- [21 changed-input TAE-like/mixed modes](changed_tae_mixed_review_modes.csv):
+- 21 changed-input TAE-like/mixed modes (archived: `changed_tae_mixed_review_modes.csv`):
   R42 has 16, F62 has five. This is the useful new review list.
-- [All 51 flagged TAE-like/mixed modes](tae_mixed_review_modes.csv): also
+- All 51 flagged TAE-like/mixed modes (archived: `tae_mixed_review_modes.csv`): also
   includes the 30 E205059A01t025 cases whose mode/continuum inputs are unchanged.
 
 Each row includes the type, crossing/nearest-log radii, offsets, exact input
@@ -68,7 +72,7 @@ are TAE-like. The shot remains held for their review. Its lower N2 continuum
 is still relatively flat at `0.01 <= r < 0.3`: frequency range 7.278–7.493,
 versus 7.349–7.495 previously. Flatness alone establishes neither validity nor
 the cause of a mode's morphology; the values are in
-[f62_inner_boundary.json](f62_inner_boundary.json).
+f62_inner_boundary.json (archived: `f62_inner_boundary.json`).
 
 ## Coverage, provenance and disposition
 
@@ -77,17 +81,17 @@ frequency-matched log records. E205059A01t025 has 24 modes with frequency-matche
 empty singularity records across all types; none has an interior TAE/mixed crossing.
 There are no missing-frequency, incomplete or conflicting matches in the
 current six groups. Potential EAE issues remain separate in
-[alignment_summary.csv](alignment_summary.csv), including the remaining R42
+alignment_summary.csv (archived: `alignment_summary.csv`), including the remaining R42
 EAE flags. The upper EAE boundary is unavailable; these findings do not clear
 or reject EAE modes.
 
-[source_comparison.csv](source_comparison.csv) records mode replacements and
-continuum changes; [auxiliary_comparison.csv](auxiliary_comparison.csv) records
+source_comparison.csv (archived: `source_comparison.csv`) records mode replacements and
+continuum changes; auxiliary_comparison.csv (archived: `auxiliary_comparison.csv`) records
 log/continuum hashes and local timestamps. Raw checks are in
-[input_summary.csv](input_summary.csv) and [invalid_inputs.csv](invalid_inputs.csv).
+input_summary.csv (archived: `input_summary.csv`) and invalid_inputs.csv (archived: `invalid_inputs.csv`).
 Full diagnostic coverage, crossings and fingerprints are preserved in
 `mode_coverage.csv`, `crossing_offsets.csv`, `metadata.json` and
-`raw_input_metadata.json`; [receipt.json](receipt.json) records verification
+`raw_input_metadata.json`; receipt.json (archived: `receipt.json`) records verification
 and the inventory updates. The unchanged diagnostic uses the shared continuum
 loader, exact binary-header omega-squared/log matching with relative tolerance
 1e-12, and `0.03 <= r < 0.75`. No RF/CNN predictions or morphology labels enter
@@ -100,7 +104,7 @@ python audits/n1_database_alignment_20260910/check_database.py \
   --out-dir outputs/review_last3_recalculated_20261010
 ```
 
-[Five entries remain unprocessed](remaining_unprocessed.csv): D46 ready,
+Five entries remain unprocessed (archived: `remaining_unprocessed.csv`): D46 ready,
 these three held, and empty `nstxu_202806`. R42 now has
 `recalculation_review_pending` after the replacement; E205059A01t025 retains
 `continuum_recalculation_pending` and F62 retains `recalculation_review_pending`.

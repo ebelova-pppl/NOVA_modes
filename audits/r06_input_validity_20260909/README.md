@@ -1,5 +1,9 @@
 # R06 whole-shot input invalidation, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **User decision: all 610 modes in `nstxuG133964R06` are INVALID.**
 
 The user reports poor eigenmode structures throughout the shot and poloidal

@@ -1,5 +1,9 @@
 # Crossing-window exception audit and adoption, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The user inspected and accepted all 13 additional candidates, then requested
 adoption. Their fingerprinted review is recorded in `user_review.csv`.
 The shared engine now implements the audited exception in production v7

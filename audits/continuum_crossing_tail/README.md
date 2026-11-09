@@ -1,5 +1,9 @@
 # Continuum crossing-tail calibration audit
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This is the compact, non-blind calibration record for production v5 and
 `BAD_CONTINUUM_CROSSING_TAIL`. It does not establish performance on the full
 approximately 200-shot dataset.

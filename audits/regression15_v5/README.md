@@ -1,5 +1,9 @@
 # Fifteen-shot production-v5 regression
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The results below are historical, before the adopted shared continuum-tail
 repair. See `../continuum_monotonic_tail_20260908/` for the subsequent v6
 regeneration of all 27 checked shots. Reproduction of this v5 comparison

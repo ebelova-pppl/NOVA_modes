@@ -1,5 +1,9 @@
 # Completed GOOD-list review of the released 14 shots, October 7, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Elena reviewed the 76 selected GOOD modes from the October 5 batch. Her
 corrections are installed in the B37 and E55 outputs; the other 12 shot
 directories are unchanged. The current collection contains **70 accepted
@@ -7,10 +11,10 @@ TAE representatives**, one newly BAD mode and five separately classified BAEs.
 
 - [Accepted TAE list](accepted_tae_modes.csv): 70 selected modes.
 - [BAE list](bae_like.csv): the five manually assigned E55/N10 modes.
-- [Six corrections](label_changes.csv) and [reusable overrides](manual_overrides.csv).
+- Six corrections (archived: `label_changes.csv`) and [reusable overrides](manual_overrides.csv).
 - [Disposition of the original 76 selections](review_dispositions.csv).
-- [Per-shot counts](shot_summary.csv), [verification](verification.json),
-  [installation receipt](publication.json) and [inventory update](inventory_update.json).
+- Per-shot counts (archived: `shot_summary.csv`), verification (archived: `verification.json`),
+  installation receipt (archived: `publication.json`) and inventory update (archived: `inventory_update.json`).
 
 ## Corrections
 
@@ -83,6 +87,6 @@ remaining pending-review shots await GOOD-list review. The earlier reviewed
 40-shot manifest, training labels, known-invalid scopes and the independent
 F83/K79 release are preserved. Potential EAE/mixed flags remain recorded.
 
-The [October 5 76-mode export](../released14_rules_20261005/good_tae_final_batch.csv)
+The October 5 76-mode export (archived: `../released14_rules_20261005/good_tae_final_batch.csv`)
 and its receipts remain the historical automatic snapshot; use the 70-mode
 accepted list above for this cohort's current selections.

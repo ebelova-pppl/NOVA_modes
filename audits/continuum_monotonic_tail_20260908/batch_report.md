@@ -1,5 +1,9 @@
 # 27-shot mode-level comparison
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Adoption follow-up (2026-09-08):** the user accepted all 41 recovered modes.
 The shared loader now uses the reviewed `last` treatment, with version
 `datcon-monotonic-tail-v1`. The initial comparison below is historical;

@@ -1,5 +1,9 @@
 # Local background for boundary peaks
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 2026-09-13; **audit only; production v12 and installed outputs unchanged**.
 The user clarifies that the radial condition applies to the peak location,
 sets it to **r_peak>=0.95 inclusive**, and proposes calculating the background
@@ -87,9 +91,9 @@ remove this conflict. The eight pilot candidates under those settings are:
 
 ## Evidence and reproduction
 
-[Review CSV](local_background_review.csv) contains the eight pilot candidates,
+Review CSV (archived: `local_background_review.csv`) contains the eight pilot candidates,
 one GOOD-label conflict and one newly rejected BAD-label training survivor
-for window=0.05, lobe exclusion and width<=1.5. The [receipt](local_background_summary.json)
+for window=0.05, lobe exclusion and width<=1.5. The receipt (archived: `local_background_summary.json`)
 contains all eight comparisons, both N2 peak measurements, hashes and checks.
 The complete per-peak arrays and all-scenario review list remain ignored in
 `outputs/review_edge_local_background_20260913/`.

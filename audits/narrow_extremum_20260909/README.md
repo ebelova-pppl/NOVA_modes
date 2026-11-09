@@ -1,5 +1,9 @@
 # Five narrow rule survivors, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 All five modes questioned by the user are detected as narrow by the interior
 total-energy gate, then exempted by its continuum-extremum exception. This is
 a non-blind diagnostic; production decisions and thresholds are unchanged.

@@ -1,5 +1,9 @@
 # Twelve new E shots: rules v11 versus RF/raw-CNN
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 2026-09-10. The user authorized a limited continuation of paired sorting while
 the N1 problem cases are recalculated. The full-database rollout and unresolved
 input scopes remain on hold. No rule threshold, model artifact, training label,
@@ -22,7 +26,7 @@ match exactly. The inference logs contain no warnings or errors.
 | Final GOOD representatives | 694 | 762 |
 
 The methods agree on **1,673/1,817 decisions (92.07%)**. The
-[144 disagreements](disagreements.csv) comprise **106 rules-BAD/AI-GOOD** and
+144 disagreements (archived: `disagreements.csv`) comprise **106 rules-BAD/AI-GOOD** and
 **38 rules-GOOD/AI-BAD**. The rule rejections are axis spike (57), grid-scale
 spike (19), near-axis oscillation (13), crossing window (7), interior unresolved
 envelope (5), continuum-crossing tail (4), and edge spike (1).
@@ -34,13 +38,13 @@ for this selected batch, not accuracy measurements.
 The largest number of disagreements is E203655F01t025, with 25/249 TAE-side
 modes. E204636A01t020 has 15 disagreements, all rules-GOOD/AI-BAD.
 Full per-shot results are in
-[shot_summary.csv](shot_summary.csv). No disagreements have been visually
+shot_summary.csv (archived: `shot_summary.csv`). No disagreements have been visually
 adjudicated during this run.
 
-The [verification receipt](verification.json) fingerprints all staged output
-trees; the [publication receipt](publication.json) records their verified
+The verification receipt (archived: `verification.json`) fingerprints all staged output
+trees; the publication receipt (archived: `publication.json`) records their verified
 installation in 24 new directories. Existing shot outputs were not replaced.
-The [inventory update](inventory_update.json) marks exactly these twelve E
+The inventory update (archived: `inventory_update.json`) marks exactly these twelve E
 shots checked, increasing the post-training total from **27 to 39**. All
 other inventory rows and the G-only inventory remain unchanged.
 
@@ -87,12 +91,12 @@ excluded entries, and selected shots are preserved beside this README.
 | nstxuE202944A02t021 | medium | 670 |
 | nstxuE203655F01t025 | medium | 558 |
 
-The [completed selection](selection.csv) contains **6,697 input files**, with
+The completed selection (archived: `selection.csv`) contains **6,697 input files**, with
 no preflight replacements. Every selected N1/N2 mode, continuum and log file
 matched the alignment-audit snapshot before and after inference. Shared
 `preprocess_shot` checked every N1–N10 mode, including binary metadata,
 continuum loading, native resolution and input-validity exclusions; the
-[preflight summary](preflight_summary.json) fingerprints its per-mode tables.
+preflight summary (archived: `preflight_summary.json`) fingerprints its per-mode tables.
 
 ## Workflow and provenance
 
@@ -105,7 +109,7 @@ share the direct 20% EAE routing and `datcon-monotonic-tail-v1` continuum repair
 Checkpoint provenance remains historical: this task does not retrain after
 the recently removed invalid N1 training rows.
 
-The portable [driver](run_pilot.py) accepts `select`, `preflight`, `stage`,
+The portable driver (archived: `run_pilot.py`) accepts `select`, `preflight`, `stage`,
 `verify`, and `install` phases. `select` refuses to overwrite a frozen draw;
 `stage` refuses to overwrite existing local shot exports. Two shots run
 concurrently on CPU. `verify` rebuilds the compact comparison from complete

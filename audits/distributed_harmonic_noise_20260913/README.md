@@ -1,5 +1,9 @@
 # Distributed harmonic noise: initial total-energy trial, 2026-09-13
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Superseded denominator:** the user clarified that the global rejection cut
 must use the **full-domain top-two-harmonic energy reference**, as previously
 agreed, to limit edge-mode dilution. The first run below mistakenly used total
@@ -102,11 +106,11 @@ production measurements, gate reporting and severity outputs.
 
 ## Evidence and reproduction
 
-- [Flagged training modes](flagged_training.csv): 19 BAD-labeled inputs,
+- Flagged training modes (archived: `flagged_training.csv`): 19 BAD-labeled inputs,
   including baseline decisions, fingerprints and witness measurements.
-- [Pilot examples](pilot_examples.csv): both inspected cases and their
+- Pilot examples (archived: `pilot_examples.csv`): both inspected cases and their
   proposed-branch results.
-- [Summary and verification](summary.json): counts, strict threshold semantics,
+- Summary and verification (archived: `summary.json`): counts, strict threshold semantics,
   source hashes, input issues and checks.
 - Full per-mode results remain ignored under
   `outputs/review_distributed_harmonic_noise_20260913/`.

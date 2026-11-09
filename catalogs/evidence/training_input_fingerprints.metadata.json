@@ -1,0 +1,8 @@
+{
+  "description": "Unmodified mode keys and saved mode-plus-continuum fingerprints extracted for portable catalog review matching; no labels or classifications recomputed.",
+  "source": "outputs/review_morphology_v13_20260913/training_comparison.csv",
+  "source_sha256": "fbf56493f57f2518dfb089186e08bb01f48c46781be34559d260e3c2b60107a1",
+  "output_sha256": "426ff3f6ce396fdbae2e9fefcfd6bf8c479a434553c2d0bdbeeaee5c189fa573",
+  "rows": 2327,
+  "extracted_on": "2026-11-09"
+}

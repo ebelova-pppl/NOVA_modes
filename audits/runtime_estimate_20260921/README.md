@@ -1,5 +1,9 @@
 # Remaining DiTw rules-sorting runtime estimate
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The user subsequently authorized this 122-shot subset. The
 [completed batch](../remaining122_rules_20260921/README.md) installed 118 shots
 and held four newly discovered NaN-input cases. The estimate below records
@@ -39,8 +43,8 @@ ideally reduce that to about 20–30 minutes, but shared filesystem contention,
 shot composition, validation and output handling justify the wider planning
 budget above. Parallel scaling has not been measured in this estimate.
 
-- [Remaining-shot count and recorded holds](remaining_shots.csv)
-- [Timing measurements, calculation and source hashes](estimate.json)
+- Remaining-shot count and recorded holds (archived: `remaining_shots.csv`)
+- Timing measurements, calculation and source hashes (archived: `estimate.json`)
 
 This estimate does not authorize or start the remaining production batch.
 Flagged recalculations need review before being included in a later run.

@@ -1,5 +1,9 @@
 # Completed 39-shot manual disagreement review
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This is the preserved September 14 review snapshot. The
 [current 40-shot collection](../processed40_20260915/README.md) adds the
 user-approved recalculated E202806A02t045 rules results on September 15.
@@ -39,19 +43,19 @@ using standalone p_good>=0.5. These counts do not estimate model accuracy.
 The eight recalculated C50/N1 modes without current AI classifications remain
 outside the 6,004 paired comparisons.
 
-- [Accepted TAE modes](accepted_tae_modes.csv): the **1,636 deduplicated
+- Accepted TAE modes (archived: `accepted_tae_modes.csv`): the **1,636 deduplicated
   representatives** for downstream use; all are in the `tae_like` category.
-- [The 17 label changes and reasons](label_changes.csv)
+- The 17 label changes and reasons (archived: `label_changes.csv`)
 - [Canonical manual overrides](manual_overrides.csv)
 - [Disposition of all 365 reviewed disagreements](review_dispositions.csv)
-- [Current final-label / AI disagreements](disagreements.csv), split into
-  [BAD / AI GOOD](rules_bad_ai_good.csv) and [GOOD / AI BAD](rules_good_ai_bad.csv)
-- [Resolved disagreements](resolved_disagreements.csv)
-- [Per-shot counts](shot_summary.csv), [selection changes](selection_changes.csv)
-- [Standalone RF comparison](final_vs_rf.csv), [CNN comparison](final_vs_cnn.csv)
-- [AI comparison exclusions](ai_comparison_excluded.csv)
-- [Verification receipt](verification.json), [installation receipt](publication.json)
-- [Inventory metadata update](inventory_update.json): review notes only,
+- Current final-label / AI disagreements (archived: `disagreements.csv`), split into
+  BAD / AI GOOD (archived: `rules_bad_ai_good.csv`) and GOOD / AI BAD (archived: `rules_good_ai_bad.csv`)
+- Resolved disagreements (archived: `resolved_disagreements.csv`)
+- Per-shot counts (archived: `shot_summary.csv`), selection changes (archived: `selection_changes.csv`)
+- Standalone RF comparison (archived: `final_vs_rf.csv`), CNN comparison (archived: `final_vs_cnn.csv`)
+- AI comparison exclusions (archived: `ai_comparison_excluded.csv`)
+- Verification receipt (archived: `verification.json`), installation receipt (archived: `publication.json`)
+- Inventory metadata update (archived: `inventory_update.json`): review notes only,
   preserving checked membership, statuses and training counts.
 
 The full 6,012-row curated classification table and all paired comparisons

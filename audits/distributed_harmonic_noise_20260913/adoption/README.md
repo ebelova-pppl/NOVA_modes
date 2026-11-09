@@ -1,5 +1,9 @@
 # Production v12: distributed harmonic noise
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../../docs/research_archive.md).
+
 The user approved the calibrated top-two setup on 2026-09-13. Production
 `tae_rules_production_v12` enables `BAD_DISTRIBUTED_HARMONIC_NOISE` as a final
 additional rejection gate, retaining every earlier primary reason. The canonical
@@ -82,15 +86,15 @@ except for the one approved new rejection:
 
 Review outputs:
 
-- [Current latest-12 disagreements](latest12_disagreements.csv), preserving
+- Current latest-12 disagreements (archived: `latest12_disagreements.csv`), preserving
   the membership of `audits/pilot12_v11_20260910/selection.csv`.
-- [All 39-shot disagreements](current_disagreements.csv).
-- [Removed disagreement](disagreements_removed.csv); no new disagreement was
+- All 39-shot disagreements (archived: `current_disagreements.csv`).
+- Removed disagreement (archived: `disagreements_removed.csv`); no new disagreement was
   introduced. Historical disagreement and Elena review files remain intact.
-- [Adopted pilot change](adopted_changes.csv), [training change](training_changes.csv),
-  [selection changes](selection_changes.csv), and [per-shot counts](shot_summary.csv).
-- [Verification](verification.json), [publication/backups](publication.json),
-  and [test receipt](tests.json).
+- Adopted pilot change (archived: `adopted_changes.csv`), training change (archived: `training_changes.csv`),
+  selection changes (archived: `selection_changes.csv`), and per-shot counts (archived: `shot_summary.csv`).
+- Verification (archived: `verification.json`), publication/backups (archived: `publication.json`),
+  and test receipt (archived: `tests.json`).
 
 The [pre-adoption calibration](../top2_pilot39/README.md) found zero flagged
 GOOD training labels out of 575, one newly rejected BAD-labeled training mode

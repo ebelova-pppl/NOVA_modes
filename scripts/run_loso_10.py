@@ -2,7 +2,7 @@
 """
 Run leave-one-shot-out checks for the expanded TAE-like training set.
 
-The driver keeps small, versionable evaluation CSVs under outputs/loso_<N> by
+The driver writes local, Git-ignored evaluation CSVs under outputs/loso_<N> by
 default, while model checkpoints and training logs go to $NOVA_RUN/loso_<N> or
 $SCRATCH/nova_s/loso_<N>. It intentionally calls the existing RF, raw-CNN, and
 mixed-shot sorter scripts rather than duplicating their preprocessing logic.

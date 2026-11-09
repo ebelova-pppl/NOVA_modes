@@ -1,5 +1,9 @@
 # Extremum-exception clearance and width floors, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Adopted decision:** the user subsequently selected clearance **>0.1% only**,
 with no additional minimum-width requirement. Production v8 implements
 `0.001 < ext_df_gap <= 0.04` in the existing interior extremum exception.

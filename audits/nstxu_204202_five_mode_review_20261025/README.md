@@ -1,5 +1,9 @@
 # nstxu_204202: five-mode diagnostic review, October 25, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Four of the five queried modes are already included in
 `$NOVA_REPO/../sort_outputs/nstxu_204202/good_tae_final.csv` and in the live
 shot's GOOD export. Only `N10/egn10w.1026E+02` is rejected there, with
@@ -56,13 +60,13 @@ This distinction does not establish which file the colleague actually used.
 
 - [Mode summary](mode_summary.csv): current training label, selection membership,
   rules verdict and measured geometry for each mode.
-- [Rule evidence](rule_evidence.json): complete grouped feature payloads from
+- Rule evidence (archived: `rule_evidence.json`): complete grouped feature payloads from
   the fresh v13 check.
-- [Provenance](provenance.json): hashes of inputs, configuration, source files,
+- Provenance (archived: `provenance.json`): hashes of inputs, configuration, source files,
   training list, exports and installed output evidence.
-- [N4 peak and N10 axis detail](../../outputs/nstxu_204202_five_mode_review_20261025/figures/n4_peak_n10_axis_detail.png)
-  ([PDF](../../outputs/nstxu_204202_five_mode_review_20261025/figures/n4_peak_n10_axis_detail.pdf)).
-- [Full diagnostic figures](../../outputs/nstxu_204202_five_mode_review_20261025/figures):
+- N4 peak and N10 axis detail (archived: `../../outputs/nstxu_204202_five_mode_review_20261025/figures/n4_peak_n10_axis_detail.png`)
+  (PDF (archived: `../../outputs/nstxu_204202_five_mode_review_20261025/figures/n4_peak_n10_axis_detail.pdf`)).
+- Full diagnostic figures (archived: `../../outputs/nstxu_204202_five_mode_review_20261025/figures`):
   all 54 signed harmonics, radial energy, absolute-frequency continuum and
   stored-harmonic spectra for all five modes. The renderer's inner-extremum
   search is restricted; use the explicit N4 local-maximum check above for

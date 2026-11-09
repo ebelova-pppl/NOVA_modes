@@ -1,5 +1,9 @@
 # Interior harmonic-incoherence calibration audit
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This compact audit records the non-blind, post-hoc evidence used to freeze
 `BAD_INTERIOR_HARMONIC_INCOHERENCE` in production v3. It is not an independent
 validation set.

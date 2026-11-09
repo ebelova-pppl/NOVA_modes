@@ -1,12 +1,16 @@
 # N75, B85 and E205059A01t025: TAE crossing review, October 7, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Review completed:** Elena released N75/B85 because all listed modes look
 junky despite confirmed N2 offsets. E205059A01t025 requires N1/N2
 recalculation because some affected modes otherwise look acceptable. See the
 [release and hold record](../continuum_release_n75_b85_20261007/README.md).
 The original measurements and review CSV below are preserved.
 
-[tae_review_modes.csv](tae_review_modes.csv) contains **42 flagged modes**,
+tae_review_modes.csv (archived: `tae_review_modes.csv`) contains **42 flagged modes**,
 one row per mode, with blank `manual_label` and `manual_reason` columns.
 The list is ordered by shot, N and frequency and includes individual crossing
 radii, nearest logged singularity radii, offsets and input fingerprints.
@@ -27,8 +31,8 @@ the modes.
 
 All **591 mode, continuum and available log files** in these six N groups
 still match the October 5 snapshot; mode inventories are unchanged. All 42
-viewer paths resolve through the shared CSV reader. [Receipt](receipt.json)
-records source hashes and verification; [shot_summary.csv](shot_summary.csv)
+viewer paths resolve through the shared CSV reader. Receipt (archived: `receipt.json`)
+records source hashes and verification; shot_summary.csv (archived: `shot_summary.csv`)
 contains the counts.
 
 Mixed modes and potential EAE issues remain separate in the

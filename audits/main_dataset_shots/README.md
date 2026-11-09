@@ -1,5 +1,9 @@
 # Live DiTw shot status
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
@@ -15,7 +19,7 @@ excluding it leaves 183 processed plus 14 training shots.
 E205059A01t025 (N1/N2 recalculation) and G133964R06 (corrected whole-shot
 inputs and review). Processing history is independent of validity: R06 has
 `post_training_checked=yes` and `status=invalid_input`. It is absent from the
-[two-entry unprocessed list](../released3_rules_20261010/remaining_unprocessed.csv),
+two-entry unprocessed list (archived: `../released3_rules_20261010/remaining_unprocessed.csv`),
 which contains only the E-shot and empty `nstxu_202806`.
 
 Do not use `post_training_checked=no` alone to count outstanding input holds.
@@ -47,7 +51,7 @@ considering recalculation of both modes and continuum. D46's latest file
 counts are 34 N1 and 18 N2, with completion still unverified. Q62 is already
 processed with seven reviewed selected TAEs; its training suspension remains.
 See the [follow-up audit](../r42_f62_followup_20261007/README.md).
-The [current five unprocessed entries](../released4_rules_20261007/remaining_unprocessed.csv)
+The current five unprocessed entries (archived: `../released4_rules_20261007/remaining_unprocessed.csv`)
 are **four held + one empty**. Potential EAE issues and separate
 mixed findings remain recorded; no released shots remain unprocessed.
 
@@ -105,7 +109,7 @@ approved corrections (9 BAD->GOOD, 8 GOOD->BAD) are installed in the 13
 affected rules shot outputs, with prior versions backed up. The other
 348 disagreement labels are retained after review. See the
 [manual-review audit](../pilot39_manual_review_20260914/README.md) and
-[1,636 accepted TAE representatives](../pilot39_manual_review_20260914/accepted_tae_modes.csv).
+1,636 accepted TAE representatives (archived: `../pilot39_manual_review_20260914/accepted_tae_modes.csv`).
 Inventory notes record completion; checked membership, statuses, training
 counts and input exclusions remain unchanged. No additional shots were sorted.
 
@@ -171,7 +175,7 @@ installation and the exact twelve inventory rows changed. Unresolved input
 scopes remain on hold. The
 [remaining-database audit](../n1_database_alignment_20260910/README.md) scanned
 N1/N2 in the other 159 shots; its
-[all-200 N1 table](../n1_database_alignment_20260910/all_200_n1_status.csv)
+all-200 N1 table (archived: `../n1_database_alignment_20260910/all_200_n1_status.csv`)
 combines that scan with the earlier training/pilot snapshots. New candidate
 flags are diagnostic, not confirmed registry exclusions. This audit does not
 change `post_training_checked` or the sorting statuses in this inventory.

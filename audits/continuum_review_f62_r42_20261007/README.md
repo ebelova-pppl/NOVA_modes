@@ -1,11 +1,15 @@
 # F62 and R42: TAE crossing review, October 7, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Review follow-up:** Elena requires R42/N2 continuum recalculation and is
 considering recalculating both modes and continuum for F62. Both remain held.
 See the [new R42 N3–N10 diagnostic and current holds](../r42_f62_followup_20261007/README.md).
 The original N1/N2 measurements and review CSV below are preserved.
 
-[tae_review_modes.csv](tae_review_modes.csv) contains **59 flagged modes**,
+tae_review_modes.csv (archived: `tae_review_modes.csv`) contains **59 flagged modes**,
 one row per mode, with blank `manual_label` and `manual_reason` columns.
 The list is ordered by shot, N and frequency. It includes crossing and
 nearest logged singularity radii, offsets and input fingerprints.
@@ -26,8 +30,8 @@ these modes.
 All **577 mode, continuum and available log files** in the four N groups
 still match the October 5 snapshot, with unchanged mode inventories.
 All 59 viewer paths resolve through the shared CSV reader. The
-[receipt](receipt.json) records verification and source hashes;
-[shot_summary.csv](shot_summary.csv) contains the counts.
+receipt (archived: `receipt.json`) records verification and source hashes;
+shot_summary.csv (archived: `shot_summary.csv`) contains the counts.
 
 Mixed modes and potential EAE issues remain separate in the
 [earlier scoped audit](../continuum_small_review_20261005/README.md).

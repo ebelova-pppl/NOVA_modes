@@ -1,5 +1,9 @@
 # Near-axis amplitude and energy concentration audit, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Adopted:** the user approved the combined gate. Production v9 now enables
 `axis_energy_concentration`, reason `BAD_AXIS_ENERGY_CONCENTRATION`, with
 the strict cuts below. It runs last, preserving earlier BAD reasons.

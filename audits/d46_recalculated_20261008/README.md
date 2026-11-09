@@ -1,5 +1,9 @@
 # D46 recalculation and crossing check, October 8, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The current `nstxuG142301D46` N1/N2 mode sets have been replaced. There are
 **37 N1 and 38 N2 modes**, with no filenames shared with the previous 57/45
 sets. Both continuum files remain byte-identical to the October 5 snapshot.
@@ -9,7 +13,7 @@ Sources and inventories remained stable through export.
 
 ## TAE-like and mixed review
 
-[tae_mixed_review_modes.csv](tae_mixed_review_modes.csv) contains **23 N2
+tae_mixed_review_modes.csv (archived: `tae_mixed_review_modes.csv`) contains **23 N2
 modes: 17 TAE-like and six mixed TAE–EAE**, with type, continuum-crossing
 radii, input fingerprints and blank manual label/reason columns.
 
@@ -46,7 +50,7 @@ python viz/view_modes_csv.py audits/d46_recalculated_20261008/tae_mixed_review_m
 
 N1 has 36 EAE-like modes, all frequency matched: 49 of 58 interior
 comparisons exceed two grid intervals, in **25 modes**. These are preserved
-in [potential_eae_review_modes.csv](potential_eae_review_modes.csv). They
+in potential_eae_review_modes.csv (archived: `potential_eae_review_modes.csv`). They
 remain potential EAE correspondence issues: the upper EAE boundary is
 unavailable, and nearest-log distance alone does not identify a displaced
 physical resonance. N2's 15 EAE-like modes also lack matching logs.
@@ -55,18 +59,18 @@ TAE-like/mixed list.
 
 ## Evidence and disposition
 
-- [alignment_summary.csv](alignment_summary.csv),
-  [mode_coverage.csv](mode_coverage.csv) and
-  [crossing_offsets.csv](crossing_offsets.csv) preserve the fresh measurements.
-- [source_comparison.csv](source_comparison.csv) records old/new membership
+- alignment_summary.csv (archived: `alignment_summary.csv`),
+  mode_coverage.csv (archived: `mode_coverage.csv`) and
+  crossing_offsets.csv (archived: `crossing_offsets.csv`) preserve the fresh measurements.
+- source_comparison.csv (archived: `source_comparison.csv`) records old/new membership
   and hash comparisons. Mode baselines are September 30 (the N1/N2 inputs
   were still unchanged on October 5); N1/N2 continuum baselines are October 5.
-- [input_summary.csv](input_summary.csv) and
-  [invalid_inputs.csv](invalid_inputs.csv) record all-N raw input checks.
-- [metadata.json](metadata.json), [raw_input_metadata.json](raw_input_metadata.json)
-  and [receipt.json](receipt.json) preserve settings, source hashes,
+- input_summary.csv (archived: `input_summary.csv`) and
+  invalid_inputs.csv (archived: `invalid_inputs.csv`) record all-N raw input checks.
+- metadata.json (archived: `metadata.json`), raw_input_metadata.json (archived: `raw_input_metadata.json`)
+  and receipt.json (archived: `receipt.json`) preserve settings, source hashes,
   inventories and viewer-path verification.
-- [remaining_unprocessed.csv](remaining_unprocessed.csv) records the five
+- remaining_unprocessed.csv (archived: `remaining_unprocessed.csv`) records the five
   remaining entries. D46 stays held for N2 log/correspondence review under
   `input_update_pending`; its earlier missing/changing-mode condition is
   superseded by this stable snapshot. No production sorting, labels,

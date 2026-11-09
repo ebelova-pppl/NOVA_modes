@@ -1,5 +1,9 @@
 # Review of the 39 checked shots, production v13
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Review completed, 2026-09-14:** Elena entered 17 corrections (9 BAD->GOOD,
 8 GOOD->BAD) and retained the other 348 labels. Her edited
 `disagreements_elena.csv` is preserved here. See the
@@ -20,13 +24,13 @@ using final GOOD/BAD decisions **before duplicate removal**. There are
 
 | List | Modes | Purpose |
 | --- | ---: | --- |
-| [disagreements.csv](disagreements.csv) | 365 | Complete comparison, ordered by shot, n and frequency |
+| disagreements.csv (archived: `disagreements.csv`) | 365 | Complete comparison, ordered by shot, n and frequency |
 | [disagreements_elena.csv](disagreements_elena.csv) | 365 | Editable review copy; fill `manual_decision` and `manual_reason` for requested changes |
-| [rules_bad_ai_good.csv](rules_bad_ai_good.csv) | 218 | Rules reject, AI accepts |
-| [rules_good_ai_bad.csv](rules_good_ai_bad.csv) | 147 | Rules accept, AI rejects |
-| [rules_vs_rf.csv](rules_vs_rf.csv) | 399 | Separate comparison with RF at p_good>=0.5 |
-| [rules_vs_cnn.csv](rules_vs_cnn.csv) | 721 | Separate comparison with CNN at p_good>=0.5 |
-| [shot_summary.csv](shot_summary.csv) | 39 | Counts for every shot, including zero-disagreement shots |
+| rules_bad_ai_good.csv (archived: `rules_bad_ai_good.csv`) | 218 | Rules reject, AI accepts |
+| rules_good_ai_bad.csv (archived: `rules_good_ai_bad.csv`) | 147 | Rules accept, AI rejects |
+| rules_vs_rf.csv (archived: `rules_vs_rf.csv`) | 399 | Separate comparison with RF at p_good>=0.5 |
+| rules_vs_cnn.csv (archived: `rules_vs_cnn.csv`) | 721 | Separate comparison with CNN at p_good>=0.5 |
+| shot_summary.csv (archived: `shot_summary.csv`) | 39 | Counts for every shot, including zero-disagreement shots |
 
 These are disagreements, not accuracy measurements. `rf_cnn_decision` is
 the saved ensemble's actual final label; it is not a threshold on the mean
@@ -36,11 +40,11 @@ severity, selected-representative flags and input fingerprint.
 `original_rule_decision` preserves BAD/REVIEW from the deterministic engine.
 
 The list is identical to the immediately preceding verified v13 list.
-Relative to v12, [one disagreement is added](added_since_v12.csv),
-E203655F01t025 N3/1987, and [five disappear](removed_since_v12.csv).
+Relative to v12, one disagreement is added (archived: `added_since_v12.csv`),
+E203655F01t025 N3/1987, and five disappear (archived: `removed_since_v12.csv`).
 Existing annotated lists elsewhere in `audits/` are preserved.
 
-[Eight recalculated C50/N1 modes](ai_comparison_excluded.csv) have current
+Eight recalculated C50/N1 modes (archived: `ai_comparison_excluded.csv`) have current
 rules results but no current AI GOOD/BAD classification. They are excluded
 from all three paired comparisons, not from the rules outputs. EAE-routed
 and INVALID modes are outside this morphology comparison.
@@ -86,7 +90,7 @@ has been performed. The remaining database will be handled later.
 
 ## Verification and reproduction
 
-The [receipt](verification.json) records source CSV hashes and counts. All
+The receipt (archived: `verification.json`) records source CSV hashes and counts. All
 6,012 rule-evaluated modes had their raw mode-plus-datcon fingerprints
 checked. Every paired row has matching omega, nr, gap region, signed_delta
 and fraction_below_upper2 in the two exports. Source CSV hashes were stable

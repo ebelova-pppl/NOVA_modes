@@ -1,5 +1,9 @@
 # R42 higher-n check and remaining holds, October 7, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **R42 review completed:** Elena finds the n>2 cases acceptable and confirms
 that **only the N2 continuum requires recalculation**. The shot remains held
 for that replacement and correspondence recheck. The
@@ -47,12 +51,12 @@ Elena subsequently accepted the n>2 cases and specified N2-only continuum
 recalculation. The original flags remain diagnostic evidence; they do not
 add recalculation requirements beyond her decision.
 
-- [Eleven-mode TAE viewer list](r42_tae_review_modes.csv), with blank manual
+- Eleven-mode TAE viewer list (archived: `r42_tae_review_modes.csv`), with blank manual
   review fields, crossing details and mode/continuum fingerprints.
-- [Per-N summary](r42_n3_n10_summary.csv), retaining mixed and potential EAE
+- Per-N summary (archived: `r42_n3_n10_summary.csv`), retaining mixed and potential EAE
   findings separately. No mixed comparisons exceeded the cutoff. EAE
   correspondence remains provisional because the upper EAE boundary is absent.
-- [One TAE log-coverage gap](r42_tae_coverage_gaps.csv): N10/2376 has three
+- One TAE log-coverage gap (archived: `r42_tae_coverage_gaps.csv`): N10/2376 has three
   interior crossings but no exact-frequency record in the available logs;
   this is not a measured offset and is separate from the eleven-mode list.
 
@@ -91,7 +95,7 @@ Production release did not restore its training membership.
 [sorted and installed](../released4_rules_20261007/README.md). The four
 holds and empty entry remain; the nine-entry CSV is the pre-run snapshot.
 
-[Remaining-shot CSV](remaining_unprocessed.csv):
+Remaining-shot CSV (archived: `remaining_unprocessed.csv`):
 
 - **Four held:** E205059A01t025 (N1/N2 recalculation), R42 (N2 continuum
   recalculation only), F62 (consider modes plus continuum
@@ -100,6 +104,6 @@ holds and empty entry remain; the nine-entry CSV is the pre-run snapshot.
 - **One empty:** `nstxu_202806`.
 
 Membership remains 177 processed plus 14 active training shots. The
-[receipt](receipt.json) records measurements, source hashes, D46 availability,
+receipt (archived: `receipt.json`) records measurements, source hashes, D46 availability,
 Q62's installed count and exact inventory changes. No sorting, training-label
 changes, manual overrides or known-invalid-registry changes were made.

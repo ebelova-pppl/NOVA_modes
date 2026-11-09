@@ -1,5 +1,9 @@
 # Incremental disagreement review, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../../docs/research_archive.md).
+
 Start with **`to_review.csv`**, containing just 13 newly appearing cases that
 have no recorded matching approval. It includes the current method labels,
 rule reason, model scores, and input fingerprint. The explicit empty `label`

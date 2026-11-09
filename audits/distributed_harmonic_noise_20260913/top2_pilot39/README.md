@@ -1,5 +1,9 @@
 # Distributed harmonic noise: top-two reference and 39-shot pilot
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../../docs/research_archive.md).
+
 2026-09-13. The user corrected the first audit's global denominator: use
 the full-domain energy of the **two strongest individual harmonics** to limit
 edge-mode dilution. This is the same reference as the existing continuum-tail
@@ -58,13 +62,13 @@ There are no unexpected input errors or fingerprint mismatches.
 
 Compact evidence:
 
-- [New pilot rejections](newly_rejected_pilot.csv): one mode for the viewer.
-- [New training rejection](newly_rejected_training.csv): J38 N8/2222.
-- [All flagged training modes](flagged_training.csv): 35 BAD labels.
-- [All flagged pilot modes](flagged_pilot.csv): 92, including 91 already BAD.
-- [Per-shot coverage and counts](pilot_shot_summary.csv): all 39 shots.
-- [Both discussed pilot examples](pilot_examples.csv).
-- [Summary and verification receipt](summary.json).
+- New pilot rejections (archived: `newly_rejected_pilot.csv`): one mode for the viewer.
+- New training rejection (archived: `newly_rejected_training.csv`): J38 N8/2222.
+- All flagged training modes (archived: `flagged_training.csv`): 35 BAD labels.
+- All flagged pilot modes (archived: `flagged_pilot.csv`): 92, including 91 already BAD.
+- Per-shot coverage and counts (archived: `pilot_shot_summary.csv`): all 39 shots.
+- Both discussed pilot examples (archived: `pilot_examples.csv`).
+- Summary and verification receipt (archived: `summary.json`).
 
 ## Exact candidate
 

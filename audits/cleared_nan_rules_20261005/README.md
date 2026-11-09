@@ -1,5 +1,9 @@
 # NaN-cleared shots: production rules results, October 5, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 User authorized sorting the cleared pending shots and clarified that this
 should use **`sort_shot_mixed.py --method rules`**, producing GOOD lists and
 deduplicated representatives. All five selected shots completed production
@@ -48,7 +52,7 @@ there are no skipped-grid warnings or duplicate-ranking fallbacks.
 `rule_decision=REVIEW`; representatives are selected by rule severity.
 No RF/CNN model was used.
 
-The [combined GOOD list](good_tae_final_batch.csv) contains the 241 selected
+The combined GOOD list (archived: `good_tae_final_batch.csv`) contains the 241 selected
 modes with portable paths and fingerprints. The respective installed
 `good_tae_final.csv` files contain the same selections. These modes await
 visual review and have not been appended to the previously reviewed 40-shot
@@ -62,8 +66,8 @@ The main inventory now contains **163 processed post-training cases plus
 `post_training_checked=yes`. The AI comparison cohort remains 39.
 
 **23 inventory entries remain unprocessed: 22 continuum-review shots and one
-empty entry, `nstxu_202806`.** Use the [plain-text list](remaining_unprocessed.txt)
-or [CSV with N1/N2 evidence and reasons](remaining_unprocessed.csv).
+empty entry, `nstxu_202806`.** Use the plain-text list (archived: `remaining_unprocessed.txt`)
+or CSV with N1/N2 evidence and reasons (archived: `remaining_unprocessed.csv`).
 The 22 are review holds of differing strength, not 22 newly confirmed invalid
 shots. No known-invalid registry entries were removed.
 
@@ -75,15 +79,15 @@ outputs remain unchanged.
 
 ## Verification and provenance
 
-- [Exact selection](selection.csv), [fresh preflight](preflight.json), and
-  [per-shot results](shot_summary.csv).
-- [Run inputs and scientific source hashes](run_inputs.json).
-- [Verified outputs and exact commands](stage_results.json).
-- [Installation receipt](publication.json): five new shot directories,
+- Exact selection (archived: `selection.csv`), fresh preflight (archived: `preflight.json`), and
+  per-shot results (archived: `shot_summary.csv`).
+- Run inputs and scientific source hashes (archived: `run_inputs.json`).
+- Verified outputs and exact commands (archived: `stage_results.json`).
+- Installation receipt (archived: `publication.json`): five new shot directories,
   no existing outputs replaced.
-- [Inventory update](inventory_update.json) and the separate
-  [D46 hold-status correction](hold_status_update.json).
-- [Final checks](verification.json).
+- Inventory update (archived: `inventory_update.json`) and the separate
+  D46 hold-status correction (archived: `hold_status_update.json`).
+- Final checks (archived: `verification.json`).
 
 Coverage, input fingerprints before/after sorting and before installation,
 routing partitions, severity completeness, final-list membership, deduplication
@@ -97,7 +101,7 @@ Full production exports/logs are staged under ignored
 `sort_shot_rules.py` calibration runs are retained separately under
 `$NOVA_SORT_OUTPUTS/calibration_20261005/`, with receipts in
 `calibration_run/`. Their routing, gate decisions/features and severities
-[match the production runs exactly](calibration_production_agreement.json).
+match the production runs exactly (archived: `calibration_production_agreement.json`).
 They are not extra processed shots and do not replace the production results.
 
 Reproduction from the repository, using new output destinations to preserve

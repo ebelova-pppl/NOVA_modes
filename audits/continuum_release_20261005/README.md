@@ -1,5 +1,9 @@
 # Fourteen shots released for rules processing, October 5, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Subsequently completed:** all 14 released shots were sorted and installed;
 the [production batch](../released14_rules_20261005/README.md) selected 76 GOOD
 modes. Eight continuum holds and one empty entry remain. The release-time
@@ -13,7 +17,7 @@ their continua is not warranted. The exception is
 Elena sees no continuum-crossing issue. This records her visual assessment;
 the original diagnostic measurements remain available.
 
-The [released list](released_shots.csv) contains the 14 shots, including U37,
+The released list (archived: `released_shots.csv`) contains the 14 shots, including U37,
 which had zero flagged TAE-like comparisons. The reviewed list has 39 modes
 in the other 13 shots. Both live inventories now mark the released shots
 `ready_for_rules`; `post_training_checked` remains `no` until sorting completes.
@@ -46,15 +50,15 @@ not automatically confirmed physical resonance offsets.
 | G142301F62 | 0 | 37 | 37 |
 | G121123R42 | 2 | 44 | 46 |
 
-The [eight-shot hold list](remaining_continuum_holds.csv) retains separate
+The eight-shot hold list (archived: `remaining_continuum_holds.csv`) retains separate
 TAE, mixed and EAE evidence. There is also the empty `nstxu_202806` entry.
-Thus the [23 unprocessed entries](unprocessed_shots.csv) now comprise
+Thus the 23 unprocessed entries (archived: `unprocessed_shots.csv`) now comprise
 **14 ready + eight continuum holds + one empty entry**. Completed membership
 remains 163 post-training shots plus 14 active training shots.
 
 ## Verification
 
-[Receipt](receipt.json) records the user's review, E34's mode/continuum
+Receipt (archived: `receipt.json`) records the user's review, E34's mode/continuum
 fingerprint, source hashes, and before/after rows for both inventories.
 All 281 exported raw mode, continuum and available log sources associated
 with the released shots still match the October 5 review snapshot. The

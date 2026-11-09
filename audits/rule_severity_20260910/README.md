@@ -1,5 +1,9 @@
 # Normalized gate severity and representative ranking, 2026-09-10
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Production preset v11 retains the v22 rejection rules and adds grouped feature
 schema v23, normalized severities, and simple rules-only duplicate ranking.
 The score is a threshold margin, not a calibrated probability or a new label.
@@ -25,19 +29,19 @@ missing-severity fallback, and an assertion that v11 never loads an RF model.
 
 Eight recalculated C50/N1 files appeared during the run. They remain INVALID
 under the existing user-approved exclusion until their continuum alignment
-is reviewed. [Inventory changes](inventory_changes.csv) records them. Current
+is reviewed. Inventory changes (archived: `inventory_changes.csv`) records them. Current
 input count is 19,260; this inventory change is separate from ranking.
 
-Evidence: [selection changes](selection_changes.csv), [shot summaries](shot_summary.csv),
-[severity distributions](severity_distribution.csv), and [verification receipt](verification.json).
-The existing [226 disagreements](../continuum_noise_20260910/current_disagreements.csv)
+Evidence: selection changes (archived: `selection_changes.csv`), shot summaries (archived: `shot_summary.csv`),
+severity distributions (archived: `severity_distribution.csv`), and verification receipt (archived: `verification.json`).
+The existing 226 disagreements (archived: `../continuum_noise_20260910/current_disagreements.csv`)
 are unchanged because classifications are unchanged.
 
 All 27 verified rules outputs have been installed in the existing
 `sort_outputs/` root. Previous outputs are preserved under
 `sort_outputs/before_rule_severity_v11_20260910/`. Publication verified the
 installed trees, backups, and unchanged RF–CNN outputs; see the
-[publication receipt](publication.json).
+publication receipt (archived: `publication.json`).
 
 ## Output and interpretation
 

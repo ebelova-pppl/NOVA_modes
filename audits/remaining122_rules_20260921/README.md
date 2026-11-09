@@ -1,5 +1,9 @@
 # Authorized 122-shot production rules batch
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Status: **complete: 122 sorter runs, 118 verified and installed shots,
 four input holds**.
 The user authorized `sort_shot_mixed.py` for the 122
@@ -23,15 +27,15 @@ under the requested whole-shot exclusion policy.
 | BAD | 13,419 |
 | INVALID | 0 |
 
-- [Selected GOOD modes from this batch](good_tae_final_batch.csv): portable
+- Selected GOOD modes from this batch (archived: `good_tae_final_batch.csv`): portable
   paths and explicit `review_status=not_visually_reviewed`. Includes 6,280
   TAE-like representatives and one mixed representative, consistent with
   production's inclusion of mixed modes on the TAE side.
-- [Per-shot counts](shot_summary.csv), [verification receipt](verification.json).
-- [Installation receipt](publication.json), [inventory update](inventory_update.json).
-- [Combined counts for all 158 processed cases](processed158_summary.csv).
-- [Preserved prior manual corrections](prior_manual_corrections_check.json).
-- [NaN-input files](invalid_input_files.csv), [whole-shot holds](input_holds.json).
+- Per-shot counts (archived: `shot_summary.csv`), verification receipt (archived: `verification.json`).
+- Installation receipt (archived: `publication.json`), inventory update (archived: `inventory_update.json`).
+- Combined counts for all 158 processed cases (archived: `processed158_summary.csv`).
+- Preserved prior manual corrections (archived: `prior_manual_corrections_check.json`).
+- NaN-input files (archived: `invalid_input_files.csv`), whole-shot holds (archived: `input_holds.json`).
 
 The selected mixed mode is `nstxuE204957F05t034/N7/egn07w.3141E+02`.
 Pending visual review is an inventory annotation; production GOOD/BAD
@@ -67,8 +71,8 @@ override, training label, or RF-CNN output is replaced.
 
 ## Execution and verification
 
-- [Exact selection](selection.csv) retains the estimate's recorded input flags.
-- [Source/configuration snapshot](run_inputs.json) pins the code, registry,
+- Exact selection (archived: `selection.csv`) retains the estimate's recorded input flags.
+- Source/configuration snapshot (archived: `run_inputs.json`) pins the code, registry,
   inventory, training labels and prior accepted manifest for this run.
 - `progress.json` records completed verification and any failures.
 - Per-shot raw input fingerprints are captured before sorting and compared

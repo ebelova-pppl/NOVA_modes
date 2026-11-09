@@ -1,5 +1,9 @@
 # Recalculated-input check, September 30, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Checked the **22 pending N1-review shots and six NaN-held shots**, comprising
 27 distinct shots because D46 is in both groups. Selection comes from the
 current processing inventory, the September 10 priority list, and the two
@@ -77,13 +81,13 @@ correct eigenmode structure. See the original
 
 ## Evidence and reproduction
 
-- [Selection](selection.csv): exact 27-shot scope and issue membership.
-- [NaN summary](nan_summary.csv): all ten toroidal numbers for each of six shots.
-- [Original offending paths](previous_nan_files.csv): current presence/finite status.
-- [Remaining invalid modes](remaining_invalid_modes.csv): header only; none found.
-- [N1 before/after](n1_before_after.csv) and [N2 controls](n2_control_before_after.csv).
-- [Auxiliary file hashes/timestamps](n1_auxiliary_files.csv).
-- [Comparison receipt](n1_comparison_receipt.json) and [audit receipt](receipt.json).
+- Selection (archived: `selection.csv`): exact 27-shot scope and issue membership.
+- NaN summary (archived: `nan_summary.csv`): all ten toroidal numbers for each of six shots.
+- Original offending paths (archived: `previous_nan_files.csv`): current presence/finite status.
+- Remaining invalid modes (archived: `remaining_invalid_modes.csv`): header only; none found.
+- N1 before/after (archived: `n1_before_after.csv`) and N2 controls (archived: `n2_control_before_after.csv`).
+- Auxiliary file hashes/timestamps (archived: `n1_auxiliary_files.csv`).
+- Comparison receipt (archived: `n1_comparison_receipt.json`) and audit receipt (archived: `receipt.json`).
 
 Full mode inventories, per-crossing measurements, per-group raw source hashes,
 and file-change details are kept under ignored

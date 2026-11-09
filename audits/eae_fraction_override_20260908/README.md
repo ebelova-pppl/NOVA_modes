@@ -1,5 +1,9 @@
 # Unconditional EAE routing below 20% TAE-side energy
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The user proposed `fraction_below_upper2 < 0.2` as sufficient for EAE-like
 routing regardless of signed_delta. This pre-adoption audit evaluated that proposal using
 the existing shared continuum loader and energy fractions. The audit preserved

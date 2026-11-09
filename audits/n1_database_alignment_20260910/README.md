@@ -1,5 +1,9 @@
 # Remaining DiTw N1 continuum / eigenmode-log audit
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 2026-09-10. Further production sorting is paused at the user's request while
 continuum/eigenmode input consistency is investigated and affected inputs are
 corrected. This audit adds no rejection rule, validity exclusion, or training
@@ -13,7 +17,7 @@ explicitly inconclusive.
 
 ## Review results
 
-Start with [priority_review.csv](priority_review.csv): 21 shots, comprising
+Start with priority_review.csv (archived: `priority_review.csv`): 21 shots, comprising
 19 G shots and two E shots. These are **candidates for input review**, not
 newly confirmed invalid shots. The counts below use TAE-like/mixed modes and
 the interior window `0.03 <= r < 0.75`.
@@ -94,7 +98,7 @@ lists and datcon crossings are recorded separately rather than silently passing.
 
 N2 is a diagnostic control, not assumed valid. For example, N75 has 41/41,
 R42 48/55, and F62 37/50 interior TAE-side N2 comparisons beyond two intervals.
-The [N2 summary](database_n2_control_summary.csv) records all 159 shots, including
+The N2 summary (archived: `database_n2_control_summary.csv`) records all 159 shots, including
 coverage failures. These observations justify checking affected N2 inputs too;
 they do not constitute automatic N2 exclusions.
 
@@ -127,14 +131,14 @@ during a scan.
 
 Versioned evidence:
 
-- [All 200 N1 statuses](all_200_n1_status.csv): one row per inventory shot,
+- All 200 N1 statuses (archived: `all_200_n1_status.csv`): one row per inventory shot,
   current confirmed registry scope, audit cohort, input root and snapshot time.
-- [New N1 summary](database_n1_summary.csv), [N2 controls](database_n2_control_summary.csv)
-  and [priority shots](priority_review.csv).
-- [Review modes](review_modes.csv): 87 selected examples across 45 shots,
+- New N1 summary (archived: `database_n1_summary.csv`), N2 controls (archived: `database_n2_control_summary.csv`)
+  and priority shots (archived: `priority_review.csv`).
+- Review modes (archived: `review_modes.csv`): 87 selected examples across 45 shots,
   ordered by review priority, including N2 controls and EAE-side follow-ups.
   The first 50 rows cover priority-1 shots: 42 N1 examples and eight N2 controls.
-- [Review crossing measurements](review_crossings.csv) and [receipt](receipt.json).
+- Review crossing measurements (archived: `review_crossings.csv`) and receipt (archived: `receipt.json`).
 
 The all-200 table combines the **earlier 14 training and 27 pilot snapshots**
 with this new 159-shot scan. It is not a fresh live remeasurement of all 200.

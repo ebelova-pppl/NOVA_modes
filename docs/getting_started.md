@@ -261,6 +261,8 @@ continuum preprocessing affects routing and derived features; selecting an
 old rules configuration alone does not restore a historical loader. See the
 [project state](project_state.md) and dated adoption audits for that history.
 
-The [previous main README](history/readme_before_reorganization_20260914.md)
-preserves all earlier main-page instructions and results. The detailed
+The previous main README is archived at
+`docs/history/readme_before_reorganization_20260914.md`; the
+[archive guide](research_archive.md) explains how to recover it and the full
+development chronology. The detailed
 [script reference](../scripts/README.md) remains in its original location.

@@ -1,5 +1,9 @@
 # F83 and K79 released for rules processing, October 7, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Later processing:** F83/K79 and N75/B85 are now
 [sorted and installed](../released4_rules_20261007/README.md). The release
 snapshot below is preserved; four held shots plus one empty entry remain.
@@ -8,10 +12,10 @@ Elena reviewed all 19 flagged TAE-like modes in F83 (eight) and K79 (eleven).
 They are grid-scale numerical modes or have other morphology problems,
 mostly near axis. She released both shots for production rules processing.
 Both live inventories now use `ready_for_rules`, with processing still
-pending. The [released list](released_shots.csv) preserves potential EAE
+pending. The released list (archived: `released_shots.csv`) preserves potential EAE
 issues, mixed findings and log-coverage gaps separately.
 
-The [reviewed-mode manifest](reviewed_modes.csv) records the user assessment
+The reviewed-mode manifest (archived: `reviewed_modes.csv`) records the user assessment
 and input fingerprints. All 211 source files in F83/K79 N1--N2 and the mode
 inventories match the October 5 snapshot. No individual sorter override or
 training-label change was made, and no sorting was run in this release step.
@@ -30,10 +34,10 @@ are currently unavailable. The F83/K79 review is complete.
 
 ## Current inventory
 
-[Nine entries remain unprocessed](remaining_unprocessed.csv): **two ready,
+Nine entries remain unprocessed (archived: `remaining_unprocessed.csv`): **two ready,
 six held and one empty**. The held shots are E205059A01t025, G121123N75,
 G121123R42, G142301B85, G142301F62 and G142301D46 (all prefixed `nstxu`).
 Completed membership remains 177 post-training shots plus 14 training shots.
 
-[Receipt](receipt.json) records the input checks, D46 availability observation,
+Receipt (archived: `receipt.json`) records the input checks, D46 availability observation,
 file hashes and exact before/after changes in both live inventories.

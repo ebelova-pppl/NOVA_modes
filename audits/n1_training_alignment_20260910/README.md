@@ -1,5 +1,9 @@
 # Training N1 continuum / eigenmode-log alignment screen
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 2026-09-10 follow-up: **the user confirmed the N1 problem in 135388, W29,
 Y93 and B12.** Their complete N1 scopes are now in the shared INVALID-input
 registry. The 63 affected active training rows (all previously BAD) were
@@ -125,14 +129,14 @@ sorter thresholds, models or production output trees were changed.
 
 ## Artifacts and reproduction
 
-- [N1 summary](training_n1_summary.csv): all 14 shots and coverage notes.
-- [N1 crossing measurements](training_n1_crossings.csv): all 153 informative
+- N1 summary (archived: `training_n1_summary.csv`): all 14 shots and coverage notes.
+- N1 crossing measurements (archived: `training_n1_crossings.csv`): all 153 informative
   training crossings, including aligned controls.
-- [N2 control summary](training_n2_control_summary.csv).
-- [Review modes](review_modes.csv): 61 N1 training modes with at least one
+- N2 control summary (archived: `training_n2_control_summary.csv`).
+- Review modes (archived: `review_modes.csv`): 61 N1 training modes with at least one
   offset beyond two intervals, or an empty log despite a crossing. Includes
   the isolated E205052 case and secondary/sparse cases, not only priority shots.
-- [Figure selections](figure_modes.csv) and [receipt](receipt.json).
+- Figure selections (archived: `figure_modes.csv`) and receipt (archived: `receipt.json`).
 
 Complete mode coverage, crossings, source hashes and plots are ignored under
 `outputs/review_n1_training_alignment_20260910/`. The eight per-shot PNG pages

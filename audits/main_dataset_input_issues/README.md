@@ -1,5 +1,9 @@
 # Main DiTw dataset input issues
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This is the maintained, incremental registry of source-data problems found
 under `$NOVA_DITW_ROOT`. It is not yet a complete audit of every shot in the
 live DiTw tree.

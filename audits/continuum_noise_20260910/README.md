@@ -1,5 +1,9 @@
 # Continuum-side high-frequency energy calibration, 2026-09-10
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The user approved adoption as a separate production gate in v10 (ruleset and
 features v22). It runs last with inclusive cuts:
 
@@ -30,21 +34,21 @@ This is non-blind calibration against existing labels.
   Across all 4,187 evaluated modes, every earlier feature value, BAD primary
   reason, and other classification remains unchanged. There was no RF-ranking
   fallback.
-- Disagreements: 227 -> 226. [Current list](current_disagreements.csv) is the
+- Disagreements: 227 -> 226. Current list (archived: `current_disagreements.csv`) is the
   previous list with only N10/1271 removed; retained rows are identical.
 - Inventory: 65 previously INVALID C50/N1 files are now absent from raw data,
   in addition to eight already absent at v9. These affect neither usable-mode
   counts nor the gate comparison. The new absence ledger is
-  [newly_absent_invalid_inputs.csv](newly_absent_invalid_inputs.csv). Canonical
+  newly_absent_invalid_inputs.csv (archived: `newly_absent_invalid_inputs.csv`). Canonical
   reruns therefore contain 19,252 inputs (4,187 evaluated, 14,358 EAE, 707
   INVALID). The C50/N1 registry exclusion remains active.
 - Published all 27 verified rules directories in the existing output root.
   Prior outputs are preserved under `before_continuum_noise_v10_20260910/`;
-  [publication receipt](publication.json) records old/new hashes and backup
+  publication receipt (archived: `publication.json`) records old/new hashes and backup
   paths. RF–CNN output trees are unchanged.
-- Evidence: [batch changes](adopted_changes.csv), [training changes](training_changes.csv),
-  [shot totals](adopted_shot_summary.csv), and
-  [verification receipt](adoption_verification.json). Runtime exports and the
+- Evidence: batch changes (archived: `adopted_changes.csv`), training changes (archived: `training_changes.csv`),
+  shot totals (archived: `adopted_shot_summary.csv`), and
+  verification receipt (archived: `adoption_verification.json`). Runtime exports and the
   full training comparison are ignored under
   `outputs/review_continuum_noise_v10_20260910/`.
 

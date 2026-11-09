@@ -1,5 +1,9 @@
 # Accepted modes from 40 processed post-training shots
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 On 2026-09-15 Elena checked the recalculated E202806A02t045 rules results and
 approved adding the shot to the processed list. There are now **40 processed
 post-training cases plus 14 disjoint active training shots: 54 cases total**.
@@ -7,8 +11,8 @@ The added shot was processed with rules and reviewed by Elena. The other
 39 cases retain their rules/RF-CNN comparison history.
 
 - [Accepted TAE modes](accepted_tae_modes.csv): **1,726 selected representatives**.
-- [Per-shot counts and methods](shot_summary.csv): all 40 processed cases.
-- [Verification and inventory update receipt](verification.json).
+- Per-shot counts and methods (archived: `shot_summary.csv`): all 40 processed cases.
+- Verification and inventory update receipt (archived: `verification.json`).
 
 | Count across the 40 processed cases | Modes |
 | --- | ---: |
@@ -29,7 +33,7 @@ remains a processed but wholly invalid case, with no accepted modes.
 
 The new shot's installed file hashes match its
 [verified rerun](../recalculated_e202806a02t045_20260915/README.md). The earlier
-manifest matches its [manual-review receipt](../pilot39_manual_review_20260914/verification.json).
+manifest matches its manual-review receipt (archived: `../pilot39_manual_review_20260914/verification.json`).
 All 1,726 mode keys are unique; each selected row is final GOOD. Only
 E202806A02t045's row in the main inventory changed, to
 `post_training_checked=yes`, `status=checked_post_training`,

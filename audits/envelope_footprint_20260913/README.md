@@ -1,5 +1,9 @@
 # Narrow-envelope footprint and smoothness calibration
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Adopted in production v13 on 2026-09-13.** The user subsequently approved
 activation and regeneration. The shared implementation is
 `src/envelope_footprint.py`; it reproduces all 41 measurements below.
@@ -124,10 +128,10 @@ status at calculation time; production implementation is still pending.
 
 ## Evidence and reproduction
 
-- [Measurements](measurements.csv): 41 modes, fingerprints and all diagnostics.
-- [Candidate new survivors](candidate_new_survivors.csv): three review entries.
-- [Nearby thresholds](threshold_sweep.csv): decision counts for 15 combinations.
-- [Receipt](summary.json): cohort counts, settings, sources and saved CSV hashes.
+- Measurements (archived: `measurements.csv`): 41 modes, fingerprints and all diagnostics.
+- Candidate new survivors (archived: `candidate_new_survivors.csv`): three review entries.
+- Nearby thresholds (archived: `threshold_sweep.csv`): decision counts for 15 combinations.
+- Receipt (archived: `summary.json`): cohort counts, settings, sources and saved CSV hashes.
 - Native signed-profile zooms and continuum panels were inspected in
   `outputs/review_envelope_footprint_20260913/comparison_profiles.png` (ignored).
 

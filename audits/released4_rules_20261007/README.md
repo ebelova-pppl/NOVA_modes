@@ -1,5 +1,9 @@
 # Production sorting of N75, B85, F83 and K79, October 7, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Current reviewed selections:** Elena rejected N75/N4_1299 for sharp edge
 spikes and approved the remaining **19 TAEs**. The installed N75 correction
 and current accepted list are in the [manual-review audit](../released4_manual_review_20261007/README.md).
@@ -18,7 +22,7 @@ Outputs are in the four new shot directories under the established
 | G142301K79 | 599 | 222 | 0 | 377 |
 | Total | 3,007 | 697 | 20 | 2,290 |
 
-Use the [combined 20-mode GOOD list](good_tae_final_batch.csv) or each
+Use the combined 20-mode GOOD list (archived: `good_tae_final_batch.csv`) or each
 installed shot's `good_tae_final.csv`. All 20 selections are TAE-like;
 none was removed by deduplication. They await selected-GOOD visual review.
 The inventories now mark the four shots `sorted_rules_pending_review`,
@@ -26,7 +30,7 @@ The inventories now mark the four shots `sorted_rules_pending_review`,
 
 All **44 crossing-review modes are automatically BAD**, agreeing with the
 user's aggregate morphology assessment. Their fingerprints and gate outcomes
-are in [reviewed_tae_mode_results.csv](reviewed_tae_mode_results.csv).
+are in reviewed_tae_mode_results.csv (archived: `reviewed_tae_mode_results.csv`).
 No manual overrides or rule changes were needed. The earlier
 [N75/B85](../continuum_release_n75_b85_20261007/README.md) and
 [F83/K79](../continuum_release_f83_k79_20261007/README.md) releases retain
@@ -48,9 +52,9 @@ correct the previously observed continuum offsets.
 - Training labels, known-invalid scopes, prior accepted manifests and
   previous shot outputs were preserved. No AI classification was run.
 
-[Per-shot counts](shot_summary.csv), [preflight](preflight.json),
-[verification](verification.json), [installation receipt](publication.json)
-and [inventory changes](inventory_update.json) record the run.
+Per-shot counts (archived: `shot_summary.csv`), preflight (archived: `preflight.json`),
+verification (archived: `verification.json`), installation receipt (archived: `publication.json`)
+and inventory changes (archived: `inventory_update.json`) record the run.
 Full per-shot logs, fingerprints and staged outputs remain under ignored
 `outputs/review_released4_rules_20261007/`.
 
@@ -61,7 +65,7 @@ shots (195 disjoint cases)**. Installed processed outputs contain **8,338
 selected GOOD modes**, with 6,542 selections in 127 shots awaiting GOOD-list
 review. Earlier reviewed collections remain unchanged.
 
-[Five entries remain unprocessed](remaining_unprocessed.csv): four held
+Five entries remain unprocessed (archived: `remaining_unprocessed.csv`): four held
 shots and one empty entry. There are no remaining released shots awaiting
 processing.
 

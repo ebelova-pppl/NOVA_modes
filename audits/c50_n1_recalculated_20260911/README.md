@@ -1,11 +1,15 @@
 # Recalculated C50/N1 review list, 2026-09-11
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **User accepted the corrected inputs on 2026-09-11:** "Now C50/N1 Looks ok
 to me." All 18 reviewed mode/continuum fingerprints were rechecked before
 removing the C50/N1 exclusion. The other five registry entries remain active.
 This is input-validity acceptance; ordinary morphology gates still apply.
 
-[current_n1_modes.csv](current_n1_modes.csv) contains all **18 current N1
+current_n1_modes.csv (archived: `current_n1_modes.csv`) contains all **18 current N1
 mode files** in DiTw `nstxuG142301C50`, ordered by binary-header frequency.
 It has no GOOD/BAD labels and includes all frequencies, without gap routing.
 All files load successfully with ntor=1, nr=201 and 25 stored harmonics;
@@ -28,7 +32,7 @@ python viz/view_modes_csv.py audits/c50_n1_recalculated_20260911/current_n1_mode
 The viewer reader was checked against all 18 paths and assigns no labels.
 The mode inventory and source hashes were stable across the check. Individual
 mode hashes and paired input fingerprints are in the CSV; baseline, continuum,
-registry and CSV hashes are in [receipt.json](receipt.json).
+registry and CSV hashes are in receipt.json (archived: `receipt.json`).
 
 The initial list fulfilled the requested raw-list alternative before user
 review. Its `receipt.json` is a historical snapshot: no sorter had yet been
@@ -46,7 +50,7 @@ gate results agree exactly between the two runs:
   `BAD_CONT_CROSS_WINDOW`. There are no N1 TAE-side survivors.
 - All 18 are valid inputs; none is excluded as `KNOWN_INVALID_INPUT`.
 
-[n1_classifications.csv](n1_classifications.csv) contains the per-mode results.
+n1_classifications.csv (archived: `n1_classifications.csv`) contains the per-mode results.
 The full shot has 556 inputs, 202 TAE-side modes (193 TAE-like / 9 mixed),
 354 EAE-like, zero INVALID and zero final GOOD. All 538 N2–N10 audit rows
 are exactly unchanged from the preceding production output. All 202 TAE-side
@@ -58,8 +62,8 @@ The verified production output is installed at
 existing rules output root. Its preceding directory is preserved at
 `$NOVA_SORT_OUTPUTS/before_c50_n1_restored_20260911/nstxuG142301C50`.
 The exact paths and tree hashes are in
-[restoration_publication.json](restoration_publication.json).
-[restoration_verification.json](restoration_verification.json) records the
+restoration_publication.json (archived: `restoration_publication.json`).
+restoration_verification.json (archived: `restoration_verification.json`) records the
 review, configuration/registry hashes, counts and checks. Four existing
 input-validity tests pass after updating their per-N fixture to B12 and
 checking explicitly that C50/N1 is cleared.

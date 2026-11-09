@@ -1,5 +1,9 @@
 # Fresh twelve-shot rules versus RF/CNN pilot
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This is the historical v5 comparison before direct 20% EAE routing and the
 shared monotonic-tail repair. The later 27-shot regeneration uses v6 routing
 and `datcon-monotonic-tail-v1`; see

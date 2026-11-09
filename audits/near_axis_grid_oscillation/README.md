@@ -1,5 +1,9 @@
 # Near-axis grid-oscillation calibration
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 This is a non-blind, post-hoc deterministic-rule calibration based on visual
 review of grid-scale oscillations near `r=0`. It is not an independent
 validation set.
@@ -37,6 +41,6 @@ The five exploratory rows released by the accepted thresholds are:
 - training 204202 N7/8631: `A_peak=0.189177`, `Q_s=0.257899`.
 
 The 20-row source table and accepted decision are recorded in
-[`outputs/near_axis_sign_flip_pilot14_plus_training6.csv`](../../outputs/near_axis_sign_flip_pilot14_plus_training6.csv),
+`outputs/near_axis_sign_flip_pilot14_plus_training6.csv` (archived: `../../outputs/near_axis_sign_flip_pilot14_plus_training6.csv`),
 SHA-256
 `d5432c9207d643a7f655294fba2fca0bab9c5cfe0d0f6b450245e0d15987f438`.

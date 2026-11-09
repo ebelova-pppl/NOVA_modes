@@ -1,5 +1,9 @@
 # NOVA training provenance audit: 2026-08-20_flux_training_vs_ditw_v1
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../../docs/research_archive.md).
+
 - Schema: `nova-training-provenance-v1`
 - Generated: `2026-08-20T20:58:36+00:00`
 - Training root: `/p/hym/ebelova/NOVA/data_mixed`

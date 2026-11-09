@@ -1,5 +1,9 @@
 # Production v13: footprint exception and secondary edge peaks
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 The user approved activation and regeneration on 2026-09-13. **All 39 reviewed
 rules shot outputs are regenerated, verified and installed** in the existing
 `sort_outputs` root. Previous v12 outputs are preserved under
@@ -12,7 +16,7 @@ matches its receipt, and every RF-CNN export tree remains unchanged.
 and continuum-extremum exception. It gains an independent exception requiring
 both **F_spikes<0.50** and **Q_local<0.05** in peak windows of nominal width
 0.05. The shared calculation in `src/envelope_footprint.py` reproduces all
-41 [calibration measurements](../envelope_footprint_20260913/measurements.csv).
+41 calibration measurements (archived: `../envelope_footprint_20260913/measurements.csv`).
 
 F_spikes integrates total radial mode energy W over disjoint regions above
 half the **global** maximum W, selecting regions <=2 native intervals wide
@@ -36,7 +40,7 @@ checks secondary local W peaks. For the **same peak**, require:
 Width is measured on the full grid. The amplitude numerator is at the W peak;
 the reference is the maximum over every harmonic at strict r<0.9. There is
 no local-median condition. The original global measurements remain intact
-for the interior gate. See the [edge refinement](../edge_secondary_peaks_20260913/body_amplitude_comparison.csv).
+for the interior gate. See the edge refinement (archived: `../edge_secondary_peaks_20260913/body_amplitude_comparison.csv`).
 
 The canonical `sort_shot_mixed.py --method rules` and conservative
 `sort_shot_rules.py` share these changes. The production survivor policy
@@ -85,14 +89,14 @@ The latest-twelve subset loses N3/1151, N4/3735 and N2/2035, and gains
 N3/1987. Historical disagreement lists and user annotations are preserved.
 
 - [Six label changes](label_changes.csv)
-- [Only newly added latest-12 disagreements](latest12_disagreements_added.csv)
-- [Removed latest-12 disagreements](latest12_disagreements_removed.csv)
-- [Complete current latest-12 list](latest12_disagreements.csv)
-- [Complete current 39-shot list](current_disagreements.csv)
+- Only newly added latest-12 disagreements (archived: `latest12_disagreements_added.csv`)
+- Removed latest-12 disagreements (archived: `latest12_disagreements_removed.csv`)
+- Complete current latest-12 list (archived: `latest12_disagreements.csv`)
+- Complete current 39-shot list (archived: `current_disagreements.csv`)
 - [Training conflict](training_changes.csv)
-- [Shot totals](shot_summary.csv), [selection changes](selection_changes.csv)
+- [Shot totals](shot_summary.csv), selection changes (archived: `selection_changes.csv`)
 - [Tests](tests.json), [calibration reproduction](calibration_reproduction.json)
-- [Verification](verification.json), [installation and backups](publication.json)
+- [Verification](verification.json), installation and backups (archived: `publication.json`)
 
 ## Configuration and reproduction
 

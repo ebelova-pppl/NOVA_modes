@@ -1,5 +1,9 @@
 # N1 continuum / eigenmode-log screen of the 27 pilot shots
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 2026-09-10. Applied the same frequency-matched NOVA log comparison as the
 [training audit](../n1_training_alignment_20260910/README.md), using the frozen
 27-shot membership from `../continuum_noise_20260910/adopted_shot_summary.csv`.
@@ -93,12 +97,12 @@ signed mean, so inspect the per-crossing records and absolute distances.
 
 ## Evidence and reproduction
 
-- [N1 summary](pilot_n1_summary.csv): all 27 shots, coverage and review notes.
-- [N2 control summary](pilot_n2_control_summary.csv).
-- [Review modes](review_modes.csv): 44 N1 modes, grouped as repeated, sparse,
+- N1 summary (archived: `pilot_n1_summary.csv`): all 27 shots, coverage and review notes.
+- N2 control summary (archived: `pilot_n2_control_summary.csv`).
+- Review modes (archived: `review_modes.csv`): 44 N1 modes, grouped as repeated, sparse,
   outer-only or isolated findings; no GOOD/BAD decisions.
-- [Review crossings](review_crossings.csv): 66 relevant comparisons.
-- [Figure selections](figure_modes.csv) and [receipt](receipt.json).
+- Review crossings (archived: `review_crossings.csv`): 66 relevant comparisons.
+- Figure selections (archived: `figure_modes.csv`) and receipt (archived: `receipt.json`).
 
 Full coverage, all crossings, source hashes, per-group snapshots and seven
 PNG pages are ignored under `outputs/review_n1_pilot_alignment_20260910/`.

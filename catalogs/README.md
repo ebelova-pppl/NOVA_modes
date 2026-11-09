@@ -58,8 +58,9 @@ blind review.
 [configs/catalog_review_sources.csv](../configs/catalog_review_sources.csv)
 lists the explicit evidence files, decision columns, shot scopes and reviewers.
 The canonical training labels omit fingerprints; the preserved September 13
-training audit supplies them. A changed fingerprint cannot inherit an old
-review status. Matching is against the saved final-list fingerprint; this
+training audit supplies them through the retained
+[training fingerprint evidence](evidence/README.md). A changed fingerprint
+cannot inherit an old review status. Matching is against the saved final-list fingerprint; this
 export does not reload or revalidate the current raw mode files.
 
 ## Provenance and regeneration
@@ -93,3 +94,9 @@ When a new visual review is completed, add its fingerprinted decision file to
 the review-source registry. Registry paths are relative to the repository;
 explicit shot scopes prevent a cohort manifest from implying review of modes
 outside its recorded review scope.
+
+The November 9 repository cleanup preserves this published catalog and metadata
+unchanged. Future regeneration reads the extracted training fingerprints from
+`catalogs/evidence/` through the review registry, with the same keys and values
+as the formerly ignored full audit. Original metadata source paths remain a
+record of the October 26 export. See [research records](../docs/research_archive.md).

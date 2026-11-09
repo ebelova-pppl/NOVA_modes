@@ -36,161 +36,20 @@ have explicitly started Bash.
 | Separate TAE-like and EAE-like modes | [Gap routing](#sorting-taes-vs-eaes-from-mixed-data-split_tae_eaepy) |
 | Train or evaluate AI models | [CNN](#cnn-model-scripts), [RF](#random-forest-classifier), [LOSO](#run_loso_10py), [RF OOF](#rf_oof_checkpy) |
 | Use older sorting interfaces | [RF sorter](#legacy-rf-shot-sorter), [single-model sorter](#sort_shotpy) |
-| Recover earlier main-page instructions and metrics | [Preserved README](../docs/history/readme_before_reorganization_20260914.md) |
+| Recover earlier main-page instructions and metrics | [Archive guide](../docs/research_archive.md) |
 | Transfer the complete project context | [Project state](../docs/project_state.md) |
 
-## Recent adoption and review notes
+## Current results and research records
 
-The [October 10 three-shot production batch](../audits/released3_rules_20261010/README.md)
-completed D46/R42/F62 with frozen v13 rules and installed 29 selected GOOD
-TAEs awaiting visual review (11/13/5 respectively). All 21 visually rejected
-R42/F62 review modes and all 23 D46 N2 review modes are automatically BAD;
-no manual overrides were needed. All 2,269 inputs are finite and nr=201,
-with complete evaluated-mode severity and no resolution warnings. Membership
-is now 184 processed plus 14 training, with 8,366 selected GOOD. The processed
-count includes wholly invalid R06. There are
-[two whole-shot input holds](../audits/main_dataset_shots/active_shot_holds.csv):
-E205059A01t025 (N1/N2 recalculation) and R06 (corrected whole-shot inputs and
-review). Only the E-shot is unprocessed; the empty entry is separate.
+The frozen production preset is v13. See [project state](../docs/project_state.md)
+for installed-result counts, current input holds, review status, and model
+provenance. [Retained review records](../audits/README.md) include reusable
+manual corrections; affected shot reruns must explicitly pass their overrides.
 
-The [October 10 N1/N2 recheck](../audits/last3_recalculated_20261010/README.md)
-covers the last three held shots. All 470 mode files are finite and nr=201.
-E205059A01t025's mode/continuum contents are unchanged despite newer timestamps.
-R42/F62 have replacement modes and updated N2 continua; residual flags remain,
-including new R42/N1 cases. The viewer lists separate 21 changed-input TAE-like/
-mixed cases from the full 51-mode list. Elena subsequently judged all 21
-changed-input cases numerical or axis-spiked and
-[released R42/F62 despite the visible offsets](../audits/continuum_release_r42_f62_20261010/README.md).
-At that release step R42/F62/D46 were ready; all three are now processed
-as recorded above. E205059A01t025 remains held for N1/N2 recalculation, and
-one entry is empty. No sorting or sorter overrides were applied in the
-release step itself.
-
-The [October 8 D46 recheck](../audits/d46_recalculated_20261008/README.md)
-verifies replacement N1/N2 modes and finite nr=201 inputs throughout the shot.
-Its TAE-like/mixed viewer list contains 23 N2 modes (17 TAE-like, six mixed).
-N2 lacks an exact-frequency match in its old March log, so these are coverage
-gaps, not measured offsets. N1's only TAE-like mode has an offset below one
-grid interval. Elena subsequently accepted N2's continuum correspondence
-visually and [released D46 for rules processing](../audits/continuum_release_d46_20261008/README.md).
-Potential EAE flags and log-coverage limits remain recorded. At that step D46
-was ready, E205059A01t025/R42/F62 were held, and one entry was empty; the
-subsequent R42/F62 release is recorded above. No sorting was run in that step.
-
-The [October 7 four-shot review](../audits/released4_manual_review_20261007/README.md)
-is complete: N75/N4_1299 was manually rejected for many sharp, large-amplitude
-edge spikes; the remaining **19 TAEs are approved** (nine N75, ten F83).
-N75's installed output includes the reusable override; future reruns must
-explicitly pass `--manual_overrides`. The original production batch had 20
-selections; current totals are 698 BAD, 19 selected GOOD, 2,290 EAE-like,
-zero INVALID, all 3,007 inputs finite and nr=201. All 44 crossing-review
-modes remain automatically BAD. Membership is 181 processed plus 14 training,
-leaving four holds and one empty entry.
-
-The [October 7 R42/F62 follow-up](../audits/r42_f62_followup_20261007/README.md)
-records R42/N2 continuum recalculation as required and F62 as held while
-considering modes-plus-continuum recalculation. Elena accepted the R42
-higher-n cases after the eleven-mode follow-up review; only its N2 continuum
-requires recalculation. Q62 is already processed
-with seven reviewed accepted TAEs; its training suspension remains. At that
-step four shots were held, four were ready, and one inventory entry was empty.
-
-The [October 7 N75/B85 review](../audits/continuum_release_n75_b85_20261007/README.md)
-released both shots despite confirmed N2 offsets because all 25 flagged
-TAE-like modes look junky. E205059A01t025 remains held for N1/N2
-recalculation: some modes with confirmed offsets otherwise look acceptable.
-At that step nine entries remained unprocessed: four ready (N75/B85/F83/K79), four held
-(E205059A01t025/R42/F62/D46), and one empty. No sorting was run in this step.
-
-The [October 7 GOOD-list review](../audits/released14_manual_review_20261007/README.md)
-corrected B37/N5/9275 to BAD and manually classified five E55/N10 modes as
-BAE. Both shot outputs are installed with backups; the 14-shot cohort now
-has 70 accepted TAEs, with BAEs in a separate list. Original automatic rule
-evidence remains intact. This introduces an explicit `BAE` manual decision,
-not an automatic gap-routing threshold.
-
-The [October 7 review](../audits/continuum_release_f83_k79_20261007/README.md)
-released F83 and K79 for production rules processing (`ready_for_rules`).
-D46 was held with `input_update_pending` while its N1/N2 mode files were
-changing or missing; the October 8 recheck above supersedes that observation.
-At that step nine entries were unprocessed: two ready,
-six held and one empty; the subsequent N75/B85 release is recorded above.
-Completed membership at that step was 177 post-training plus 14 training.
-
-The [October 5 released-shot batch](../audits/released14_rules_20261005/README.md)
-completed production rules sorting for all 14 newly released shots: 12,250
-valid inputs, 77 GOOD before deduplication and 76 selected GOOD. Verified
-outputs are installed and marked `sorted_rules_pending_review`. Membership
-reached 177 processed plus 14 training shots; eight continuum-review holds
-and one empty entry remained at that time. Potential EAE issues, mixed findings and Q62's
-training suspension remain recorded. All 39 crossing-review modes are
-automatically BAD, including E34/N2/2204 (`BAD_CONT_CROSS_WINDOW`); its user
-assessment is preserved separately, with no inferred manual override.
-
-The [2026-10-05 NaN-cleared batch](../audits/cleared_nan_rules_20261005/README.md)
-used production `sort_shot_mixed.py --method rules` for five more shots:
-2,607 valid inputs, 243 GOOD before deduplication and 241 selected GOOD,
-zero INVALID. Installed outputs await visual review. Membership after that
-batch was 163 processed plus 14 training shots, with 23 entries unprocessed.
-The dated audit links the combined GOOD list and remaining-shot reasons.
-Initial conservative `sort_shot_rules.py` results are archived separately;
-their REVIEW labels are superseded by the installed production workflow.
-
-The [2026-09-21 remaining-shot batch](../audits/remaining122_rules_20260921/README.md)
-ran rules for all 122 requested cases. It installed 118 verified outputs,
-with 6,281 selected GOOD modes awaiting visual review, and held four newly
-discovered NaN-metadata shots. Inventory membership then reached 158 processed
-post-training cases plus 14 training shots; the original 39 AI comparisons
-and 17 manual corrections are preserved. `sorted_rules_pending_review`
-is an inventory status; it does not change production GOOD/BAD decisions.
-
-On 2026-09-15 Elena accepted the recalculated E202806A02t045 rules results.
-The [current processed collection](../audits/processed40_20260915/README.md)
-now has 40 post-training shots (plus 14 active training shots), with 1,737
-GOOD modes and 1,726 selected representatives. The new shot's
-`checked_methods=rules` distinguishes it from the 39 rules/RF-CNN comparisons.
-
-The following dated adoption counts describe their original runs. The later
-manual-review receipt supersedes the automatic-only pilot selections; gate
-configuration and model training provenance retain their separate identities.
-
-This document consolidates scripts related to various models and methods used in our project. Each section serves as a guide to the corresponding scripts, including their functionality and usage.
-
-Elena completed the 39-shot disagreement review on 2026-09-14. The
-[manual-review audit](../audits/pilot39_manual_review_20260914/README.md)
-records 17 approved overrides across 13 regenerated and installed shot outputs,
-with unchanged production v13 rules. The collection now has 1,647 final GOOD
-modes and 1,636 selected TAE representatives. Use `final_decision` or the
-accepted-mode manifest for curated selections; original rule decisions and
-reasons remain available. Future reruns of affected shots must explicitly pass
-their installed `manual_overrides.csv` through `--manual_overrides`, as shown
-in the audit README, to preserve these corrections.
-
-Production v13 extends `BAD_EDGE_SPIKE` to secondary total-energy peaks
-at least half the global W maximum. Radius>=0.97 and own-FWHM<=10 intervals
-are unchanged. Secondary peaks also require max_h |xi_h(r_peak)| to exceed
-the maximum amplitude over all harmonics at strict r<0.9. The original global
-branch is unchanged. It also enables the accepted interior-envelope exception
-with strict F_spikes<50% and Q_local<5% in width-0.05 peak windows. Features
-are grouped v26; older named presets retain the global-only edge gate and
-disable the footprint exception. The [v13 regeneration](../audits/morphology_v13_20260913/README.md)
-records the 39-shot regression and refreshed disagreement lists.
-All 39 reviewed rules outputs are installed with verified v12 backups. There
-are six label changes; the latest twelve have 141 disagreements, with only
-E203655F01t025 N3/1987 newly added. The adoption audit includes additions and
-removals separately so previously reviewed cases need not be checked again.
-
-Production v12 adds `BAD_DISTRIBUTED_HARMONIC_NOISE`, a continuum-independent
-branch using HF/full-domain top-two-harmonic energy>0.5%, HF/whole-window
-energy>5%, L_eff>0.03 and simultaneous N_hf>=4 in width-0.05 windows. All
-conditions refer to one window and the same selected HF centers. The
-[adoption audit](../audits/distributed_harmonic_noise_20260913/adoption/README.md)
-records implementation, regression checks, and regenerated pilot outputs.
-The existing continuum-side noise gate retains its earlier thresholds.
-All 39 checked rules shot exports have been regenerated with verified v11
-backups. The [v12 latest-12 disagreement list](../audits/distributed_harmonic_noise_20260913/adoption/latest12_disagreements.csv)
-has 143 entries; N10/3470 is the only removed disagreement. The historical
-lists and user review annotations remain intact.
+Generated run exports, plots, detailed calibration artifacts, and one-off
+experiment scripts are local archives. Historical examples below can name
+those archived paths; follow the [archive guide](../docs/research_archive.md)
+for recovery and use the current production commands for new shots.
 
 ## Shared input and command conventions
 

@@ -1,5 +1,9 @@
 # D46, R42 and F62 production rules run, October 10, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 Completed and installed the three explicitly requested released G shots using
 `sort_shot_mixed.py --method rules` and frozen `tae_rules_production_v13`.
 The new directories are under the established `sort_outputs/` root; no previous
@@ -13,7 +17,7 @@ output directory was replaced. **E205059A01t025 remains on hold and was not run.
 | Total | 2,269 | 506 | **29** | 1,734 |
 
 All **29 selected GOOD modes are TAE-like and await visual review**.
-[good_tae_final_batch.csv](good_tae_final_batch.csv) is the combined viewer
+good_tae_final_batch.csv (archived: `good_tae_final_batch.csv`) is the combined viewer
 list; each installed shot also has its `good_tae_final.csv`.
 There were 29 GOOD modes before and after duplicate processing, so none
 was removed as a duplicate.
@@ -30,7 +34,7 @@ python viz/view_modes_csv.py audits/released3_rules_20261010/good_tae_final_batc
 - All 23 D46 N2 correspondence-review modes are also automatically BAD.
   The two potentially acceptable examples, **N2/2650 and N2/2817**, both
   trigger `BAD_AXIS_SPIKE`. Their assessment did not request GOOD overrides.
-  The [44-mode comparison](reviewed_tae_mode_results.csv) retains the user
+  The 44-mode comparison (archived: `reviewed_tae_mode_results.csv`) retains the user
   review context, fingerprints and actual rule outcomes.
 - All 2,269 raw files are finite, including gamma_d, and nr=201. There are
   29 populated N groups; D46/N3 remains empty as previously recorded.
@@ -49,9 +53,9 @@ The earlier [D46 release](../continuum_release_d46_20261008/README.md) and
 scientific disposition records. Sorting does not erase continuum offsets,
 log-coverage limits or the separately recorded potential EAE findings.
 
-[Per-shot counts](shot_summary.csv), [input checks](preflight.json),
-[verification](verification.json), [installation receipt](publication.json)
-and [inventory changes](inventory_update.json) record completion. Per-shot
+Per-shot counts (archived: `shot_summary.csv`), input checks (archived: `preflight.json`),
+verification (archived: `verification.json`), installation receipt (archived: `publication.json`)
+and inventory changes (archived: `inventory_update.json`) record completion. Per-shot
 logs, fingerprints and staged outputs remain under ignored
 `outputs/review_released3_rules_20261010/`.
 
@@ -61,7 +65,7 @@ There are **184 processed post-training shots plus 14 active training shots
 (198 cases)**. Installed processed outputs contain **8,366 selected GOOD
 modes**, including 6,551 in 126 shots awaiting GOOD-list review.
 
-[Two entries remain unprocessed](remaining_unprocessed.csv):
+Two entries remain unprocessed (archived: `remaining_unprocessed.csv`):
 
 - **Held:** `nstxuE205059A01t025`, requiring N1/N2 recalculation.
 - **Empty:** `nstxu_202806`.

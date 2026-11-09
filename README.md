@@ -120,67 +120,19 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Use or retrain RF/CNN models | [Model inventory](models/README.md) and [training instructions](scripts/README.md#cnn-model-scripts) |
 | Understand training labels and archived datasets | [Training-label documentation](training_labels/README.md) |
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
-| Find earlier results, version notes, and README instructions | [Preserved README reference](docs/history/readme_before_reorganization_20260914.md) |
+| Find historical results and archived research records | [Archive and recovery guide](docs/research_archive.md) |
 
-As of October 10, 2026, the inventory contains **184 processed post-training
-shots plus 14 active training shots (198 total)**. The processed count includes
-the wholly invalid R06 shot, which still awaits corrected inputs. Excluding
-R06 gives 183 processed shots plus 14 training shots. The
-[latest three-shot rules batch](audits/released3_rules_20261010/README.md)
-processed D46, R42 and F62 and installed **29 selected GOOD TAEs awaiting
-visual review** (11 D46, 13 R42, five F62). All 21 visually unsuitable
-R42/F62 review modes were automatically rejected. Installed selections now
-total **8,366**. The
-[latest four-shot review](audits/released4_manual_review_20261007/README.md)
-is complete for N75, B85, F83 and K79: **19 accepted TAEs** (nine N75 and ten
-F83) after manually rejecting N75/N4_1299 for sharp edge spikes. Installed
-outputs include the correction; the original 20-mode list is historical.
-All 44 crossing-review modes were automatically rejected. The
-[latest 14-shot GOOD-list review](audits/released14_manual_review_20261007/README.md)
-is complete, leaving **70 accepted TAEs** after one manual BAD correction
-and five E55/N10 modes reclassified as BAE. The installed outputs and
-accepted list include these corrections; rejected modes were not all
-visually reviewed. The earlier
-[five-shot batch](audits/cleared_nan_rules_20261005/README.md) processed
-NaN-cleared inputs and installed **241 selected GOOD modes awaiting visual
-review**. The earlier
-[remaining-shot rules batch](audits/remaining122_rules_20260921/README.md) ran all 122
-requested cases and installed 118, holding four newly discovered NaN-input
-shots. Its **6,281 selected GOOD modes await visual review**. The
-[1,726 accepted representatives from the earlier 40-shot cohort](audits/processed40_20260915/accepted_tae_modes.csv)
-remain unchanged. The
-[39-shot disagreement review](audits/pilot39_manual_review_20260914/README.md)
-is complete, including 17 reasoned manual corrections. Future reruns must
-explicitly supply the affected shots' `manual_overrides.csv` to reproduce
-those curated selections. The
-[two unprocessed inventory entries](audits/released3_rules_20261010/remaining_unprocessed.csv)
-are E205059A01t025 and empty `nstxu_202806`; no released shots await processing.
-There are **two active whole-shot input holds** overall:
-[E205059A01t025 and G133964R06](audits/main_dataset_shots/active_shot_holds.csv).
-R06 already has outputs marked INVALID and therefore does not appear in
-the unprocessed list. The
-[October 10 recheck](audits/last3_recalculated_20261010/README.md) finds unchanged
-N1/N2 mode/continuum results for E205059A01t025 and replacement modes with
-updated N2 continua for R42/F62. Residual TAE-like/mixed crossing flags remain;
-Elena judged all 21 changed-input cases numerical or axis-spiked and
-[released R42/F62 for the completed rules run](audits/continuum_release_r42_f62_20261010/README.md).
-E205059A01t025 remains held for N1/N2 recalculation; R06 remains excluded
-pending corrected whole-shot inputs and review.
-[D46 was released](audits/continuum_release_d46_20261008/README.md)
-after Elena accepted recalculated N2 continuum correspondence in the
-23-mode TAE-like/mixed review. Its missing current log matches remain documented.
-Potential EAE issues remain separately flagged; see
-the [latest follow-up](audits/r42_f62_followup_20261007/README.md). See the full
-[project state](docs/project_state.md) for context and next steps.
+The current collection has **198 installed shot outputs** (184 post-training
+plus 14 training), including one wholly invalid case. The
+[shared catalog](catalogs/README.md) contains **8,943 selected GOOD modes**:
+8,366 post-training and 577 from historical training-shot outputs. Selection
+and visual review are distinct; the catalog records review status and
+unresolved training-label conflicts. See [project state](docs/project_state.md)
+for current counts, input holds, model provenance, and next steps.
 
-The active training list has 2,327 rows from 14 shots; Q62 and confirmed invalid
-N1 inputs have preserved records outside that active list. Existing AI
-checkpoints retain their earlier 2,390-row training provenance. Historical
-training counts and model metrics belong to their original snapshots, rather
-than being interchangeable with today's active list.
-
-The full `project_state.md` and detailed script instructions are retained.
-The previous main README is preserved in the linked dated reference, including
-its model comparisons, adoption notes, audit links, calibration options, and
-older setup recipes. The `tae_only_baseline_v1` tag retains the earlier
-TAE-only baseline; the former mixed-data branch has been merged into `main`.
+Generated outputs, exploratory runs, and poster assets stay outside version
+control. Compact audit summaries, reusable manual corrections, and catalog
+review evidence remain tracked. See [retained evidence](audits/README.md) and
+[research records and recovery](docs/research_archive.md) for the retention
+policy and access to historical artifacts. The `tae_only_baseline_v1` tag
+retains the earlier TAE-only baseline; the mixed-data branch is merged into main.

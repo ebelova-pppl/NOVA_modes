@@ -1,5 +1,9 @@
 # C50 N1 continuum / eigenmode-run inconsistency, 2026-09-09
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Historical status: user-approved INVALID for the original 73 C50 n=1 modes.**
 On 2026-09-11 the user accepted the recalculated 18-mode N1 set and the
 registry exclusion was removed. See the [correction review](../c50_n1_recalculated_20260911/README.md).

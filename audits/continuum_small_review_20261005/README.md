@@ -1,5 +1,9 @@
 # TAE crossing manual review, October 5, 2026
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Review completed:** Elena released all 14 shortlist shots for rules
 processing. The [release record](../continuum_release_20261005/README.md)
 supersedes the pending-review/hold wording below and preserves the potential
@@ -44,19 +48,19 @@ The count cutoff is strictly `<10` crossings per shot, not modes per shot.
 
 ## Review files
 
-- **[39-mode TAE viewer list](tae_only_small_count_modes.csv)**: one row per affected
+- **39-mode TAE viewer list (archived: `tae_only_small_count_modes.csv`)**: one row per affected
   mode, ordered by shot crossing count, N and frequency. Includes blank
   `manual_label` and `manual_reason` columns, source fingerprints, routing,
   maximum distance and individual crossing details. Nothing is pre-labeled.
-- [14-shot TAE summary](tae_only_small_count_shots.csv).
-- [All 49 individual TAE comparisons](tae_only_small_count_crossings.csv).
-- [All 22 shot counts and scope flags](tae_only_all_22_summary.csv), with
+- 14-shot TAE summary (archived: `tae_only_small_count_shots.csv`).
+- All 49 individual TAE comparisons (archived: `tae_only_small_count_crossings.csv`).
+- All 22 shot counts and scope flags (archived: `tae_only_all_22_summary.csv`), with
   separate TAE-like, mixed and EAE-like counts and log-coverage limits.
-- [Mixed-mode viewer list](mixed_crossing_modes.csv): 71 flagged comparisons
+- Mixed-mode viewer list (archived: `mixed_crossing_modes.csv`): 71 flagged comparisons
   in 47 modes across 12 of the 22 shots; separate from the primary review.
-- [Potential EAE crossing issues](potential_eae_crossing_modes.csv): 349
+- Potential EAE crossing issues (archived: `potential_eae_crossing_modes.csv`): 349
   comparisons in 234 modes across 20 shots. These are provisional findings.
-- [EAE log-coverage gaps](eae_log_coverage_gaps.csv): 70 modes with incomplete
+- EAE log-coverage gaps (archived: `eae_log_coverage_gaps.csv`): 70 modes with incomplete
   or conflicting logs and no interior datcon crossing, plus one E205059/N1
   mode with interior crossings but no logged singularities. These are
   coverage limits, not measured offsets.
@@ -91,7 +95,7 @@ and cross-checked against the historical all-frequency 22-shot hold list.
 Mode, continuum and available log hashes for all exported review entries were
 verified against that snapshot. All viewer lists and coverage-gap lists
 were parsed with the shared CSV reader: every path resolves and no labels
-are assigned. [Receipt](receipt.json) records thresholds and hashes.
+are assigned. Receipt (archived: `receipt.json`) records thresholds and hashes.
 
 The user will inspect TAE morphology. If affected modes are judged numerical,
 record those mode-level decisions and then reassess the corresponding TAE

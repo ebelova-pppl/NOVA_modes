@@ -1,5 +1,9 @@
 # N75/B85 released; E205059A01t025 requires recalculation
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 **Later processing:** N75/B85 and the earlier F83/K79 releases are now
 [sorted and installed](../released4_rules_20261007/README.md). The release
 snapshot below is preserved; four held shots plus one empty entry remain.
@@ -16,13 +20,13 @@ on October 7, 2026.
 N75/B85 are released because the affected TAE-like modes are unsuitable,
 not because the continuum correspondence has been corrected. Elena judged
 continuum recalculation unnecessary for these two shots. The
-[25-mode assessment record](reviewed_modes.csv) preserves their fingerprints;
-the [released-shot list](released_shots.csv) retains mixed and potential EAE
+25-mode assessment record (archived: `reviewed_modes.csv`) preserves their fingerprints;
+the released-shot list (archived: `released_shots.csv`) retains mixed and potential EAE
 findings separately. No individual sorter overrides or training labels
 were changed.
 
 E205059A01t025 remains unprocessed with
-`status=continuum_recalculation_pending`. The [hold record](held_shots.csv)
+`status=continuum_recalculation_pending`. The hold record (archived: `held_shots.csv`)
 specifies both N1 and N2. The user did not identify individual acceptable
 modes, so no per-mode GOOD labels are inferred from that assessment.
 Recalculated inputs need a renewed correspondence check before release.
@@ -30,13 +34,13 @@ Potential EAE issues and log-coverage limits remain recorded.
 
 All 591 mode, continuum and available log sources in the six reviewed N
 groups still match the October 5 snapshot, with unchanged mode inventories.
-All 42 review fingerprints were checked again. The [receipt](receipt.json)
+All 42 review fingerprints were checked again. The receipt (archived: `receipt.json`)
 records source checks, protected-file hashes and the five before/after
 inventory-row updates (three in the main list, two in the G subset).
 
 ## Remaining processing
 
-[Nine entries remain unprocessed](remaining_unprocessed.csv):
+Nine entries remain unprocessed (archived: `remaining_unprocessed.csv`):
 
 - **Four ready:** G121123N75, G142301B85, G142301F83, G142301K79.
 - **Four held:** E205059A01t025 (N1/N2 recalculation), G121123R42 and

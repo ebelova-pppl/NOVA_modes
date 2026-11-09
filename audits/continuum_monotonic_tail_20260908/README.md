@@ -1,10 +1,14 @@
 # Sustained edge-rise repair audit and adoption
 
+> Retained historical summary. Archived files and historical commands require
+> the local research records or the earlier Git revision; see the
+> [archive guide](../../docs/research_archive.md).
+
 For incremental review after regeneration, use
-[`disagreement_delta_20260909/to_review.csv`](disagreement_delta_20260909/to_review.csv).
+`disagreement_delta_20260909/to_review.csv` (archived: `disagreement_delta_20260909/to_review.csv`).
 It contains only 13 new cases, excluding retained disagreements and four
 newly appearing modes the user already approved. The accompanying
-[`changes.csv`](disagreement_delta_20260909/changes.csv) records all 17 additions
+`changes.csv` (archived: `disagreement_delta_20260909/changes.csv`) records all 17 additions
 and 13 removals; see that directory's README for the comparison scope.
 
 **Adopted 2026-09-08:** the user reviewed all 41 recovered modes and accepted
