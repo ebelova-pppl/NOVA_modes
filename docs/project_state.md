@@ -1,7 +1,7 @@
 # NOVA mode classifier: current project state
 
-Updated November 9, 2026. Scientific counts below retain their October 10/26/29
-snapshot dates; the November 9 work is repository cleanup only. The complete
+Updated November 10, 2026. Selection counts below retain their October 10/26/29
+snapshot dates; November 10 adds surrogate input discovery. The complete
 prior chronology is preserved locally and in Git history as described in
 [research records and recovery](research_archive.md).
 
@@ -98,6 +98,17 @@ these roles separate and follow the [platform guide](platforms.md).
 
 ## Recent work and next steps
 
+- **November 10 surrogate input discovery:** the
+  [source map](surrogate_input_sources.md) traces the three printed q sections,
+  mapped profiles/geometry, TRANSP data, and per-shot frequency normalization.
+  All 199 populated inventory cases have the main equilibrium files;
+  NetCDF/text q and pressure agree exactly, and binary `mpout1` also matches
+  q/pressure/g. E55's `outequ` is truncated despite matching mapped profiles.
+  Five mapped cases contain nonzero rotation data. Historical density recipe,
+  per-n overrides, and mode/equilibrium correspondence remain open checks;
+  the user requested retaining the density question as unresolved. Detailed
+  discovery evidence is in the ignored research archive. Scientific selections
+  and processing code are unchanged.
 - **October 29 poster preparation:** selected the mixed-routing example
   E204957F05t034/N7/3141 and produced total-count and G/non-G parameter tables.
   The mixed example has a fresh isolated v13 check; a full EAE-gap reconstruction
