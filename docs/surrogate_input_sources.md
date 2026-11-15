@@ -1,40 +1,167 @@
 # NOVA surrogate: equilibrium input sources
 
-Discovery date: November 10, 2026. Scope: frequencies and mode structures for
-the accepted TAE database. Paths below are relative to `$NOVA_DITW_ROOT/SHOT`.
-This is a source map, not an implemented training-data loader or a certification
-that current equilibrium files reproduce every historical eigenmode.
+Discovery date: November 10, 2026; database-wide corrections confirmed by the
+user on November 13; scalar availability audited November 15. Scope:
+frequencies and mode structures for the accepted TAE database. Paths below
+are relative to `$NOVA_DITW_ROOT/SHOT`.
+This source map records the confirmed conventions and the discovery evidence;
+the surrogate training-data loader has not yet been implemented.
 
 ## Conventions established with the user
 
-- For this dataset, physical poloidal `m` equals stored harmonic index `m`.
-  This is a dataset convention; the generic loader does not infer it.
+- `m` is the physical poloidal harmonic number. Its minimum may be zero or
+  negative, for example `-3`; a stored array row index is not its physical m
+  label. Preserve an explicit `m_values` array with each mode. For a verified
+  consecutive ascending range, row `i` corresponds to `m_min + i`.
 - The native frequency is normalized by
   `Omega_N = V_A_ref / (q_lcfs * R_v)`, with
-  `V_A_ref = B(R_v) / sqrt(mu0 * m_i * n_e(axis))` and
-  `R_v = (R_min_LCFS + R_max_LCFS) / 2`.
-  The reference field is evaluated at the geometric center, and the reference
-  electron density at the magnetic axis. The scale varies between shots.
+  `V_A_ref = B_vacuum / sqrt(mu0 * sum_j(m_ij * n_ij(axis)))` and
+  `R_v = (R_min_midplane_LCFS + R_max_midplane_LCFS) / 2`.
+  `B_vacuum` is the vacuum toroidal field at this midplane geometric center.
+  The species masses and densities are obtained from `transp.dat`; the
+  reference density is evaluated on the magnetic axis. The scale varies
+  between shots. Global LCFS R extrema cannot generally replace its midplane
+  intersections, especially for strongly shaped cross sections.
+- To keep units explicit, let `rho_i = sum_j(m_ij * n_ij)` denote physical
+  mass density. The user's `rho_mass` in `V_A_ref = B_vacuum/sqrt(rho_mass)`
+  is `mu0 * rho_i(axis)`; include `mu0` exactly once.
+- The `iden=4` density profile is built from TRANSP ion species, including
+  beam ions and impurities, with smoothing of selected profiles, axis
+  normalization, and interpolation in normalized poloidal flux.
+- `qa`, `pa`, and `ga` agree with the corresponding mapped quantities in
+  `mapdsk` and `mpout1` and are the profiles used by NOVA after q-solver and
+  mapping. The user confirmed this and the density prescription for the
+  entire database; both questions are resolved.
 - Old NOVA calculations assume up-down symmetry. The future superNOVA input
   representation should retain asymmetric geometry as well.
-- The density profile actually used by the historical executables remains an
-  open check. The user confirmed that this needs investigation; the frequency
-  reference above does not establish the radial density-profile prescription.
+
+## Scalar-first surrogate: availability audit, November 15
+
+Alvaro's initial target is the lower and upper TAE continuum boundaries,
+`omega_min(psi_N)` and `omega_max(psi_N)`, conditioned on equilibrium scalars
+and `n_tor`. Possible later targets are the number of selected GOOD TAEs, K,
+and their frequency, radial location, and width. A quadratic q-profile fit is
+under consideration; no fit or surrogate training was performed here.
+
+**All ten requested scalar inputs are recoverable for all 199 populated
+inventory cases.** The remaining entry, `nstxu_202806`, is empty. A root-level
+check found four aliases and seven analysis/derived directories beyond the
+200 inventory entries, not additional independent equilibrium cases.
+
+| Requested input | Preferred extraction | Populated cases |
+| --- | --- | --- |
+| a, R_v | `mapdsk.cdf: xinf,zinf`; half-width and midpoint of LCFS intersections with the symmetry midplane | 199/199 |
+| delta, kappa | Same mapped LCFS; triangularity at upper/lower tips and total vertical extent divided by 2a | 199/199 |
+| B_v | `abs(transp.dat:BZXR)/(100*R_v_m)` in tesla | 199/199 |
+| q_0, q_lcfs, q_min | `mapdsk.cdf: qa`, with `PsiBig` for radial coordinates; retain the near-axis sampling qualification below | 199/199 |
+| p_0 (requested peak) | Maximum mapped `pa`; preserve native normalization, with SI conversion `p_Pa = pa*B_v**2/mu0` | 199/199 |
+| rho_0 (requested peak) | Reconstruct physical mass density from `transp.dat` with the confirmed `iden=4` processing | 199/199 |
+
+The geometry audit intersects the LCFS with `Zmag` (the symmetry plane in
+these cases). It computes `delta_upper/lower=(R_v-R_at_Z_extremum)/a`, retains
+both values, and uses their mean as scalar delta. Upper/lower values agree
+in every case. The derived midplane R_v agrees with both mapped `X0` and
+TRANSP edge `RMJMP/100` within 1e-9 m. The LCFS arrays agree exactly with the
+last mapped surface. Shaping uses the sampled contour, without fitting its
+extrema. `mapdsk.cdf:B0=1` is not the dimensional vacuum field.
+
+Use distinct names for **axis** and **peak** values. At a relative tolerance
+of 1e-6, the sampled pressure maximum exceeds the first mapped value in
+22 cases, and the processed density-knot maximum exceeds the axis value in
+77 cases. The frequency reference still uses axial mass density. In the
+audit CSV, q and pressure axis proxies are labeled `*_axis_near`: the first
+mapped point is at `psi_N≈2.5e-7`, not exactly zero. q and pressure minima/
+maxima are sampled-grid extrema. Density maxima are processed-knot extrema;
+finding extrema of NOVA's subsequent spline remains export implementation
+work. This distinction does not indicate missing input data.
+
+For reproducibility, the audited density mass sum, before axis normalization,
+is proportional to
+`NH + 2*ND + 3*NT + 2*BDENS_D + 3*BDENS_T + 4*NFI + 3*NHE3 + AIMPJ*NIMP`.
+The current source smooths each contributing density except `NHE3` once;
+it does not smooth `AIMPJ`. It then extrapolates the mass sum to axis/edge.
+`PLFLX` is interpolated from `XB` to `X`, extrapolated, and normalized to
+poloidal flux. The SI audit uses proton-mass units and converts cm^-3 to m^-3;
+`rho_*_kg_m3` does not include mu0. All 199 files supply every required block.
+The inactive `NT`, `NFI`, `BDENS_T`, and `NHE3` blocks explicitly contain zeros
+in every case. No missing species block was silently filled. All processed
+density knots and mapped pressure samples are positive.
+
+The density audit agrees with compiled original `smooth`, `extrap1`, and
+`boundtoc`/`fun4` Fortran helpers across all 199 cases: maximum differences
+are 1.06e-22 kg/m^3 in density and 1.23e-15 in normalized poloidal flux.
+Current NetCDF, `qpvspsi.dat`, and `mpout1` q/pressure copies again agree
+exactly. The pressure conversion follows the active normalization
+`p0=p0*mu0/bzero**2` in `eqsolvAnis.f`; the mapped quantity is the equilibrium
+pressure flux function, not an independently substituted TRANSP pressure.
+
+Per-case values, source-file hashes, coverage/ranges, the bounded audit
+script, and the Fortran comparison are in the local ignored directory
+`research_archive/surrogate_scalar_availability_20261115/`:
+`shot_scalars.csv`, `input_fingerprints.json`, `summary.json`, `audit.py`,
+`density_validation.json`, and `validate_density.py`. This is an availability
+audit, not a released training table. Existing invalid-input and continuum/
+mode association holds remain in force; complete scalar coverage does not
+clear them. No production processing or scientific selections changed.
+
+### Follow-up: stored shaping, axis definitions, and q extrapolation
+
+The reported delta and kappa were calculated from the mapped LCFS in
+`mapdsk.cdf`; they were not copied from TRANSP shaping scalars. All 199
+TRANSP files also contain `TRIANG`, `TRIANGL`, and `ELONG` profiles, whose
+edge values describe the original TRANSP geometry. Keep those separate from
+the shaping of NOVA's mapped equilibrium. `qpvspsi.dat` additionally prints
+`ellipt` and `triangl`, but its source uses global R extrema; the contour
+calculation explicitly preserves the agreed midplane definition of a/R_v.
+The NetCDF variable named `delta` is a mapping array, not the scalar
+triangularity. q_0, q_min, and q_lcfs likewise come from mapped `qa`.
+
+The user is reconsidering the initial peak-value request and tentatively
+prefers axial p_0 and rho_0. The recommended initial schema uses axis values
+for both, preserving maxima separately. Axial density is the normalization
+reference; the pressure axis estimate should retain its extraction method.
+The original audit CSV keeps both definitions and is unchanged.
+
+A follow-up checked all 199 mapped q profiles, using the text copies whose
+hashes still match the original audit. Linear extrapolation in psi_N from
+the first two points (approximately 2.5e-7 and 2.5e-5) to zero gives:
+
+| Correction from first mapped q to estimated q(0) | Median | Maximum |
+| --- | --- | --- |
+| Absolute difference in q | 3.70e-7 | 4.24e-5 |
+| Relative difference, percent | 0.0000176% | 0.000880% |
+
+The largest relative change is `nstxuG121123N22`: 3.9293604394 becomes
+3.9293950155. Local three-point quadratic and four-point cubic extrapolation
+change the linear estimate by at most 1.62e-6 and 2.31e-6 in q, respectively.
+These are small extrapolation corrections, not an independent measurement
+of the exact axis value or a global quadratic q-profile fit. Reproduction
+and results are `q_axis_check.py`, `q_axis_comparison.csv`, and
+`q_axis_summary.json` in the same ignored audit directory.
+
+All 199 NetCDF files share the same variable schema and contain no mass-
+density field. The inspected NOVA initialization calls `datin_new` for
+`iden=4` to construct density from TRANSP, separately from reading mapped
+equilibrium data. Reconstruct the species sum for export and retain its
+axis scale before normalization. The existing audit already saves
+`rho_axis_kg_m3` and `rho_peak_knots_kg_m3`; it does not yet export the full
+NOVA-interpolated density profile.
 
 ## Preferred sources and checks
 
 | Quantity | Source | Interpretation / checks |
 | --- | --- | --- |
-| Mapped q profile | `mapdsk.cdf: qa`; `qpvspsi.dat`, column 2 | Compare against binary `mpout1`, the input used by NOVA initialization. |
-| Mapped pressure | `mapdsk.cdf: pa`; `qpvspsi.dat`, column 3 | NOVA pressure after equilibrium solution and mapping, including mapper edge treatment. Do not substitute raw TRANSP pressure without checking. |
+| Physical poloidal harmonics | Matching mode/run metadata, including `N<n>/out_go` and harmonic-range settings | Recover the actual exported m range and ordering; preserve `m_values` separately from array indices. Account for any solver-only extra harmonics when interpreting settings. |
+| Mapped q profile | `mapdsk.cdf: qa`; `qpvspsi.dat`, column 2 | Confirmed NOVA input after q-solver/mapping; agrees with mapped binary quantities. |
+| Mapped pressure | `mapdsk.cdf: pa`; `qpvspsi.dat`, column 3 | Confirmed NOVA pressure after equilibrium solution and mapping, including mapper edge treatment. |
 | Radial coordinate | `mapdsk.cdf: PsiBig`; `qpvspsi.dat`, column 1 | `qpvspsi[:,0] = PsiBig / PsiBig[-1]`, normalized poloidal flux. Use its square root for the mapped radial coordinate. |
-| Field function | `mapdsk.cdf: ga`, `gpa` | Mapped g and its derivative; retain the code convention and verify any conversion to dimensional F. |
+| Field function | `mapdsk.cdf: ga`, `gpa` | ga is confirmed as the mapped field function used by NOVA; retain the code convention for g and its derivative and verify any conversion to dimensional F. |
 | Flux surfaces | `mapdsk.cdf: xa`, `za` | In the examined files, Python reads `(radius, poloidal_angle)`. The poloidal endpoint is repeated. Retain the mapped angle convention. |
 | LCFS | `mapdsk.cdf: xinf`, `zinf` | Full boundary coordinates; derive shaping consistently from contours. |
-| Geometric center and axis | `mapdsk.cdf: X0`, `Xmag`, `Zmag`, `Xmin`, `Xmax` | Cross-check `X0` against `(Xmin+Xmax)/2`; `Xmag` is a different reference location. |
+| Geometric center and axis | `mapdsk.cdf: X0`, `Xmag`, `Zmag`; LCFS contours `xinf`, `zinf` | Validate `X0` against the midpoint of the inboard/outboard LCFS intersections with the equilibrium midplane. Global `Xmin`, `Xmax` are not the general definition of R_v. Preserve the magnetic-axis location separately. |
 | Scalar equilibrium summary | Final named blocks in `outequ` | Includes `q-zero`, `q-edge`, `xmagax`, `x-maj`, `arad`, `a-ratio`, `dness`, and several distinctly defined betas. Match labels, not fixed line numbers. |
-| Dimensional vacuum-field scale | `transp.dat: BZXR` | Header gives tesla-cm. Candidate vacuum field at `R_v` in meters is `abs(BZXR)/(100*R_v)`; preserve the sign separately and verify the historical conversion convention. |
-| Density and composition | `transp.dat: NE`, `NH`, `ND`, `NT`, `NIMP`, beam/species densities, `AIMPJ` | Source data for the density reader; needs the original smoothing, endpoint treatment, and radial mapping. |
+| Dimensional vacuum-field scale | `transp.dat: BZXR` | Header gives tesla-cm. The vacuum toroidal-field magnitude at midplane `R_v` in meters is `abs(BZXR)/(100*R_v)`; retain the signed field separately. |
+| Density and composition | `transp.dat`: ion-species and beam densities, `NIMP`, `AIMPJ` | Use the confirmed species mass sum and reproduce the `iden=4` smoothing, endpoint treatment, axis normalization, and radial mapping. NE alone does not specify this mass density. |
 | Original profile coordinates | `transp.dat: X`, `XB`, `PLFLX`, `TRFLX` | Center and boundary grids differ. Headers distinguish them. Do not identify TRANSP X with NOVA sqrt(poloidal flux). |
 | Original shaping / asymmetry | TRANSP `RMC*`, `RMS*`, `YMC*`, `YMS*`, `ELONG`, `TRIANG`, `TRIANGL` | Preserve for future superNOVA work. Current NOVA labels belong to the mapped symmetric geometry, not automatically to the original asymmetric reconstruction. |
 | TAE continuum | `N<n>/datcon<n>` | Use the existing shared loader and its validity handling. Frequencies are squared and must remain consistent with native mode frequencies. |
@@ -93,7 +220,7 @@ The front input cards' `q0=1` and `qlim=3` are not these final q values.
   `sqrt(psi_N)≈0.0005`, followed by `0.005`, rather than an exact zero.
   Preserve the actual radial coordinates when preparing surrogate inputs.
 
-## Density and remaining provenance work
+## Confirmed density treatment and remaining implementation work
 
 The current `iden=4` paths in `mhdidin_flux.f:4091` and
 `contx_flux.f:2094` read TRANSP species, smooth selected density profiles,
@@ -101,9 +228,11 @@ move the poloidal-flux data from boundary to center locations, extrapolate to
 axis/edge, and spline the normalized mass-density profile versus normalized
 poloidal flux. The active mass sum includes hydrogen, deuterium, tritium,
 beam ions, helium, and impurity mass. The electron-only density prescription
-is commented out. The historical executable provenance must determine which
-recipe applies; this audit does not replace the user's frequency reference
-with an inferred one.
+is commented out. On November 13 the user confirmed this species-based
+treatment for all database cases. The surrogate loader must reproduce it;
+selecting between electron-only and species-based density is no longer an
+open scientific question. Both the normalized radial profile and the axial
+mass-density scale are needed to retain the normalization information.
 
 Rotation also needs a per-case check. Five mapped cases have `imach=1` and
 nonzero `pM`: `nstx_135388`, `nstxuG142301E34`, `nstxuG142301E77`,
@@ -111,10 +240,11 @@ nonzero `pM`: `nstx_135388`, `nstxuG142301E34`, `nstxuG142301E77`,
 `imach=1`, `mach20=0.01`, and `mach21=0`. Preserve these settings and the
 mapped rotation data when deciding the surrogate's physics scope.
 
-The current source tree explains the formats, but it is not proven to be the
-exact source revision compiled into every stored executable. Equality between
-present-day mapped files also does not establish correspondence with existing
-`egn*` files. Existing mode/continuum fingerprint holds remain in force.
+The November 13 confirmation establishes the density and mapped-profile
+conventions across the database. The November 10 audit did not fingerprint
+every historical executable source revision; preserve input hashes when
+building the training set. Existing mode/continuum fingerprint holds remain
+in force and are separate from these resolved source-convention questions.
 
 ## Discovery evidence and next step
 
@@ -149,7 +279,11 @@ Detailed local evidence, the bounded audit script, and source/example-file
 fingerprints are under `research_archive/surrogate_input_discovery_20261110/`
 (ignored research artifacts). The audit records availability separately from
 scientific eligibility; invalid or held cases are not cleared by this work.
+Its historical `Rv_midpoint_absdiff` diagnostic compared `X0` with global
+`Xmin`/`Xmax`. That comparison is not a general validation of the midplane
+definition clarified on November 13; future extraction must use midplane
+intersections. The original discovery artifacts retain their dated scope.
 
-Next: settle the historical density recipe and per-n overrides, confirm the
-remaining normalization conventions, and link each mode to a fingerprinted
-equilibrium before building the reusable surrogate input loader.
+Next: implement a reusable loader for the confirmed mapped profiles and
+species-based density, recover the physical m labels, validate the midplane
+geometry reference, and retain per-run settings and input fingerprints.

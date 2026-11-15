@@ -23,7 +23,7 @@ Directories outside the requested range are not scanned.
 | Input | Expected meaning |
 | --- | --- |
 | `egn*` | NOVA structure plus `omega`, `gamma_d`, and toroidal mode number `ntor`; shot preprocessing checks that `ntor` matches its `N<N>` directory. |
-| Mode structure | Signed amplitudes on a `(number of harmonics, number of radial points)` grid. Harmonic count can vary; stored row indices do not establish a physical poloidal-`m` offset. |
+| Mode structure | Signed amplitudes on a `(number of harmonics, number of radial points)` grid. Harmonic count can vary. Physical poloidal m may start at zero or a negative value; stored row indices do not establish its offset. |
 | Normalization | Radius in `[0, 1]`; maximum absolute harmonic amplitude normalized to one by NOVA. |
 | `datcon<N>` | Corresponding TAE continuum bounds `low2(r)` and `high2(r)`, in squared-frequency units consistent with `omega**2`. Each participating `N<N>` directory needs a matching profile. |
 

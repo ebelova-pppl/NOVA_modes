@@ -1,7 +1,7 @@
 # NOVA mode classifier: current project state
 
-Updated November 10, 2026. Selection counts below retain their October 10/26/29
-snapshot dates; November 10 adds surrogate input discovery. The complete
+Updated November 15, 2026. Selection counts below retain their October 10/26/29
+snapshot dates; November 15 audits surrogate scalar availability. The complete
 prior chronology is preserved locally and in Git history as described in
 [research records and recovery](research_archive.md).
 
@@ -98,17 +98,64 @@ these roles separate and follow the [platform guide](platforms.md).
 
 ## Recent work and next steps
 
+- **November 15 scalar-input availability:** all ten inputs requested for
+  Alvaro's continuum-first surrogate are recoverable for all 199 populated
+  cases; only the empty `nstxu_202806` inventory entry is missing. The
+  [source map](surrogate_input_sources.md) records sources and definitions.
+  Midplane geometry agrees with mapped/TRANSP references within 1e-9 m;
+  mapped q/pressure copies agree exactly. Species-density processing matches
+  original Fortran helpers for all 199 cases. Retain separate axis and peak
+  values: sampled pressure/density peaks exceed axis values in 22/77 cases.
+  The audit records near-axis q/p proxies and grid/knot extrema explicitly;
+  final axis/spline extraction remains loader work. Per-case CSV, hashes,
+  script, and validation are in
+  `research_archive/surrogate_scalar_availability_20261115/`. No production
+  code or selections changed; existing input holds remain. Next: agree the
+  export schema and assemble matched scalar/continuum data by `n_tor`.
+  Follow-up: the user tentatively prefers axial p_0/rho_0; retain peaks
+  separately. Linear near-axis q extrapolation changes q by at most 4.24e-5
+  (maximum relative change 0.000880%) across all 199 cases, with small local
+  quadratic/cubic differences. TRANSP shaping is also stored, while the
+  audit uses shaping derived from the mapped LCFS. None of the 199 NetCDF
+  schemas contains mass density; reconstruct it from TRANSP as NOVA does.
+  Follow-up measurements and reproduction script are in the same archive.
+- **November 13 surrogate example plots:** prepared the five human-GOOD TAEs
+  for `nstxuE202855A01t020/N1` as a comparison sheet and individual three-panel
+  pages (signed radial harmonics, signed m/r contour, continuum/frequency;
+  no m-spectrum). All training mode/continuum fingerprints match retained
+  review evidence; matching run metadata verifies physical m=0..13. Figures
+  use the reviewed training continuum because the live `datcon1` has changed.
+  PDF, PNGs, selected-mode CSV, provenance, and reproduction script are in
+  `research_archive/alvaro_tae_examples_20261113/`. No scientific selections
+  or shared plotting/processing code changed. The follow-up higher-n package
+  in `research_archive/alvaro_tae_high_n_20261113/` includes all six reviewed
+  GOOD modes at N8 for the same shot, with verified physical m=0..89 and
+  matching training fingerprints. It also uses the reviewed continuum
+  (`datcon8` differs in the live database), and preserves the original N1
+  package. N8 modes C/D differ by only 1.17% in frequency but have markedly
+  different radial location and width.
+- **November 13 surrogate conventions confirmed:** the user confirmed across
+  the entire database that physical poloidal m can start at zero or a negative
+  value, the frequency reference uses the vacuum toroidal field at the
+  midplane geometric center and the axial TRANSP species mass sum, and
+  `iden=4` builds and normalizes the species-based density profile including
+  beam ions and impurities. `qa`, `pa`, and `ga` are the mapped profiles used
+  by NOVA and agree with `mapdsk`/`mpout1`. Density prescription and mapped
+  profile identity are resolved. The [source map](surrogate_input_sources.md)
+  replaces the earlier index-m, electron-density, and global-LCFS-midpoint
+  assumptions. Next: implement extraction with physical m labels, the
+  confirmed density processing, and the midplane reference geometry.
 - **November 10 surrogate input discovery:** the
   [source map](surrogate_input_sources.md) traces the three printed q sections,
   mapped profiles/geometry, TRANSP data, and per-shot frequency normalization.
   All 199 populated inventory cases have the main equilibrium files;
   NetCDF/text q and pressure agree exactly, and binary `mpout1` also matches
   q/pressure/g. E55's `outequ` is truncated despite matching mapped profiles.
-  Five mapped cases contain nonzero rotation data. Historical density recipe,
-  per-n overrides, and mode/equilibrium correspondence remain open checks;
-  the user requested retaining the density question as unresolved. Detailed
-  discovery evidence is in the ignored research archive. Scientific selections
-  and processing code are unchanged.
+  Five mapped cases contain nonzero rotation data. The density recipe and
+  mapped-profile interpretation were initially open and were resolved by the
+  November 13 confirmation above. Detailed discovery evidence is in the
+  ignored research archive. Scientific selections and processing code are
+  unchanged; retain per-run settings and file provenance during extraction.
 - **October 29 poster preparation:** selected the mixed-routing example
   E204957F05t034/N7/3141 and produced total-count and G/non-G parameter tables.
   The mixed example has a fresh isolated v13 check; a full EAE-gap reconstruction
