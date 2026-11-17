@@ -30,6 +30,7 @@ have explicitly started Bash.
 | Make a compact CSV for sharing | [`compact_mode_csv.py`](#compact_mode_csvpy) |
 | Export the common accepted-mode catalog | [`build_accepted_catalog.py`](#build_accepted_catalogpy) |
 | Export surrogate equilibria, continua and mode scalars to HDF5 | [`export_nova_surrogate.py`](../docs/surrogate_hdf5.md) |
+| Reconstruct continua with independent serial NOVA tasks under MPI | [`run_nova_continuum_mpi.py`](#run_nova_continuum_mpipy) |
 | Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |
 | Understand duplicate severity ranking | [Normalized severity](#normalized-gate-severity) and [deduplication](#final-good-production-deduplication) |
 | View modes or apply manual corrections | [Viewer](#view_modes_csvpy), [labeler](#label_modes_fastpy), [adjudication](#manual-adjudication) |
@@ -39,6 +40,85 @@ have explicitly started Bash.
 | Use older sorting interfaces | [RF sorter](#legacy-rf-shot-sorter), [single-model sorter](#sort_shotpy) |
 | Recover earlier main-page instructions and metrics | [Archive guide](../docs/research_archive.md) |
 | Transfer the complete project context | [Project state](../docs/project_state.md) |
+
+## run_nova_continuum_mpi.py
+
+Reconstruct native `datconN` files using each case's existing `gocont_tr`
+executable. The scheduling follows the FRC atlas MPI driver: rank zero
+coordinates independent serial calculations, one per `(shot, ntor)`, and
+records failures without stopping unrelated tasks. This requires Python 3.10+
+and, for MPI execution, `mpi4py` with a compatible MPI library.
+
+Prepare a task CSV with required columns `shot,ntor,lmin,lmax`, for example:
+
+```csv
+shot,ntor,lmin,lmax
+example_case,1,-3,108
+example_case,2,-3,108
+```
+
+Use settings supported by the case executable and historical records. The
+runner does not infer harmonic limits from `ntor` or perform convergence
+studies. Optional CSV columns and defaults are `binary=gocont_tr` (relative
+to the case directory), `gamma=1.66666666`, `iden=4`, `ksound=1`,
+`ns_first=3`, `ns_last=201`, `ns_step=1`. Only the audited `iden=4`
+workflow and unit radial-index increment are supported. Other radial grids
+need matching executables and inputs; this driver does not compile them.
+
+Each case must contain `mapdsk`, `mpout1`, `transp.dat`, and its executable.
+The output root must be a new directory separate from the input tree. Check
+all tasks without writing or launching NOVA:
+
+```tcsh
+python scripts/run_nova_continuum_mpi.py --dry-run \
+  --tasks tasks.csv --data-root "$NOVA_DITW_ROOT" --output-root /path/to/new/run
+```
+
+On an allocated compute node, use `mpiexec -n 11 python` with the same
+script and arguments, omitting `--dry-run`, for one coordinator and ten
+workers. `--serial` runs the identical worker sequentially without MPI;
+invoke `--serial` and `--dry-run` directly, without an MPI launcher.
+
+The provided Slurm launcher accepts the same arguments. Submit from the
+repository root with site-appropriate account, partition, and resources.
+For Flux (`tcsh`), after preparing a Python environment containing `mpi4py`:
+
+```tcsh
+setenv NOVA_MPI_MODULE openmpi/4.1.6-gcc-13.2.0
+setenv NOVA_MPI_PYTHON /path/to/mpi/environment/bin/python
+sbatch --account=theory --partition=short --nodes=1 --ntasks=11 \
+  --cpus-per-task=1 --mem=12G --time=00:10:00 \
+  scripts/run_nova_continuum_mpi.sbatch \
+  --tasks tasks.csv --data-root "$NOVA_DITW_ROOT" --output-root /path/to/new/run
+```
+
+`NOVA_MPI_MODULE` is optional when the matching MPI is already loaded.
+The Slurm script uses Bash internally. Python may also be selected through
+the active environment by leaving `NOVA_MPI_PYTHON` unset.
+
+The output tree contains:
+
+- `batch_manifest.json`: task settings, input/executable SHA-256 hashes, and
+  worker-code hash; `results.csv` and `summary.json`: progress and final status.
+- `cases/<shot>/N<n>/datcon<n>`, `outcon`, `commands`, `stdout.log`, and
+  `receipt.json`: validated outputs and provenance for a successful task.
+- `cases/<shot>/N<n>/attempts/0001/`, etc.: retained isolated input copies,
+  executable, all native outputs, and attempt receipts, including failures.
+
+Use `--resume` with the same task manifest, input files, worker code, and
+output root. Completed tasks are skipped only after output hashes match;
+failed tasks receive new attempt directories. Interrupted publication of a
+validated calculation is completed without rerunning it. Changed inputs or
+completed outputs cause explicit failures. The per-task timeout defaults to
+1,200 seconds; BLAS/OpenMP threads are fixed at one per serial producer.
+
+Validation checks process status, common Fortran error messages, emitted
+namelist settings, unchanged copied inputs, and finite three-column native
+output with valid radial bounds and at least one ordered boundary pair.
+Native `datcon` values, including sentinels, remain unchanged. These checks
+establish execution integrity; historical agreement and physical convergence
+require separate comparisons using the shared continuum loader. A restored
+file does not automatically change classifications or an HDF5 export.
 
 ## Current results and research records
 

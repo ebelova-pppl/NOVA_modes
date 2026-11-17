@@ -1,6 +1,6 @@
 # NOVA mode classifier: current project state
 
-Updated November 16, 2026. Selection counts below retain their October 10/26/29
+Updated November 17, 2026. Selection counts below retain their October 10/26/29
 snapshot dates; November 16 checks NOVA-C density outputs and implements
 the surrogate HDF5 export using the confirmed NOVA density prescription. The complete
 prior chronology is preserved locally and in Git history as described in
@@ -9,8 +9,9 @@ prior chronology is preserved locally and in Git history as described in
 ## Purpose and current workflow
 
 Select physically useful Alfvén eigenmodes from existing NOVA outputs for
-NOVA-C, surrogate modeling, and digital-twin analysis. The repository does not
-run NOVA or calculate energetic-particle growth rates.
+NOVA-C, surrogate modeling, and digital-twin analysis. An optional MPI driver
+now runs existing serial NOVA continuum executables in isolated project
+directories. Eigenmode and growth-rate calculations remain separate workflows.
 
 - Production: `scripts/sort_shot_mixed.py --method rules`, frozen
   `tae_rules_production_v13` (ruleset v25, grouped features v26, severity v2).
@@ -26,6 +27,91 @@ run NOVA or calculate energetic-particle growth rates.
 See [getting started](getting_started.md), [platform setup](platforms.md),
 [rule configurations](../configs/rules/README.md), and the
 [script reference](../scripts/README.md) for commands and gate definitions.
+
+## Surrogate roadmap and legacy-seed priority
+
+On November 17 the user supplied the October 14 long-term plan:
+
+1. Use the approximately 9K selected old-NOVA modes from the 198 processed
+   cases as an up-down-symmetric seed dataset. Alvaro's requested per-case/n
+   inputs and targets have already been discussed and the first subset sent.
+2. Recalculate the same equilibria with Pablo's superNOVA, which the user
+   describes as parallel, more efficient and free of the up-down-symmetry
+   restriction, with an improved workflow.
+3. Apply the TAE classifier to separate numerical/continuum modes from the
+   new output, checking its applicability to the superNOVA representation.
+4. Retrain the surrogate on superNOVA frequencies and mode structures.
+5. Expand equilibrium coverage through active learning and additional
+   superNOVA runs; a connection to Julien's DATAMAK for new NSTX-U cases
+   is under consideration, not yet arranged.
+
+For the current seed, prioritize reconstructing the overwritten continua
+with their historical settings and checking agreement against available
+historical evidence. A comprehensive old-NOVA convergence campaign is not
+a prerequisite for this provisional surrogate dataset. Modest documented
+convergence limitations are acceptable at this stage; preserve existing
+invalid-input holds and review metadata. Distinguish reconstructed continua
+from recovered original bytes and from newly converged calculations.
+Any expanded export must record that provenance and use a new version,
+preserving Alvaro's delivered subset. Convergence and reproducibility checks
+should be built into the superNOVA recalculation stage. The user subsequently
+authorized continuum reconstruction in the project directory and a reusable
+MPI driver. DiTw write access was confirmed on November 17 after the owner's
+ACL update; ask the user before any future publication there. No HDF5 change is part of
+this reconstruction task.
+
+### November 17 MPI reconstruction
+
+`scripts/run_nova_continuum_mpi.py` reuses the scheduling pattern of
+`FRC_AI/scripts/build_frcin_atlas_mpi.py`: one coordinator and independent
+serial workers, checkpointed results, per-task errors, and verified resume.
+The shared worker `src/nova_continuum_run.py` copies and hashes each case's
+`mapdsk`, `mpout1`, `transp.dat`, and `gocont_tr`; retains every attempt; checks
+runtime settings and structural outputs; and preserves native values.
+
+The target manifest contains 638 affected case/n scopes across 80 cases,
+covering the 4,426 selected modes whose continua were overwritten. Every
+case-root `outcon` retains `lmin=-3`, `lmax=108`, `iden=4`, `ksound=1`,
+`gamma=1.66666666`, `ns=3,201,1`. These settings and their source hashes are
+recorded in `research_archive/continuum_reconstruction_20261117/`.
+
+Flux pilot job 2557343 completed all ten n values for E204645A16t015 in
+26.6 seconds with ten workers. All 84 saved October mode-centroid boundary
+pairs agree within 4.784e-11 relative error; N1/N2/N5/N10 are byte-identical
+to the earlier controlled reconstructions. A verified resume skipped all ten
+without rerunning the producer. Twelve focused execution and continuum-loader
+tests passed. Full Flux job 2557348 completed all 638 tasks with 32 workers,
+zero failures, and exit code 0 in 557 scheduler seconds (555.7 seconds in
+the driver), writing to
+`research_archive/continuum_reconstruction_20261117/restored/cases/<shot>/N<n>/`.
+
+The full historical comparison verified every published output hash. Both
+boundaries match all 3,066 original October centroid measurements within
+4.784e-11 relative error. For the 1,360 modes already mismatched in October,
+all 1,372 original crossing witnesses (645 modes, 135 of 179 scopes) are
+available again and agree within 5.851e-12 relative error. The other 44
+scopes have no such crossing witnesses; matching recorded settings is not
+a pointwise numerical check there. None of the 459 available original
+full-file hashes matches the reconstructed bytes. Preserve the distinction
+between numerical agreement at historical samples and byte-exact recovery;
+do not reuse original input fingerprints for these files.
+
+`restored/validation_summary.json` and the three `historical_*_comparison.csv`
+files retain these results; batch/attempt receipts retain settings, copied
+inputs, executable hashes, and outputs. The already delivered complete-case
+HDF5 still has SHA-256
+`72c45e665fd2027aa2ba41fecb96201d3104ed969e428da60fef965fa8e60c40`.
+Next: use explicit reconstructed-continuum provenance in a new export version
+when requested. Existing invalid-input holds and selection/review decisions
+remain in force. DiTw publication still requires separate user approval.
+
+Following the owner-run ACL instructions, a November 17 host permission
+recheck confirmed effective `ebelova` write access to DiTw, the sampled
+E204645A16t015 case and N1 directory, and its existing `datcon1` file.
+The inspected directories have both access and default `user:ebelova:rwx`
+entries; the file has effective `user:ebelova:rw-`. All ancestors remain
+traversable. This was an ACL/access check, not a write test or an exhaustive
+audit of all descendants. The assistant made no DiTw permission or data changes.
 
 ## Installed results and shared catalog
 
@@ -132,6 +218,68 @@ these roles separate and follow the [platform guide](platforms.md).
 
 ## Recent work and next steps
 
+- **Continuum parallel-execution reference:** the user proposed reusing
+  `FRC_AI/scripts/build_frcin_atlas_mpi.py` for embarrassingly parallel
+  continuum recalculation. GitHub could not serve the supplied link through
+  the available connector/web access; inspected the clean local copy at
+  `/u/ebelova/FRC_AI/scripts/build_frcin_atlas_mpi.py` (checkout c89b2e9,
+  file SHA-256 9be65b1847b17d3affc2a4ace441931f09ce75d3235f68d786fdd8a8208d088e).
+  It uses mpi4py.futures.MPICommExecutor with rank 0 coordinating independent
+  serial workers, root-only ordered CSV/checkpoint writes, resume validation
+  and per-task failure reporting. The NOVA adaptation uses one (case, n_tor)
+  per independent working directory; FRC-specific extraction/retry logic is
+  not applicable. Eleven ranks provide ten workers for a full n=1..10 shot.
+  The pilot measured 26.6 seconds for all ten, versus roughly 15 seconds per
+  n in earlier serial diagnostics. A project-local environment at
+  `research_archive/.nova_mpi_env` contains mpi4py 4.1.2 and uses Flux module
+  `openmpi/4.1.6-gcc-13.2.0`. See the reconstruction section above for
+  execution and validation status.
+- **November 17 Tommaso workflow reference received and inspected:** the user
+  supplied `/u/tbarberi/NOVA_runs/NOVA_workflow`. Read the current (non-OLD)
+  `transp_dat/README`, `bash_scripts/READMEsh`, `python_scripts/READMEpy` and
+  principal setup/run wrappers. They document TRANSP extraction -> q-solver
+  -> mapping -> continuum -> NOVA eigenmodes -> NOVAK -> RBQ. `makeNOVA.sh`
+  prepares/rebuilds the five stages using Nikolai's sources; `runst.scr`
+  supports broad, targeted and detailed frequency scans with `goin`/`gost`.
+  `run_gotae3.py` links an eigenfunction, opens `NOVAK_param` for editing,
+  runs `gotae3_dev` and organizes output. `run_boost_pipeline.py` checks
+  `pk=0.5` and prepares the RBQ inputs/database; the README notes that NOVAK
+  and RBQ share object filenames and require separate/clean builds.
+  `prepare_clichlmax.sh` keeps compiled minm_1=-3 and sets maxm_1 to rounded
+  n_max*TRANSP-q_edge+5; this is an initial basis choice, not a convergence
+  certificate or a check of the final mapped q. `prepare_gridparam.sh`
+  takes ndat from TRANSP and fixes nmbrgrd=201, mnths0=256. Equilibrium beta
+  matching still involves manual p_0 adjustment according to the README.
+  These wrappers are interactive and site-specific; use as references for
+  future isolated validation, not an already validated unattended pipeline.
+  Current continuum wrapper leaves unnumbered `datcon` in the working
+  directory; the NOVAK ntor mismatch warning occurs after execution, so
+  future automation must verify inputs and preserve outputs explicitly.
+  No external scripts were run or changed. This does not expand the current
+  execution status beyond the validated continuum diagnostics.
+- **November 17 continuum discrepancy traced and reproduced:** isolated
+  continuum-only runs identify changed physical poloidal-harmonic limits as
+  the cause of the reported >1% changes (32 modes / 18 case-n scopes). The
+  older continuum used m=-3..108; the NOVA-C launcher regenerates `datcon`
+  with m_min=0 and smaller per-n m_max, capped at 100. Using a common retained
+  executable per case and copied equilibrium/TRANSP inputs, old settings
+  recover October 29 boundaries for all 61 selected modes in these scopes
+  within 4.79e-11 relative; new settings reproduce all 18 November 16 datcon
+  backups byte-for-byte. Both use the NOVA thermal-NH continuum density;
+  NOVA-C's later NMINI_H prescription is a separate discrepancy.
+  In E204645A16t015/N10, changing only m_max=100 to 108 recovers the 46.98%
+  upper-boundary shift at r=0.8417084, where nq=99.65. The 46.98% uses
+  existing tail repair; the raw shift there is 67.23%. Low-n tests also show
+  a significant effect from dropping negative m. Increasing m_max from 108
+  to 166 changes this example's upper boundary by another 1.24%, so recovery
+  of historical settings is not proof of convergence. Diagnostic scripts,
+  independent input copies, source snapshots, receipts, comparisons and a
+  plot are in `research_archive/continuum_cause_20261117/`; see the
+  [source map](surrogate_input_sources.md). Production inputs, selections and
+  delivered HDF5 files remain unchanged. Follow the legacy-seed restoration
+  priority in the surrogate roadmap above; reserve comprehensive convergence
+  work for the superNOVA recalculation. This audit does not validate all
+  other scopes or recover historical hashes.
 - **November 16 complete-case subset sent to Alvaro:** the user confirmed
   sending `nova_surrogate_v1_complete_cases.h5` to Alvaro. Preserve this
   delivered file as the baseline; publish any expanded dataset under a new
@@ -200,6 +348,17 @@ these roles separate and follow the [platform guide](platforms.md).
   source-pair preflight and independent checks stay with the artifact.
   Next: reconcile changed inputs before expanding verified K/mode coverage;
   lobe-count definition and future physical-m amplitude export remain open.
+- **November 17 density provenance clarification:** rechecked the source
+  mass sums and all 199 populated TRANSP inputs. Every case supplies constant
+  `AIMPJ=12`, `XZIMPJ=6`; the reconstruction uses `AIMPJ*smooth(NIMP)` with
+  proton-mass units, then extrapolates the complete mass sum to the axis.
+  The old impurity-mass-13 comment is obsolete; that term is inactive in
+  both sources. All TRANSP hashes and the NOVA source hashes are unchanged.
+  NOVA-C's current source differs from the audited backup only by correcting
+  the XZIMPJ comment from A to Z. The thermal `NH` versus `NMINI_H` evidence
+  and prior 89-case diagnostic agreement remain applicable; historical
+  executable identity is still not established. See the
+  [source map](surrogate_input_sources.md) for source locations and details.
 - **November 16 density source selected:** the user chose reconstructed
   NOVA `iden=4` axial mass density for all 199 populated surrogate cases;
   `rho_axis_kg_m3` is already saved in the November 15 scalar audit. Use the

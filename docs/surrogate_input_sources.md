@@ -102,6 +102,20 @@ The inactive `NT`, `NFI`, `BDENS_T`, and `NHE3` blocks explicitly contain zeros
 in every case. No missing species block was silently filled. All processed
 density knots and mapped pressure samples are positive.
 
+**November 17 impurity-mass clarification:** all 199 populated cases have
+`AIMPJ=12` and `XZIMPJ=6` at every TRANSP radial point; all 199 `transp.dat`
+hashes still match the November 15 audit. The reconstruction uses the supplied
+`AIMPJ` profile, not a separately chosen impurity mass or an A-from-Z rule.
+Thus the impurity contribution in this database is `12*smooth(NIMP)` in
+proton-mass units before extrapolating the complete mass sum to the axis.
+This follows the code's integer-mass convention (`m_imp=12*m_proton`), not
+an exact atomic/isotopic mass conversion. It describes the supplied effective
+impurity model, without independently establishing the plasma composition.
+Both inspected sources retain an obsolete comment about impurity mass 13;
+the corresponding `13*dzdat` term is commented out. The active term is
+`aimpj(i)*dzdat(i)` in `Equil/mhdidin_flux.f:4276` and
+`NOVAK3/tae_flux.f:7226`. `XZIMPJ` is read but is not used in this mass term.
+
 The density audit agrees with compiled original `smooth`, `extrap1`, and
 `boundtoc`/`fun4` Fortran helpers across all 199 cases: maximum differences
 are 1.06e-22 kg/m^3 in density and 1.23e-15 in normalized poloidal flux.
@@ -279,7 +293,91 @@ the previous NOVA density reconstruction is unchanged. Source hashes are
 retained, without claiming identity of every historical executable. No NOVA
 inputs, selections, normalization conventions, or HDF5 exports were changed.
 
+On November 17, the NOVA sources still matched their audited hashes, and
+all 89 comparison TRANSP inputs were unchanged. The current NOVA-C source
+hash differed, but its adjacent `tae_flux.f~` exactly matched the November 16
+audit hash. Their sole difference is a comment correction at line 7060:
+`XZIMPJ` is zonal-average **Z**, rather than **A**. The executable statements,
+including the hydrogen and impurity mass terms, are unchanged.
+
+## Continuum changes traced to poloidal-harmonic limits (November 17)
+
+The NOVA-C workflow invokes a separate `gocont_tr` continuum calculation
+before running `gotae3`. Its `Equil/contx_flux.f` density sum at lines
+2243–2245 includes thermal `NH`, as does NOVA initialization. It does not
+use the `NMINI_H` mass sum in `NOVAK3/tae_flux.f`. Thus the NOVA-C central
+density difference above does not explain these regenerated datcon changes.
+The normalized squared continuum eigenvalues contain the factor
+`r2*q1*q1*rho0/rhoms` (`contx_flux.f:1379–1382`); a uniform density-scale
+change cancels in this normalized ratio. Physical frequencies at fixed B and
+geometry scale as rho^-1/2, but axial density alone cannot bound a change
+in the full normalized density shape.
+
+The retained original `runcontrange.scr`, root `outcon`, and example older
+`plotcontN10` establish the historical range m=-3..108. New `N*/outcon`
+files use m_min=0 and smaller per-n upper limits. In E204645A16t015,
+`runStabNovakBeams.py:73–74` sets `lsub=min(int(n*qa),100)` with script
+parameter `qa=12`, whereas the mapped q_lcfs is about 16.349. This is an
+input-script parameter, not a read of the mapped edge q. The N10 launcher
+passes `lmax=100` and calls `gocont_tr` at lines 65 and 72 respectively.
+In the solver, `lmin`/`lmax` set the actual matrix basis
+(`contx_flux.f:1280–1301`), not just a plotting range. The datcon writer
+selects positive eigenvalues from that truncated spectrum (lines 117–137).
+
+Controlled runs in independent directories cover all 18 scopes containing
+the 32 modes with >1% boundary changes in the October 29/November 16 audit.
+For each scope, a common retained executable and identical copies of
+`mapdsk`, `mpout1`, and `transp.dat` were used with old/new harmonic settings
+and the corresponding recorded gamma decimal precision. Restoring the old
+settings recovers both October boundaries for all 61 selected modes in
+these scopes within 4.79e-11 relative. New settings reproduce all 18 frozen
+November datcon files byte-for-byte. Exported q profiles are identical
+between the two input ranges. Separate runs changing one limit with gamma
+held fixed establish the harmonic-range effects directly.
+
+For E204645A16t015/N10 at r=0.8417083979 (nq about 99.65), the upper boundary
+is 4.848143081 with m=0..100 and 3.298538479 with m=0..108; the historical
+value is 3.298538479 (46.9785% smaller-denominator relative change).
+These centroid values use the existing continuum preprocessing. The new
+raw upper boundary interpolated at the same radius is 5.516104181, a
+67.2287% change; the existing monotonic-tail repair holds the new terminal
+rise at its r=0.84 value, 4.848143081. The repair reduces the apparent
+discrepancy and does not create it. The comparison plot distinguishes the
+raw and repaired new upper curves.
+Changing m_min to -3 at m_max=108 has negligible effect there. At low n,
+negative m can matter: for E203981A01t022/N1 at r=0.5370464, the upper
+boundary is 3.700051574 with m=0..10, 3.630915986 with m=-3..10,
+3.693851555 with m=0..108, and 3.624761457 with m=-3..108.
+
+Restoring historical settings is not a convergence certification: in the
+N10 example, m=0..166 gives 3.257479829, another 1.24% below the m_max=108
+result at the selected location. No range here is asserted to be converged
+over the entire radius, and no mode reclassification or production/HDF5
+replacement was performed. The 1,360 previously mismatched modes and other
+scopes were not included in this controlled experiment.
+
+Reproduction scripts, copied inputs/executables, input/output SHA-256
+receipts, source/script snapshots, full-profile byte checks and centroid
+comparisons are in `research_archive/continuum_cause_20261117/`.
+`reproduction_summary.json` and `reproduction_comparison.csv` retain the
+numerical results; `harmonic_range_comparison.png`/`.pdf` illustrate the
+large-change example. These are diagnostic reconstructions, not substitutes
+for missing historical raw-file hashes.
+
 ## Preferred sources and checks
+
+The subsequent November 17 MPI reconstruction expanded the historical-setting
+calculation to all 638 affected case/n scopes in 80 cases. All executions
+succeeded. Both October centroid boundaries agree for all 3,066 modes with
+available original October measurements (maximum relative residual
+4.784e-11). All 1,372 original crossing witnesses for the earlier-overwritten
+group agree within 5.851e-12, spanning 645 modes in 135 of that group's 179
+scopes. These local checks do not establish full-profile identity. None of
+the 459 available original raw-file hashes matches the reconstructed bytes;
+use new input hashes and explicit reconstruction provenance. Results and
+receipts are under `research_archive/continuum_reconstruction_20261117/`;
+see [project state](project_state.md#november-17-mpi-reconstruction).
+The delivered HDF5, source DiTw files, and selection decisions were not changed.
 
 | Quantity | Source | Interpretation / checks |
 | --- | --- | --- |

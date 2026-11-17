@@ -3,8 +3,10 @@
 Tools for selecting physically useful Alfvén eigenmodes from NOVA ideal-MHD
 output and filtering numerical solutions and duplicates. The selected modes
 support downstream NOVA-C analysis, surrogate modeling, and NSTX-U digital
-twin workflows. This repository processes existing NOVA output; it does not
-run NOVA or calculate energetic-particle growth rates.
+twin workflows. The classifier processes existing NOVA output. An optional
+[MPI continuum runner](scripts/README.md#run_nova_continuum_mpipy) reconstructs
+continua with existing case executables in isolated output directories;
+eigenmode and energetic-particle growth-rate calculations are separate workflows.
 
 **The recommended production workflow is deterministic rules.** Random Forest
 (RF), convolutional neural networks (CNNs), and the combined RF+CNN method
