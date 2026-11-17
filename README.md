@@ -118,6 +118,7 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Identify a frozen rules configuration | [Rules configurations](configs/rules/README.md) |
 | Share the common accepted-mode list | [12-column catalog](catalogs/README.md) and [CSV](catalogs/accepted_modes.csv) |
 | Locate equilibrium inputs for the NOVA surrogate | [Surrogate input source map](docs/surrogate_input_sources.md) |
+| Export the scalar/continuum/mode surrogate dataset | [HDF5 schema and usage](docs/surrogate_hdf5.md) |
 | Use or retrain RF/CNN models | [Model inventory](models/README.md) and [training instructions](scripts/README.md#cnn-model-scripts) |
 | Understand training labels and archived datasets | [Training-label documentation](training_labels/README.md) |
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |

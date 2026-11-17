@@ -29,6 +29,7 @@ have explicitly started Bash.
 | Sort a new shot with current rules | [`sort_shot_mixed.py`](#sort_shot_mixedpy) |
 | Make a compact CSV for sharing | [`compact_mode_csv.py`](#compact_mode_csvpy) |
 | Export the common accepted-mode catalog | [`build_accepted_catalog.py`](#build_accepted_catalogpy) |
+| Export surrogate equilibria, continua and mode scalars to HDF5 | [`export_nova_surrogate.py`](../docs/surrogate_hdf5.md) |
 | Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |
 | Understand duplicate severity ranking | [Normalized severity](#normalized-gate-severity) and [deduplication](#final-good-production-deduplication) |
 | View modes or apply manual corrections | [Viewer](#view_modes_csvpy), [labeler](#label_modes_fastpy), [adjudication](#manual-adjudication) |

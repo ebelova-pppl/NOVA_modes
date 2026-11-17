@@ -1,11 +1,14 @@
 # NOVA surrogate: equilibrium input sources
 
 Discovery date: November 10, 2026; database-wide corrections confirmed by the
-user on November 13; scalar availability audited November 15. Scope:
+user on November 13; scalar availability audited November 15 and saved
+density profiles and NOVA-C central-density diagnostics checked November 16. Scope:
 frequencies and mode structures for the accepted TAE database. Paths below
 are relative to `$NOVA_DITW_ROOT/SHOT`.
-This source map records the confirmed conventions and the discovery evidence;
-the surrogate training-data loader has not yet been implemented.
+This source map records the confirmed conventions and the discovery evidence.
+The [HDF5 exporter and schema](surrogate_hdf5.md) implement the scalar,
+continuum and mode-moment dataset with both `r` and `psi_N`, using reconstructed
+NOVA ion mass density. Mode amplitudes and signed lobe counts remain deferred.
 
 ## Conventions established with the user
 
@@ -28,6 +31,18 @@ the surrogate training-data loader has not yet been implemented.
 - The `iden=4` density profile is built from TRANSP ion species, including
   beam ions and impurities, with smoothing of selected profiles, axis
   normalization, and interpolation in normalized poloidal flux.
+  The November 16 NOVA-C output check below identifies a thermal-hydrogen
+  difference between that NOVA prescription and the inspected NOVA-C sum;
+  retain their normalization scales separately.
+- **Density source decision, November 16:** the user selected reconstructed
+  NOVA `iden=4` axial mass density for the surrogate across all 199 populated
+  cases. These values are already saved as `rho_axis_kg_m3` in the November
+  15 scalar audit. Use the same NOVA reconstruction for the normalized
+  density profile and planned `rho(psi_N=0.5)/rho_axis` feature. NOVA-C output
+  remains comparison evidence; its completion is not a dependency for the
+  surrogate. This choice is consistent with the inspected NOVA continuum/
+  mode density path and the user's confirmed database convention, without
+  asserting verification of every historical executable.
 - `qa`, `pa`, and `ga` agree with the corresponding mapped quantities in
   `mapdsk` and `mpout1` and are the profiles used by NOVA after q-solver and
   mapping. The user confirmed this and the density prescription for the
@@ -142,10 +157,127 @@ and results are `q_axis_check.py`, `q_axis_comparison.csv`, and
 All 199 NetCDF files share the same variable schema and contain no mass-
 density field. The inspected NOVA initialization calls `datin_new` for
 `iden=4` to construct density from TRANSP, separately from reading mapped
-equilibrium data. Reconstruct the species sum for export and retain its
-axis scale before normalization. The existing audit already saves
+equilibrium data. The November 16 check below additionally establishes a
+saved normalized profile in `N<n>/otaep` for part of the database. Retain
+the physical axis scale from the species sum separately. The existing audit saves
 `rho_axis_kg_m3` and `rho_peak_knots_kg_m3`; it does not yet export the full
 NOVA-interpolated density profile.
+
+## Saved RHOPRF profiles in otaep: November 16 audit
+
+The user identified `N<n>/otaep`, under the exact heading `RHOPRF profile`,
+as a saved density-profile source, and subsequently confirmed that these
+files are produced by NOVA-C growth-rate calculations. Only 89 cases have
+been processed with NOVA-C so far. This corrects the earlier implication
+that every normalized profile must be reconstructed from TRANSP: the mapped
+NetCDF files lack density, but the run output can contain it.
+
+A bounded scan of all inventory cases, N1 through N10, completed at
+12:42 EST on November 16. The 199 populated cases have 1,990 N directories;
+the remaining inventory entry, `nstxu_202806`, is empty.
+
+| Check | Result |
+| --- | --- |
+| Active `gridparam: nmbrgrd` | 201 in all 1,990 N directories; commented alternatives ignored |
+| Exact `otaep` files found | 761 |
+| Complete `RHOPRF profile` blocks | 749, one per file, all 201 values |
+| `otaep` files without a profile | 12 header-only files, each 333 bytes |
+| N directories without `otaep` | 1,229 |
+| Cases with at least one complete profile | 89 of 199 populated cases |
+| Cases with multiple complete copies | 88; all copies agree exactly at printed precision |
+| Cases with all ten complete copies | 23 |
+| Case with only one complete copy | `nstxuE204118F01t035` |
+| Populated cases with no complete copy | 110; listed in the coverage CSV |
+
+All 749 profiles are finite and positive, start at 1.0, and span a combined
+range 0.116 to 1.15. Their `NNSURF` headers match the active `gridparam`
+dimension, and their `NTOR` headers match their directories. Maximum
+within-case difference between saved profile samples is zero. An independent
+parser rechecked all 749 arrays against the saved extraction.
+
+The inspected `NOVAK3/tae_flux.f` sets `rho0=rhoprf(1)` at line 3012 and
+divides `rhoprf(i)` by it at line 3084. `printprf` writes `RHOPRF profile`
+with format `10E12.3` at lines 3279–3284. Thus this block supplies normalized
+mass-density shape, approximately three significant digits per sample,
+not physical density in kg/m^3. The physical axis scale remains a separate
+quantity. Exact agreement of printed copies does not imply full-precision
+identity of their internal arrays.
+
+The audit preserves surface ordering without inventing a radial coordinate
+from the element count. The inspected source evaluates density on
+`rgrid**2` (`tae_flux.f:6025–6034`); eventual export must attach the matching
+run grid. No interpolation to psi_N=0.5, complete 13-parameter export, or
+HDF5 generation was performed. Saved-profile/current-input correspondence
+and existing mode/continuum holds remain separate from this consistency check.
+
+Evidence is in the ignored local directory
+`research_archive/otaep_density_audit_20261116/`: `file_audit.csv`,
+`shot_coverage.csv`, `rhoprf_profiles.npz`, `summary.json`, `validation.json`,
+and the bounded reproduction script `audit.py`. The CSVs include file and
+profile hashes. NPZ rows map to the per-file `profile_index` and carry shot
+and n identifiers. Coverage is a dated snapshot: two additional header-only
+files appeared between the preliminary inventory and the final scan.
+
+## NOVA-C central density and Alfvén speed in outb outputs
+
+Following the user's pointer, a second November 16 audit searched
+`N1`–`N10/outb_*` within the 200 inventory cases. The scan ran from
+14:23 to 14:29 EST. It found the exact diagnostic
+`the alfven speed and center density are:` in **5,338 output logs covering
+all 89 NOVA-C cases**. Each successful file has one two-value diagnostic.
+Both values are identical across all available modes and n for each case.
+Another 34 output files lack the diagnostic; 4,895 empty lock markers were
+recorded separately. No file changed while being read. Coverage exactly
+matches the 89 cases with saved `otaep` density profiles.
+
+The inspected writer is `NOVAK3/tae_flux.f:7534–7540`:
+`va=2.18e11*b0/sqrt(rho0)`, followed by `write(*,'(2e16.7)') va,rho0`.
+Here B0 is in gauss, va is in cm/s, and rho0 is the code's mass-weighted
+density expressed in proton-mass units per cm^3. Convert with
+`va_m_s = 0.01*va` and `rho_kg_m3 = rho0*m_proton_kg*1e6`.
+The second number is not electron number density or SI mass density.
+It is the pre-normalization scale used for NOVA-C's `RHOPRF`.
+
+The user's example occurs in `nstxuE204708F03t017`, including
+`N2/outb_egn02w.1122E+02_gc062_e09:1294`:
+
+```text
+the alfven speed and center density are:
+  0.2622642E+09   0.2953330E+14
+```
+
+This gives va = 2.622642e6 m/s and NOVA-C central mass density
+4.9398045e-8 kg/m^3 using the same proton-mass constant as the prior audit.
+
+**NOVA and NOVA-C central-density prescriptions differ in the inspected
+sources and these outputs.** NOVA `iden=4` uses smoothed thermal hydrogen
+`NH` (`Equil/mhdidin_flux.f:4274–4277`), whereas NOVA-C uses `NMINI_H`
+through `dhmindat` (`NOVAK3/tae_flux.f:7029–7031`, `:7222–7226`) in that mass
+term. `NMINI_H` is zero in all 89 audited cases. Replacing the processed NH
+contribution by NMINI_H reproduces **all 89 logged densities to their seven
+significant printed digits**. The largest residual before output rounding
+is 2.69e-7 relative. The logged Alfvén speeds also match the source formula
+using the saved field scale within 3.77e-7 relative.
+
+Consequently, the logged NOVA-C density is lower than the prior NOVA
+reconstruction by 0.000276%–0.451813%, with median 0.282130%. The largest
+difference is `nstxuE204708A06t017`. Keep `rho_axis_novac` and the NOVA
+`iden=4` scale separate; do not silently replace one with the other.
+The NOVA-C thermal-H treatment should be checked with the code runner before
+adopting its scale for NOVA frequency normalization. Full radial-profile
+agreement across the two codes was not established by this central-value
+audit, so `otaep` should not yet replace the NOVA profile without that check.
+The subsequent user decision is to use reconstructed NOVA density for the
+surrogate; the NOVA-C hydrogen question does not block that choice.
+
+The local ignored directory `research_archive/outb_density_audit_20261116/`
+contains `file_audit.csv`, all extracted pairs in `diagnostic_values.csv`,
+the per-case `shot_density.csv` with raw/SI NOVA-C values and both density
+recipe comparisons, `summary.json`, `validation.json`, and `audit.py`.
+All 89 reference logs were independently reparsed and their hashes checked;
+the previous NOVA density reconstruction is unchanged. Source hashes are
+retained, without claiming identity of every historical executable. No NOVA
+inputs, selections, normalization conventions, or HDF5 exports were changed.
 
 ## Preferred sources and checks
 
@@ -161,6 +293,8 @@ NOVA-interpolated density profile.
 | Geometric center and axis | `mapdsk.cdf: X0`, `Xmag`, `Zmag`; LCFS contours `xinf`, `zinf` | Validate `X0` against the midpoint of the inboard/outboard LCFS intersections with the equilibrium midplane. Global `Xmin`, `Xmax` are not the general definition of R_v. Preserve the magnetic-axis location separately. |
 | Scalar equilibrium summary | Final named blocks in `outequ` | Includes `q-zero`, `q-edge`, `xmagax`, `x-maj`, `arad`, `a-ratio`, `dness`, and several distinctly defined betas. Match labels, not fixed line numbers. |
 | Dimensional vacuum-field scale | `transp.dat: BZXR` | Header gives tesla-cm. The vacuum toroidal-field magnitude at midplane `R_v` in meters is `abs(BZXR)/(100*R_v)`; retain the signed field separately. |
+| Saved NOVA-C normalized mass-density profile | `N<n>/otaep`, `RHOPRF profile` block | 201 samples where present; axis-normalized, printed to approximately three significant digits. November 16: 89 cases covered; all available copies within each case agree. Attach the matching radial grid. Cross-code agreement with NOVA remains to be checked given the NH/NMINI_H difference above. |
+| Logged NOVA-C axial density and Alfvén speed | `N<n>/outb_*`, two numbers after `the alfven speed and center density are:` | Speed in cm/s; density in proton-mass units per cm^3. 89 cases covered with exact within-case agreement at printed precision. Keep this scale separate from the NOVA iden=4 scale. |
 | Density and composition | `transp.dat`: ion-species and beam densities, `NIMP`, `AIMPJ` | Use the confirmed species mass sum and reproduce the `iden=4` smoothing, endpoint treatment, axis normalization, and radial mapping. NE alone does not specify this mass density. |
 | Original profile coordinates | `transp.dat: X`, `XB`, `PLFLX`, `TRFLX` | Center and boundary grids differ. Headers distinguish them. Do not identify TRANSP X with NOVA sqrt(poloidal flux). |
 | Original shaping / asymmetry | TRANSP `RMC*`, `RMS*`, `YMC*`, `YMS*`, `ELONG`, `TRIANG`, `TRIANGL` | Preserve for future superNOVA work. Current NOVA labels belong to the mapped symmetric geometry, not automatically to the original asymmetric reconstruction. |
@@ -229,10 +363,14 @@ axis/edge, and spline the normalized mass-density profile versus normalized
 poloidal flux. The active mass sum includes hydrogen, deuterium, tritium,
 beam ions, helium, and impurity mass. The electron-only density prescription
 is commented out. On November 13 the user confirmed this species-based
-treatment for all database cases. The surrogate loader must reproduce it;
-selecting between electron-only and species-based density is no longer an
-open scientific question. Both the normalized radial profile and the axial
-mass-density scale are needed to retain the normalization information.
+treatment for all database cases. Saved NOVA-C normalized profiles are now
+verified in `otaep` for 89 cases, with NOVA-C axial scales available in
+`outb_*`. The thermal-H difference documented above must be resolved before
+substituting those NOVA-C profiles/scales for NOVA inputs. Reconstruction
+remains available for missing profiles and greater numerical precision;
+it follows the confirmed NOVA species-based treatment. Selecting between
+electron-only and species-based density is no longer an open scientific
+question. Both normalized shape and axial mass-density scale are needed.
 
 Rotation also needs a per-case check. Five mapped cases have `imach=1` and
 nonzero `pM`: `nstx_135388`, `nstxuG142301E34`, `nstxuG142301E77`,
