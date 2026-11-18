@@ -29,13 +29,15 @@ from input_validity import load_input_validity_registry
 from mode_features import radial_centroid, radial_width
 from nova_equilibrium import PARAMETERS, load_equilibrium
 from nova_mode_loader import load_mode_from_nova
+from nova_surrogate_provenance import ConfirmedEmptyRegistry, ReconstructionRegistry
 from tae_rule_io import input_fingerprint, sha256_file
 
-SCHEMA = 'nova-surrogate-v1'
+SCHEMA = 'nova-surrogate-v3'
 STR = h5py.string_dtype('utf-8')
 MODE_NUMBERS = ('omega', 'r_loc', 'r_width', 'psi_N_loc', 'psi_N_width')
-MODE_STRINGS = ('mode_id', 'path', 'source_root', 'input_fingerprint',
+MODE_STRINGS_V1 = ('mode_id', 'path', 'source_root', 'input_fingerprint',
                 'family', 'review_status', 'rule_config', 'manual_override')
+MODE_STRINGS = MODE_STRINGS_V1 + ('selection_input_fingerprint', 'mode_sha256', 'pair_provenance')
 
 
 def put(group, name, data, units=None, description=None):
@@ -65,8 +67,8 @@ def mode_moments(mode):
     return result
 
 
-def resolve_pair(row, roots):
-    """Accept only the exact mode/continuum pair used by the saved selection."""
+def resolve_pair(row, roots, reconstruction=None, *, zero_selection=False):
+    """Prefer the saved exact pair; allow an explicitly audited reconstruction."""
     key = row['mode_key']
     parts = Path(key).parts
     if len(parts) != 3 or any(p in ('.', '..') for p in parts) or Path(key).is_absolute():
@@ -83,11 +85,18 @@ def resolve_pair(row, roots):
             continue
         if input_fingerprint(path, continuum) == row['input_fingerprint']:
             return label, path
-    return None
+    return reconstruction.resolve(row, roots, zero_selection=zero_selection) if reconstruction else None
+
+
+def pair_continuum(resolved, ntor):
+    return resolved[2] if len(resolved) == 3 else resolved[1].parent/f'datcon{ntor}'
 
 
 def load_selected(row, catalog_row, resolved, nr):
-    label, path = resolved
+    label, path = resolved[:2]
+    continuum = pair_continuum(resolved, int(row['ntor']))
+    reconstructed = len(resolved) == 3
+    fingerprint = input_fingerprint(path, continuum) if reconstructed else row['input_fingerprint']
     mode, omega, _, ntor = load_mode_from_nova(path)
     if mode.shape[1] != nr or ntor != int(row['ntor']):
         raise ValueError(f'Mode grid/n differs from equilibrium: {path}')
@@ -96,11 +105,13 @@ def load_selected(row, catalog_row, resolved, nr):
         raise ValueError(f'Mode frequency differs from accepted catalog: {path}')
     record = dict(omega=omega, **mode_moments(mode), mode_id=path.name,
                   path=row['mode_key'], source_root=label,
-                  input_fingerprint=row['input_fingerprint'])
+                  input_fingerprint=fingerprint, selection_input_fingerprint=row['input_fingerprint'],
+                  mode_sha256=sha256_file(path),
+                  pair_provenance='reconstructed_continuum' if reconstructed else 'exact_saved_pair')
     for key in ('family', 'review_status', 'rule_config', 'manual_override'):
         record[key] = catalog_row[key]
     # Recheck after reading; these source trees can be updated by ongoing runs.
-    if input_fingerprint(path, path.parent/f'datcon{ntor}') != row['input_fingerprint']:
+    if input_fingerprint(path, continuum) != fingerprint:
         raise ValueError(f'Input changed while reading: {path}')
     return record
 
@@ -133,7 +144,7 @@ def zero_selection_anchors(path, empty_n):
 
 
 def write_scope(group, *, ntor, nr, rows, catalog, summaries, roots,
-                hold, equilibrium_ok, anchors):
+                hold, equilibrium_ok, anchors, reconstruction=None, confirmed_empty=None):
     """Keep continuum availability separate from verified selected-mode labels."""
     put(group, 'n_tor', ntor)
     r = np.linspace(0, 1, nr) if nr else np.array([], dtype=float)
@@ -155,14 +166,14 @@ def write_scope(group, *, ntor, nr, rows, catalog, summaries, roots,
     else:
         if int(summaries[ntor]['n_final_good']) != len(rows):
             raise ValueError(f'{group.name}: selected-list count differs from n summary')
-        matches = [resolve_pair(row, roots) for row in rows]
+        matches = [resolve_pair(row, roots, reconstruction) for row in rows]
         if any(m is None for m in matches):
             state = 'unmatched_input_pair'
             issues.extend('No saved-fingerprint match: '+row['mode_key']
                           for row, match in zip(rows, matches) if match is None)
         elif rows:
             # One n scope must use a single continuum version.
-            digests = {sha256_file(p.parent/f'datcon{ntor}') for _, p in matches}
+            digests = {sha256_file(pair_continuum(match, ntor)) for match in matches}
             if len(digests) != 1:
                 state = 'mixed_continuum_versions'
                 issues.append('Selected modes resolve to different continuum versions')
@@ -174,15 +185,18 @@ def write_scope(group, *, ntor, nr, rows, catalog, summaries, roots,
             # An empty selected list is a label only with an installed n summary
             # and a saved classified-input pair tying it to this continuum.
             for row in anchors.get(ntor, []):
-                source = resolve_pair(row, roots)
+                source = resolve_pair(row, roots, reconstruction, zero_selection=True)
                 if source:
                     put(group, 'zero_K_anchor_path', row['mode_key'])
-                    put(group, 'zero_K_anchor_fingerprint', row['input_fingerprint'])
+                    put(group, 'zero_K_anchor_fingerprint', input_fingerprint(source[1], pair_continuum(source,ntor)))
+                    put(group, 'zero_K_anchor_selection_fingerprint', row['input_fingerprint'])
                     break
             if source is None:
                 state = 'unverified_zero_selection'
                 issues.append('No classified-input pair verifies the zero-GOOD continuum')
-    paired = state == 'available'
+    if state == 'available' and source is not None and len(source) == 3:
+        state = 'available_reconstructed'
+    paired = state in ('available', 'available_reconstructed')
     continuum_state = 'missing'
     low, high = np.full(nr, np.nan), np.full(nr, np.nan)
     valid = np.zeros(nr, dtype=bool)
@@ -193,19 +207,24 @@ def write_scope(group, *, ntor, nr, rows, catalog, summaries, roots,
             # Standalone current continuum can support the first surrogate task.
             # It does not validate the old K/mode targets.
             source = ('live', roots[0][1]/group.parent.name.split('/')[-1]/f'N{ntor}'/'egn_placeholder')
-        label, path = source
-        cpath = path.parent/f'datcon{ntor}'
+        label, path = source[:2]
+        cpath = pair_continuum(source, ntor)
         try:
             before = sha256_file(cpath)
-            low2, high2, i1, i2 = load_datcon_for_mode(str(path), nr)
+            low2, high2, i1, i2 = load_datcon_for_mode(str(cpath.parent/'egn_placeholder'), nr)
             valid = (np.isfinite(low2) & np.isfinite(high2) & (low2 >= 0)
                      & (high2 >= low2))
             low[valid], high[valid] = np.sqrt(low2[valid]), np.sqrt(high2[valid])
             if sha256_file(cpath) != before:
                 raise ValueError(f'Continuum changed while reading: {cpath}')
             put(group, 'continuum_path', '/'.join(cpath.parts[-3:]))
-            put(group, 'continuum_source_root', label)
+            put(group, 'continuum_source_root', reconstruction.continuum_label(cpath) if len(source)==3 else label)
             put(group, 'continuum_sha256', before)
+            put(group, 'continuum_provenance', 'historical_reconstruction' if len(source)==3 else
+                ('exact_saved_pair' if paired else 'standalone_current'))
+            if len(source)==3:
+                scope = '/'.join(cpath.parts[-3:-1])
+                put(group, 'reconstruction_evidence_json', json.dumps(reconstruction.evidence_for(scope), sort_keys=True))
             group.attrs['datcon_i1'] = i1
             group.attrs['datcon_i2'] = i2
             continuum_state = ('available_paired' if paired else 'available_unpaired') if valid.any() else 'no_valid_samples'
@@ -240,9 +259,17 @@ def write_scope(group, *, ntor, nr, rows, catalog, summaries, roots,
         put(modes, key, np.array([row[key] for row in records], dtype=float), '1')
     for key in MODE_STRINGS:
         modes.create_dataset(key, data=[row[key] for row in records], dtype=STR)
-    return dict(status=state, continuum_status=continuum_state,
-                K=len(records) if paired else -1, catalog_K=catalog_k,
-                continuum_valid_samples=int(valid.sum()), details='\n'.join(issues))
+    if confirmed_empty:
+        confirmed_empty.apply(group, roots[0][1])
+    return scope_report(group)
+
+
+def scope_report(group):
+    return dict(status=group['status'].asstr()[()],
+                continuum_status=group['continuum_status'].asstr()[()],
+                K=int(group['K'][()]), catalog_K=int(group['catalog_K'][()]),
+                continuum_valid_samples=int(group['continuum_valid'][:].sum()),
+                details=group['status_detail'].asstr()[()])
 
 
 def validate_export(path):
@@ -250,7 +277,7 @@ def validate_export(path):
     counts, continuum_counts = Counter(), Counter()
     cases, scalars, modes = 0, 0, 0
     with h5py.File(path, 'r') as f:
-        if f.attrs['schema'] != SCHEMA:
+        if f.attrs['schema'] not in ('nova-surrogate-v1', 'nova-surrogate-v2', SCHEMA):
             raise ValueError('Unexpected HDF5 schema')
         for case in f['equilibria'].values():
             cases += 1
@@ -275,7 +302,22 @@ def validate_export(path):
                 k, present, ok = g['K'][()], g['has_good_tae'][()], g['mode_targets_valid'][()]
                 assert (k >= 0 and present == int(k > 0) and valid.any()) if ok else (k == present == -1)
                 m = g['modes']
-                assert all(len(m[key]) == (k if ok else 0) for key in MODE_NUMBERS+MODE_STRINGS)
+                strings = MODE_STRINGS if f.attrs['schema']!='nova-surrogate-v1' else MODE_STRINGS_V1
+                assert all(len(m[key]) == (k if ok else 0) for key in MODE_NUMBERS+strings)
+                if f.attrs['schema']!='nova-surrogate-v1':
+                    for current, saved, kind in zip(m['input_fingerprint'].asstr()[:],
+                            m['selection_input_fingerprint'].asstr()[:],m['pair_provenance'].asstr()[:]):
+                        assert len(current)==len(saved)==64
+                        assert kind in ('exact_saved_pair','reconstructed_continuum')
+                        if kind=='exact_saved_pair': assert current==saved
+                if g['status'].asstr()[()] == ConfirmedEmptyRegistry.STATUS:
+                    assert ok and k == present == 0 and g['catalog_K'][()] == -1
+                    assert g['zero_K_provenance'].asstr()[()] == 'nova_internal_filter'
+                    evidence = json.loads(g['zero_K_evidence_json'].asstr()[()])
+                    assert evidence['mode_file_count'] == 0 and not evidence['classifier_run']
+                    assert evidence['confirmation']['statement']
+                    assert evidence['continuum_sha256'] == g['continuum_sha256'].asstr()[()]
+                    assert g['continuum_status'].asstr()[()] == 'available_upstream_zero'
                 assert np.all(np.diff(m['omega'][:]) >= 0)
                 for key in MODE_NUMBERS:
                     assert np.all(np.isfinite(m[key][:]))
@@ -292,6 +334,10 @@ def validate_export(path):
 def export(args):
     roots = [('live', args.data_root.resolve())]
     roots += [(f'snapshot_{i+1}', root.resolve()) for i, root in enumerate(args.snapshot_root)]
+    reconstruction = ReconstructionRegistry(args.reconstruction_manifest) if getattr(args,'reconstruction_manifest',None) else None
+    confirmed_empty = ConfirmedEmptyRegistry(args.confirmed_empty_manifest) if getattr(args,'confirmed_empty_manifest',None) else None
+    if confirmed_empty:
+        confirmed_empty.verify_sources(args.data_root)
     inventory_path = REPO/'audits/main_dataset_shots/shot_status.csv'
     catalog_path = REPO/'catalogs/accepted_modes.csv'
     meta_path = catalog_path.with_suffix('.metadata.json')
@@ -311,7 +357,7 @@ def export(args):
     provenance = {str(p.relative_to(REPO)): sha256_file(p) for p in
                   (inventory_path, catalog_path, meta_path, holds_path, invalid_path,
                    Path(__file__), REPO/'src/nova_equilibrium.py', REPO/'src/cont_features.py',
-                   REPO/'src/mode_features.py', REPO/'src/nova_mode_loader.py')}
+                   REPO/'src/mode_features.py', REPO/'src/nova_mode_loader.py', REPO/'src/nova_surrogate_provenance.py')}
     destinations = [args.output, args.output.with_suffix('.summary.json'), args.output.with_suffix('.scopes.csv')]
     if any(p.exists() for p in destinations):
         raise ValueError('Output or companion file already exists; choose a new output filename')
@@ -328,13 +374,23 @@ def export(args):
                            density_convention='NOVA iden=4 reconstructed from TRANSP ion species; rho excludes mu0',
                            selection_convention='Saved selected GOOD catalog; includes its two mixed-family entries; review status retained',
                            case_split_advice='Split by physical discharge, grouping all equilibrium variants/time slices',
-                           pairing_scope='Fingerprints verify mode+datcon; historical executable and equilibrium-to-run identity are not independently verified')
+                           pairing_scope='Exact saved pairs or explicitly audited historical continuum reconstructions; per-scope provenance distinguishes them',
+                           continuum_validity_scope='Finite ordered samples after existing tail treatment; not a harmonic-convergence certificate')
             put(h, 'parameter_names', np.array(list(PARAMETERS), dtype=STR))
             put(h, 'case_ids', np.array([x['shot'] for x in inventory], dtype=STR))
             prov = h.create_group('provenance')
             put(prov, 'inputs_json', json.dumps(provenance, sort_keys=True))
-            put(prov, 'source_roots_json', json.dumps({label: str(root) for label, root in roots}))
+            source_roots = {label:str(root) for label,root in roots}
+            if reconstruction:
+                source_roots.update({'reconstructed:'+label:str(root) for label,root in roots})
+                source_roots.update(reconstruction.continuum_roots)
+            put(prov, 'source_roots_json', json.dumps(source_roots))
             put(prov, 'sort_root', str(args.sort_root.resolve()))
+            if reconstruction:
+                put(prov, 'reconstruction_registry_json', json.dumps(reconstruction.data, sort_keys=True))
+                put(prov, 'reconstruction_registry_sha256', reconstruction.sha256)
+            if confirmed_empty:
+                confirmed_empty.write_provenance(h)
             equilibria = h.create_group('equilibria')
             for index, item in enumerate(inventory):
                 shot = item['shot']
@@ -392,13 +448,18 @@ def export(args):
                     report = write_scope(case.create_group(f'n_{n:02}'), ntor=n,
                         nr=len(profiles.get('r', [])), rows=[row for row in rows if int(row['ntor']) == n],
                         catalog=catalog, summaries=summaries, roots=roots,
-                        hold=scope_holds(shot, n, registry, holds), equilibrium_ok=eq_ok, anchors=anchors)
+                        hold=scope_holds(shot, n, registry, holds), equilibrium_ok=eq_ok, anchors=anchors,
+                        reconstruction=reconstruction, confirmed_empty=confirmed_empty)
                     reports.append(dict(shot=shot, n_tor=n, **report))
                 if any(sha256_file(args.sort_root/shot/name) != digest for name, digest in source_hashes.items()):
                     raise ValueError(f'Selection sources changed while reading {shot}')
                 if (index+1) % 10 == 0:
                     print(f'Exported {index+1}/{len(inventory)} cases', flush=True)
         result = validate_export(temp)
+        if reconstruction:
+            reconstruction.verify_sources()
+        if confirmed_empty:
+            confirmed_empty.verify_sources(args.data_root)
         if any(sha256_file(REPO/name) != digest for name, digest in provenance.items()):
             raise ValueError('Repository input changed during export')
         # Link is atomic and fails if another process created the requested output.
@@ -422,6 +483,10 @@ def main():
     parser.add_argument('--sort-root', type=Path, default=REPO.parent/'sort_outputs',
                         help='Installed per-case selections matching accepted catalog receipts')
     parser.add_argument('--output', type=Path, required=True, help='New .h5 file; writes summary.json and scopes.csv companions')
+    parser.add_argument('--reconstruction-manifest', type=Path,
+                        help='Audited reconstruction registry: explicit scope hashes, mode identities, and historical evidence')
+    parser.add_argument('--confirmed-empty-manifest', type=Path,
+                        help='User-confirmed case/n zeros after NOVA internal filtering; named empty directories and continuum hashes are checked')
     args = parser.parse_args()
     if args.data_root is None:
         parser.error('Supply --data-root or set NOVA_DITW_ROOT')

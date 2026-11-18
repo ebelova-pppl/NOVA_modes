@@ -30,6 +30,8 @@ have explicitly started Bash.
 | Make a compact CSV for sharing | [`compact_mode_csv.py`](#compact_mode_csvpy) |
 | Export the common accepted-mode catalog | [`build_accepted_catalog.py`](#build_accepted_catalogpy) |
 | Export surrogate equilibria, continua and mode scalars to HDF5 | [`export_nova_surrogate.py`](../docs/surrogate_hdf5.md) |
+| Extract cases complete across n=1–10 from a surrogate HDF5 | [`extract_complete_surrogate_cases.py`](../docs/surrogate_hdf5.md#generate-and-read) |
+| Version an HDF5 with user-confirmed zeros from NOVA's internal filter | [`confirm_nova_empty_scopes.py`](../docs/surrogate_hdf5.md#nova-filter-zero-records-v3) |
 | Reconstruct continua with independent serial NOVA tasks under MPI | [`run_nova_continuum_mpi.py`](#run_nova_continuum_mpipy) |
 | Back up and publish validated continuum reconstructions | [`publish_nova_continua.py`](#publish_nova_continuapy) |
 | Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |

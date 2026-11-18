@@ -1,0 +1,81 @@
+{
+  "confirmation": {
+    "confirmed_by": "user",
+    "date": "2026-11-17",
+    "source": "User clarification in this conversation",
+    "statement": "NOVA has some simple filter which removes singular/large amplitude grid-scale modes, so zero modes in the N# directory means that it found no modes other than numerical, which were discarded before our classifier was used. So, it is safe to switch K=-1 to K=0, and consider these cases as complete"
+  },
+  "schema": "nova-confirmed-empty-v1",
+  "scopes": {
+    "nstxuE202926A03t037/N9": {
+      "continuum_sha256": "086957e4b55b3b280e4fc78b15ecdafcfa288986c929361bd925e06eda7b9326"
+    },
+    "nstxuE203653A02t030/N3": {
+      "continuum_sha256": "4b3e19a796bca2815d13611f3da74a046acbdce8632966d87648101d5b952de4"
+    },
+    "nstxuE205054A01t020/N6": {
+      "continuum_sha256": "b39261c34e65d62f7ef2e1d247c74ffc632d93b227ead7b175bd3c35887d12ea"
+    },
+    "nstxuE205054A01t020/N7": {
+      "continuum_sha256": "eac20e9f2d6dfecefa811ff8c17499e20d5add228fc4ddc7cbd98f0497d94d83"
+    },
+    "nstxuE205054A01t020/N8": {
+      "continuum_sha256": "5d8daa8e8f615cebf536d0fdc39454f2c5b212e1853f36f85eb5c9ccdd450631"
+    },
+    "nstxuE205054A01t037/N6": {
+      "continuum_sha256": "79012dd52e784e22f1ccfab537e4cbb01916bd463f2be4f17381ecbb587a67af"
+    },
+    "nstxuE205072A02t034/N8": {
+      "continuum_sha256": "97e791fd180d5b27e53b1dc820452eada9276ff06844069e46b8d3dc37087f47"
+    },
+    "nstxuG142301B37/N8": {
+      "continuum_sha256": "b1bc534a65dd4d78bdfc2ea1e81e3e9a0d3d453ddcdd25253bea502595c03d10"
+    },
+    "nstxuG142301D46/N3": {
+      "continuum_sha256": "b3ad96894ff42cff1b5d4ec18636622fe8116cc9540e3bed028b4e92f8b607c5"
+    },
+    "nstxuG142301E34/N3": {
+      "continuum_sha256": "6288a78c3979b5e6fe51a9f9d96a10fba09d57f8250dc531d6c04db5b7e2dd17"
+    },
+    "nstxuG142301E34/N4": {
+      "continuum_sha256": "393496b8d85b58e21c2e8eb7fe8cc92715d41cef3b12c4d7e270f37bb948c17a"
+    },
+    "nstxuG142301E34/N5": {
+      "continuum_sha256": "32e6065ba2d93dd694967fcd797369df4e6b98a4c5e5e274a77e980f04546354"
+    },
+    "nstxuG142301E34/N7": {
+      "continuum_sha256": "ef78034c180f56c7cf05ba048a943acc03e28136fff14da3f88f5fe86ab5c85c"
+    },
+    "nstxuG142301H56/N4": {
+      "continuum_sha256": "4330f7b4e60448dd41e00f6ee5bd3fcb34091b96b49923c6321dc525381fba0f"
+    },
+    "nstxuG142301Q91/N1": {
+      "continuum_sha256": "ba00628e21cb000f5e60125a1e32bccf5d8b11cd418614f58353fd1a80ad0b60"
+    },
+    "nstxuG142301Q91/N2": {
+      "continuum_sha256": "388e6642325d69513adc1bbc8c5b2cd11c7fb2ffe0d20e65d6bc339f16d5188a"
+    },
+    "nstxuG142301Q91/N3": {
+      "continuum_sha256": "95bb49fe432f921e675b5a2831ef33c1bf37948fa5408fddeb8ec527107f7d8c"
+    },
+    "nstxuG142301Q91/N4": {
+      "continuum_sha256": "ab795eef5a0873fe2c04130e277f34b0bf351aef9b42c4f6a3f3119ca30e6114"
+    },
+    "nstxuG142301Q91/N6": {
+      "continuum_sha256": "2dd94250ccab1f08d2f5b145e6c192d5cbda45f9b6cbdd13c43e5a94d8be2d4e"
+    },
+    "nstxuG142301S39/N1": {
+      "continuum_sha256": "378a0092082ba6d36c56b3ba761ded40fcaa9d6c7c2cadba80246c544911e60a"
+    },
+    "nstxuG142301S39/N6": {
+      "continuum_sha256": "bcb335f0f1c2b3b964037342cca2df41aac9e48fa01d755d1755af14ea07900f"
+    },
+    "nstxuG142301V21/N6": {
+      "continuum_sha256": "4dc7ff7efb5b28d17d506c4c6a6b05af9a2421a2b13d3cdfc444763b2c147f66"
+    },
+    "nstxu_204202/N1": {
+      "continuum_sha256": "79103a735fc6960f6c3384cf2e37d9d907d5541650eed26db01dbaa14f50d922"
+    }
+  },
+  "source_hdf5_sha256": "11d92818323cafe0dc85b3f7eca7b2345e6a51a391d186e62bf18572d5a77a44"
+}

@@ -1,8 +1,8 @@
 # NOVA mode classifier: current project state
 
 Updated November 17, 2026. Selection counts below retain their October 10/26/29
-snapshot dates; November 16 checks NOVA-C density outputs and implements
-the surrogate HDF5 export using the confirmed NOVA density prescription. The complete
+snapshot dates; November 16–17 checks NOVA-C density outputs and implements
+the surrogate HDF5 export and continuum restoration using the confirmed NOVA density prescription. The complete
 prior chronology is preserved locally and in Git history as described in
 [research records and recovery](research_archive.md).
 
@@ -58,8 +58,78 @@ should be built into the superNOVA recalculation stage. The user subsequently
 authorized continuum reconstruction in the project directory and a reusable
 MPI driver. DiTw write access was confirmed on November 17 after the owner's
 ACL update. The user then authorized backing up the overwritten continua and
-publishing the 638 validated reconstructions there. No HDF5 change is part of
-this task.
+publishing the 638 validated reconstructions there. The user subsequently
+requested completion of the scalar-target HDF5, retaining both radial
+coordinates and reconstructed NOVA mass density, with 2D structures and lobe
+counts explicitly deferred. Additional zero-GOOD continuum reconstructions
+for this export remain in the project archive; they have not been published
+to DiTw.
+
+### November 17 HDF5 expansion: verification
+
+Completed products under `research_archive/nova_surrogate_export_20261117/`:
+
+- `nova_surrogate_v2.h5`: **8,943 catalog modes**, 200 inventory IDs,
+  199 populated 13-scalar sets, 1,974 available continua, 1,943 usable K/mode
+  records including **541 verified K=0 records**; 64,323,636 bytes.
+- `nova_surrogate_v2_complete_cases.h5`: **180 cases, all n=1–10**,
+  **8,491 modes**, 1,800 paired continua and **470 K=0 records**;
+  49,702,520 bytes. The original 94 complete cases are all retained.
+- Remaining gaps in the full file: 31 missing selections, 16 existing holds,
+  ten n records in one empty inventory case. These remain K/presence=-1.
+  All original 8,943 selected modes are nevertheless included in usable n
+  records. The 20 incomplete cases are listed in `handoff_validation.json`.
+- Independent validation confirms exact catalog membership/frequencies,
+  saved full-precision r moments and metadata, and unchanged v1 numerical
+  values for all 4,517 old modes, 1,201 paired continua and equilibrium inputs.
+  The complete-case copier checks all **70,540 copied datasets** against the
+  full file. The example reader runs successfully. The old delivered v1 subset
+  retains SHA-256 `72c45e665fd2027aa2ba41fecb96201d3104ed969e428da60fef965fa8e60c40`.
+- New full SHA-256:
+  `11d92818323cafe0dc85b3f7eca7b2345e6a51a391d186e62bf18572d5a77a44`.
+  New subset SHA-256:
+  `5773706c0e1de836d2dec24aefddf33edbda90bbb7324f9897d9b196c919236f`.
+
+`README.txt`, `read_surrogate.py`, coverage/case-list CSVs and validation
+summaries accompany the files. Native normalized frequencies, both r and
+psi_N moments, density convention, radial masks, review flags and two mixed
+catalog entries are retained. No 2D structures or lobe counts were added.
+Next: share the new handoff; resolve existing missing selections/holds only
+through separate work, then follow the superNOVA recalculation roadmap.
+
+The export now accepts explicitly audited reconstructed continua in addition
+to exact saved mode/datcon pairs. Reconstruction metadata preserves both the
+old selection fingerprint and the fingerprint of the actual exported pair;
+mode hashes, continuum hashes, and supporting evidence are checked. Existing
+input holds, classifications and review states are unchanged. The new
+`scripts/extract_complete_surrogate_cases.py` copies cases complete across
+n=1–10 and checks every copied dataset against the source. Fifteen focused
+coordinate/provenance tests pass.
+
+The original 638 restoration tasks covered scopes containing selected modes.
+The 104 zero-GOOD scopes also had continuum files, but their selection-era
+versions had not been verified. A further 104 project-only tasks completed
+under Flux job 2557625. Complete file membership and saved frequency, damping,
+radial moments and grid size match for all 3,869 classified modes. Ninety-nine
+scopes reproduce their historical crossings with case-root settings.
+
+Five G-shot N1 scopes require historical ranges beginning at m=0:
+G121123K34: 0–24; G121123K70: 0–17; G142301E72: 0–17;
+G142301L94: 0–21; G142301U84: 0–23. A surviving K34 graphic explicitly
+records 0–24; these range sizes also match their mode harmonic counts.
+Job 2557629 reproduces all 119 saved crossings for those five scopes to
+7.64e-15 maximum relative error. The attempted common -3–108 and 0–108
+reconstructions did not match and remain archived as diagnostics, excluded
+from the export. The current N1 files/logs date to October 2 and use other
+ranges; the root outcon alone is insufficient for these five records.
+
+Together, all 1,766 saved crossing witnesses in 93 of the 104 zero-GOOD
+scopes reproduce within 3.46e-12 relative error. The other 11 scopes have
+settings and mode-scalar evidence without saved crossing witnesses. The
+registry covers 742 reconstructed scopes and distinguishes 459 centroid,
+228 crossing and 55 settings-only validations. This restores legacy
+selection compatibility, not a convergence certificate. Evidence and the
+builder are in `research_archive/nova_surrogate_export_20261117/`.
 
 ### November 17 MPI reconstruction
 
