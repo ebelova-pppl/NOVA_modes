@@ -377,7 +377,24 @@ the 459 available original raw-file hashes matches the reconstructed bytes;
 use new input hashes and explicit reconstruction provenance. Results and
 receipts are under `research_archive/continuum_reconstruction_20261117/`;
 see [project state](project_state.md#november-17-mpi-reconstruction).
-The delivered HDF5, source DiTw files, and selection decisions were not changed.
+The reconstruction phase left the delivered HDF5, source DiTw files, and
+selection decisions unchanged. In the subsequent authorized November 17
+publication, all 638 reconstructed numbered continua were installed in DiTw
+after two independent backup sets were verified. The live manifest is
+`DiTw/.continuum_restoration_20261117T230824Z.json`; project records are under
+`research_archive/continuum_publication_20261117/`. It records the new hashes
+and settings; preexisting NOVA-C `outcon` logs describe the earlier runs.
+Mode files, selections, and the delivered HDF5 remain unchanged.
+
+The subsequent full-profile audit compares all 638 restored/backed-up pairs
+in frequency, using both raw sentinel-masked boundaries and the unchanged
+shared loader. The largest raw upper-boundary difference is +911.075% at
+r=0.99 for E204669M03t030/N9; changes concentrate near the outer harmonic
+cutoff. Lower-boundary relative errors need care near zero frequency, and
+the historical high-n profiles are not convergence references. Methods,
+radial coverage, representative cases, and raw/processed distinctions are
+recorded in [project state](project_state.md#november-17-full-profile-continuum-comparison)
+and `research_archive/continuum_full_profile_comparison_20261117/`.
 
 | Quantity | Source | Interpretation / checks |
 | --- | --- | --- |

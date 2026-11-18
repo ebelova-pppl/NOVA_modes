@@ -57,8 +57,9 @@ preserving Alvaro's delivered subset. Convergence and reproducibility checks
 should be built into the superNOVA recalculation stage. The user subsequently
 authorized continuum reconstruction in the project directory and a reusable
 MPI driver. DiTw write access was confirmed on November 17 after the owner's
-ACL update; ask the user before any future publication there. No HDF5 change is part of
-this reconstruction task.
+ACL update. The user then authorized backing up the overwritten continua and
+publishing the 638 validated reconstructions there. No HDF5 change is part of
+this task.
 
 ### November 17 MPI reconstruction
 
@@ -103,7 +104,8 @@ HDF5 still has SHA-256
 `72c45e665fd2027aa2ba41fecb96201d3104ed969e428da60fef965fa8e60c40`.
 Next: use explicit reconstructed-continuum provenance in a new export version
 when requested. Existing invalid-input holds and selection/review decisions
-remain in force. DiTw publication still requires separate user approval.
+remain in force. The user has now authorized this batch's DiTw publication
+after preserving the existing files; see the publication record below.
 
 Following the owner-run ACL instructions, a November 17 host permission
 recheck confirmed effective `ebelova` write access to DiTw, the sampled
@@ -111,7 +113,98 @@ E204645A16t015 case and N1 directory, and its existing `datcon1` file.
 The inspected directories have both access and default `user:ebelova:rwx`
 entries; the file has effective `user:ebelova:rw-`. All ancestors remain
 traversable. This was an ACL/access check, not a write test or an exhaustive
-audit of all descendants. The assistant made no DiTw permission or data changes.
+audit of all descendants. That permission check made no DiTw changes.
+
+### November 17 continuum publication
+
+The user authorized two steps: back up the overwritten numbered continua,
+then install the validated historical-setting reconstructions. The scope is
+638 files across 80 cases, not all approximately 90 NOVA-C cases. A fresh
+host preflight verified that every target still matches its November 16
+audited hash, is a regular single-link file owned by ngorelen, and has the
+expected unnumbered `datcon` symlink and a writable destination directory.
+
+`scripts/publish_nova_continua.py` prepares independently copied project
+backups and a frozen plan, then creates and verifies a second backup set
+beside the live files before any replacement. Atomic replacements preserve
+the unnumbered symlinks and existing ACL access, with an explicit ACL entry
+retaining the previous owner's permissions. Six publication tests passed,
+including changed-input/live-file rejection, backup verification, interrupted
+replacement recovery, and previous-owner access. All 638 files were installed
+and verified on November 17 at 18:11 EST (23:11 UTC), with no skips or errors.
+
+The frozen plan, original metadata/ACLs, project backups, per-file event log,
+and completed report are under
+`research_archive/continuum_publication_20261117/`. The two independent backup
+sets preserve the NOVA-C-era contents immediately before publication:
+
+- Project: `before/<shot>/N<n>/datcon<n>` below that archive.
+- DiTw: `<shot>/N<n>/continuum_backups/20261117T230824Z/datcon<n>`.
+
+Every active numbered file now matches its validated reconstructed SHA-256;
+both backup sets match the corresponding pre-publication SHA-256. A separate
+host check verified all 638 ACLs, original groups/modes, and independent
+backup inodes. Atomic replacement makes `ebelova` the file owner; explicit
+`user:ngorelen:rw-` ACL entries preserve Nikolai's effective write access.
+The existing unnumbered `datcon` symlinks remain intact. DiTw's
+`.continuum_restoration_20261117T230824Z.json` records the complete plan and
+publication result. Existing NOVA-C `outcon` logs remain historical records;
+the restoration manifest records the settings of the active reconstructed
+continua. Later NOVA-C runs can still overwrite those active filenames, so
+the workflow still needs separate output names to prevent recurrence.
+
+Mode files, selections, holds, and the delivered HDF5 were not changed.
+The next expanded HDF5 must use the new hashes and explicit reconstructed
+provenance; this publication does not make the historical combined mode/input
+fingerprints match again.
+
+### November 17 full-profile continuum comparison
+
+Compared all 638 frozen pre-publication NOVA-C-workflow files with their
+validated historical-setting reconstructions. Both input hashes are checked
+against the publication plan. Frequency is the square root of native datcon
+columns; no physical-unit conversion is applied. Raw comparisons use the
+shared sentinel mask without tail repair; processed comparisons use the
+unchanged shared loader. Metrics use common finite, nonnegative, ordered
+boundary pairs on the native r grid; unavailable samples are not filled.
+
+Across the full available radial domain, 620/638 profiles exceed 1% in at
+least one boundary, and 554 raw / 552 processed exceed 10%. For r<=0.9
+(psi_N<=0.81), both representations have 104 profiles above 1% and 33 above
+10%; thus 516 profiles' >1% differences occur only outside r=0.9. This
+radial restriction is a diagnostic, not a convergence criterion. 186
+NOVA-C-workflow profiles lose usable samples relative to the reference
+under the existing validity mask (606 raw / 609 processed grid points).
+
+Representative maximum upper-frequency differences, relative to the restored
+profile, are:
+
+| Case/n | Raw maximum | r at raw maximum | Maximum after shared loader |
+| --- | ---: | ---: | ---: |
+| E204645A16t015/N10 | +559.755% | 0.865 | +47.842% at r=0.845 |
+| E204645A16t015/N9 | +530.247% | 0.900 | +65.956% at r=0.885 |
+| E204645A16t015/N2 | +657.324% | 0.985 | +657.324% at r=0.985 |
+| E204669M03t030/N9 | +911.075% | 0.990 | +17.023% at r=0.990 |
+
+The last row is the largest raw upper-boundary percentage change among all
+638 pairs: Omega changes from 2.95698 to 29.89725. Lower-boundary percentage
+maxima can be much larger near vanishing reference frequencies; the report
+also measures absolute shifts relative to the reference gap midpoint and
+radial RMS. These are native-grid maxima, not interpolated extrema.
+
+The plotted rises track nq exceeding the NOVA-C launcher m_max: for example,
+the original N10 case crosses 100 at r=0.845, while the largest raw upper
+case has nq=98.63 at r=0.99 with m_max=90. This supports the established
+harmonic-range explanation. Historical high-n curves can also rise near
+their own m_max=108 limit; neither raw spikes nor the loader's tail clamps
+are convergence evidence. The unchanged tail repair suppresses some large
+differences and leaves others, including the N2 example, intact.
+
+Reproducible scripts, per-profile metrics for both representations/domains,
+compressed arrays with r and psi_N, input hashes, copied settings evidence,
+seven diagnostic PDF pages, and overview/distribution PNG/PDF figures are in
+`research_archive/continuum_full_profile_comparison_20261117/`. This comparison
+does not change DiTw data, the loader, classifications, or the HDF5 export.
 
 ## Installed results and shared catalog
 

@@ -31,6 +31,7 @@ have explicitly started Bash.
 | Export the common accepted-mode catalog | [`build_accepted_catalog.py`](#build_accepted_catalogpy) |
 | Export surrogate equilibria, continua and mode scalars to HDF5 | [`export_nova_surrogate.py`](../docs/surrogate_hdf5.md) |
 | Reconstruct continua with independent serial NOVA tasks under MPI | [`run_nova_continuum_mpi.py`](#run_nova_continuum_mpipy) |
+| Back up and publish validated continuum reconstructions | [`publish_nova_continua.py`](#publish_nova_continuapy) |
 | Audit or calibrate deterministic gates | [Rules reference](#deterministic-rule-sorting-production-and-calibration-interfaces) |
 | Understand duplicate severity ranking | [Normalized severity](#normalized-gate-severity) and [deduplication](#final-good-production-deduplication) |
 | View modes or apply manual corrections | [Viewer](#view_modes_csvpy), [labeler](#label_modes_fastpy), [adjudication](#manual-adjudication) |
@@ -119,6 +120,44 @@ Native `datcon` values, including sentinels, remain unchanged. These checks
 establish execution integrity; historical agreement and physical convergence
 require separate comparisons using the shared continuum loader. A restored
 file does not automatically change classifications or an HDF5 export.
+
+## publish_nova_continua.py
+
+Use after authorization to replace the live numbered continua with a validated
+reconstruction. Publication is separate from calculation and HDF5 export.
+The two phases are:
+
+```tcsh
+python scripts/publish_nova_continua.py prepare \
+  --run-root /path/to/restored --data-root "$NOVA_DITW_ROOT" \
+  --archive-root /path/to/new/publication
+python scripts/publish_nova_continua.py apply \
+  --archive-root /path/to/publication
+```
+
+`prepare` requires successful task receipts and a batch historical-validation
+summary with no unavailable/failed sample comparisons. It rechecks the
+reconstruction and equilibrium/TRANSP/executable hashes, snapshots live
+file metadata and ACLs, and makes independent read-only project backups in
+`before/<shot>/N<n>/datcon<n>`. The source tree is unchanged in this phase.
+
+`apply` verifies the frozen plan, inputs, and backups, then creates a second
+independent backup for every target under
+`<shot>/N<n>/continuum_backups/<UTC-stamp>/datcon<n>`. Every adjacent backup
+is checked before any numbered continuum is replaced. Files are staged in
+their destination directory and replaced atomically. The existing unnumbered
+`datcon` symlink is preserved. The installing user owns the replacement;
+the previous owner's permissions are retained through an explicit ACL entry,
+alongside the existing group and named-user permissions. This needs Linux
+ACL tools (`getfacl`, `setfacl`) and write access to the destination directories.
+
+Unexpected live content, changed metadata, redirected paths, changed source
+inputs, or mismatched backups stop publication. Rerunning `apply` with the
+same archive skips already-installed matching files and retains both backup
+sets. Per-file events and `publication_summary.json` record progress; the live
+root also receives `.continuum_restoration_<UTC-stamp>.json` with provenance.
+The tool leaves mode files, selections, and HDF5 exports unchanged. Avoid
+simultaneous producer writes to the target continua during publication.
 
 ## Current results and research records
 
