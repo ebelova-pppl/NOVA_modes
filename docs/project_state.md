@@ -1,6 +1,6 @@
 # NOVA mode classifier: current project state
 
-Updated November 18, 2026. Selection counts below retain their October 10/26/29
+Updated November 19, 2026. Selection counts below retain their October 10/26/29
 snapshot dates; November 16–17 checks NOVA-C density outputs and implements
 the surrogate HDF5 export and continuum restoration using the confirmed NOVA density prescription. The complete
 prior chronology is preserved locally and in Git history as described in
@@ -74,6 +74,115 @@ coordinates and reconstructed NOVA mass density, with 2D structures and lobe
 counts explicitly deferred. Additional zero-GOOD continuum reconstructions
 for this export remain in the project archive; they have not been published
 to DiTw.
+
+### November 19 HDF5 v4: four reviewed N1 scopes released
+
+After comparing convergence results, the user chose to retain the internally
+matched continua for consistency with the legacy database and requested
+adding the four cases to HDF5. The November 18 user review rejected all 331
+raw N1 modes; the four new N1 records therefore use K=0 and presence=0, with
+explicit `user_visual_review` zero provenance. This is not the NOVA-filter
+empty-directory rule, and does not assert that no physical TAE could exist.
+
+The new handoff is
+`research_archive/nova_surrogate_export_20261119_v4/nova_surrogate_v4_complete_cases.h5`:
+**197 complete cases, all n=1–10, 8,943 selected modes and 568 K=0 records**.
+It adds 135388/B12/W29/Y93 to v3's 193 cases; their n=2–10 records contribute
+155 previously selected modes (125/23/7/0 respectively). No new N1 modes
+are selected. The full `nova_surrogate_v4.h5` retains 200 inventory IDs,
+199 populated parameter sets, 1,978 available continua and 1,970 valid
+K/mode records. Only R06 remains incomplete among the 198 processed cases;
+the other two incomplete inventory entries are E205059A01t025 and nstxu_202806.
+
+N1 continua use m=-2..22/-2..19/-2..15/-2..17, with hashes matching the
+published DiTw profiles and archived producer receipts. Wider-range test
+outputs are excluded. Live inputs match the preserved HDF5 equilibrium
+hashes; all 331 reviewed mode bytes and membership were rechecked. The
+shared exporter supplies the existing coordinates, normalization and radial
+mask treatment. All four new continua have 197 valid native samples.
+
+The updater preserves v3 files. **78,254 unaffected datasets** and their
+attributes match v3 exactly, including every selected-mode array and all
+equilibrium data. The subset copier verified **77,299 datasets** against
+the new full file. Independent checks confirm membership is exactly v3 plus
+the four approved cases, the 155 added subset modes, unchanged live
+continua, and direct agreement with sqrt(native datcon values).
+
+v4 is a data-release version; the structural schema stays `nova-surrogate-v3`
+with `data_release=v4`. The four scopes use `status=available_reviewed_zero`,
+`continuum_provenance=internal_harmonic_match`, and embedded review/release
+evidence retaining their original hold reasons. The release is confined to
+these hash-verified HDF5 records; the shared sorter registry still protects
+older copies such as data_mixed. Other holds, catalog selections, source
+modes and DiTw files remain unchanged. Reproduction uses the archived
+`build_v4.py` and `reviewed_n1_release.json`; the archive also contains a
+reader, input copies, coverage tables, source snapshots and validation reports.
+
+### November 19 N1 harmonic convergence checks
+
+The user authorized convergence checks for the four N1 cases after confirming
+that the matched internal bases align the live continua with existing modes.
+Flux jobs 2561408/2561409/2561411/2561413 completed 35 successful continuum
+calculations in isolated project directories. The four starting baselines
+reproduce the published files byte for byte. Only harmonic limits changed;
+equilibrium/TRANSP/executable hashes, gamma, density settings and the radial
+grid stayed fixed within each case, and exported q profiles are identical.
+
+All cases tested m=-3..30, -3..40 and -6..40. Further tests used -6..50,
+-12..50, -12..40 and -23..40 for 135388; the other three used -6..60,
+-12..60, -12..90, -18..90 and -30..90. The separate 135388 40/50 upper-limit
+check changes either boundary by at most 0.0149%. The final negative-cutoff
+increment is -12..40 to -23..40 for 135388, and -18..90 to -30..90 otherwise.
+
+| Case | Last-tested m range | Max upper-boundary change from matched baseline | Max change in either boundary in final increment | Final increment, r<=0.9 |
+| --- | --- | --- | --- | --- |
+| 135388 | -23..40 | 5.633% | 0.0105% | 0.00968% |
+| B12 | -30..90 | 9.917% | 0.0179% | 0.00690% |
+| W29 | -30..90 | 28.968% | 0.3485% | 0.0649% |
+| Y93 | -30..90 | 34.653% | 0.8032% | 0.1763% |
+
+These are frequency changes, using sqrt(native datcon columns), over 197
+valid native pairs at r=0.01..0.99 (psi_N=0.0001..0.9801). No axis/LCFS
+extrapolation or tail repair enters the comparison. The largest final changes
+occur at r=0.99. Both cutoffs matter; W29/Y93 retain edge sensitivity and are
+not uniformly converged to 0.1%. Successive differences are not error bounds,
+and equilibrium/radial resolution was not varied. Upper-cutoff checks precede
+the final lower-cutoff extensions; no joint infinite-basis limit is established.
+
+One additional 135388 attempt at -6..60 produced no continuum and was rejected.
+Its executable's symbol sizes imply capacity for 64 harmonics; that request
+needs 67. The other three executables support 125. The failed receipt is
+retained, and subsequent tests stay within those capacities. No executable
+was rebuilt or substituted. File/settings preflight alone does not verify
+compiled harmonic capacity.
+
+Artifacts are in `research_archive/training_n1_convergence_20261119/`:
+`README.txt`, `harmonic_convergence.png/.pdf`, `case_summary.csv`, full and
+pointwise metrics, raw arrays in both coordinates, task settings, receipts,
+frozen source evidence and `analyze.py`. Total reported batch wall time was
+90.4 seconds, excluding queue/MPI startup. All 331 mode hashes and the four
+live datcon1 hashes remain unchanged. No publication, hold release,
+classification or HDF5 update occurred. These diagnostic profiles remain
+separate from the continua matched to the old eigenmode calculations.
+
+The user then requested comparison with the original backups. The reference
+is the November 18 `training_n1_continuum_plan_20261118/before/` datcon1 set,
+before the internal-range correction; all four backup hashes were verified.
+For r<=0.9, latest wider-range frequencies are lower at every compared sample.
+Maximum lower/upper changes from those originals are 2.97%/7.00% (135388),
+7.50%/7.92% (B12), 4.59%/10.03% (W29), and 4.53%/10.17% (Y93). Median
+absolute differences across that region are 1.88–3.20% for the lower boundary
+and 2.50–5.81% for the upper. The internal-range correction accounts for a
+substantial part of the shift; separate original-to-matched,
+original-to-latest and matched-to-latest metrics are retained. Near r=0.99,
+upper changes reach 40.03% for W29 and 44.36% for Y93. The original 135388
+tail has abrupt jumps; its r=0.99 upper omega-squared=1121.32 is excluded by
+the existing raw-value mask (it is not the literal 1000 sentinel). This
+excluded native sample is recorded explicitly and does not affect r<=0.9
+statistics. The convergence archive now includes
+`original_backup_comparison.png/.pdf`, `original_backup_metrics.csv`,
+pointwise differences, excluded samples, fingerprints and the reproducible
+`compare_original_backups.py`. No additional NOVA runs or live changes.
 
 ### November 18 matched-harmonic continuum experiment
 

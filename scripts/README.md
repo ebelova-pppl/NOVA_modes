@@ -73,7 +73,14 @@ example_case,2,-3,108
 
 Use settings supported by the case executable and historical records. The
 runner does not infer harmonic limits from `ntor` or perform convergence
-studies. Optional CSV columns and defaults are `binary=gocont_tr` (relative
+studies. Before widening the range, verify that `lmax-lmin+1` fits the
+executable's compiled array capacity; file/settings preflight and namelist
+readback do not establish this. The November 19 N1 checks found capacities
+of 64 harmonics for the frozen 135388 binary and 125 for the B12/W29/Y93
+binaries. An oversized 135388 request returned zero but produced no `datcon`,
+which the runner rejected. See the [convergence record](../docs/project_state.md#november-19-n1-harmonic-convergence-checks).
+
+Optional CSV columns and defaults are `binary=gocont_tr` (relative
 to the case directory), `gamma=1.66666666`, `iden=4`, `ksound=1`,
 `ns_first=3`, `ns_last=201`, `ns_step=1`. Only the audited `iden=4`
 workflow and unit radial-index increment are supported. Other radial grids

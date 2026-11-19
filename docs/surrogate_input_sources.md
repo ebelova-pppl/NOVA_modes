@@ -426,6 +426,17 @@ provenance manifest. The archived reconstruction receipts, rather than the
 unchanged historical N1/outcon files, identify the new continuum settings.
 HDF5 products and input holds remain unchanged.
 
+The subsequent [November 19 convergence checks](project_state.md#november-19-n1-harmonic-convergence-checks)
+varied both harmonic cutoffs with fixed inputs and reproduced all four matched
+baselines. Wider ranges change the upper boundary by up to 5.63%, 9.92%,
+28.97% and 34.65% for 135388/B12/W29/Y93 over native r=0.01..0.99.
+The final negative-cutoff increments change either boundary by at most
+0.0105%, 0.0179%, 0.3485% and 0.8032%, respectively. W29/Y93 retain edge
+sensitivity; these increments are not error bounds. Both cutoffs and the
+compiled harmonic capacity must be checked. The diagnostic profiles and
+full comparisons are in `research_archive/training_n1_convergence_20261119/`;
+the published mode-matched profiles and HDF5 remain unchanged.
+
 ## Preferred sources and checks
 
 The subsequent November 17 MPI reconstruction expanded the historical-setting

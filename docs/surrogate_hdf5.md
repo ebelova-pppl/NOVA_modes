@@ -17,9 +17,66 @@ scope, pinned continuum and mode hashes, unchanged supporting evidence, and
 a matching saved selection identity. It does not rerun classification or
 certify harmonic convergence. Existing input holds remain in force.
 
-## NOVA-filter zero records (v3)
+## Reviewed N1 records and internally matched continua (v4)
 
-The current handoff is under `research_archive/nova_surrogate_export_20261117_v3/`:
+The November 19 handoff is under
+`research_archive/nova_surrogate_export_20261119_v4/`. It adds the four cases
+`nstx_135388`, `nstxuG121123B12`, `nstxuG142301W29` and `nstxuG142301Y93` to
+the complete-case subset by releasing their N1 records. The user's November
+18 visual review rejected all 331 raw N1 modes; on November 19 the user
+accepted the internally matched continua and requested inclusion in HDF5.
+
+The continuum harmonic ranges are respectively -2..22, -2..19, -2..15 and
+-2..17, exactly as published in DiTw. The wider-range convergence-test
+profiles are not used. Both coordinates, radial masks and native frequency
+normalization retain the existing schema. Each N1 record has `K=0`,
+`has_good_tae=0`, `mode_targets_valid=True`, empty mode arrays,
+`status=available_reviewed_zero`, `continuum_status=available_reviewed_zero`,
+and `zero_K_provenance=user_visual_review`. Its saved `catalog_K=0` is
+preserved. This describes the reviewed calculated sample, not the absence
+of all possible physical TAEs in that equilibrium.
+
+The full file is `nova_surrogate_v4.h5`; the handoff subset is
+`nova_surrogate_v4_complete_cases.h5`:
+
+| File | Coverage |
+| --- | --- |
+| `nova_surrogate_v4_complete_cases.h5` | **197 cases**, all n=1–10; **8,943 modes**, **568 K=0 records** |
+| `nova_surrogate_v4.h5` | 200 inventory IDs / 199 populated equilibria; **8,943 modes**, 1,978 available continua, 1,970 valid K/mode records |
+
+The subset now includes all existing catalog modes: the four added cases
+bring 155 already-selected modes at n=2–10, and zero selected modes at n=1.
+Only R06 remains incomplete among the 198 processed cases. The full file
+also retains the two other incomplete inventory entries, E205059A01t025 and
+the empty nstxu_202806 case. Validation confirms 78,254 unaffected full-file
+datasets match v3 and all 77,299 copied subset datasets match v4 exactly.
+
+**v4 is a data-release version:** the
+compatible structural schema remains `nova-surrogate-v3`, with
+`data_release=v4` and additional provenance. Existing readers using the
+availability flags and K need no changes. Consumers enumerating status
+strings must recognize `available_reviewed_zero`.
+
+The release manifest pins the parent HDF5, all reviewed mode hashes, the
+matched continua and reconstruction receipts. Per-record provenance uses
+`continuum_provenance=internal_harmonic_match`, `zero_K_evidence_json`,
+`reconstruction_evidence_json` and `hold_release_evidence_json`; the original
+hold reason remains recorded. All other original datasets and attributes
+are checked against v3, including the parameters, reconstructed density,
+other n records and all previously selected modes. v3 files are preserved.
+
+This is an HDF5-specific release for verified inputs. The shared sorter
+registry still protects older copies such as `data_mixed`, whose continua
+were not replaced. A fresh standard export alone therefore retains those
+holds. Reproduce the v4 update using the archived `build_v4.py` and
+`reviewed_n1_release.json`, which invoke the shared continuum exporter and
+complete-case copier. The updater refuses existing output files. The
+earlier NOVA-filter zero mechanism is separate: these N1 directories contain
+reviewed rejected modes and must not be represented as empty directories.
+
+## Previous NOVA-filter zero records (v3)
+
+The previous handoff is under `research_archive/nova_surrogate_export_20261117_v3/`:
 
 | File | Coverage |
 | --- | --- |
