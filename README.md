@@ -98,8 +98,11 @@ select `--method rf-cnn` and supply both model checkpoints. See
 - Inputs use normalized radius in `[0, 1]` and NOVA mode amplitudes whose
   largest absolute harmonic amplitude is one. Mode arrays use harmonic and
   radius axes; see the [input contract](docs/getting_started.md#required-inputs).
-- Continuum profiles must correspond to the eigenmode calculation. Known
-  invalid shot/`n` scopes are excluded before either classification method;
+- Continuum profiles must correspond to the eigenmode calculation. Match
+  NOVA's **internal harmonic range**, including the two extra harmonics on
+  each side in the verified legacy runs; the saved mode's `nhar` alone is
+  insufficient. See the [matching rule and verified ranges](docs/surrogate_input_sources.md#saved-mode-harmonics-versus-internal-surface-field-harmonics-november-18).
+  Known invalid shot/`n` scopes are excluded before either classification method;
   missing required continuum files abort shot processing. Diagnostic and
   exclusion evidence remains available in the outputs.
 - Calibration has primarily used `nr=201`. Other radial grids can receive

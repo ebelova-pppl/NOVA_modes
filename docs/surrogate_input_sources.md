@@ -364,6 +364,68 @@ numerical results; `harmonic_range_comparison.png`/`.pdf` illustrate the
 large-change example. These are diagnostic reconstructions, not substitutes
 for missing historical raw-file hashes.
 
+## Saved mode harmonics versus internal surface-field harmonics (November 18)
+
+**The matching rule: calculate the continuum with NOVA's internal harmonic
+range, including the two extra harmonics on each side in these legacy runs.**
+For a saved range `m_min_saved..m_max_saved`, the continuum task therefore
+uses `lmin=m_min_saved-2`, `lmax=m_max_saved+2`: `nhar_saved+4` harmonics.
+Check the matching eigenmode run's internal limits rather than inferring
+physical m values from the number of saved components. The two-per-side
+padding is verified for the configurations below; check other builds and
+superNOVA independently. Matching the existing basis does not establish
+convergence.
+
+The four held training N1 cases expose a separate source of continuum/mode
+inconsistency. NOVA has an `imode` range for the saved mode components and
+a wider `jmode` range for internal surface-field matrices. In these cases,
+`jmin=minm-2` and `jmax=maxm+2`: four additional harmonics. `mhdidin_flux.f`
+builds the surface matrices using `kmin=jmin`, `ktot=jt`; `mhdidst.f` and
+`mhdidst_esp.f` invert that block before selecting the `imode` components.
+Consequently, the harmonic count in an `egn*` file alone is insufficient
+to specify a continuum calculation consistent with that eigenmode run.
+
+| Case | Saved physical m range (`nhar`) | Internal / continuum m range (count) |
+| --- | --- | --- |
+| `nstx_135388`, original 250-mode cohort | 0..20 (21) | -2..22 (25) |
+| `nstxuG121123B12` | 0..17 (18) | -2..19 (22) |
+| `nstxuG142301W29` | 0..13 (14) | -2..15 (18) |
+| `nstxuG142301Y93` | 0..15 (16) | -2..17 (20) |
+
+B12/W29/Y93 matching logs record these internal limits directly as
+`mmin,mtot`. For 135388, the available harmonic header and
+modotv support the inference, and unchanged modes retain saved September
+singularity references; its matching full log is no longer available.
+The separate newer 23-harmonic 135388 mode is not covered by that inference.
+Replacing `datcon1` does not change the saved eigenmode components or the
+`nhar` displayed by the viewer. To inspect the published profiles, select
+DiTw with `--base_dir $NOVA_DITW_ROOT`; the separate `data_mixed` copy still
+contains the older continua.
+
+Controlled continuum-only runs first reproduce the current 135388 file at
+0..12, then test saved-component and internal ranges. Merely changing
+135388 to 0..20 leaves 38/41 historical training interior crossing offsets
+above two grid intervals. Using the internal ranges reduces flags to 0/42
+(135388), 2/6 (B12), 0/14 (W29), 1/21 (Y93). Across all matched modes,
+105/108 interior crossings are within two intervals. Three crossings lack
+nearby logged counterparts and remain unresolved; nearest-distance tests
+do not identify a specific branch. These raw-profile results do not rely
+on tail repairs and do not establish convergence.
+
+Frozen source evidence, settings, receipts, four diagnostic `datcon1`
+files, comparison CSVs and PNG/PDF plots are under
+`research_archive/training_n1_matched_harmonics_20261118/`. Identical input
+and executable hashes, fixed non-harmonic settings, and byte-identical
+exported q profiles isolate the range effect. No DiTw/HDF5 replacement
+or input-hold release was performed during the diagnostic experiment.
+The user subsequently authorized publication, completed November 18 with
+UTC stamp `20261119T000250Z`. These four live N1/datcon1 files now contain
+the internal-basis results. Originals are preserved in project and adjacent
+DiTw backups, with a live-root `.continuum_matching_20261119T000250Z.json`
+provenance manifest. The archived reconstruction receipts, rather than the
+unchanged historical N1/outcon files, identify the new continuum settings.
+HDF5 products and input holds remain unchanged.
+
 ## Preferred sources and checks
 
 The subsequent November 17 MPI reconstruction expanded the historical-setting

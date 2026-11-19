@@ -151,13 +151,12 @@ CSV lists; the [labeler reference](../scripts/README.md#label_modes_fastpy)
 documents keyboard controls, signed profiles, and display options. These tools
 need Matplotlib in addition to the rules dependencies.
 
-The standalone `viz/view_modes_csv.py` still needs this checkout's `src/` on
-`PYTHONPATH`. Source the appropriate [platform path helper](platforms.md), or
-set it for just the viewer command (works in both Bash and `tcsh`):
+The standalone `viz/view_modes_csv.py` locates this checkout's shared modules
+automatically. Activate an environment with NumPy, SciPy, and Matplotlib
+as described in [platform setup](platforms.md); then run (Bash or `tcsh`):
 
 ```bash
-env PYTHONPATH=/path/to/NOVA_modes/src \
-  python /path/to/NOVA_modes/viz/view_modes_csv.py \
+python /path/to/NOVA_modes/viz/view_modes_csv.py \
   /path/to/results/shot/good_tae_final.csv
 ```
 

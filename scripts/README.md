@@ -52,6 +52,17 @@ coordinates independent serial calculations, one per `(shot, ntor)`, and
 records failures without stopping unrelated tasks. This requires Python 3.10+
 and, for MPI execution, `mpi4py` with a compatible MPI library.
 
+**To match an existing eigenmode calculation, set `lmin,lmax` to NOVA's
+internal harmonic range.** In the four verified legacy N1 cases, this means
+two extra harmonics on each side of the saved mode range:
+`lmin = m_min_saved - 2`, `lmax = m_max_saved + 2`, giving `nhar_saved + 4`
+internal harmonics. For example, saved m=0..20 requires continuum m=-2..22.
+The saved harmonic count alone does not identify the physical m limits;
+verify the matching eigenmode run's `mmin,mtot` or `jmin_1,jmax_1` metadata.
+Confirm the padding for other builds, including superNOVA. This matches the
+existing basis; convergence requires a separate study. See the
+[source trace and four-case table](../docs/surrogate_input_sources.md#saved-mode-harmonics-versus-internal-surface-field-harmonics-november-18).
+
 Prepare a task CSV with required columns `shot,ntor,lmin,lmax`, for example:
 
 ```csv
@@ -1052,11 +1063,16 @@ frequency.
 
 ## `view_modes_csv.py`
 
+Requires NumPy, SciPy, and Matplotlib; PyTorch and RF packages are not needed.
+Direct execution locates shared repository modules without `PYTHONPATH`.
+See the [Flux environment setup](../docs/platforms.md#rules-only) for one-time
+installation and per-session activation.
+
 Script to plot mode structures from a `name.csv` list.
 
-This `viz/` script requires `src/` on `PYTHONPATH`, unlike the bootstrapped
-`scripts/` entry points. Source the matching platform path helper first or use
-the [self-contained viewer command](../docs/getting_started.md#view-modes-and-preserve-manual-corrections).
+Use the [self-contained viewer command](../docs/getting_started.md#view-modes-and-preserve-manual-corrections)
+with an activated scientific Python environment. Platform helpers are optional
+for data-path defaults and aliases.
 
 Makes the same plots as `label_modes_fast.py` plus contour plots of `mode(r, m)`.
 Relative paths in the CSV are resolved under `--base_dir`, which defaults to
@@ -1067,6 +1083,14 @@ the figure title. The mode and continuum panels share
 the normalized-radius x-axis. The black dashed `r*` closest-approach marker and
 purple dotted `r* max crossing` marker extend through both panels so they can
 be compared directly with mode-amplitude features.
+
+On Flux, the path helper sets `$NOVA_DATA` to the separate `data_mixed`
+training copy. To inspect updated live DiTw continua with a relative-path
+CSV, pass `--base_dir "$NOVA_DITW_ROOT"`. Absolute CSV paths are used
+unchanged, even when `--base_dir` is supplied. The full mode path appears
+in the figure title; the continuum is loaded from `datcon<ntor>` beside
+that mode. The displayed `nhar` is the number of harmonics in the `egn*`
+file, so replacing only `datcon<ntor>` does not change it.
 
 For positive mode frequencies, the continuum frequency axis is capped at
 `2 * omega` when its automatic upper limit would exceed that value. This

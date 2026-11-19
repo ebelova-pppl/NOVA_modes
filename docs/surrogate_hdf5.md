@@ -19,6 +19,19 @@ certify harmonic convergence. Existing input holds remain in force.
 
 ## NOVA-filter zero records (v3)
 
+The current handoff is under `research_archive/nova_surrogate_export_20261117_v3/`:
+
+| File | Coverage |
+| --- | --- |
+| `nova_surrogate_v3_complete_cases.h5` | **193 cases**, all n=1–10; **8,788 modes**, **545 K=0 records** |
+| `nova_surrogate_v3.h5` | 200 inventory IDs / 199 populated equilibria; all **8,943 modes**, 1,974 continua, **564 K=0 records** |
+
+The full file has 1,966 usable K/mode records. Among the 198 processed cases,
+only the five with existing scientific holds remain incomplete. E205059A01t025
+and the empty nstxu_202806 entry are the other two inventory cases. Previous
+v1/v2 files remain unchanged. The v3 handoff includes a reader, confirmation
+manifest, coverage tables and validation summaries.
+
 On November 17 the user confirmed that NOVA removes singular/large-amplitude
 grid-scale numerical modes before writing the mode files. For the identified
 23 empty case/n directories in 13 processed cases, zero files therefore means

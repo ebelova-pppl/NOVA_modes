@@ -1,8 +1,15 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 import argparse
 import os
+import sys
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+# Reuse the CLI bootstrap when launched directly from outside scripts/.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+from _repo_bootstrap import ensure_repo_src_on_path
+
+ensure_repo_src_on_path()
 
 import numpy as np
 import matplotlib.pyplot as plt

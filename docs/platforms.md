@@ -50,7 +50,12 @@ Flux commands below use the user's usual interactive shell, `tcsh`.
 
 ### Rules only
 
-Use Python 3.10+ with NumPy 2.x and SciPy. On the checked
+Use Python 3.10+ with NumPy 2.x and SciPy; add Matplotlib for
+`viz/view_modes_csv.py` and `label_modes_fast.py --no-rf`. These workflows
+do not need PyTorch, scikit-learn, or a Perlmutter-matched AI environment.
+**Install an environment once; activate it in each new terminal/session.**
+
+On the checked
 Flux node (2026-09-14), `module load anaconda3` alone supplies NumPy 1.26.4
 and SciPy 1.13.1, so it does **not** satisfy the rules requirement. The existing
 shared `nova-perlmutter` environment does. Activate it with the separate
@@ -75,14 +80,44 @@ after `module load anaconda3` and use:
 ```tcsh
 source `conda info --base`/etc/profile.d/conda.csh
 setenv CONDA_PKGS_DIRS /path/to/writable/conda_pkgs
-conda create --prefix /path/to/writable/conda_envs/nova-rules python=3.11 "numpy>=2,<3" scipy
+conda create --override-channels -c conda-forge \
+  --prefix /path/to/writable/conda_envs/nova-rules \
+  python=3.11 "numpy>=2,<3" scipy matplotlib
 conda activate /path/to/writable/conda_envs/nova-rules
 ```
 
 The `create` command is a one-time installation. Replace the placeholder
-paths first; on later sessions, initialize Conda and activate the environment.
-Add Matplotlib if using the plot viewers. This minimal environment is not an
-AI-checkpoint environment.
+paths first and keep the environment separate from the package-cache directory.
+Matplotlib may be omitted for sorting alone. This command uses only
+conda-forge: `--override-channels` prevents requests to `defaults`, which
+returned HTTP 429 with a client-registration requirement on Flux on November
+18. See [Anaconda's registration guidance](https://www.anaconda.com/docs/anaconda-platform/user/conda-registration)
+and [Conda's channel options](https://docs.conda.io/projects/conda/en/stable/commands/create.html#channel-customization).
+It does not change the shared base environment or persistent channel settings.
+On later sessions:
+
+```tcsh
+module load anaconda3
+source `conda info --base`/etc/profile.d/conda.csh
+conda activate /path/to/writable/conda_envs/nova-rules
+cd /path/to/your/NOVA_modes
+source configs/paths/nova_paths.flux.csh
+python viz/view_modes_csv.py --help
+```
+
+Sourcing the project path helper sets paths and aliases; it does not activate
+Conda or install Python packages. `No module named scipy` means the selected
+Python lacks SciPy: activate the environment containing it and verify with
+`python -c "import sys, numpy, scipy, matplotlib; print(sys.executable)"`.
+The viewer now finds repository modules itself, so sourcing the helper is
+optional when passing explicit data paths. Older viewer copies need its
+`PYTHONPATH` setting to find `nova_mode_loader`.
+
+For other non-CNN tasks, RF use additionally needs joblib and the
+checkpoint-compatible scikit-learn dependencies described below; HDF5 export
+needs h5py. Neither requires PyTorch. The existing `nova-perlmutter`
+environment can also be reused: activating it does not make the viewer or
+rules sorter import its installed AI packages.
 
 The sorter can run with explicit input and output paths; sourcing a path
 helper is optional. Continue with [the user instructions](getting_started.md).

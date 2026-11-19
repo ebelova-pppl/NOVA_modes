@@ -1,12 +1,22 @@
 # NOVA mode classifier: current project state
 
-Updated November 17, 2026. Selection counts below retain their October 10/26/29
+Updated November 18, 2026. Selection counts below retain their October 10/26/29
 snapshot dates; November 16–17 checks NOVA-C density outputs and implements
 the surrogate HDF5 export and continuum restoration using the confirmed NOVA density prescription. The complete
 prior chronology is preserved locally and in Git history as described in
 [research records and recovery](research_archive.md).
 
 ## Purpose and current workflow
+
+November 18: the CSV viewer now uses the shared repository import bootstrap,
+so direct execution no longer needs `PYTHONPATH`. Flux setup documentation
+distinguishes one-time NumPy/SciPy/Matplotlib installation from per-session
+activation; these viewing/rules workflows do not require PyTorch. Startup
+passed from another directory with `PYTHONPATH` unset and with PyTorch,
+scikit-learn, and joblib imports blocked. Interactive display was not tested.
+The lightweight setup command now selects conda-forge exclusively after Flux
+reported an Anaconda `defaults` HTTP 429 registration block; no environment
+installation or shared-base changes were performed by the assistant.
 
 Select physically useful Alfvén eigenmodes from existing NOVA outputs for
 NOVA-C, surrogate modeling, and digital-twin analysis. An optional MPI driver
@@ -65,7 +75,210 @@ counts explicitly deferred. Additional zero-GOOD continuum reconstructions
 for this export remain in the project archive; they have not been published
 to DiTw.
 
-### November 17 HDF5 expansion: verification
+### November 18 matched-harmonic continuum experiment
+
+**Operational rule:** match the continuum to NOVA's internal harmonic
+range, including two extra harmonics on each side for these verified legacy
+runs: `lmin=m_min_saved-2`, `lmax=m_max_saved+2` (`nhar_saved+4` total).
+This rule is now prominent in the main README and continuum runner guide,
+with the four-case table and provenance in the
+[input source map](surrogate_input_sources.md#saved-mode-harmonics-versus-internal-surface-field-harmonics-november-18).
+Matching the stored `egn*` harmonic count alone is insufficient; verify the
+internal limits for other builds. This is distinct from convergence testing.
+
+The user requested matching the existing eigenmode harmonic sets before
+convergence tests. Nine isolated continuum calculations completed in Flux
+jobs 2561269/2561270, archived under
+`research_archive/training_n1_matched_harmonics_20261118/`. The current
+135388 continuum is reproduced byte for byte at m=0..12. Matching its
+21 saved harmonics (0..20) barely changes the interior discrepancy: 38/41
+historical training crossings remain beyond two grid intervals. W29/Y93
+at 0..13/0..15 reproduce current continua byte for byte; B12 at 0..17 is
+numerically equivalent in the interior (maximum relative difference 1.44e-9).
+
+Source and matching logs expose the relevant distinction: NOVA's internal
+surface-field matrices extend two harmonics below/above the saved mode
+range. Matching these internal sets gives 135388=-2..22, B12=-2..19,
+W29=-2..15 and Y93=-2..17. This is an existing-basis consistency check,
+not the proposed -3..30/-3..40 convergence experiment. Input/executable
+hashes and non-harmonic settings are identical within each comparison;
+exported q profiles are byte-identical.
+
+For the historical training subset and raw continua over 0.03<=r<0.75,
+crossings beyond two grid intervals fall from 38/41 to 0/42 (135388),
+4/4 to 2/6 (B12), 16/16 to 0/14 (W29), and 21/22 to 1/21 (Y93).
+The new median absolute offsets are 0.411/0.825/0.475/0.368 grid intervals.
+Across all frequency-matched modes, 105/108 interior crossings are within
+two intervals. The three remaining flags lack nearby logged counterparts:
+B12 4164/4181 near r=0.053/0.051, and Y93 1937 at r=0.165. Large nearest
+distances there must not be interpreted as identified-branch displacements.
+The dominant systematic shift is explained, with these residuals retained.
+
+The archive contains four internal-basis datcon1 files, a hash-indexed CSV,
+native receipts, frozen source evidence, before/after PNG/PDF plots and
+reusable analysis. All 331 mode hashes and 62 original source-file hashes
+remain unchanged. The single newer 23-harmonic 135388 mode has no saved
+historical reference and is not individually validated by the 250-mode
+cohort's range. No DiTw files, holds, labels, catalog or HDF5 were changed.
+Convergence remains the next stage after this consistency experiment.
+
+The user subsequently explicitly authorized publishing these four files,
+provided the originals were backed up. Publication completed on November 18
+(UTC stamp `20261119T000250Z`). Each `DiTw/<case>/N1/datcon1` now matches the
+internal-basis result byte for byte, and the existing `datcon -> datcon1`
+symlink is preserved. Originals were verified in the initial project backup,
+an additional read-only `publication_20261118/before/` backup, and adjacent
+`N1/continuum_backups/20261119T000250Z/datcon1` copies before replacement.
+Atomic installs retain the original group/access permissions and the prior
+owner's access through an explicit ACL. Independent verification confirms
+all hashes, backup copies, viewer-loaded arrays and permission preservation.
+
+The experiment archive's `publication_20261118/` contains the frozen plan,
+events, completion receipt and independent checks; DiTw has
+`.continuum_matching_20261119T000250Z.json`. Publication is explicitly an
+approved matching-basis update with three remaining log-counterpart checks,
+not an exact historical restoration or convergence certificate. The existing
+N1/outcon still describes its previous calculation; the new native outcon,
+commands and settings are in the referenced reconstruction receipt. Holds,
+labels, catalog and HDF5 products remain unchanged.
+
+After the user reported unchanged viewer offsets, a fresh check confirmed
+all four live datcon1 hashes still match the publication. The separate
+`data_mixed` training tree retains old continua, and Flux's default
+`NOVA_DATA` points there. The user confirmed launching the original
+relative-path n1_all_modes.csv without --base_dir, which takes this default.
+Added
+absolute-DiTw-path `n1_all_modes_ditw.csv` (331) and
+`n1_historical_training_modes_ditw.csv` (63) in the prior recheck archive,
+leaving portable lists and training inputs unchanged. Both lists resolve
+correctly through the viewer even with a data_mixed base directory. A
+noninteractive execution of the actual viewer confirms W29/2158's live
+crossing at r=0.68493555 versus 0.71838195 in data_mixed; its plotted
+arrays match the validated replacement exactly. `nhar=14` in both is
+expected because nhar is read from the unchanged eigenmode. The viewer
+image and path-verification receipt are in the matching-experiment archive.
+
+The user then confirmed that their viewer command had omitted
+`--base_dir $NOVA_DITW_ROOT` and reported that everything aligns well after
+selecting DiTw. This confirms the data-root explanation and provides user
+visual confirmation of the published profiles. The three missing nearby
+log counterparts remain documented as diagnostic limitations; no additional
+calculation, input-hold release, or HDF5 change follows from this confirmation.
+
+### November 18 user review of the four held N1 cases
+
+The user reviewed the 331 raw N1 modes in 135388/B12/W29/Y93 and reports all
+are bad, many above the TAE gap, with visible spike/continuum-crossing
+offsets. They suggested a backed-up m=-3..30 continuum experiment for the
+surrogate. No input hold or production/HDF5 status was changed by this
+discussion; accepting zero useful modes in this legacy set would not prove
+that a wider-basis eigenmode calculation has no TAEs.
+
+`research_archive/training_n1_continuum_plan_20261118/` preserves 62
+hash-verified files: current N1 continua/settings/logs and the mapped inputs,
+TRANSP files and case-root continuum executables. All 331 current mode
+hashes and four datcon1 hashes match the November 17 recheck. Mapped edge q
+values are 18.75/14.38/13.54/16.30. Saved N1/outcon records m=0..12 for
+135388, 0..13 for W29 and 0..15 for Y93; B12's older format omits these
+limits. The original 135388 mode cohort has 21 harmonics, plus one newer
+23-harmonic file; B12/W29/Y93 have 18/14/16. Editable harmonic headers
+alone cannot establish executable capacities or solver-only harmonics.
+
+Two four-case task CSVs propose m=-3..30 and -3..40 using frozen input copies
+and pass the shared runner's file/settings preflight. **No runs launched.**
+Recommended work is a fixed-input/binary comparison with a reproduction
+baseline, raw full-profile comparison and further range checks (including
+the lower cutoff) before claiming convergence. Matching old spikes and
+converging the continuum are separate checks; retain that distinction in
+surrogate provenance. The archive README and backup_and_preflight.json
+record settings, hashes, the user review and the proposed experiment.
+
+### November 17 NOVA-filter zero clarification (v3)
+
+The user confirmed that NOVA's internal filter removes singular/large-amplitude
+grid-scale numerical modes before our classifier receives files. Zero `egn*`
+files in the 23 identified case/n directories therefore means no modes
+surviving that filter. This is sufficient evidence to change K/presence from
+-1 to 0 and mark the 13 affected cases complete; the prior suggestion to
+check logs for these records is superseded by that confirmation.
+
+`configs/nova_confirmed_empty_scopes_20261117.json` freezes the user's statement,
+23 scopes and their continuum hashes. `ConfirmedEmptyRegistry` applies the
+same policy in the exporter and `scripts/confirm_nova_empty_scopes.py`, which
+versions an existing HDF5 without recomputing scientific arrays. Named
+directories must still exist with no mode entries, and continua must match
+their hashes. Missing inputs and existing holds remain excluded. New fields
+identify the K=0 source as `nova_internal_filter`, with the confirmation saved
+per record and globally. `catalog_K=-1` retains the absence of a downstream
+classifier summary; usable `K=0` and `mode_targets_valid=True` reflect the
+confirmed upstream result.
+
+The new full product is
+`research_archive/nova_surrogate_export_20261117_v3/nova_surrogate_v3.h5`:
+**193 complete cases**, all **8,943 existing selected modes**, 1,974 available
+continua, 1,966 usable K/mode records and **564 K=0 records**. There remain
+16 held n records, eight unclassified n records in E205059A01t025 and ten
+records in the empty nstxu_202806 entry. Among the 198 processed cases only
+five remain incomplete: nstx_135388, G121123B12, G142301W29, G142301Y93 (N1
+holds), and G133964R06 (whole-case hold).
+
+The companion `nova_surrogate_v3_complete_cases.h5` contains **193 cases,
+1,930 complete n records, 8,788 modes and 545 K=0 records**. Its 75,703 copied
+datasets match the new full file exactly. Independent validation confirms
+that membership is precisely the prior 180 cases plus the 13 newly complete
+cases, with all 23 promoted zeros present. Both v2 file hashes are unchanged.
+The new archive includes `README.txt`, the working reader, manifests, code
+snapshots, coverage tables and validation summaries. Full SHA-256:
+`f46dc55b9ab66cc2c6d0e11f1e591d731c1f6882d3f02bbe3f465fe82fb9965c`.
+
+The update changes six scalar/status fields in each of 23 records and adds
+provenance. **78,108 other original datasets** and their attributes match v2
+exactly, including all continua, coordinates, mode arrays, parameters and
+profiles. Twenty-one focused coordinate/provenance tests pass, including
+protection against new mode files, missing directories, changed/missing
+continua and accidentally releasing holds. Earlier HDF5 files are preserved.
+
+### November 17 recheck of the four training N1 holds
+
+The user recalled recalculation and approval of the four training cases.
+The correspondence does contain Nikolai's October 2 statement that all
+identified shots had corrected continua. The explicit recorded acceptances
+are C50/N1 on September 11, D46/N1/N2 on October 8, and R42/F62 on October 10
+(the latter released because the remaining flagged modes were unsuitable).
+No subsequent release of 135388/B12/W29/Y93 was found. The September 30
+27-case audit explicitly excluded these four training cases; the later
+post-training release lists should not be interpreted as clearing them.
+
+Fresh read-only checks are in
+`research_archive/training_n1_hold_recheck_20261117/`. Against the September 10
+source hashes, B12/W29/Y93 retain identical N1 continua, all 8/34/38 mode
+files respectively, and their available logs. The current crossing/log
+diagnostic reproduces the old training-mode flags: 4/4, 16/16 and 21/22
+interior comparisons exceed two grid intervals. Large nearest-log distances
+can indicate missing correspondence rather than a displacement of an
+identified branch.
+
+135388/N1 has a changed continuum and one additional mode, but all 250
+original modes are byte-identical. Current logs provide no matching frequency
+records. The saved September singularity references remain usable for those
+unchanged modes: comparing the current continuum to them still flags 38/41
+interior crossings across 30 informative training modes, with median absolute
+offset 4.90 grid intervals. Across all matched original modes, 47/52 crossings
+are flagged. The current continuum differs from the preserved original by up
+to 0.021% (lower) / 0.073% (upper) in frequency over 0.03<=r<0.75; much larger
+outer differences do not resolve the original interior mismatch. No holds,
+classifications, training labels or HDF5 products were changed by this recheck.
+
+The same archive now includes viewer-ready `n1_all_modes.csv` with **331 raw
+N1 files** (135388: 251; B12: 8; W29: 34; Y93: 38), sorted by case and
+normalized frequency. `n1_historical_training_modes.csv` contains the **63
+pre-hold training entries** (36/2/14/11). Both omit classification labels;
+`in_pre_hold_training` records historical membership only. Current file
+membership and every mode hash were checked against the recheck metadata,
+and both CSVs were verified through the viewer reader. Counts, hashes and
+source references are recorded in `n1_lists_summary.json`.
+
+### November 17 HDF5 expansion: v2 verification
 
 Completed products under `research_archive/nova_surrogate_export_20261117/`:
 
