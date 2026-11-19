@@ -75,6 +75,33 @@ counts explicitly deferred. Additional zero-GOOD continuum reconstructions
 for this export remain in the project archive; they have not been published
 to DiTw.
 
+### November 19 collaborator-facing handoff in DiTw/surrogate1_h5
+
+The user copied the 199-case complete HDF5 to
+`/p/nstxdigtwin/energetic_particles/nova/DiTw/surrogate1_h5/` and requested
+standalone documentation for Alvaro, without release-to-release history.
+Its hash matches the validated handoff. The directory now contains a rewritten
+`README.txt`, `SOURCE_DATA.txt`, `accepted_tae_modes.csv`, and the example
+`read_surrogate.py`, alongside the unchanged HDF5. The previous README is
+preserved in `backups/README_before_20261119.txt` and the project archive.
+
+The source guide maps all 13 parameters to their exact equilibrium variables
+and calculations, documents the density prescription, and explains source-root
+resolution for modes and continua. It has no per-case/n table. The user chose
+a compact CSV and explicitly retained the deferral of mode amplitudes. That
+CSV has 9,001 selected rows and 12 columns: case/n, mode ID, full-precision
+frequency and radial moments in both coordinates, family/review flags, and
+absolute mode/continuum source paths. It is generated from HDF5, avoiding the
+rounded scalar values in the historical compact catalog. All 8,999 TAE and
+two mixed-family entries are retained and identified; K=0 records remain in
+HDF5 rather than becoming dummy mode rows.
+
+The source check found all 796 named equilibrium files and 9,001 nonempty
+selected-mode source paths; all 1,990 continuum files match their HDF5 hashes.
+CSV numerical values round-trip exactly. Publication verifies all four file
+hashes, the README backup, and the unchanged HDF5 hash. Preparation, receipts
+and local copies are in `research_archive/surrogate1_h5_handoff_20261119/`.
+
 ### November 19 final legacy-seed release: HDF5 v5 and four DiTw continua
 
 The user authorized releasing E205059A01t025, implementing the previously

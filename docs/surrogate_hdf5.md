@@ -19,6 +19,14 @@ certify harmonic convergence. Existing input holds remain in force.
 
 ## Current handoff: all populated cases (v5)
 
+The collaborator-facing copy is in
+`/p/nstxdigtwin/energetic_particles/nova/DiTw/surrogate1_h5/`, with standalone
+`README.txt`, `SOURCE_DATA.txt`, a 12-column `accepted_tae_modes.csv` generated
+at full HDF5 precision, and `read_surrogate.py`. The source guide maps the 13
+parameters to raw equilibrium variables and explains archived source paths
+without a case-by-case table. The CSV contains the 9,001 selected modes only;
+zero-mode records and all continua remain in HDF5. Mode amplitudes are deferred.
+
 Use `research_archive/nova_surrogate_export_20261119_v5/nova_surrogate_v5_complete_cases.h5`:
 **199 cases complete for n=1–10, 9,001 selected modes and 579 K=0 records**.
 The full `nova_surrogate_v5.h5` also retains the empty `nstxu_202806` inventory
