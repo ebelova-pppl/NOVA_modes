@@ -31,9 +31,11 @@ NOVA ion mass density. Mode amplitudes and signed lobe counts remain deferred.
 - The `iden=4` density profile is built from TRANSP ion species, including
   beam ions and impurities, with smoothing of selected profiles, axis
   normalization, and interpolation in normalized poloidal flux.
-  The November 16 NOVA-C output check below identifies a thermal-hydrogen
-  difference between that NOVA prescription and the inspected NOVA-C sum;
-  retain their normalization scales separately.
+  The November 16 NOVA-C outputs use a mass sum that omits thermal hydrogen.
+  The November 19 source now includes it; see the
+  [ion-mass consistency check](#ion-mass-consistency-check-november-19).
+  Retain historical NOVA-C normalization separately until corrected runs
+  have been verified.
 - **Density source decision, November 16:** the user selected reconstructed
   NOVA `iden=4` axial mass density for the surrogate across all 199 populated
   cases. These values are already saved as `rho_axis_kg_m3` in the November
@@ -263,7 +265,7 @@ the alfven speed and center density are:
 This gives va = 2.622642e6 m/s and NOVA-C central mass density
 4.9398045e-8 kg/m^3 using the same proton-mass constant as the prior audit.
 
-**NOVA and NOVA-C central-density prescriptions differ in the inspected
+**NOVA and NOVA-C central-density prescriptions differed in the November 16
 sources and these outputs.** NOVA `iden=4` uses smoothed thermal hydrogen
 `NH` (`Equil/mhdidin_flux.f:4274–4277`), whereas NOVA-C uses `NMINI_H`
 through `dhmindat` (`NOVAK3/tae_flux.f:7029–7031`, `:7222–7226`) in that mass
@@ -299,6 +301,85 @@ hash differed, but its adjacent `tae_flux.f~` exactly matched the November 16
 audit hash. Their sole difference is a comment correction at line 7060:
 `XZIMPJ` is zonal-average **Z**, rather than **A**. The executable statements,
 including the hydrogen and impurity mass terms, are unchanged.
+
+## Ion-mass consistency check: November 19
+
+The current Flux TRANSP workflow uses consistent ion/proton mass factors in
+NOVA initialization, the continuum calculation, and NOVA-C. This is the
+code's integer-mass convention, not an exact isotope-mass conversion.
+
+| Species | Mass / proton mass | Active representation |
+| --- | --- | --- |
+| Thermal H | 1 | `NH`; NOVA-C `rmcp(4)=1` |
+| Thermal and beam D | 2 | `ND`, `BDENS_D`; `rmcp(2)=rmhp(1)=2` |
+| Thermal and beam T | 3 | `NT`, `BDENS_T`; `rmcp(3)=rmhp(2)=3` |
+| Helium-3 | 3 | `NHE3` in the mass-density sum |
+| Fusion alphas | 4 | `NFI`; default `rmhp(3)=4` |
+| Impurity | supplied `AIMPJ`, here 12 | `AIMPJ*NIMP`; kinetic `rmcp(5)=12`, `zc(5)=6` |
+
+The electron mass is separately `rmcp(1)=1/1836`; electrons are not included
+in the ion mass-density sum. Mass and charge are separate inputs: impurity
+charge 6 is not used as the mass multiplier.
+
+The bounded check reread all **199 populated TRANSP inputs**. Their hashes
+still match the November 15 audit. Every case has `AIMPJ=12`, `XZIMPJ=6`,
+and zero `NMINI_H`, `NT`, `BDENS_T`, `NFI`, and `NHE3` profiles. Thermal H,
+thermal D, and beam D are present in every case. Among 1,990 named
+`N1`–`N10/NOVAK_param` paths, **964 files exist** and all specify
+`rmhp=(2,3,4)`, `zh=(1,1,2)`, `ihsps=1`, `itransp=1`, and `_dtype=l`.
+The remaining 1,026 paths have no parameter file; they are not inferred runs.
+Thus every available parameter file selects deuterium beam ions with mass
+2 and charge 1.
+
+All **5,338 historical output logs** from the November 16 diagnostic cohort
+were also checked directly. Their printed namelists agree exactly on
+`rmcp=(1/1836,2,3,1,12)`, `zc=(-1,1,1,1,6)`, `rmhp=(2,3,4)`, and
+`zh=(1,1,2)` within floating-point print precision. No log changed during
+its read. This check fingerprints each log's first 65,536 bytes containing
+the namelist; it does not claim a full-file hash for every log.
+
+**The current NOVA-C source already contains the thermal-H correction.**
+Compared with the preserved November 17 source, `NOVAK3/tae_flux.f` now
+adds `+1.*dhdat(i)` to `rhodat` and retains `+1.*dhmindat(i)`
+(lines 7222–7224). Its modification time is November 19, 16:10 EST.
+The only other change is the thermal-H read comment. NOVA initialization
+(`Equil/mhdidin_flux.f:4274–4276`) and the continuum source
+(`Equil/contx_flux.f:2243–2245`) are unchanged from the November 17 snapshots.
+Since `NMINI_H=0` in all 199 cases, the current NOVA-C mass sum now agrees
+with NOVA's mass sum throughout the input profile, with the same contributing
+species smoothing. This does not establish identity of the subsequent
+interpolated profiles or of installed executables.
+
+The historical density discrepancy was an omitted species contribution,
+not an incorrect D/H or impurity mass ratio. All **89 reference density
+logs** were reread in full and their hashes still match November 16; all
+89 reproduce the old mass sum at printed precision, and none reproduce
+the corrected sum at that precision. The November 16 logs have
+central density up to 0.451813% below NOVA's value, implying up to 0.226675%
+higher Alfvén speed at fixed B. This is a normalization-scale comparison,
+not a measured change in kinetic growth rates or a bound on normalized
+continuum changes. The existing surrogate density already uses the NOVA
+prescription and needs no change from this correction.
+
+Additional limitations matter when extending the workflow. The kinetic impurity
+mass/charge remain fixed at 12/6 while the density sum reads `AIMPJ`; they
+agree for this database but are not automatically synchronized for another
+impurity. NOVA-C also retains a separate `NMINI_H` contribution absent from
+the NOVA sum; the agreement established here relies on that profile being
+zero. A nonzero minority-H case needs its species accounting checked.
+Also, `orbit2dlib.f:3490–3493` retains an older `datin` routine
+with an active impurity factor 13 and no thermal-H term. The inspected
+TRANSP path calls `datin_pest` instead (`tae_flux.f:6015`); its `call datin`
+is commented out. The obsolete mass-13 comments in the active density
+routines should not be mistaken for executed formulas.
+
+Source snapshots, the November 17/19 diff, input hashes, per-case species
+checks, parameter-file checks, and historical-log checks are retained in
+`research_archive/ion_mass_consistency_20261119/`. This was a read-only audit
+of solver sources, inputs, and results. No solver was rebuilt or rerun, and
+no production selection or HDF5 artifact was changed. Next: verify a binary
+built from the corrected source against the reconstructed density before
+treating any new NOVA-C outputs as corrected.
 
 ## Continuum changes traced to poloidal-harmonic limits (November 17)
 

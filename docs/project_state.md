@@ -38,6 +38,93 @@ See [getting started](getting_started.md), [platform setup](platforms.md),
 [rule configurations](../configs/rules/README.md), and the
 [script reference](../scripts/README.md) for commands and gate definitions.
 
+### November 19 ion-mass consistency audit
+
+Checked the current Flux NOVA initialization/continuum and NOVA-C TRANSP
+source paths, all 199 populated TRANSP inputs, and the available NOVA-C
+parameter files. Ion/proton mass factors agree: H=1, D=2, T=3, He3=3,
+alpha=4, and impurity=`AIMPJ` (12 everywhere here, with charge 6).
+All 199 TRANSP hashes still match the November 15 audit. All 964 available
+`N1`–`N10/NOVAK_param` files use `rmhp=(2,3,4)`, `zh=(1,1,2)`,
+`ihsps=1`, `itransp=1`, `_dtype=l`; 1,026 named paths have no file.
+All 5,338 historical log namelists print the expected thermal/fast masses
+and charges. All 89 reference density logs retain their November 16 hashes
+and match the old density recipe, not the corrected recipe, at printed
+precision. These are existing outputs, not runs of the corrected source.
+
+The current `tae_flux.f`, modified November 19 at 16:10 EST, already adds
+the formerly omitted thermal `NH` contribution. It retains `NMINI_H`,
+which is zero in all 199 cases, so the current species mass sums agree
+with NOVA. Historical NOVA-C outputs retain the earlier density convention;
+the previously measured maximum 0.451813% density deficit corresponds to
+a 0.226675% higher Alfvén-speed scale at fixed B. Kinetic impurity mass and
+charge remain fixed at 12/6 and would need review for other compositions.
+The old active factor 13 in `orbit2dlib.f:datin` is outside the inspected
+TRANSP call path, which uses `datin_pest`.
+
+Evidence is in `research_archive/ion_mass_consistency_20261119/`; see the
+[source-map audit](surrogate_input_sources.md#ion-mass-consistency-check-november-19).
+No solver sources, inputs, binaries, production results, or HDF5 exports
+were changed. Next: verify a rebuilt NOVA-C binary's density diagnostic
+against the corrected prescription before accepting new outputs as corrected.
+The surrogate's existing NOVA density needs no correction from this finding.
+
+### November 19 radial-grid portability review
+
+Reviewed frozen production v13, the rule extractors, continuum preprocessing,
+family routing, severity, and duplicate selection for the proposed superNOVA
+and different-device extension. This was an implementation review with small
+synthetic feature probes; no superNOVA output or new solver convergence runs
+were evaluated. Classifier code, thresholds, and installed results are unchanged.
+
+- The input contract assumes real signed, NOVA-normalized harmonic amplitudes
+  and reconstructs `r=linspace(0,1,nr)`. The continuum loader places its samples
+  on the same index grid. A nonuniform grid, different radial coordinate, or
+  independently sampled continuum requires an explicit coordinate adapter.
+- Explicit mesh-scale criteria include axis/edge widths <=10 intervals,
+  signed-lobe widths <=1 (<=0.75 above r=0.7), five-sample repeated-turn packets,
+  consecutive sign flips and their unscaled step norm, the crossing +/-2-cell
+  window, and interior-envelope/footprint widths <=2 intervals. Mesh-relative
+  criteria can be appropriate for numerical artifacts; their intended scale
+  must be decided before replacing them with fixed radial widths.
+- Harmonic incoherence and crossing-tail rejection require nr=201. The
+  smooth-crossing exception also requires nr=201, but its rejection gate still
+  runs at other resolutions. Thus changing nr can remove both rejections and
+  exemptions. Resolution warnings cover skipped rejection gates, not every
+  grid-sensitive measurement or unavailable exception. Missing enabled-gate
+  severity also prevents severity-ranked duplicate removal in affected clusters.
+- Crossing roughness uses unscaled second differences; extended/distributed
+  noise and the envelope-footprint exception use signed `diff2/4` energy.
+  For a smooth fixed profile these scale approximately as dr^2 in amplitude
+  and dr^4 in energy. Normalized radial extent cuts do not remove this filter
+  dependence. Axis-energy concentration is more portable because its windows
+  and integration endpoints are fixed in radius, although sampling and
+  cross-device calibration still matter.
+- Less visible dependencies include five-point continuum-extremum smoothing,
+  continuum tail-repair lookbacks/steps and absolute frequency thresholds,
+  unweighted radial sums in routing, and duplicate ridge smoothing/step limits.
+  Future device support must also check harmonic ordering/basis and participation,
+  the `nhar>=4*ntor` input rule, amplitude/frequency normalization, and TAE gap
+  identification. A complex harmonic representation, if used by superNOVA,
+  would require reassessing the signed-profile rules.
+- Direct extractor probes sampled the same Gaussian with amplitude FWHM 0.04:
+  the axis gate qualified at nr=101/201 (4/8 intervals), but not nr=401
+  (16 intervals). For `sin(20*pi*r)`, native high-pass energy fractions were
+  0.00911863, 0.000598866, and 0.0000378942 respectively. These demonstrate
+  feature scaling, not physical correctness of any label.
+- A four-harmonic native alternating profile exposed a coarse-grid coverage
+  limitation: the distributed gate reports eligibility at nr=41/51, but its
+  maximum effective lengths are only 0.025/0.02, below the strict >0.03 cut.
+  It cannot reject at these grids with current defaults, despite fitting a
+  stencil. The same probe fired at nr=61/101/201/401.
+
+Next: establish the superNOVA coordinate, amplitude, harmonic, and continuum
+contract; distinguish mesh-noise criteria from fixed-radius morphology; then
+audit both analytic profiles and matched solver modes across native resolutions.
+Use the conservative REVIEW-preserving interface during calibration. Preserve
+native samples for noise diagnostics; interpolation to 201 points cannot
+establish equivalent screening or replace solver convergence checks.
+
 ## Surrogate roadmap and legacy-seed priority
 
 On November 17 the user supplied the October 14 long-term plan:
