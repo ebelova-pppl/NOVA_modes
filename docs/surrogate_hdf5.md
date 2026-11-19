@@ -17,7 +17,47 @@ scope, pinned continuum and mode hashes, unchanged supporting evidence, and
 a matching saved selection identity. It does not rerun classification or
 certify harmonic convergence. Existing input holds remain in force.
 
-## Reviewed N1 records and internally matched continua (v4)
+## Current handoff: all populated cases (v5)
+
+Use `research_archive/nova_surrogate_export_20261119_v5/nova_surrogate_v5_complete_cases.h5`:
+**199 cases complete for n=1–10, 9,001 selected modes and 579 K=0 records**.
+The full `nova_surrogate_v5.h5` also retains the empty `nstxu_202806` inventory
+entry, giving 200 IDs and 199 populated parameter sets. No populated case is
+withheld. Prior v4 products are preserved.
+
+The two added cases are E205059A01t025 and G133964R06. E205059A01t025 adds 58
+production-rule selections, with K by n of 0, 1, 2, 4, 5, 7, 9, 10, 10, 10.
+Their review status remains pending. R06 adds ten zero-TAE records: N1/N2
+use the user's explicit rejection of all 95 modes, and N3–N10 use the approved
+historical zero selection verified against unchanged input pairs. This is
+not a fresh visual review of all higher-n modes. For both cases, the internally
+matched N1/N2 continua are now published in DiTw with verified original backups.
+
+Structural schema remains `nova-surrogate-v3`, with `data_release=v5`.
+All 13 equilibrium parameters, native normalized frequencies, both radial
+coordinates, radial masks and deferred structures/lobes retain their existing
+definitions. The update verifies 77,695 unaffected original datasets exactly
+against v4, including all 8,943 inherited selected modes, and all 78,148
+copied subset datasets against full v5. Independent live-input checks verify
+the 20 released continua and all 58 new mode scalars. Case completeness
+does not imply full radial coverage: always apply `continuum_valid`.
+
+The archive includes full E-shot rule outputs, preserved inputs, the combined
+`accepted_modes_v5.csv`, `release_evidence.json`, publication receipts,
+validation results, a reader, and `build_v5.py`. The updater reuses the shared
+exporter and complete-case copier. `final_case_release_json` in HDF5 records
+the input hashes, authorization, classification and review provenance.
+N1/N2 R06 records use `available_reviewed_zero`; higher-n zeros use the normal
+available status with `zero_K_provenance=historical_rules_user_release`.
+
+As with v4, the release is specific to verified input versions. The frozen
+global catalog and installed historical outputs remain unchanged; the v5
+catalog is their 8,943 modes plus the 58 new E-shot selections. Old global
+input guards still protect uncorrected copies. Use the archived updater to
+reproduce v5; a fresh default export alone does not apply these releases.
+See the [release record](../audits/surrogate_release_20261119_v5/README.md).
+
+## Previous reviewed N1 release (v4)
 
 The November 19 handoff is under
 `research_archive/nova_surrogate_export_20261119_v4/`. It adds the four cases

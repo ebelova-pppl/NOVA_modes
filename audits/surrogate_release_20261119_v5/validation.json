@@ -1,0 +1,50 @@
+{
+  "validation_passed": true,
+  "complete_cases": 199,
+  "mode_count": 9001,
+  "zero_K_scopes": 579,
+  "e_shot_K_by_n": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    7,
+    9,
+    10,
+    10,
+    10
+  ],
+  "r06_K_by_n": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "mode_moments_independently_checked": 58,
+  "continuum_scopes_compared_to_live": 20,
+  "all_9001_catalog_frequencies_and_review_flags_exact": true,
+  "published_continua_and_backups_verified": 4,
+  "old_v4_products_preserved": true,
+  "full_sha256": "274d29d35f738bb9db47438fe3d4d8fa571cf774bc380a266fdb3c770bbdaaf6",
+  "subset_sha256": "bbe0bff8f3b1a73eccd0e5f7baafb7a2dd9f8813ef65e72895622698a6f1db41",
+  "modes": 9001,
+  "added_cases": [
+    "nstxuG133964R06",
+    "nstxuE205059A01t025"
+  ],
+  "added_modes": 58,
+  "all_original_datasets_preserved_except_approved_scopes": true,
+  "unchanged_dataset_comparisons": 77695,
+  "exact_subset_dataset_comparisons": 78148,
+  "preserved_parent_sha256": {
+    "/p/hym/ebelova/NOVA/NOVA_modes/research_archive/nova_surrogate_export_20261119_v4/nova_surrogate_v4.h5": "9f46808637ebab784b07233404158c1c48151e029c8dd3488419ae26452ee149",
+    "/p/hym/ebelova/NOVA/NOVA_modes/research_archive/nova_surrogate_export_20261119_v4/nova_surrogate_v4_complete_cases.h5": "9233d14c32eed7b568fd1c2747cf9766f49b7a0a6de32a1989be0dbcf2f02f5c"
+  }
+}

@@ -147,4 +147,7 @@ prompts/
 !/audits/remaining122_rules_20260921/README.md
 !/audits/rule_severity_20260910/README.md
 !/audits/runtime_estimate_20260921/README.md
+!/audits/surrogate_release_20261119_v5/README.md
+!/audits/surrogate_release_20261119_v5/released_scopes.csv
+!/audits/surrogate_release_20261119_v5/validation.json
 !/audits/training_provenance/2026-08-20_flux_v1/report.md

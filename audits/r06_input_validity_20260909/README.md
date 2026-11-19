@@ -6,6 +6,21 @@
 
 **User decision: all 610 modes in `nstxuG133964R06` are INVALID.**
 
+**November 19 follow-up:** the user reviewed the 60 N1 and 35 N2 modes with
+internally matched continua and rejected all 95 as numerical junk. These
+specific samples now have recorded user-reviewed K=0 decisions. N3–N10 also
+have continuum/internal-basis range differences, but the subsequent direct
+check has not established a systematic spike/crossing displacement. Range
+metadata alone are insufficient grounds for requiring recalculation. The shared registry
+and historical exports below are unchanged. See the
+[current review record](../../docs/project_state.md#november-19-r06-user-review-and-remaining-higher-n-checks)
+for the new evidence. The subsequent authorized **HDF5 v5 release** includes
+R06 with K=0 for all n, using the explicit N1/N2 review and approved historical
+higher-n zero selection. Matched N1/N2 continua are now published in DiTw with
+verified original backups. This releases the hash-verified HDF5 records; the
+old shared registry and installed historical outputs remain guards for
+uncorrected copies. See the [release record](../surrogate_release_20261119_v5/README.md).
+
 The user reports poor eigenmode structures throughout the shot and poloidal
 harmonic spectra peaking at the largest retained m in some modes. This is an
 explicit, non-blind user adjudication. Those observations are recorded as

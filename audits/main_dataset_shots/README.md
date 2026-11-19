@@ -8,7 +8,18 @@ This inventory lists the unique physical shot directories directly under
 `$NOVA_DITW_ROOT`. It was captured on 2026-08-31 to select additional
 post-training cases for rules-versus-RF-CNN comparison.
 
-## Current status, October 10, 2026
+## November 19 surrogate release
+
+HDF5 v5 releases both populated cases listed in the retained hold inventory:
+E205059A01t025 (58 selected modes after full-n production rules) and
+G133964R06 (approved K=0 for all n). The handoff now contains all 199 populated
+cases, complete across n=1–10; only empty `nstxu_202806` is excluded. The old
+inventory/hold CSVs remain historical inputs and guards for uncorrected data
+copies. Version-specific release evidence supersedes them for the verified
+v5 inputs. See the [release record](../surrogate_release_20261119_v5/README.md)
+and [HDF5 documentation](../../docs/surrogate_hdf5.md).
+
+## Historical status, October 10, 2026
 
 The D46/R42/F62 production run brings membership to **184 processed
 post-training entries plus 14 training shots**. Installed outputs contain

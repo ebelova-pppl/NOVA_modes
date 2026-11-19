@@ -5,6 +5,12 @@ assembled from the direct per-shot `good_tae_final.csv` files in
 `$NOVA_REPO/../sort_outputs/`. It preserves the installed final selection;
 training labels and review records supply review status, not membership.
 
+The November 19 HDF5 v5 handoff has a separate release catalog at
+`research_archive/nova_surrogate_export_20261119_v5/accepted_modes_v5.csv`:
+**9,001 modes**, comprising this unchanged 8,943-row snapshot plus 58 new
+E205059A01t025 production selections. Their review status remains pending.
+See the [HDF5 release](../docs/surrogate_hdf5.md#current-handoff-all-populated-cases-v5).
+
 The October 26, 2026 snapshot contains **8,943 modes** from 190 nonempty
 shot lists. All 198 installed lists were checked, including eight empty ones.
 There are 8,941 TAE and two mixed modes, with nine applied manual GOOD

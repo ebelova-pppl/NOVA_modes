@@ -129,7 +129,12 @@ select `--method rf-cnn` and supply both model checkpoints. See
 | Resume development with the scientific context | [Project state](docs/project_state.md) and [repository instructions](AGENTS.md) |
 | Find historical results and archived research records | [Archive and recovery guide](docs/research_archive.md) |
 
-The current collection has **198 installed shot outputs** (184 post-training
+The current surrogate handoff contains **199 complete cases and 9,001 selected
+modes**, including all populated inventory cases. Use the
+[v5 HDF5 handoff](docs/surrogate_hdf5.md#current-handoff-all-populated-cases-v5).
+The release preserves the historical installed outputs and catalog below.
+
+The historical collection has **198 installed shot outputs** (184 post-training
 plus 14 training), including one wholly invalid case. The
 [shared catalog](catalogs/README.md) contains **8,943 selected GOOD modes**:
 8,366 post-training and 577 from historical training-shot outputs. Selection

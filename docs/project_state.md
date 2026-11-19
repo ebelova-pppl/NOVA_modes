@@ -75,6 +75,279 @@ counts explicitly deferred. Additional zero-GOOD continuum reconstructions
 for this export remain in the project archive; they have not been published
 to DiTw.
 
+### November 19 final legacy-seed release: HDF5 v5 and four DiTw continua
+
+The user authorized releasing E205059A01t025, implementing the previously
+approved R06 release, publishing the corrected continua, and updating HDF5.
+The v5 archive is `research_archive/nova_surrogate_export_20261119_v5/`.
+Its complete-case product contains **199 cases complete for n=1–10, 9,001
+selected modes and 579 K=0 records**. All populated inventory cases are
+included; only the empty `nstxu_202806` entry remains outside the handoff.
+The full inventory product retains that empty entry explicitly (200 IDs).
+
+E205059A01t025 was classified across all 1,346 saved modes using the frozen
+production_v13 rules and matched N1/N2 continua. It has no invalid inputs,
+no skipped radial-resolution gates and no manual overrides: 275 TAE-side
+candidates yield 59 GOOD modes before duplicates and 58 selected. Its K
+values for n=1–10 are **0, 1, 2, 4, 5, 7, 9, 10, 10, 10**. The N1/N2
+decisions exactly reproduce the earlier paired check. New selections are
+marked `review_status=pending`; release approval is not a per-mode GOOD
+visual review. Their full-precision outputs and all input bytes are archived.
+
+R06 has K=0 for all ten n records. N1/N2 carry the user's explicit review of
+all 95 modes with matched continua. N3–N10 retain the hash-verified historical
+rules selection: 33 TAE-side candidates rejected, 482 EAE-like modes routed
+separately. The user accepted this zero selection after the direct higher-n
+correspondence check. No new higher-n classification, visual review, or
+convergence claim is implied.
+
+Four files were backed up and atomically published as numbered `datcon1/2`
+in DiTw: R06 m=-2..26/-2..47 and E205059A01t025 m=-5..16/-5..27. Their
+unnumbered symlinks and access permissions were preserved. Originals are
+verified in the prior calculation archives, `publication/before/` in v5,
+and adjacent `N#/continuum_backups/<stamp>/` directories. Publication receipts
+and SHA-256 checks are retained. Higher-n profiles were unchanged.
+
+The release copies v4 and changes only the two cases' n records and release
+metadata. All **77,695 unaffected original datasets** compare exactly with
+v4, including all equilibrium parameters, reconstructed densities, and the
+8,943 inherited selected modes. All **78,148 copied subset datasets** match
+the full v5 file exactly. Independent checks verify every catalog frequency
+and review flag, all 20 released live continua, all 58 new modes' frequencies,
+fingerprints and moments in both coordinates, and all four published files
+and backup sets. Both v4 products retain their original hashes.
+Schema remains `nova-surrogate-v3` with
+`data_release=v5`; r and psi_N, radial masks, native frequency normalization,
+and deferred structures/lobes are unchanged. The release catalog
+`accepted_modes_v5.csv` adds the 58 E-shot selections to the frozen catalog.
+The shared historical catalog, installed old outputs and global guards are
+preserved; they continue to protect uncorrected copies. The v5 release is
+specific to its verified input versions, following the v4 release convention.
+See [release evidence](../audits/surrogate_release_20261119_v5/README.md).
+
+### November 19 E205059A01t025 N1/N2 production rules after continuum matching
+
+The user confirmed that N1/N2 resonance alignment now looks good and flagged
+N2 omega=3.27793 and 3.21680 as potentially good. A paired local run of the
+frozen production rules on all 318 modes confirms that both are final GOOD
+with either continuum. Their preliminary REVIEW / NO_GOOD_TEMPLATE evidence
+is preserved; accept-as-good-v1 promotes them. No manual labels were added.
+No installed historical E-shot production result was found; the original-
+continuum run is a fresh control, not a recovered historical classification.
+
+The existing duplicate filter groups `egn02w.1074E+02` (3.277934179885934)
+and `egn02w.1035E+02` (3.2168040713397756). Their frequency separation is
+1.88245% of the mean and ridge-envelope cosine similarity is 0.996586.
+It selects the former, with lower overall rule severity 0.597852 versus
+0.925114. The latter remains GOOD but is not the selected representative.
+
+| Scope | Modes | TAE-like/mixed, original -> matched | GOOD before duplicates | Selected GOOD |
+| --- | --- | --- | --- | --- |
+| N1 | 266 | 49 -> 16 | 6 -> 0 | 1 -> 0 |
+| N2 | 52 | 12 -> 10 | 2 -> 2 | 1 -> 1 |
+
+All six original-control N1 GOOD modes, omega=4.684956..4.721413, move to
+EAE-like routing with the matched continuum; this is not a new morphology
+rejection. All 16 remaining N1 TAE-side modes are BAD; N2 has eight BAD and
+the two GOOD candidates. EAE-like modes are not validated for EAE quality.
+
+`research_archive/e205059_t025_rules_20261119/` contains both full sorter
+outputs, commands/hashes, paired `comparison.csv`, `comparison_summary.json`,
+and `user_candidates.csv` for viewing the two candidates with matched continua.
+Both runs use production_v13, ruleset v25, grouped features v26, severity v2,
+and datcon-monotonic-tail-v1. Validation confirmed 318 unique paired modes,
+unchanged mode metadata, no invalid inputs or resolution-skipped gates, and
+unchanged protected registries/catalogs. No RF/CNN or manual overrides were
+used. This covers N1/N2 only; N3-N10 processing, publication, full-shot
+disposition and HDF5 inclusion remain pending.
+
+### November 19 E205059A01t025 N1/N2 internally matched continuum calculations
+
+The user authorized continuum recalculation for this final populated held
+shot, matching the eigenmode internal harmonic ranges. Repeated out_go
+headers agree on saved/internal m=-3..14/-5..16 for N1 and
+-3..25/-5..27 for N2. All 266/52 mode files and both live continua still
+match the October 10 input hashes. There are 249/45 frequency matches with
+nonempty singularity lists and 17/7 complete empty lists; the latter are
+retained explicitly, not assigned invented resonances.
+
+Both small local continuum executables reproduce the saved datcon files
+byte for byte; their emitted namelists establish old continuum ranges
+0..14 and 0..25. Their compiled capacities are only 15/26, below the
+requested internal sizes 22/33. An initial larger R06 executable failed
+reading the E-shot TRANSP format and produced no continua; both failed
+receipts are preserved. The E shot's existing N3 executable has capacity 37
+and successfully handles both ranges. No source changes or compilation were
+needed. It also reproduces both original continua byte for byte at their
+original ranges, establishing four successful baseline reproductions.
+
+Flux jobs 2561879/2561880 produced six successful controls/calculations in
+total plus the two discarded donor-reader failures. The final comparison
+uses the same E N3 executable, equilibrium/TRANSP inputs, gamma=1.66666666,
+iden=4, ksound=1 and 201-point grid; only lmin/lmax change. Output qprofile
+files are identical. A total of 354 input/source files are backed up and
+hash-verified, including all 318 modes; live membership and bytes are unchanged.
+
+For the fixed historical TAE-like/mixed cohort, nearest logged-singularity
+offsets above two grid intervals (Delta r=0.005, 0.03<=r<0.75) change:
+
+| Scope | Original | Matched internal basis | Median absolute offset, grid intervals |
+| --- | --- | --- | --- |
+| N1 | 26/26 crossings | 2/39 crossings | 14.590 -> 0.336 |
+| N2 | 6/12 crossings | 0/10 crossings | 1.985 -> 0.742 |
+
+Crossing counts can change; this is a nearest-log comparison, not a
+branch-identified resonance match. Raw and viewer-processed summaries agree.
+The two remaining flags are both N1 `egn01w.4306E+02`: new crossings at
+r=0.73202/0.73745 bracket its visible signed-mode spike near 0.735, whereas
+the nearest listed singularity is 0.805. The plot supports local correspondence
+despite the missing log counterpart. Other examples show old crossings moving
+from smooth mode lobes onto the existing sharp features. No new mode-quality
+decisions or harmonic-convergence claims are made.
+
+Artifacts are under `research_archive/e205059_t025_internal_harmonics_20261119/`.
+The requested profiles are `matched_internal/cases/nstxuE205059A01t025/`
+`N1/datcon1` and `N2/datcon2`. The archive contains receipts, settings,
+`README.txt`, `alignment_examples.png/.pdf`, `remaining_n1_example.png/.pdf`,
+and absolute-path CSVs `matched_modes.csv` (318), `original_modes.csv` (318),
+and `historical_tae_candidates.csv` (61). These work with the existing viewer
+without --base_dir; the candidate list is historical routing, not new labels.
+Physical m labels in static plots use the verified saved offset -3; the
+viewer's contour ordinate remains the stored harmonic index.
+
+No DiTw publication, eigenmode rerun, hold-registry release or HDF5 update
+was performed. The subsequent user correspondence review and local N1/N2
+sorting are recorded above; the R06/E-shot release and export remain deferred.
+
+### November 19 R06 direct higher-n correspondence check: range difference alone is insufficient
+
+Following this check, the user agreed that R06 can be released and asked to
+review the last nonempty held shot, `nstxuE205059A01t025`, before updating the
+HDF5 or related release products. R06 is accepted in principle as a zero-good-
+TAE case with the existing review/selection provenance; implementation is
+deferred until that final-shot check. The empty `nstxu_202806` inventory entry
+does not count as an outstanding populated shot. No release files or shared
+registries have been changed by this agreement.
+
+The user challenged treating different stored continuum/internal m ranges as
+proof of displaced resonances and noted that such differences may occur in
+many database cases. The direct follow-up supersedes the earlier recommendation
+to require matching all eight higher-n continua before any R06 release.
+Do not impose a database-wide recalculation or new hold from range metadata
+alone; assess the actual correspondence and the legacy-seed scope.
+
+R06 has no accepted catalog TAEs. Before the September hold, the rules selected
+only one mode, at N2; the user's November 19 rejection of all N1/N2 modes
+includes it. The 33 historical N3–N10 TAE-like/mixed candidates were all
+rule-rejected. This is a selection/review statement, not a new independent
+visual classification of all 515 higher-n modes or proof of physical absence.
+
+All 515 higher-n modes were checked against complete frequency-matched logs.
+For native continua and 0.03<=r<0.75, 222/228 N3–N9 crossings lie within two
+grid intervals of the nearest logged singularity (Delta r=0.005). The six
+exceptions are 2/25 at N3, 1/63 at N4, 1/16 at N5, 1/30 at N6, 1/2 at N7,
+0/48 at N8 and 0/44 at N9. In the historical TAE/mixed cohort the total is
+4/66 exceptions. Nearest-log offsets are not branch-identified spike shifts.
+
+N10 has 65/178 native interior crossings beyond two intervals, but focused
+signed-profile inspection shows why interpreting this as a corresponding
+spike displacement is unsafe. For N10 `egn10w.1939E+02`, upper/lower crossings
+at r=0.71783/0.73085 lie close to visible m=99/100 peaks at 0.720/0.730;
+the nearest listed singularity is instead at 0.885. For `egn10w.2146E+02`,
+crossings at 0.71928/0.73121 likewise lie near those sampled peaks. The N7
+exception has a strong peak near 0.080 and a crossing at 0.07507 despite a
+nearest log entry at 0.125. These observed local agreements do not identify
+every resonance, certify convergence, or establish the cause of missing log
+counterparts. No systematic higher-n spike/crossing shift has been established.
+
+N10 also needs explicit raw/processed distinction: the existing shared viewer
+tail treatment removes the steep outer branch rise near r~0.72, leaving only
+28 interior crossings, all within two intervals of a logged singularity.
+Thus disappearance from that processed comparison is not evidence that an
+offset was corrected. N3–N9 raw and processed interior statistics agree.
+No preprocessing was changed in this check.
+
+Artifacts: `research_archive/r06_higher_n_crossings_20261119/`, including
+`README.txt`, `analysis.json`, raw/processed `summary.csv`, `crossings.csv`,
+`focused_correspondence.png/.pdf` and per-n examples. Inspection followed the
+visual TAE skill as an explicitly non-blind diagnostic; prior labels were
+already known and no new labels were assigned. No NOVA calculation, DiTw
+write, registry edit or HDF5 update occurred. Original whole-shot exclusion
+metadata remain in place pending the release decision; metadata alone are
+not grounds for requiring further higher-n continuum runs.
+
+### November 19 R06 user review and remaining higher-n checks
+
+After viewing all 60 N1 and 35 N2 modes with the internally matched continua,
+the user judged all 95 numerical junk and proposed releasing the shot unless
+n>2 has additional problems. These decisions are recorded as user-reviewed
+BAD modes and K=0 for the two calculated samples. Their complete membership
+and hashes match the frozen calculation inputs and viewer copies. This
+supersedes unresolved morphology review for these specific N1/N2 inputs;
+it is not a statement that no physical TAE could exist in the equilibrium.
+
+The remaining n=3–10 check found the same continuum-basis discrepancy:
+N3 uses 0..66 instead of internal -2..68, N4 uses 0..87 instead of -2..89,
+and N5–N10 use 0..100 instead of -2..102. All 515 higher-n modes have
+frequency-matched complete singularity logs. All 610 live mode/continuum
+pairs reproduce their September audit fingerprints exactly, so the higher-n
+concerns have not been resolved by replacement inputs.
+
+Historically, n=3–10 had 33 TAE-like/mixed candidates, all rejected by the
+rules, and 482 EAE-like modes outside those TAE rejection decisions. These
+are historical results with the old continua, not a fresh classification.
+Ten modes at n=7–9 have their largest absolute xi_psi amplitude at the highest
+stored harmonic m=100; one is the old N8 TAE-like candidate
+`egn08w.1084E+02`. This is an observed cutoff-related review flag, not proof
+of inadequate internal coverage or an automatically invalid equilibrium.
+
+Evidence is under `research_archive/r06_user_review_20261119/`:
+`user_reviewed_bad.csv` pins the 95 user decisions to mode and matched
+continuum fingerprints; `review_and_remaining_evidence.json`, `scope_audit.csv`
+and `mode_audit.csv` record the higher-n check. A task CSV for the eight
+internal ranges and a 33-mode historical candidate list are prepared.
+No additional NOVA calculation, new automatic classification, DiTw write,
+registry change or HDF5 release was performed. This first metadata check
+recommended further higher-n matching/review; the subsequent direct
+correspondence check above qualifies that recommendation. N1/N2's reviewed
+zeros should be carried into the next scope-specific release. The machine
+whole-shot exclusion and delivered v4 file remain unchanged.
+
+### November 19 R06 N1/N2 internal-harmonic comparison
+
+The user requested the same continuum-matching check for nstxuG133964R06.
+All 60 N1 and 35 N2 modes match complete frequency-specific singularity logs.
+Those logs record internal m=-2..26 (29 harmonics) and -2..47 (50), whereas
+the saved continua use the stored-mode ranges 0..24 (25) and 0..45 (46).
+The N-directory executables have inferred capacities of 25 and 46; the
+existing case-root `gocont_tr` has capacity 125. No recompilation was needed.
+
+Flux job 2561429 completed six isolated calculations: native-executable
+baselines, root-executable baselines, and root-executable internal-range
+runs. All four baselines reproduce the original datcon files byte for byte.
+Within the root-executable comparisons, only lmin/lmax change; all input
+hashes, other settings and output q profiles agree. The archive preserves
+127 source/input/mode files and verifies that live bytes remain unchanged.
+
+For 0.03<=r<0.75, nearest logged-singularity discrepancies exceeding two
+radial grid intervals (Delta r=0.005) decrease from 49/100 to 4/88 crossings
+for N1, and from 6/52 to 3/50 for N2. Thus 131/138 new interior crossings
+are within two intervals; seven comparisons remain unresolved. These are
+nearest-log comparisons, not identified-branch matches; changing continua
+can also remove crossings. Raw and viewer-processed interior results agree.
+For r<=0.9, maximum boundary-frequency changes are 2.948% (N1) and 0.893%
+(N2); much larger raw differences near the edge remain separately tabulated.
+
+Artifacts: `research_archive/r06_internal_harmonics_20261119/`, including
+`README.txt`, `r06_alignment_examples.png/.pdf`, `remaining_crossings.csv`,
+`analysis_summary.json`, and `r06_matched_modes.csv` for the existing viewer.
+The latter uses absolute project paths and requires no `--base_dir`.
+New profiles are in `internal_basis/cases/nstxuG133964R06/N1/datcon1` and
+`N2/datcon2`. This was a matching experiment, not a convergence campaign.
+No DiTw publication, HDF5 update, mode reclassification or whole-shot
+structure-hold release was performed during this experiment. The subsequent
+user review and remaining higher-n work are recorded above.
+
 ### November 19 HDF5 v4: four reviewed N1 scopes released
 
 After comparing convergence results, the user chose to retain the internally
@@ -633,10 +906,16 @@ curated lists.
 
 ## Input holds and unresolved scientific work
 
-- **E205059A01t025:** N1/N2 continuum recalculation and correspondence review
-  remain required. The October 10 recheck found unchanged mode/continuum inputs.
-- **G133964R06:** the entire shot remains excluded pending corrected inputs and
-  review. Its completed INVALID outputs do not remove the hold.
+- **E205059A01t025:** N1/N2 continua were recalculated locally on November 19
+  with m=-5..16/-5..27 and published after the user confirmed correspondence.
+  Full-n production rules select 58 modes. All ten records are released in
+  HDF5 v5; their per-mode visual review flags remain pending.
+- **G133964R06:** released in HDF5 v5 with K=0 for all n, using the 95 reviewed
+  N1/N2 rejections and the approved historical higher-n zero selection.
+  Matched N1/N2 continua are published. The old shared input registry and
+  historical INVALID outputs remain guards for uncorrected input copies;
+  they are not the status of the v5 release. Higher-n basis differences alone
+  do not require recalculation under the approved seed-database scope.
 - The [known-invalid registry](../configs/known_invalid_inputs.csv) also
   excludes N1 for nstx_135388, G121123B12, G142301W29, and G142301Y93.
   See [active whole-shot holds](../audits/main_dataset_shots/active_shot_holds.csv).
